@@ -1,5 +1,5 @@
 #!/bin/bash
-basePath=/home/yogi/NetBeansProjects
+basePath=/home/yogi/src/os/
 cd $basePath/myHelloWorld/dist
 ./makeit
 cd $basePath/myHelloWorld2/dist

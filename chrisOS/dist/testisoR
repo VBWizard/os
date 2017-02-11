@@ -10,7 +10,7 @@ qemu-system-i386 					\
 	-m 1024						\
 	-smp 8    					\
 	-usb                                            \
-	-cdrom /home/yogi/NetBeansProjects/chrisOS/dist/myos.iso \
+	-cdrom /home/yogi/src/os//chrisOS/dist/myos.iso \
 	-drive file=./myos.iso,if=none,id=sata-cd-0 \
 	-drive file=~/qemu-test-disk.img,if=none,id=sata-disk-0 \
 	-drive file=/dev/disk/by-id/ata-ST31000528AS_5VP8R4ME,index=4,format=raw,if=none,cache=none,id=sata-disk-1 \
