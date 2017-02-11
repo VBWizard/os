@@ -1,0 +1,5 @@
+pushd ..
+./make_debug
+popd
+objdump -x -t Debug/cross-Linux/chrisos > chrisosD.sym
+vi chrisosD.sym

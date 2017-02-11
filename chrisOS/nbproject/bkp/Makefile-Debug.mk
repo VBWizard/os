@@ -1,0 +1,356 @@
+#
+# Generated Makefile - do not edit!
+#
+# Edit the Makefile in the project folder instead (../Makefile). Each target
+# has a -pre and a -post target defined where you can add customized code.
+#
+# This makefile implements configuration specific macros and targets.
+
+
+# Environment
+MKDIR=mkdir
+CP=cp
+GREP=grep
+NM=nm
+CCADMIN=CCadmin
+RANLIB=ranlib
+CC=gcc
+CCC=g++
+CXX=g++
+FC=gfortran
+AS=as
+
+# Macros
+CND_PLATFORM=cross-Linux-x86
+CND_DLIB_EXT=so
+CND_CONF=Debug
+CND_DISTDIR=dist
+CND_BUILDDIR=build
+
+# Include project Makefile
+include Makefile
+
+# Object Directory
+OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
+
+# Object Files
+OBJECTFILES= \
+	${OBJECTDIR}/_ext/110772370/isr.o \
+	${OBJECTDIR}/_ext/1959345194/strftime.o \
+	${OBJECTDIR}/_ext/776859762/keyboard.o \
+	${OBJECTDIR}/_ext/776675000/paging_init.o \
+	${OBJECTDIR}/_ext/471131318/strncmp.o \
+	${OBJECTDIR}/_ext/471131318/strncpy.o \
+	${OBJECTDIR}/asm/asmFunctions.o \
+	${OBJECTDIR}/asm/boot.o \
+	${OBJECTDIR}/asm/bootCPU.o \
+	${OBJECTDIR}/src/bishell.o \
+	${OBJECTDIR}/src/block/pci.o \
+	${OBJECTDIR}/src/char/console/basic_display.o \
+	${OBJECTDIR}/src/cpu/acpi.o \
+	${OBJECTDIR}/src/cpu/apic.o \
+	${OBJECTDIR}/src/cpu/bitops.o \
+	${OBJECTDIR}/src/cpu/identify_cpu_features.o \
+	${OBJECTDIR}/src/cpu/idt.o \
+	${OBJECTDIR}/src/cpu/irqHandlers.o \
+	${OBJECTDIR}/src/cpu/msr.o \
+	${OBJECTDIR}/src/cpu/ports.o \
+	${OBJECTDIR}/src/cpu/smp.o \
+	${OBJECTDIR}/src/fat/fat_access.o \
+	${OBJECTDIR}/src/fat/fat_cache.o \
+	${OBJECTDIR}/src/fat/fat_filelib.o \
+	${OBJECTDIR}/src/fat/fat_format.o \
+	${OBJECTDIR}/src/fat/fat_misc.o \
+	${OBJECTDIR}/src/fat/fat_string.o \
+	${OBJECTDIR}/src/fat/fat_table.o \
+	${OBJECTDIR}/src/fat/fat_write.o \
+	${OBJECTDIR}/src/filesystem/mbr.o \
+	${OBJECTDIR}/src/init/ata_disk.o \
+	${OBJECTDIR}/src/init/cpudet-clean.o \
+	${OBJECTDIR}/src/init/e820.o \
+	${OBJECTDIR}/src/init/init.o \
+	${OBJECTDIR}/src/init/utility.o \
+	${OBJECTDIR}/src/loader/elfloader.o \
+	${OBJECTDIR}/src/memcpy.o \
+	${OBJECTDIR}/src/panic.o \
+	${OBJECTDIR}/src/printf.o \
+	${OBJECTDIR}/src/strings/strcat.o \
+	${OBJECTDIR}/src/strings/strcpy.o \
+	${OBJECTDIR}/src/strings/strlen.o \
+	${OBJECTDIR}/src/strings/stroul.o \
+	${OBJECTDIR}/src/strings/strparts.o \
+	${OBJECTDIR}/src/strings/strtol.o \
+	${OBJECTDIR}/src/strings/strtrim.o \
+	${OBJECTDIR}/src/time.o
+
+
+# C Compiler Flags
+CFLAGS=-m32 -ffreestanding -Wall -Wextra -masm=intel
+
+# CC Compiler Flags
+CCFLAGS=
+CXXFLAGS=
+
+# Fortran Compiler Flags
+FFLAGS=
+
+# Assembler Flags
+ASFLAGS=-msyntax=intel
+
+# Link Libraries and Options
+LDLIBSOPTIONS=-L/usr/local/lib -L/home/yogi/opt/cross/lib -static -lcpuid
+
+# Build Targets
+.build-conf: ${BUILD_SUBPROJECTS}
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisos
+
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisos: ${OBJECTFILES}
+	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisos ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lgcc
+
+${OBJECTDIR}/_ext/110772370/isr.o: /home/yogi/NetBeansProjects/chrisOS/asm/isr.s 
+	${MKDIR} -p ${OBJECTDIR}/_ext/110772370
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/_ext/110772370/isr.o /home/yogi/NetBeansProjects/chrisOS/asm/isr.s
+
+${OBJECTDIR}/_ext/1959345194/strftime.o: /home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1959345194
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1959345194/strftime.o /home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c
+
+${OBJECTDIR}/_ext/776859762/keyboard.o: /home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/776859762
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/776859762/keyboard.o /home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c
+
+${OBJECTDIR}/_ext/776675000/paging_init.o: /home/yogi/NetBeansProjects/chrisOS/src/init/paging_init.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/776675000
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/776675000/paging_init.o /home/yogi/NetBeansProjects/chrisOS/src/init/paging_init.c
+
+${OBJECTDIR}/_ext/471131318/strncmp.o: /home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/471131318
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/471131318/strncmp.o /home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c
+
+${OBJECTDIR}/_ext/471131318/strncpy.o: /home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/471131318
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/471131318/strncpy.o /home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c
+
+${OBJECTDIR}/asm/asmFunctions.o: asm/asmFunctions.s 
+	${MKDIR} -p ${OBJECTDIR}/asm
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/asm/asmFunctions.o asm/asmFunctions.s
+
+${OBJECTDIR}/asm/boot.o: asm/boot.s 
+	${MKDIR} -p ${OBJECTDIR}/asm
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/asm/boot.o asm/boot.s
+
+${OBJECTDIR}/asm/bootCPU.o: asm/bootCPU.s 
+	${MKDIR} -p ${OBJECTDIR}/asm
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/asm/bootCPU.o asm/bootCPU.s
+
+${OBJECTDIR}/src/bishell.o: src/bishell.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bishell.o src/bishell.c
+
+${OBJECTDIR}/src/block/pci.o: src/block/pci.c 
+	${MKDIR} -p ${OBJECTDIR}/src/block
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/block/pci.o src/block/pci.c
+
+${OBJECTDIR}/src/char/console/basic_display.o: src/char/console/basic_display.c 
+	${MKDIR} -p ${OBJECTDIR}/src/char/console
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/char/console/basic_display.o src/char/console/basic_display.c
+
+${OBJECTDIR}/src/cpu/acpi.o: src/cpu/acpi.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/acpi.o src/cpu/acpi.c
+
+${OBJECTDIR}/src/cpu/apic.o: src/cpu/apic.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/apic.o src/cpu/apic.c
+
+${OBJECTDIR}/src/cpu/bitops.o: src/cpu/bitops.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/bitops.o src/cpu/bitops.c
+
+${OBJECTDIR}/src/cpu/identify_cpu_features.o: src/cpu/identify_cpu_features.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/identify_cpu_features.o src/cpu/identify_cpu_features.c
+
+${OBJECTDIR}/src/cpu/idt.o: src/cpu/idt.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/idt.o src/cpu/idt.c
+
+${OBJECTDIR}/src/cpu/irqHandlers.o: src/cpu/irqHandlers.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/irqHandlers.o src/cpu/irqHandlers.c
+
+${OBJECTDIR}/src/cpu/msr.o: src/cpu/msr.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/msr.o src/cpu/msr.c
+
+${OBJECTDIR}/src/cpu/ports.o: src/cpu/ports.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/ports.o src/cpu/ports.c
+
+${OBJECTDIR}/src/cpu/smp.o: src/cpu/smp.c 
+	${MKDIR} -p ${OBJECTDIR}/src/cpu
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/cpu/smp.o src/cpu/smp.c
+
+${OBJECTDIR}/src/fat/fat_access.o: src/fat/fat_access.c 
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_access.o src/fat/fat_access.c
+
+${OBJECTDIR}/src/fat/fat_cache.o: src/fat/fat_cache.c 
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_cache.o src/fat/fat_cache.c
+
+${OBJECTDIR}/src/fat/fat_filelib.o: src/fat/fat_filelib.c 
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_filelib.o src/fat/fat_filelib.c
+
+${OBJECTDIR}/src/fat/fat_format.o: src/fat/fat_format.c 
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_format.o src/fat/fat_format.c
+
+${OBJECTDIR}/src/fat/fat_misc.o: src/fat/fat_misc.c 
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_misc.o src/fat/fat_misc.c
+
+${OBJECTDIR}/src/fat/fat_string.o: src/fat/fat_string.c 
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_string.o src/fat/fat_string.c
+
+${OBJECTDIR}/src/fat/fat_table.o: src/fat/fat_table.c 
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_table.o src/fat/fat_table.c
+
+${OBJECTDIR}/src/fat/fat_write.o: src/fat/fat_write.c 
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_write.o src/fat/fat_write.c
+
+${OBJECTDIR}/src/filesystem/mbr.o: src/filesystem/mbr.c 
+	${MKDIR} -p ${OBJECTDIR}/src/filesystem
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/filesystem/mbr.o src/filesystem/mbr.c
+
+${OBJECTDIR}/src/init/ata_disk.o: src/init/ata_disk.c 
+	${MKDIR} -p ${OBJECTDIR}/src/init
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/init/ata_disk.o src/init/ata_disk.c
+
+${OBJECTDIR}/src/init/cpudet-clean.o: src/init/cpudet-clean.c 
+	${MKDIR} -p ${OBJECTDIR}/src/init
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/init/cpudet-clean.o src/init/cpudet-clean.c
+
+${OBJECTDIR}/src/init/e820.o: src/init/e820.c 
+	${MKDIR} -p ${OBJECTDIR}/src/init
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/init/e820.o src/init/e820.c
+
+${OBJECTDIR}/src/init/init.o: src/init/init.c 
+	${MKDIR} -p ${OBJECTDIR}/src/init
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -ffreestanding -O2 -Wall -Wextra -masm=intel -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/init/init.o src/init/init.c
+
+${OBJECTDIR}/src/init/utility.o: src/init/utility.c 
+	${MKDIR} -p ${OBJECTDIR}/src/init
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/init/utility.o src/init/utility.c
+
+${OBJECTDIR}/src/loader/elfloader.o: src/loader/elfloader.c 
+	${MKDIR} -p ${OBJECTDIR}/src/loader
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/loader/elfloader.o src/loader/elfloader.c
+
+${OBJECTDIR}/src/memcpy.o: src/memcpy.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/memcpy.o src/memcpy.c
+
+${OBJECTDIR}/src/panic.o: src/panic.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/panic.o src/panic.c
+
+${OBJECTDIR}/src/printf.o: src/printf.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/printf.o src/printf.c
+
+${OBJECTDIR}/src/strings/strcat.o: src/strings/strcat.c 
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strcat.o src/strings/strcat.c
+
+${OBJECTDIR}/src/strings/strcpy.o: src/strings/strcpy.c 
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strcpy.o src/strings/strcpy.c
+
+${OBJECTDIR}/src/strings/strlen.o: src/strings/strlen.c 
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strlen.o src/strings/strlen.c
+
+${OBJECTDIR}/src/strings/stroul.o: src/strings/stroul.c 
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/stroul.o src/strings/stroul.c
+
+${OBJECTDIR}/src/strings/strparts.o: src/strings/strparts.c 
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strparts.o src/strings/strparts.c
+
+${OBJECTDIR}/src/strings/strtol.o: src/strings/strtol.c 
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strtol.o src/strings/strtol.c
+
+${OBJECTDIR}/src/strings/strtrim.o: src/strings/strtrim.c 
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strtrim.o src/strings/strtrim.c
+
+${OBJECTDIR}/src/time.o: src/time.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/time.o src/time.c
+
+# Subprojects
+.build-subprojects:
+
+# Clean Targets
+.clean-conf: ${CLEAN_SUBPROJECTS}
+	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisos
+
+# Subprojects
+.clean-subprojects:
+
+# Enable dependency checking
+.dep.inc: .depcheck-impl
+
+include .dep.inc

@@ -1,0 +1,6 @@
+#!/bin/bash
+pushd ..
+./make_debug
+popd
+objdump -d -S -l Debug/cross-Linux-x86/testmainprogramentry -M intel-mnemonic > testmainprogramentry_all_debug.asm
+vi testmainprogramentry_all_debug.asm

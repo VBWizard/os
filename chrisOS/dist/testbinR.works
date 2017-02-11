@@ -1,0 +1,24 @@
+#!/bin/bash
+pushd ..
+./make_release
+popd
+strip --strip-debug --strip-unneeded Release/cross-Linux-x86/chrisos
+qemu-system-i386 					\
+	-m 1024						\
+	-kernel Release/cross-Linux-x86/chrisos 	\
+	-smp 8    					\
+	-usb                                            \
+        -device usb-ehci,id=ehci                        \
+        -device usb-tablet,bus=usb-bus.0                \
+	-drive id=usbflash,file=/home/yogi/qemu-usb-mass-storage.dsk,if=none,boot=on,cache=writeback\
+        -device usb-storage,drive=usbflash	\
+	-drive file=./myos.iso,index=2,media=cdrom	\
+	-drive file=~/qemu-test-disk.img,if=none,id=sata-disk-0 \
+	-device ich9-ahci,id=ahci0 \
+	-device ide-drive,drive=sata-disk-0,bus=ahci0.0
+	#-device pci-bridge,addr=5.0,chassis_nr=2 #	\
+	#--enable-kvm
+
+#drive=/home/yogi/qemu-usb-mass-storage.dsk
+#-hda ~/diskimage.img
+

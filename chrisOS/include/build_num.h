@@ -1,0 +1,19 @@
+#ifndef BUILD_NUM_H
+#define BUILD_NUM_H
+
+#define BUILD_NUM 74435
+
+#define BUILD_YEAR 2017
+#define BUILD_MONTH 2
+#define BUILD_DATE 11
+#define BUILD_HOUR 8
+#define BUILD_MIN 22
+#define BUILD_SEC 14
+
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 1
+
+#define VERSION "0.1"
+#define COMPLETE_VERSION "0.1.20170211.082214"
+
+#endif // BUILD_NUM_H

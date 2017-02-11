@@ -1,0 +1,3 @@
+cat /home/yogi/NetBeansProjects/chrisOS/kernelData1.ld > kernelData.ld
+cat ./kernelData_local.ld >> kernelData.ld
+cat /home/yogi/NetBeansProjects/chrisOS/kernelData2.ld >> kernelData.ld 

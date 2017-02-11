@@ -1,0 +1,684 @@
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              DYN (Shared object file)
+  Machine:                           Intel 80386
+  Version:                           0x1
+  Entry point address:               0x0
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          90512 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         4
+  Size of section headers:           40 (bytes)
+  Number of section headers:         30
+  Section header string table index: 27
+
+Section Headers:
+  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .text             PROGBITS        00000000 001000 006ef6 00  AX  0   0  4
+  [ 2] .text.__x86.get_p PROGBITS        00006ef6 007ef6 000004 00  AX  0   0  1
+  [ 3] .text.__x86.get_p PROGBITS        00006efa 007efa 000004 00  AX  0   0  1
+  [ 4] .plt              PROGBITS        00006f00 007f00 0004a0 04  AX  0   0 16
+  [ 5] .rodata           PROGBITS        000073a0 0083a0 0003fb 00   A  0   0  4
+  [ 6] .eh_frame         PROGBITS        0000779c 00879c 0010d4 00   A  0   0  4
+  [ 7] .dynsym           DYNSYM          00008870 009870 000c90 10   A  8   1  4
+  [ 8] .dynstr           STRTAB          00009500 00a500 000c20 00   A  0   0  1
+  [ 9] .hash             HASH            0000a120 00b120 000640 04   A  7   0  4
+  [10] .eh_frame         PROGBITS        0000a760 00b760 000040 00   A  0   0  4
+  [11] .eh_frame_hdr     PROGBITS        0000a7a0 00b7a0 0003ec 00   A  0   0  4
+  [12] .rel.dyn          REL             0000ab8c 00bb8c 000268 08   A  7   0  4
+  [13] .data             PROGBITS        0000ae00 00be00 000070 00  WA  0   0 32
+  [14] .dynamic          DYNAMIC         0000ae70 00be70 0000b0 08  WA  8   0  4
+  [15] .got              PROGBITS        0000af20 00bf20 000008 04  WA  0   0  4
+  [16] .got.plt          PROGBITS        0000af28 00bf28 000130 04  WA  0   0  4
+  [17] .init_array       INIT_ARRAY      0000b058 00c058 000004 00  WA  0   0  4
+  [18] .fini_array       FINI_ARRAY      0000b05c 00c05c 000004 00  WA  0   0  4
+  [19] .bss              NOBITS          0000b060 00c060 004538 00  WA  0   0 32
+  [20] .debug_info       PROGBITS        00000000 00c060 00457a 00      0   0  1
+  [21] .debug_abbrev     PROGBITS        00000000 0105da 000ef9 00      0   0  1
+  [22] .debug_aranges    PROGBITS        00000000 0114d3 000100 00      0   0  1
+  [23] .debug_line       PROGBITS        00000000 0115d3 0014d2 00      0   0  1
+  [24] .debug_str        PROGBITS        00000000 012aa5 00139f 01  MS  0   0  1
+  [25] .comment          PROGBITS        00000000 013e44 000011 01  MS  0   0  1
+  [26] .debug_ranges     PROGBITS        00000000 013e55 000060 00      0   0  1
+  [27] .shstrtab         STRTAB          00000000 013eb5 000129 00      0   0  1
+  [28] .symtab           SYMTAB          00000000 013fe0 001240 10     29  92  4
+  [29] .strtab           STRTAB          00000000 015220 000f6f 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings)
+  I (info), L (link order), G (group), T (TLS), E (exclude), x (unknown)
+  O (extra OS processing required) o (OS specific), p (processor specific)
+
+There are no section groups in this file.
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  LOAD           0x001000 0x00000000 0x00000000 0x0b060 0x0f598 RWE 0x1000
+  DYNAMIC        0x00be70 0x0000ae70 0x0000ae70 0x000b0 0x000b0 RW  0x4
+  GNU_EH_FRAME   0x00b7a0 0x0000a7a0 0x0000a7a0 0x003ec 0x003ec R   0x4
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .text .text.__x86.get_pc_thunk.ax .text.__x86.get_pc_thunk.bx .plt .rodata .eh_frame .dynsym .dynstr .hash .eh_frame .eh_frame_hdr .rel.dyn .data .dynamic .got .got.plt .init_array .fini_array .bss 
+   01     .dynamic 
+   02     .eh_frame_hdr 
+   03     
+
+Dynamic section at offset 0xbe70 contains 17 entries:
+  Tag        Type                         Name/Value
+ 0x00000019 (INIT_ARRAY)                 0xb058
+ 0x0000001b (INIT_ARRAYSZ)               4 (bytes)
+ 0x0000001a (FINI_ARRAY)                 0xb05c
+ 0x0000001c (FINI_ARRAYSZ)               4 (bytes)
+ 0x00000004 (HASH)                       0xa120
+ 0x00000005 (STRTAB)                     0x9500
+ 0x00000006 (SYMTAB)                     0x8870
+ 0x0000000a (STRSZ)                      3104 (bytes)
+ 0x0000000b (SYMENT)                     16 (bytes)
+ 0x00000003 (PLTGOT)                     0xaf28
+ 0x00000002 (PLTRELSZ)                   584 (bytes)
+ 0x00000014 (PLTREL)                     REL
+ 0x00000017 (JMPREL)                     0xab8c
+ 0x00000011 (REL)                        0xadd4
+ 0x00000012 (RELSZ)                      32 (bytes)
+ 0x00000013 (RELENT)                     8 (bytes)
+ 0x00000000 (NULL)                       0x0
+
+Relocation section '.rel.dyn' at offset 0xbb8c contains 77 entries:
+ Offset     Info    Type            Sym.Value  Sym. Name
+0000af20  00006106 R_386_GLOB_DAT    0000ae40   _cluster_size_table32
+0000af24  0000bb06 R_386_GLOB_DAT    0000ae00   _cluster_size_table16
+0000b058  00002c01 R_386_32          000028bc   fl_init
+0000b05c  00006301 R_386_32          00002a94   fl_shutdown
+0000af34  00000507 R_386_JUMP_SLOT   000010e9   fatfs_mark_file_delete
+0000af38  00000707 R_386_JUMP_SLOT   000054da   fatfs_convert_from_fat
+0000af3c  00000d07 R_386_JUMP_SLOT   00005d78   fatfs_fat_init
+0000af40  00001107 R_386_JUMP_SLOT   00005598   fatfs_convert_to_fat_d
+0000af44  00001b07 R_386_JUMP_SLOT   00003619   fl_fwrite
+0000af48  00001e07 R_386_JUMP_SLOT   000066c7   fatfs_fat_add_cluster_
+0000af4c  00002107 R_386_JUMP_SLOT   0000193a   fatfs_cache_set_next_c
+0000af50  00002307 R_386_JUMP_SLOT   00004981   fatfs_format
+0000af54  00002407 R_386_JUMP_SLOT   00006390   fatfs_find_blank_clust
+0000af58  00002507 R_386_JUMP_SLOT   0000609e   fatfs_fat_purge
+0000af5c  00002607 R_386_JUMP_SLOT   00004e6b   fatfs_entry_is_file
+0000af60  00002807 R_386_JUMP_SLOT   00000000   memcpy
+0000af64  00002c07 R_386_JUMP_SLOT   000028bc   fl_init
+0000af68  00003007 R_386_JUMP_SLOT   0000553c   fatfs_convert_to_fat_t
+0000af6c  00003207 R_386_JUMP_SLOT   00000000   fatfs_init
+0000af70  00003707 R_386_JUMP_SLOT   000059a7   fatfs_compare_names
+0000af74  00003807 R_386_JUMP_SLOT   00003bb5   fl_opendir
+0000af78  00003e07 R_386_JUMP_SLOT   000055f8   fatfs_total_path_level
+0000af7c  00003f07 R_386_JUMP_SLOT   0000125f   fatfs_list_directory_n
+0000af80  00004007 R_386_JUMP_SLOT   00000e52   fatfs_update_timestamp
+0000af84  00004107 R_386_JUMP_SLOT   00000d78   fatfs_sfn_exists
+0000af88  00004307 R_386_JUMP_SLOT   000057aa   fatfs_split_path
+0000af8c  00004807 R_386_JUMP_SLOT   00000641   fatfs_sector_write
+0000af90  00004d07 R_386_JUMP_SLOT   00004e97   fatfs_lfn_entries_requ
+0000af94  00004f07 R_386_JUMP_SLOT   00003c84   fl_readdir
+0000af98  00005207 R_386_JUMP_SLOT   000068a4   fatfs_add_free_space
+0000af9c  00005307 R_386_JUMP_SLOT   000053db   fatfs_lfn_generate_tai
+0000afa0  00005807 R_386_JUMP_SLOT   00006292   fatfs_set_fs_info_next
+0000afa4  00005907 R_386_JUMP_SLOT   00004a35   fatfs_lfn_cache_entry
+0000afa8  00005a07 R_386_JUMP_SLOT   00006c91   fatfs_add_file_entry
+0000afac  00005e07 R_386_JUMP_SLOT   00004e3f   fatfs_entry_is_dir
+0000afb0  00005f07 R_386_JUMP_SLOT   00003071   fl_fgetc
+0000afb4  00006207 R_386_JUMP_SLOT   000034d2   fl_fgetpos
+0000afb8  00006607 R_386_JUMP_SLOT   00000618   fatfs_sector_read
+0000afbc  00006707 R_386_JUMP_SLOT   00005b74   fatfs_get_sfn_display_
+0000afc0  00006807 R_386_JUMP_SLOT   0000313f   fl_fread
+0000afc4  00006907 R_386_JUMP_SLOT   00003d02   fl_closedir
+0000afc8  00006c07 R_386_JUMP_SLOT   00000000   strncmp
+0000afcc  00006f07 R_386_JUMP_SLOT   00002f6c   fl_fclose
+0000afd0  00007107 R_386_JUMP_SLOT   00004cab   fatfs_lfn_cache_get
+0000afd4  00007207 R_386_JUMP_SLOT   00000000   strncpy
+0000afd8  00007407 R_386_JUMP_SLOT   00000f99   fatfs_update_file_leng
+0000afdc  00007707 R_386_JUMP_SLOT   0000651b   fatfs_fat_set_cluster
+0000afe0  00007907 R_386_JUMP_SLOT   00004d3a   fatfs_entry_lfn_invali
+0000afe4  00007d07 R_386_JUMP_SLOT   00000000   printk
+0000afe8  00007f07 R_386_JUMP_SLOT   00004812   fatfs_format_fat32
+0000afec  00008207 R_386_JUMP_SLOT   00000ad7   fatfs_get_root_cluster
+0000aff0  00008607 R_386_JUMP_SLOT   00002af1   fl_fopen
+0000aff4  00008707 R_386_JUMP_SLOT   0000547b   fatfs_convert_from_fat
+0000aff8  00008a07 R_386_JUMP_SLOT   00004d85   fatfs_entry_lfn_exists
+0000affc  00008b07 R_386_JUMP_SLOT   00000000   localtime
+0000b000  00008c07 R_386_JUMP_SLOT   00000000   memset
+0000b004  00008f07 R_386_JUMP_SLOT   00000000   time
+0000b008  00009107 R_386_JUMP_SLOT   00001236   fatfs_list_directory_s
+0000b00c  00009307 R_386_JUMP_SLOT   00004ee8   fatfs_filename_to_lfn
+0000b010  00009407 R_386_JUMP_SLOT   00002ed2   fl_fflush
+0000b014  00009707 R_386_JUMP_SLOT   0000066a   fatfs_sector_reader
+0000b018  00009807 R_386_JUMP_SLOT   00000aec   fatfs_get_file_entry
+0000b01c  00009a07 R_386_JUMP_SLOT   00004d0d   fatfs_entry_lfn_text
+0000b020  00009c07 R_386_JUMP_SLOT   000060fe   fatfs_find_next_cluste
+0000b024  00009d07 R_386_JUMP_SLOT   00001912   fatfs_cache_init
+0000b028  0000a107 R_386_JUMP_SLOT   000049d0   fatfs_lfn_cache_init
+0000b02c  0000a307 R_386_JUMP_SLOT   00001926   fatfs_cache_get_next_c
+0000b030  0000a507 R_386_JUMP_SLOT   0000513c   fatfs_lfn_create_sfn
+0000b034  0000a707 R_386_JUMP_SLOT   00005692   fatfs_get_substring
+0000b038  0000ad07 R_386_JUMP_SLOT   0000666a   fatfs_free_cluster_cha
+0000b03c  0000b207 R_386_JUMP_SLOT   000005ac   fatfs_lba_of_cluster
+0000b040  0000b707 R_386_JUMP_SLOT   00004de9   fatfs_entry_sfn_only
+0000b044  0000b807 R_386_JUMP_SLOT   00004681   fatfs_format_fat16
+0000b048  0000ba07 R_386_JUMP_SLOT   00000000   strlen
+0000b04c  0000c207 R_386_JUMP_SLOT   0000695b   fatfs_allocate_free_sp
+0000b050  0000c707 R_386_JUMP_SLOT   000008e0   fatfs_write_sector
+0000b054  0000c807 R_386_JUMP_SLOT   00005065   fatfs_sfn_create_entry
+
+The decoding of unwind sections for machine type Intel 80386 is not currently supported.
+
+Symbol table '.dynsym' contains 201 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 02000044     0 NOTYPE  GLOBAL DEFAULT   20 kE820Status
+     2: 02000050     0 NOTYPE  GLOBAL DEFAULT   20 kE820RecordCount
+     3: 02000168     0 NOTYPE  GLOBAL DEFAULT   20 kMBR
+     4: 0000394a   187 FUNC    GLOBAL DEFAULT    1 fl_remove
+     5: 000010e9   333 FUNC    GLOBAL DEFAULT    1 fatfs_mark_file_deleted
+     6: 020000d4     0 NOTYPE  GLOBAL DEFAULT   20 debugCR3
+     7: 000054da    98 FUNC    GLOBAL DEFAULT    1 fatfs_convert_from_fat_da
+     8: 000038fc    78 FUNC    GLOBAL DEFAULT    1 fl_fputs
+     9: 02000054     0 NOTYPE  GLOBAL DEFAULT   20 exceptionNumber
+    10: 02000064     0 NOTYPE  GLOBAL DEFAULT   20 exceptionBX
+    11: 02000260     0 NOTYPE  GLOBAL DEFAULT   20 _daylight
+    12: 02000040     0 NOTYPE  GLOBAL DEFAULT   20 smap_table
+    13: 00005d78   269 FUNC    GLOBAL DEFAULT    1 fatfs_fat_init
+    14: 02000240     0 NOTYPE  GLOBAL DEFAULT   20 kExecLoadCount
+    15: 020000a0     0 NOTYPE  GLOBAL DEFAULT   20 exceptionFlags
+    16: 0200015c     0 NOTYPE  GLOBAL DEFAULT   20 kPCIDeviceCount
+    17: 00005598    93 FUNC    GLOBAL DEFAULT    1 fatfs_convert_to_fat_date
+    18: 0200005c     0 NOTYPE  GLOBAL DEFAULT   20 debugSavedStack
+    19: 0200001c     0 NOTYPE  GLOBAL DEFAULT   20 savedPosY
+    20: 02000008     0 NOTYPE  GLOBAL DEFAULT   20 terminal_color
+    21: 02000170     0 NOTYPE  GLOBAL DEFAULT   20 kIOAPICPtr
+    22: 02000154     0 NOTYPE  GLOBAL DEFAULT   20 kKernelPageDir
+    23: 02000100     0 NOTYPE  GLOBAL DEFAULT   20 debugEIP
+    24: 02000110     0 NOTYPE  GLOBAL DEFAULT   20 kTicksSinceStart
+    25: 000035d7    66 FUNC    GLOBAL DEFAULT    1 fl_fputc
+    26: 02000160     0 NOTYPE  GLOBAL DEFAULT   20 kDebugStartsNow
+    27: 00003619   739 FUNC    GLOBAL DEFAULT    1 fl_fwrite
+    28: 02000080     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCR3
+    29: 02000120     0 NOTYPE  GLOBAL DEFAULT   20 kRTCTicksSinceStart
+    30: 000066c7   138 FUNC    GLOBAL DEFAULT    1 fatfs_fat_add_cluster_to_
+    31: 02000148     0 NOTYPE  GLOBAL DEFAULT   20 kKernelPagedBaseAddress
+    32: 02000070     0 NOTYPE  GLOBAL DEFAULT   20 exceptionSI
+    33: 0000193a    20 FUNC    GLOBAL DEFAULT    1 fatfs_cache_set_next_clus
+    34: 02000088     0 NOTYPE  GLOBAL DEFAULT   20 exceptionDS
+    35: 00004981    77 FUNC    GLOBAL DEFAULT    1 fatfs_format
+    36: 00006390   395 FUNC    GLOBAL DEFAULT    1 fatfs_find_blank_cluster
+    37: 0000609e    96 FUNC    GLOBAL DEFAULT    1 fatfs_fat_purge
+    38: 00004e6b    44 FUNC    GLOBAL DEFAULT    1 fatfs_entry_is_file
+    39: 02000094     0 NOTYPE  GLOBAL DEFAULT   20 exceptionGS
+    40: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND memcpy
+    41: 02000248     0 NOTYPE  GLOBAL DEFAULT   20 kSelectedPartNum
+    42: 00006751   339 FUNC    GLOBAL DEFAULT    1 fatfs_count_free_clusters
+    43: 02000027     0 NOTYPE  GLOBAL DEFAULT   20 kTerminalHeight
+    44: 000028bc   260 FUNC    GLOBAL DEFAULT    1 fl_init
+    45: 0000336d   357 FUNC    GLOBAL DEFAULT    1 fl_fseek
+    46: 02000234     0 NOTYPE  GLOBAL DEFAULT   20 kTSSTable
+    47: 02000250     0 NOTYPE  GLOBAL DEFAULT   20 kAHCICurrentPart
+    48: 0000553c    92 FUNC    GLOBAL DEFAULT    1 fatfs_convert_to_fat_time
+    49: 0200024c     0 NOTYPE  GLOBAL DEFAULT   20 kAHCICurrentDisk
+    50: 00000000  1452 FUNC    GLOBAL DEFAULT    1 fatfs_init
+    51: 020000f4     0 NOTYPE  GLOBAL DEFAULT   20 debugFlags
+    52: 02000084     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCR4
+    53: 02000048     0 NOTYPE  GLOBAL DEFAULT   20 kE820MemoryBytes
+    54: 02000130     0 NOTYPE  GLOBAL DEFAULT   20 kTicksPerSecond
+    55: 000059a7   379 FUNC    GLOBAL DEFAULT    1 fatfs_compare_names
+    56: 00003bb5   207 FUNC    GLOBAL DEFAULT    1 fl_opendir
+    57: 00005bea   163 FUNC    GLOBAL DEFAULT    1 fatfs_get_extension
+    58: 020000c0     0 NOTYPE  GLOBAL DEFAULT   20 debugDX
+    59: 000029c0    34 FUNC    GLOBAL DEFAULT    1 fl_attach_locks
+    60: 000007ba   294 FUNC    GLOBAL DEFAULT    1 fatfs_read_sector
+    61: 02000274     0 NOTYPE  GLOBAL DEFAULT   20 _days
+    62: 000055f8   154 FUNC    GLOBAL DEFAULT    1 fatfs_total_path_levels
+    63: 0000125f  1215 FUNC    GLOBAL DEFAULT    1 fatfs_list_directory_next
+    64: 00000e52   327 FUNC    GLOBAL DEFAULT    1 fatfs_update_timestamps
+    65: 00000d78   218 FUNC    GLOBAL DEFAULT    1 fatfs_sfn_exists
+    66: 0200012c     0 NOTYPE  GLOBAL DEFAULT   20 kExceptionsSinceStart
+    67: 000057aa   195 FUNC    GLOBAL DEFAULT    1 fatfs_split_path
+    68: 02000140     0 NOTYPE  GLOBAL DEFAULT   20 kTimeZone
+    69: 02000068     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCX
+    70: 0200016c     0 NOTYPE  GLOBAL DEFAULT   20 kDebugLevel
+    71: 02000290     0 NOTYPE  GLOBAL DEFAULT   20 _days_abbrev
+    72: 00000641    41 FUNC    GLOBAL DEFAULT    1 fatfs_sector_write
+    73: 0200009c     0 NOTYPE  GLOBAL DEFAULT   20 exceptionSavedESP
+    74: 0200015e     0 NOTYPE  GLOBAL DEFAULT   20 kPCIFunctionCount
+    75: 00003a63   338 FUNC    GLOBAL DEFAULT    1 fl_listdirectory
+    76: 00003531    52 FUNC    GLOBAL DEFAULT    1 fl_ftell
+    77: 00004e97    81 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_entries_require
+    78: 02000058     0 NOTYPE  GLOBAL DEFAULT   20 exceptionSavedStack
+    79: 00003c84   126 FUNC    GLOBAL DEFAULT    1 fl_readdir
+    80: 020000e0     0 NOTYPE  GLOBAL DEFAULT   20 debugES
+    81: 020000b4     0 NOTYPE  GLOBAL DEFAULT   20 debugAX
+    82: 000068a4   183 FUNC    GLOBAL DEFAULT    1 fatfs_add_free_space
+    83: 000053db   160 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_generate_tail
+    84: 02000224     0 NOTYPE  GLOBAL DEFAULT   20 kOriginalAddressZeroValue
+    85: 02000074     0 NOTYPE  GLOBAL DEFAULT   20 exceptionDI
+    86: 020000fc     0 NOTYPE  GLOBAL DEFAULT   20 debugCS
+    87: 02000268     0 NOTYPE  GLOBAL DEFAULT   20 _tzname
+    88: 00006292   254 FUNC    GLOBAL DEFAULT    1 fatfs_set_fs_info_next_fr
+    89: 00004a35   630 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_cache_entry
+    90: 00006c91   613 FUNC    GLOBAL DEFAULT    1 fatfs_add_file_entry
+    91: 0200006c     0 NOTYPE  GLOBAL DEFAULT   20 exceptionDX
+    92: 02000098     0 NOTYPE  GLOBAL DEFAULT   20 exceptionSS
+    93: 020000e4     0 NOTYPE  GLOBAL DEFAULT   20 debugFS
+    94: 00004e3f    44 FUNC    GLOBAL DEFAULT    1 fatfs_entry_is_dir
+    95: 00003071    68 FUNC    GLOBAL DEFAULT    1 fl_fgetc
+    96: 02000300     0 NOTYPE  GLOBAL DEFAULT   20 _months_abbrev
+    97: 0000ae40    48 OBJECT  GLOBAL DEFAULT   13 _cluster_size_table32
+    98: 000034d2    95 FUNC    GLOBAL DEFAULT    1 fl_fgetpos
+    99: 00002a94    93 FUNC    GLOBAL DEFAULT    1 fl_shutdown
+   100: 020000b0     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCR2
+   101: 020000ac     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCS
+   102: 00000618    41 FUNC    GLOBAL DEFAULT    1 fatfs_sector_read
+   103: 00005b74   118 FUNC    GLOBAL DEFAULT    1 fatfs_get_sfn_display_nam
+   104: 0000313f   558 FUNC    GLOBAL DEFAULT    1 fl_fread
+   105: 00003d02    20 FUNC    GLOBAL DEFAULT    1 fl_closedir
+   106: 020000dc     0 NOTYPE  GLOBAL DEFAULT   20 debugDS
+   107: 02000244     0 NOTYPE  GLOBAL DEFAULT   20 kSelectedDiskNum
+   108: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND strncmp
+   109: 02000004     0 NOTYPE  GLOBAL DEFAULT   20 terminal_column
+   110: 0200015f     0 NOTYPE  GLOBAL DEFAULT   20 kPCIBusCount
+   111: 00002f6c   261 FUNC    GLOBAL DEFAULT    1 fl_fclose
+   112: 020002c0     0 NOTYPE  GLOBAL DEFAULT   20 _months
+   113: 00004cab    98 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_cache_get
+   114: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND strncpy
+   115: 0200013c     0 NOTYPE  GLOBAL DEFAULT   20 kSystemCurrentTime
+   116: 00000f99   336 FUNC    GLOBAL DEFAULT    1 fatfs_update_file_length
+   117: 02000104     0 NOTYPE  GLOBAL DEFAULT   20 kDataSizes
+   118: 00005c8d   235 FUNC    GLOBAL DEFAULT    1 fatfs_create_path_string
+   119: 0000651b   335 FUNC    GLOBAL DEFAULT    1 fatfs_fat_set_cluster
+   120: 02000134     0 NOTYPE  GLOBAL DEFAULT   20 kTicksPerMS
+   121: 00004d3a    75 FUNC    GLOBAL DEFAULT    1 fatfs_entry_lfn_invalid
+   122: 020000e8     0 NOTYPE  GLOBAL DEFAULT   20 debugGS
+   123: 020000bc     0 NOTYPE  GLOBAL DEFAULT   20 debugCX
+   124: 020000ec     0 NOTYPE  GLOBAL DEFAULT   20 debugSS
+   125: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND printk
+   126: 02000158     0 NOTYPE  GLOBAL DEFAULT   20 kKernelPageTables
+   127: 00004812   367 FUNC    GLOBAL DEFAULT    1 fatfs_format_fat32
+   128: 02000150     0 NOTYPE  GLOBAL DEFAULT   20 kInitDone
+   129: 02000264     0 NOTYPE  GLOBAL DEFAULT   20 _dstbias
+   130: 00000ad7    21 FUNC    GLOBAL DEFAULT    1 fatfs_get_root_cluster
+   131: 020000d0     0 NOTYPE  GLOBAL DEFAULT   20 debugCR0
+   132: 00003d63    48 FUNC    GLOBAL DEFAULT    1 fl_format
+   133: 02000174     0 NOTYPE  GLOBAL DEFAULT   20 kMPConfigTable
+   134: 00002af1   468 FUNC    GLOBAL DEFAULT    1 fl_fopen
+   135: 0000547b    95 FUNC    GLOBAL DEFAULT    1 fatfs_convert_from_fat_ti
+   136: 02000128     0 NOTYPE  GLOBAL DEFAULT   20 kPagingExceptionsSinceSta
+   137: 020000a4     0 NOTYPE  GLOBAL DEFAULT   20 exceptionErrorCode
+   138: 00004d85   100 FUNC    GLOBAL DEFAULT    1 fatfs_entry_lfn_exists
+   139: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND localtime
+   140: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND memset
+   141: 0200022c     0 NOTYPE  GLOBAL DEFAULT   20 kGDTAvailable
+   142: 00005b22    82 FUNC    GLOBAL DEFAULT    1 fatfs_string_ends_with_sl
+   143: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND time
+   144: 02000230     0 NOTYPE  GLOBAL DEFAULT   20 kTSSAvailable
+   145: 00001236    41 FUNC    GLOBAL DEFAULT    1 fatfs_list_directory_star
+   146: 0200015d     0 NOTYPE  GLOBAL DEFAULT   20 kPCIBridgeCount
+   147: 00004ee8   381 FUNC    GLOBAL DEFAULT    1 fatfs_filename_to_lfn
+   148: 00002ed2   154 FUNC    GLOBAL DEFAULT    1 fl_fflush
+   149: 02000164     0 NOTYPE  GLOBAL DEFAULT   20 kATADeviceInfoCount
+   150: 02000060     0 NOTYPE  GLOBAL DEFAULT   20 exceptionAX
+   151: 0000066a   336 FUNC    GLOBAL DEFAULT    1 fatfs_sector_reader
+   152: 00000aec   652 FUNC    GLOBAL DEFAULT    1 fatfs_get_file_entry
+   153: 020000f8     0 NOTYPE  GLOBAL DEFAULT   20 debugErrorCode
+   154: 00004d0d    45 FUNC    GLOBAL DEFAULT    1 fatfs_entry_lfn_text
+   155: 0200000c     0 NOTYPE  GLOBAL DEFAULT   20 terminal_buffer
+   156: 000060fe   404 FUNC    GLOBAL DEFAULT    1 fatfs_find_next_cluster
+   157: 00001912    20 FUNC    GLOBAL DEFAULT    1 fatfs_cache_init
+   158: 02000026     0 NOTYPE  GLOBAL DEFAULT   20 savedPosPointer
+   159: 00003565   114 FUNC    GLOBAL DEFAULT    1 fl_feof
+   160: 00000a1a   189 FUNC    GLOBAL DEFAULT    1 fatfs_show_details
+   161: 000049d0   101 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_cache_init
+   162: 02000151     0 NOTYPE  GLOBAL DEFAULT   20 kPagingInitDone
+   163: 00001926    20 FUNC    GLOBAL DEFAULT    1 fatfs_cache_get_next_clus
+   164: 02000228     0 NOTYPE  GLOBAL DEFAULT   20 ahciCapsCount
+   165: 0000513c   488 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_create_sfn
+   166: 0200008c     0 NOTYPE  GLOBAL DEFAULT   20 exceptionES
+   167: 00005692   280 FUNC    GLOBAL DEFAULT    1 fatfs_get_substring
+   168: 020000b8     0 NOTYPE  GLOBAL DEFAULT   20 debugBX
+   169: 00003a05    94 FUNC    GLOBAL DEFAULT    1 fl_createdirectory
+   170: 0200007c     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCR0
+   171: 02000138     0 NOTYPE  GLOBAL DEFAULT   20 kSystemStartTime
+   172: 02000178     0 NOTYPE  GLOBAL DEFAULT   20 kCPUFeatures
+   173: 0000666a    93 FUNC    GLOBAL DEFAULT    1 fatfs_free_cluster_chain
+   174: 020000c8     0 NOTYPE  GLOBAL DEFAULT   20 debugDI
+   175: 02000270     0 NOTYPE  GLOBAL DEFAULT   20 ticksToWait
+   176: 000029e2   178 FUNC    GLOBAL DEFAULT    1 fl_attach_media
+   177: 020000cc     0 NOTYPE  GLOBAL DEFAULT   20 debugBP
+   178: 000005ac   108 FUNC    GLOBAL DEFAULT    1 fatfs_lba_of_cluster
+   179: 020000c4     0 NOTYPE  GLOBAL DEFAULT   20 debugSI
+   180: 02000220     0 NOTYPE  GLOBAL DEFAULT   20 kKeyboardBuffer
+   181: 00003d16    77 FUNC    GLOBAL DEFAULT    1 fl_is_dir
+   182: 0200023c     0 NOTYPE  GLOBAL DEFAULT   20 kExecLoadInfo
+   183: 00004de9    86 FUNC    GLOBAL DEFAULT    1 fatfs_entry_sfn_only
+   184: 00004681   401 FUNC    GLOBAL DEFAULT    1 fatfs_format_fat16
+   185: 000030b5   138 FUNC    GLOBAL DEFAULT    1 fl_fgets
+   186: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND strlen
+   187: 0000ae00    64 OBJECT  GLOBAL DEFAULT   13 _cluster_size_table16
+   188: 02000090     0 NOTYPE  GLOBAL DEFAULT   20 exceptionFS
+   189: 020000d8     0 NOTYPE  GLOBAL DEFAULT   20 debugCR4
+   190: 02000000     0 NOTYPE  GLOBAL DEFAULT   20 terminal_row
+   191: 020001a0     0 NOTYPE  GLOBAL DEFAULT   20 kCPU
+   192: 02000078     0 NOTYPE  GLOBAL DEFAULT   20 exceptionBP
+   193: 02000118     0 NOTYPE  GLOBAL DEFAULT   20 kISRsSinceStart
+   194: 0000695b   239 FUNC    GLOBAL DEFAULT    1 fatfs_allocate_free_space
+   195: 02000010     0 NOTYPE  GLOBAL DEFAULT   20 savedPosX
+   196: 02000238     0 NOTYPE  GLOBAL DEFAULT   20 kTaskTable
+   197: 020000f0     0 NOTYPE  GLOBAL DEFAULT   20 debugSavedESP
+   198: 020000a8     0 NOTYPE  GLOBAL DEFAULT   20 exceptionEIP
+   199: 000008e0   314 FUNC    GLOBAL DEFAULT    1 fatfs_write_sector
+   200: 00005065   215 FUNC    GLOBAL DEFAULT    1 fatfs_sfn_create_entry
+
+Symbol table '.symtab' contains 292 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00000000     0 SECTION LOCAL  DEFAULT    1 
+     2: 00006ef6     0 SECTION LOCAL  DEFAULT    2 
+     3: 00006efa     0 SECTION LOCAL  DEFAULT    3 
+     4: 00006f00     0 SECTION LOCAL  DEFAULT    4 
+     5: 000073a0     0 SECTION LOCAL  DEFAULT    5 
+     6: 0000779c     0 SECTION LOCAL  DEFAULT    6 
+     7: 00008870     0 SECTION LOCAL  DEFAULT    7 
+     8: 00009500     0 SECTION LOCAL  DEFAULT    8 
+     9: 0000a120     0 SECTION LOCAL  DEFAULT    9 
+    10: 0000a760     0 SECTION LOCAL  DEFAULT   10 
+    11: 0000a7a0     0 SECTION LOCAL  DEFAULT   11 
+    12: 0000ab8c     0 SECTION LOCAL  DEFAULT   12 
+    13: 0000ae00     0 SECTION LOCAL  DEFAULT   13 
+    14: 0000ae70     0 SECTION LOCAL  DEFAULT   14 
+    15: 0000af20     0 SECTION LOCAL  DEFAULT   15 
+    16: 0000af28     0 SECTION LOCAL  DEFAULT   16 
+    17: 0000b058     0 SECTION LOCAL  DEFAULT   17 
+    18: 0000b05c     0 SECTION LOCAL  DEFAULT   18 
+    19: 0000b060     0 SECTION LOCAL  DEFAULT   19 
+    20: 00000000     0 SECTION LOCAL  DEFAULT   20 
+    21: 00000000     0 SECTION LOCAL  DEFAULT   21 
+    22: 00000000     0 SECTION LOCAL  DEFAULT   22 
+    23: 00000000     0 SECTION LOCAL  DEFAULT   23 
+    24: 00000000     0 SECTION LOCAL  DEFAULT   24 
+    25: 00000000     0 SECTION LOCAL  DEFAULT   25 
+    26: 00000000     0 SECTION LOCAL  DEFAULT   26 
+    27: 00000000     0 FILE    LOCAL  DEFAULT  ABS fat_access.c
+    28: 00000107     0 NOTYPE  LOCAL  DEFAULT    1 .L8
+    29: 00000101     0 NOTYPE  LOCAL  DEFAULT    1 .L9
+    30: 000000fb     0 NOTYPE  LOCAL  DEFAULT    1 .L11
+    31: 00000000     0 FILE    LOCAL  DEFAULT  ABS fat_cache.c
+    32: 00001720    37 FUNC    LOCAL  DEFAULT    1 fat_list_init
+    33: 00001745    88 FUNC    LOCAL  DEFAULT    1 fat_list_remove
+    34: 0000179d    77 FUNC    LOCAL  DEFAULT    1 fat_list_insert_after
+    35: 000017ea    73 FUNC    LOCAL  DEFAULT    1 fat_list_insert_before
+    36: 00001833    83 FUNC    LOCAL  DEFAULT    1 fat_list_insert_first
+    37: 00001886    63 FUNC    LOCAL  DEFAULT    1 fat_list_insert_last
+    38: 000018c5    28 FUNC    LOCAL  DEFAULT    1 fat_list_is_empty
+    39: 000018e1    49 FUNC    LOCAL  DEFAULT    1 fat_list_pop_head
+    40: 00000000     0 FILE    LOCAL  DEFAULT  ABS fat_filelib.c
+    41: 00001950    37 FUNC    LOCAL  DEFAULT    1 fat_list_init
+    42: 00001975    88 FUNC    LOCAL  DEFAULT    1 fat_list_remove
+    43: 000019cd    77 FUNC    LOCAL  DEFAULT    1 fat_list_insert_after
+    44: 00001a1a    73 FUNC    LOCAL  DEFAULT    1 fat_list_insert_before
+    45: 00001a63    83 FUNC    LOCAL  DEFAULT    1 fat_list_insert_first
+    46: 00001ab6    63 FUNC    LOCAL  DEFAULT    1 fat_list_insert_last
+    47: 00001af5    28 FUNC    LOCAL  DEFAULT    1 fat_list_is_empty
+    48: 00001b11    49 FUNC    LOCAL  DEFAULT    1 fat_list_pop_head
+    49: 0000b060 16560 OBJECT  LOCAL  DEFAULT   19 _files
+    50: 0000f110     4 OBJECT  LOCAL  DEFAULT   19 _filelib_init
+    51: 0000f114     4 OBJECT  LOCAL  DEFAULT   19 _filelib_valid
+    52: 0000f120  1128 OBJECT  LOCAL  DEFAULT   19 _fs
+    53: 0000f588     8 OBJECT  LOCAL  DEFAULT   19 _open_file_list
+    54: 0000f590     8 OBJECT  LOCAL  DEFAULT   19 _free_file_list
+    55: 00001b42    86 FUNC    LOCAL  DEFAULT    1 _allocate_file
+    56: 00001b98   156 FUNC    LOCAL  DEFAULT    1 _check_file_open
+    57: 00001c34    69 FUNC    LOCAL  DEFAULT    1 _free_file
+    58: 00001c79   253 FUNC    LOCAL  DEFAULT    1 _open_directory
+    59: 00001d76   991 FUNC    LOCAL  DEFAULT    1 _create_directory
+    60: 00002155   563 FUNC    LOCAL  DEFAULT    1 _open_file
+    61: 00002388   897 FUNC    LOCAL  DEFAULT    1 _create_file
+    62: 00002709   435 FUNC    LOCAL  DEFAULT    1 _read_sectors
+    63: 00002be0     0 NOTYPE  LOCAL  DEFAULT    1 .L131
+    64: 00002b92     0 NOTYPE  LOCAL  DEFAULT    1 .L132
+    65: 00002b84     0 NOTYPE  LOCAL  DEFAULT    1 .L134
+    66: 00002bd9     0 NOTYPE  LOCAL  DEFAULT    1 .L135
+    67: 00002b70     0 NOTYPE  LOCAL  DEFAULT    1 .L136
+    68: 00002b76     0 NOTYPE  LOCAL  DEFAULT    1 .L137
+    69: 00002cc5   525 FUNC    LOCAL  DEFAULT    1 _write_sectors
+    70: 00000000     0 FILE    LOCAL  DEFAULT  ABS fat_format.c
+    71: 00003d94   159 FUNC    LOCAL  DEFAULT    1 fatfs_calc_cluster_size
+    72: 00003e33   118 FUNC    LOCAL  DEFAULT    1 fatfs_erase_sectors
+    73: 00003ea9  1427 FUNC    LOCAL  DEFAULT    1 fatfs_create_boot_sector
+    74: 0000443c   259 FUNC    LOCAL  DEFAULT    1 fatfs_create_fsinfo_secto
+    75: 0000453f   322 FUNC    LOCAL  DEFAULT    1 fatfs_erase_fat
+    76: 00000000     0 FILE    LOCAL  DEFAULT  ABS fat_misc.c
+    77: 00005324   183 FUNC    LOCAL  DEFAULT    1 fatfs_itoa
+    78: 00000000     0 FILE    LOCAL  DEFAULT  ABS fat_string.c
+    79: 0000586d   158 FUNC    LOCAL  DEFAULT    1 FileString_StrCmpNoCase
+    80: 0000590b    73 FUNC    LOCAL  DEFAULT    1 FileString_GetExtension
+    81: 00005954    83 FUNC    LOCAL  DEFAULT    1 FileString_TrimLength
+    82: 00000000     0 FILE    LOCAL  DEFAULT  ABS fat_table.c
+    83: 00005e85   188 FUNC    LOCAL  DEFAULT    1 fatfs_fat_writeback
+    84: 00005f41   349 FUNC    LOCAL  DEFAULT    1 fatfs_fat_read_sector
+    85: 00000000     0 FILE    LOCAL  DEFAULT  ABS fat_write.c
+    86: 00006a4a   583 FUNC    LOCAL  DEFAULT    1 fatfs_find_free_dir_offse
+    87: 00000000     0 FILE    LOCAL  DEFAULT  ABS 
+    88: 0000ae70     0 OBJECT  LOCAL  DEFAULT   14 _DYNAMIC
+    89: 00006ef6     0 FUNC    LOCAL  DEFAULT    2 __x86.get_pc_thunk.ax
+    90: 00006efa     0 FUNC    LOCAL  DEFAULT    3 __x86.get_pc_thunk.bx
+    91: 0000af28     0 OBJECT  LOCAL  DEFAULT   16 _GLOBAL_OFFSET_TABLE_
+    92: 02000044     0 NOTYPE  GLOBAL DEFAULT   20 kE820Status
+    93: 02000050     0 NOTYPE  GLOBAL DEFAULT   20 kE820RecordCount
+    94: 02000168     0 NOTYPE  GLOBAL DEFAULT   20 kMBR
+    95: 0000394a   187 FUNC    GLOBAL DEFAULT    1 fl_remove
+    96: 000010e9   333 FUNC    GLOBAL DEFAULT    1 fatfs_mark_file_deleted
+    97: 020000d4     0 NOTYPE  GLOBAL DEFAULT   20 debugCR3
+    98: 000054da    98 FUNC    GLOBAL DEFAULT    1 fatfs_convert_from_fat_da
+    99: 000038fc    78 FUNC    GLOBAL DEFAULT    1 fl_fputs
+   100: 02000054     0 NOTYPE  GLOBAL DEFAULT   20 exceptionNumber
+   101: 02000064     0 NOTYPE  GLOBAL DEFAULT   20 exceptionBX
+   102: 02000260     0 NOTYPE  GLOBAL DEFAULT   20 _daylight
+   103: 02000040     0 NOTYPE  GLOBAL DEFAULT   20 smap_table
+   104: 00005d78   269 FUNC    GLOBAL DEFAULT    1 fatfs_fat_init
+   105: 02000240     0 NOTYPE  GLOBAL DEFAULT   20 kExecLoadCount
+   106: 020000a0     0 NOTYPE  GLOBAL DEFAULT   20 exceptionFlags
+   107: 0200015c     0 NOTYPE  GLOBAL DEFAULT   20 kPCIDeviceCount
+   108: 00005598    93 FUNC    GLOBAL DEFAULT    1 fatfs_convert_to_fat_date
+   109: 0200005c     0 NOTYPE  GLOBAL DEFAULT   20 debugSavedStack
+   110: 0200001c     0 NOTYPE  GLOBAL DEFAULT   20 savedPosY
+   111: 02000008     0 NOTYPE  GLOBAL DEFAULT   20 terminal_color
+   112: 02000170     0 NOTYPE  GLOBAL DEFAULT   20 kIOAPICPtr
+   113: 02000154     0 NOTYPE  GLOBAL DEFAULT   20 kKernelPageDir
+   114: 02000100     0 NOTYPE  GLOBAL DEFAULT   20 debugEIP
+   115: 02000110     0 NOTYPE  GLOBAL DEFAULT   20 kTicksSinceStart
+   116: 000035d7    66 FUNC    GLOBAL DEFAULT    1 fl_fputc
+   117: 02000160     0 NOTYPE  GLOBAL DEFAULT   20 kDebugStartsNow
+   118: 00003619   739 FUNC    GLOBAL DEFAULT    1 fl_fwrite
+   119: 02000080     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCR3
+   120: 02000120     0 NOTYPE  GLOBAL DEFAULT   20 kRTCTicksSinceStart
+   121: 000066c7   138 FUNC    GLOBAL DEFAULT    1 fatfs_fat_add_cluster_to_
+   122: 02000148     0 NOTYPE  GLOBAL DEFAULT   20 kKernelPagedBaseAddress
+   123: 02000070     0 NOTYPE  GLOBAL DEFAULT   20 exceptionSI
+   124: 0000193a    20 FUNC    GLOBAL DEFAULT    1 fatfs_cache_set_next_clus
+   125: 02000088     0 NOTYPE  GLOBAL DEFAULT   20 exceptionDS
+   126: 00004981    77 FUNC    GLOBAL DEFAULT    1 fatfs_format
+   127: 00006390   395 FUNC    GLOBAL DEFAULT    1 fatfs_find_blank_cluster
+   128: 0000609e    96 FUNC    GLOBAL DEFAULT    1 fatfs_fat_purge
+   129: 00004e6b    44 FUNC    GLOBAL DEFAULT    1 fatfs_entry_is_file
+   130: 02000094     0 NOTYPE  GLOBAL DEFAULT   20 exceptionGS
+   131: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND memcpy
+   132: 02000248     0 NOTYPE  GLOBAL DEFAULT   20 kSelectedPartNum
+   133: 00006751   339 FUNC    GLOBAL DEFAULT    1 fatfs_count_free_clusters
+   134: 02000027     0 NOTYPE  GLOBAL DEFAULT   20 kTerminalHeight
+   135: 000028bc   260 FUNC    GLOBAL DEFAULT    1 fl_init
+   136: 0000336d   357 FUNC    GLOBAL DEFAULT    1 fl_fseek
+   137: 02000234     0 NOTYPE  GLOBAL DEFAULT   20 kTSSTable
+   138: 02000250     0 NOTYPE  GLOBAL DEFAULT   20 kAHCICurrentPart
+   139: 0000553c    92 FUNC    GLOBAL DEFAULT    1 fatfs_convert_to_fat_time
+   140: 0200024c     0 NOTYPE  GLOBAL DEFAULT   20 kAHCICurrentDisk
+   141: 00000000  1452 FUNC    GLOBAL DEFAULT    1 fatfs_init
+   142: 020000f4     0 NOTYPE  GLOBAL DEFAULT   20 debugFlags
+   143: 02000084     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCR4
+   144: 02000048     0 NOTYPE  GLOBAL DEFAULT   20 kE820MemoryBytes
+   145: 02000130     0 NOTYPE  GLOBAL DEFAULT   20 kTicksPerSecond
+   146: 000059a7   379 FUNC    GLOBAL DEFAULT    1 fatfs_compare_names
+   147: 00003bb5   207 FUNC    GLOBAL DEFAULT    1 fl_opendir
+   148: 00005bea   163 FUNC    GLOBAL DEFAULT    1 fatfs_get_extension
+   149: 020000c0     0 NOTYPE  GLOBAL DEFAULT   20 debugDX
+   150: 000029c0    34 FUNC    GLOBAL DEFAULT    1 fl_attach_locks
+   151: 000007ba   294 FUNC    GLOBAL DEFAULT    1 fatfs_read_sector
+   152: 02000274     0 NOTYPE  GLOBAL DEFAULT   20 _days
+   153: 000055f8   154 FUNC    GLOBAL DEFAULT    1 fatfs_total_path_levels
+   154: 0000125f  1215 FUNC    GLOBAL DEFAULT    1 fatfs_list_directory_next
+   155: 00000e52   327 FUNC    GLOBAL DEFAULT    1 fatfs_update_timestamps
+   156: 00000d78   218 FUNC    GLOBAL DEFAULT    1 fatfs_sfn_exists
+   157: 0200012c     0 NOTYPE  GLOBAL DEFAULT   20 kExceptionsSinceStart
+   158: 000057aa   195 FUNC    GLOBAL DEFAULT    1 fatfs_split_path
+   159: 02000140     0 NOTYPE  GLOBAL DEFAULT   20 kTimeZone
+   160: 02000068     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCX
+   161: 0200016c     0 NOTYPE  GLOBAL DEFAULT   20 kDebugLevel
+   162: 02000290     0 NOTYPE  GLOBAL DEFAULT   20 _days_abbrev
+   163: 00000641    41 FUNC    GLOBAL DEFAULT    1 fatfs_sector_write
+   164: 0200009c     0 NOTYPE  GLOBAL DEFAULT   20 exceptionSavedESP
+   165: 0200015e     0 NOTYPE  GLOBAL DEFAULT   20 kPCIFunctionCount
+   166: 00003a63   338 FUNC    GLOBAL DEFAULT    1 fl_listdirectory
+   167: 00003531    52 FUNC    GLOBAL DEFAULT    1 fl_ftell
+   168: 00004e97    81 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_entries_require
+   169: 02000058     0 NOTYPE  GLOBAL DEFAULT   20 exceptionSavedStack
+   170: 00003c84   126 FUNC    GLOBAL DEFAULT    1 fl_readdir
+   171: 020000e0     0 NOTYPE  GLOBAL DEFAULT   20 debugES
+   172: 020000b4     0 NOTYPE  GLOBAL DEFAULT   20 debugAX
+   173: 000068a4   183 FUNC    GLOBAL DEFAULT    1 fatfs_add_free_space
+   174: 000053db   160 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_generate_tail
+   175: 02000224     0 NOTYPE  GLOBAL DEFAULT   20 kOriginalAddressZeroValue
+   176: 02000074     0 NOTYPE  GLOBAL DEFAULT   20 exceptionDI
+   177: 020000fc     0 NOTYPE  GLOBAL DEFAULT   20 debugCS
+   178: 02000268     0 NOTYPE  GLOBAL DEFAULT   20 _tzname
+   179: 00006292   254 FUNC    GLOBAL DEFAULT    1 fatfs_set_fs_info_next_fr
+   180: 00004a35   630 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_cache_entry
+   181: 00006c91   613 FUNC    GLOBAL DEFAULT    1 fatfs_add_file_entry
+   182: 0200006c     0 NOTYPE  GLOBAL DEFAULT   20 exceptionDX
+   183: 02000098     0 NOTYPE  GLOBAL DEFAULT   20 exceptionSS
+   184: 020000e4     0 NOTYPE  GLOBAL DEFAULT   20 debugFS
+   185: 00004e3f    44 FUNC    GLOBAL DEFAULT    1 fatfs_entry_is_dir
+   186: 00003071    68 FUNC    GLOBAL DEFAULT    1 fl_fgetc
+   187: 02000300     0 NOTYPE  GLOBAL DEFAULT   20 _months_abbrev
+   188: 0000ae40    48 OBJECT  GLOBAL DEFAULT   13 _cluster_size_table32
+   189: 000034d2    95 FUNC    GLOBAL DEFAULT    1 fl_fgetpos
+   190: 00002a94    93 FUNC    GLOBAL DEFAULT    1 fl_shutdown
+   191: 020000b0     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCR2
+   192: 020000ac     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCS
+   193: 00000618    41 FUNC    GLOBAL DEFAULT    1 fatfs_sector_read
+   194: 00005b74   118 FUNC    GLOBAL DEFAULT    1 fatfs_get_sfn_display_nam
+   195: 0000313f   558 FUNC    GLOBAL DEFAULT    1 fl_fread
+   196: 00003d02    20 FUNC    GLOBAL DEFAULT    1 fl_closedir
+   197: 020000dc     0 NOTYPE  GLOBAL DEFAULT   20 debugDS
+   198: 02000244     0 NOTYPE  GLOBAL DEFAULT   20 kSelectedDiskNum
+   199: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND strncmp
+   200: 02000004     0 NOTYPE  GLOBAL DEFAULT   20 terminal_column
+   201: 0200015f     0 NOTYPE  GLOBAL DEFAULT   20 kPCIBusCount
+   202: 00002f6c   261 FUNC    GLOBAL DEFAULT    1 fl_fclose
+   203: 020002c0     0 NOTYPE  GLOBAL DEFAULT   20 _months
+   204: 00004cab    98 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_cache_get
+   205: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND strncpy
+   206: 0200013c     0 NOTYPE  GLOBAL DEFAULT   20 kSystemCurrentTime
+   207: 00000f99   336 FUNC    GLOBAL DEFAULT    1 fatfs_update_file_length
+   208: 02000104     0 NOTYPE  GLOBAL DEFAULT   20 kDataSizes
+   209: 00005c8d   235 FUNC    GLOBAL DEFAULT    1 fatfs_create_path_string
+   210: 0000651b   335 FUNC    GLOBAL DEFAULT    1 fatfs_fat_set_cluster
+   211: 02000134     0 NOTYPE  GLOBAL DEFAULT   20 kTicksPerMS
+   212: 00004d3a    75 FUNC    GLOBAL DEFAULT    1 fatfs_entry_lfn_invalid
+   213: 020000e8     0 NOTYPE  GLOBAL DEFAULT   20 debugGS
+   214: 020000bc     0 NOTYPE  GLOBAL DEFAULT   20 debugCX
+   215: 020000ec     0 NOTYPE  GLOBAL DEFAULT   20 debugSS
+   216: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND printk
+   217: 02000158     0 NOTYPE  GLOBAL DEFAULT   20 kKernelPageTables
+   218: 00004812   367 FUNC    GLOBAL DEFAULT    1 fatfs_format_fat32
+   219: 02000150     0 NOTYPE  GLOBAL DEFAULT   20 kInitDone
+   220: 02000264     0 NOTYPE  GLOBAL DEFAULT   20 _dstbias
+   221: 00000ad7    21 FUNC    GLOBAL DEFAULT    1 fatfs_get_root_cluster
+   222: 020000d0     0 NOTYPE  GLOBAL DEFAULT   20 debugCR0
+   223: 00003d63    48 FUNC    GLOBAL DEFAULT    1 fl_format
+   224: 02000174     0 NOTYPE  GLOBAL DEFAULT   20 kMPConfigTable
+   225: 00002af1   468 FUNC    GLOBAL DEFAULT    1 fl_fopen
+   226: 0000547b    95 FUNC    GLOBAL DEFAULT    1 fatfs_convert_from_fat_ti
+   227: 02000128     0 NOTYPE  GLOBAL DEFAULT   20 kPagingExceptionsSinceSta
+   228: 020000a4     0 NOTYPE  GLOBAL DEFAULT   20 exceptionErrorCode
+   229: 00004d85   100 FUNC    GLOBAL DEFAULT    1 fatfs_entry_lfn_exists
+   230: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND localtime
+   231: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND memset
+   232: 0200022c     0 NOTYPE  GLOBAL DEFAULT   20 kGDTAvailable
+   233: 00005b22    82 FUNC    GLOBAL DEFAULT    1 fatfs_string_ends_with_sl
+   234: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND time
+   235: 02000230     0 NOTYPE  GLOBAL DEFAULT   20 kTSSAvailable
+   236: 00001236    41 FUNC    GLOBAL DEFAULT    1 fatfs_list_directory_star
+   237: 0200015d     0 NOTYPE  GLOBAL DEFAULT   20 kPCIBridgeCount
+   238: 00004ee8   381 FUNC    GLOBAL DEFAULT    1 fatfs_filename_to_lfn
+   239: 00002ed2   154 FUNC    GLOBAL DEFAULT    1 fl_fflush
+   240: 02000164     0 NOTYPE  GLOBAL DEFAULT   20 kATADeviceInfoCount
+   241: 02000060     0 NOTYPE  GLOBAL DEFAULT   20 exceptionAX
+   242: 0000066a   336 FUNC    GLOBAL DEFAULT    1 fatfs_sector_reader
+   243: 00000aec   652 FUNC    GLOBAL DEFAULT    1 fatfs_get_file_entry
+   244: 020000f8     0 NOTYPE  GLOBAL DEFAULT   20 debugErrorCode
+   245: 00004d0d    45 FUNC    GLOBAL DEFAULT    1 fatfs_entry_lfn_text
+   246: 0200000c     0 NOTYPE  GLOBAL DEFAULT   20 terminal_buffer
+   247: 000060fe   404 FUNC    GLOBAL DEFAULT    1 fatfs_find_next_cluster
+   248: 00001912    20 FUNC    GLOBAL DEFAULT    1 fatfs_cache_init
+   249: 02000026     0 NOTYPE  GLOBAL DEFAULT   20 savedPosPointer
+   250: 00003565   114 FUNC    GLOBAL DEFAULT    1 fl_feof
+   251: 00000a1a   189 FUNC    GLOBAL DEFAULT    1 fatfs_show_details
+   252: 000049d0   101 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_cache_init
+   253: 02000151     0 NOTYPE  GLOBAL DEFAULT   20 kPagingInitDone
+   254: 00001926    20 FUNC    GLOBAL DEFAULT    1 fatfs_cache_get_next_clus
+   255: 02000228     0 NOTYPE  GLOBAL DEFAULT   20 ahciCapsCount
+   256: 0000513c   488 FUNC    GLOBAL DEFAULT    1 fatfs_lfn_create_sfn
+   257: 0200008c     0 NOTYPE  GLOBAL DEFAULT   20 exceptionES
+   258: 00005692   280 FUNC    GLOBAL DEFAULT    1 fatfs_get_substring
+   259: 020000b8     0 NOTYPE  GLOBAL DEFAULT   20 debugBX
+   260: 00003a05    94 FUNC    GLOBAL DEFAULT    1 fl_createdirectory
+   261: 0200007c     0 NOTYPE  GLOBAL DEFAULT   20 exceptionCR0
+   262: 02000138     0 NOTYPE  GLOBAL DEFAULT   20 kSystemStartTime
+   263: 02000178     0 NOTYPE  GLOBAL DEFAULT   20 kCPUFeatures
+   264: 0000666a    93 FUNC    GLOBAL DEFAULT    1 fatfs_free_cluster_chain
+   265: 020000c8     0 NOTYPE  GLOBAL DEFAULT   20 debugDI
+   266: 02000270     0 NOTYPE  GLOBAL DEFAULT   20 ticksToWait
+   267: 000029e2   178 FUNC    GLOBAL DEFAULT    1 fl_attach_media
+   268: 020000cc     0 NOTYPE  GLOBAL DEFAULT   20 debugBP
+   269: 000005ac   108 FUNC    GLOBAL DEFAULT    1 fatfs_lba_of_cluster
+   270: 020000c4     0 NOTYPE  GLOBAL DEFAULT   20 debugSI
+   271: 02000220     0 NOTYPE  GLOBAL DEFAULT   20 kKeyboardBuffer
+   272: 00003d16    77 FUNC    GLOBAL DEFAULT    1 fl_is_dir
+   273: 0200023c     0 NOTYPE  GLOBAL DEFAULT   20 kExecLoadInfo
+   274: 00004de9    86 FUNC    GLOBAL DEFAULT    1 fatfs_entry_sfn_only
+   275: 00004681   401 FUNC    GLOBAL DEFAULT    1 fatfs_format_fat16
+   276: 000030b5   138 FUNC    GLOBAL DEFAULT    1 fl_fgets
+   277: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND strlen
+   278: 0000ae00    64 OBJECT  GLOBAL DEFAULT   13 _cluster_size_table16
+   279: 02000090     0 NOTYPE  GLOBAL DEFAULT   20 exceptionFS
+   280: 020000d8     0 NOTYPE  GLOBAL DEFAULT   20 debugCR4
+   281: 02000000     0 NOTYPE  GLOBAL DEFAULT   20 terminal_row
+   282: 020001a0     0 NOTYPE  GLOBAL DEFAULT   20 kCPU
+   283: 02000078     0 NOTYPE  GLOBAL DEFAULT   20 exceptionBP
+   284: 02000118     0 NOTYPE  GLOBAL DEFAULT   20 kISRsSinceStart
+   285: 0000695b   239 FUNC    GLOBAL DEFAULT    1 fatfs_allocate_free_space
+   286: 02000010     0 NOTYPE  GLOBAL DEFAULT   20 savedPosX
+   287: 02000238     0 NOTYPE  GLOBAL DEFAULT   20 kTaskTable
+   288: 020000f0     0 NOTYPE  GLOBAL DEFAULT   20 debugSavedESP
+   289: 020000a8     0 NOTYPE  GLOBAL DEFAULT   20 exceptionEIP
+   290: 000008e0   314 FUNC    GLOBAL DEFAULT    1 fatfs_write_sector
+   291: 00005065   215 FUNC    GLOBAL DEFAULT    1 fatfs_sfn_create_entry
+
+Histogram for bucket list length (total of 197 buckets):
+ Length  Number     % of total  Coverage
+      0  73         ( 37.1%)
+      1  70         ( 35.5%)     35.0%
+      2  36         ( 18.3%)     71.0%
+      3  14         (  7.1%)     92.0%
+      4  4          (  2.0%)    100.0%
+
+No version information found in this file.

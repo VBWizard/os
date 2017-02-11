@@ -1,0 +1,233 @@
+
+Debug/cross-Linux/myhelloworld:     file format elf32-i386
+Debug/cross-Linux/myhelloworld
+architecture: i386, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x10000a14
+
+Program Header:
+    LOAD off    0x00002000 vaddr 0x00a00000 paddr 0x00a00000 align 2**12
+         filesz 0x00000000 memsz 0x000004f8 flags rw-
+    LOAD off    0x00001000 vaddr 0x10000000 paddr 0x10000000 align 2**12
+         filesz 0x00001224 memsz 0x00001224 flags r-x
+    LOAD off    0x00003000 vaddr 0x10002000 paddr 0x10002000 align 2**12
+         filesz 0x00000000 memsz 0x0000aa24 flags rw-
+EH_FRAME off    0x00001f64 vaddr 0x10000f64 paddr 0x10000f64 align 2**2
+         filesz 0x0000012c memsz 0x0000012c flags r--
+   STACK off    0x00000000 vaddr 0x00000000 paddr 0x00000000 align 2**4
+         filesz 0x00000000 memsz 0x00000000 flags rw-
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000a75  10000000  10000000  00001000  2**12
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .eh_frame     000004ec  10000a78  10000a78  00001a78  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .eh_frame_hdr 0000012c  10000f64  10000f64  00001f64  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  3 .rodata.str1.4 00000094  10001090  10001090  00002090  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  4 .rodata.str1.1 00000100  10001124  10001124  00002124  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  5 .bss          0000aa24  10002000  10002000  00003000  2**12
+                  ALLOC
+  6 kernelData    000004f8  00a00000  00a00000  00002000  2**13
+                  ALLOC
+  7 .debug_info   00004551  00000000  00000000  00002224  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_abbrev 000009e6  00000000  00000000  00006775  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_loc    0000119c  00000000  00000000  0000715b  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_aranges 000000c0  00000000  00000000  000082f7  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_line   000008ca  00000000  00000000  000083b7  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_str    00001aea  00000000  00000000  00008c81  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 13 .comment      00000011  00000000  00000000  0000a76b  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+10000000 l    d  .text	00000000 .text
+10000a78 l    d  .eh_frame	00000000 .eh_frame
+10000f64 l    d  .eh_frame_hdr	00000000 .eh_frame_hdr
+10001090 l    d  .rodata.str1.4	00000000 .rodata.str1.4
+10001124 l    d  .rodata.str1.1	00000000 .rodata.str1.1
+10002000 l    d  .bss	00000000 .bss
+00a00000 l    d  kernelData	00000000 kernelData
+00000000 l    d  .debug_info	00000000 .debug_info
+00000000 l    d  .debug_abbrev	00000000 .debug_abbrev
+00000000 l    d  .debug_loc	00000000 .debug_loc
+00000000 l    d  .debug_aranges	00000000 .debug_aranges
+00000000 l    d  .debug_line	00000000 .debug_line
+00000000 l    d  .debug_str	00000000 .debug_str
+00000000 l    d  .comment	00000000 .comment
+00000000 l    df *ABS*	00000000 basic_display.c
+00000000 l    df *ABS*	00000000 memcpy.c
+00000000 l    df *ABS*	00000000 panic.c
+00000000 l    df *ABS*	00000000 printf.c
+10000548 l     F .text	0000001c printchar
+10000564 l     F .text	000000fc prints
+10000660 l     F .text	00000132 printi
+10000792 l     F .text	000001e8 print
+00000000 l    df *ABS*	00000000 strlen.c
+00000000 l    df *ABS*	00000000 main.c
+00a0032c g     O kernelData	00000004 kInitialIDT
+00a00044 g     O kernelData	00000004 kE820Status
+00a00050 g     O kernelData	00000002 kE820RecordCount
+00a00334 g     O kernelData	00000004 kMBR
+10000345 g     F .text	0000000b cursorMoveToY
+00a00224 g     O kernelData	00000004 debugCR3
+00a00060 g     O kernelData	00000144 kcpuInfo
+00a001a4 g     O kernelData	00000004 exceptionNumber
+00a001b4 g     O kernelData	00000004 exceptionBX
+00a00428 g     O kernelData	00000004 _daylight
+00a00040 g     O kernelData	00000004 smap_table
+00a00404 g     O kernelData	00000004 kExecLoadCount
+00a001f0 g     O kernelData	00000004 exceptionFlags
+00a002ac g     O kernelData	00000001 kPCIDeviceCount
+00a001ac g     O kernelData	00000004 debugSavedStack
+00a0001c g     O kernelData	0000000a savedPosY
+00a00008 g     O kernelData	00000001 terminal_color
+1000035e g     F .text	00000008 cursorGetMaxY
+00a002a4 g     O kernelData	00000004 kKernelPageDir
+00a0033c g     O kernelData	00000004 kIOAPICPtr
+00a00250 g     O kernelData	00000004 debugEIP
+00a002bc g     O kernelData	00000004 kPCIDeviceFunctions
+00a00260 g     O kernelData	00000004 kTicksSinceStart
+100000bf g     F .text	00000036 cursorRestorePosition
+00a002b0 g     O kernelData	00000001 kDebugStartsNow
+00a001d0 g     O kernelData	00000004 exceptionCR3
+00a00270 g     O kernelData	00000008 kRTCTicksSinceStart
+00a00298 g     O kernelData	00000008 kKernelPagedBaseAddress
+00a0043c g     O kernelData	00000006 rmGdtp
+00a001c0 g     O kernelData	00000004 exceptionSI
+00a001d8 g     O kernelData	00000004 exceptionDS
+00a001e4 g     O kernelData	00000004 exceptionGS
+10000428 g     F .text	000000e5 memcpy
+00a0040c g     O kernelData	00000004 kSelectedPartNum
+00a00027 g     O kernelData	00000001 kTerminalHeight
+100000f5 g     F .text	00000069 terminal_clear
+100003e9 g     F .text	0000002d puts
+00a002b8 g     O kernelData	00000004 kPCIBridgeHeaders
+1000033a g     F .text	0000000b cursorMoveToX
+00a003f8 g     O kernelData	00000004 kTSSTable
+00a00414 g     O kernelData	0000000e kAHCICurrentPart
+00a00410 g     O kernelData	00000004 kAHCICurrentDisk
+00a00244 g     O kernelData	00000004 debugFlags
+00a00448 g     O kernelData	00000004 gdt
+00a001d4 g     O kernelData	00000004 exceptionCR4
+00a00048 g     O kernelData	00000008 kE820MemoryBytes
+00a00280 g     O kernelData	00000004 kTicksPerSecond
+00a00330 g     O kernelData	00000004 kAPICRegisterRemapAddress
+00a00210 g     O kernelData	00000004 debugDX
+10000194 g     F .text	00000031 terminal_copyline
+10002000 g     O .bss	00000004 cpuid_extended_feature_bits
+10000000 g     F .text	0000003e update_cursor
+1000015e g     F .text	00000036 terminal_clear_line
+1000097a g     F .text	00000019 printk_valist
+00a00458 g     O kernelData	0000001c _days
+00a0027c g     O kernelData	00000004 kExceptionsSinceStart
+1000004b g     F .text	00000011 make_vgaentry
+00a00290 g     O kernelData	00000004 kTimeZone
+00a001b8 g     O kernelData	00000004 exceptionCX
+00a00338 g     O kernelData	00000004 kDebugLevel
+00a00474 g     O kernelData	0000001c _days_abbrev
+00a001ec g     O kernelData	00000004 exceptionSavedESP
+00a002ae g     O kernelData	00000001 kPCIFunctionCount
+00a001a8 g     O kernelData	00000004 exceptionSavedStack
+100001c5 g     F .text	00000140 terminal_putchar
+00a00204 g     O kernelData	00000004 debugAX
+00a00230 g     O kernelData	00000004 debugES
+10002020 g     O .bss	0000aa00 ABARs
+00a003e4 g     O kernelData	00000004 kOriginalAddressZeroValue
+00a001c4 g     O kernelData	00000004 exceptionDI
+00a0024c g     O kernelData	00000004 debugCS
+00a00430 g     O kernelData	00000008 _tzname
+100003bc g     F .text	0000002d kTermInit
+00a001bc g     O kernelData	00000004 exceptionDX
+00a001e8 g     O kernelData	00000004 exceptionSS
+00a00234 g     O kernelData	00000004 debugFS
+00a004e0 g     O kernelData	00000030 _months_abbrev
+1000005c g     F .text	0000000a terminal_setcolor
+00a001fc g     O kernelData	00000004 exceptionCS
+00a00200 g     O kernelData	00000004 exceptionCR2
+1000ca20 g     O .bss	00000004 test
+1000003e g     F .text	0000000d make_color
+10000305 g     F .text	0000001a cursorUpdateBiosCursor
+1000200c g     O .bss	00000001 printDLineCount
+00a0022c g     O kernelData	00000004 debugDS
+00a00408 g     O kernelData	00000004 kSelectedDiskNum
+00a00004 g     O kernelData	00000004 terminal_column
+00a002af g     O kernelData	00000001 kPCIBusCount
+00a004a0 g     O kernelData	00000030 _months
+1000031f g     F .text	0000001b cursorMoveTo
+00a0028c g     O kernelData	00000004 kSystemCurrentTime
+00a00254 g     O kernelData	0000000a kDataSizes
+10000510 g     F .text	00000037 panic
+00a00284 g     O kernelData	00000004 kTicksPerMS
+00a0020c g     O kernelData	00000004 debugCX
+00a00238 g     O kernelData	00000004 debugGS
+00a0023c g     O kernelData	00000004 debugSS
+10000993 g     F .text	00000018 printk
+00a002a8 g     O kernelData	00000004 kKernelPageTables
+00a002a0 g     O kernelData	00000001 kInitDone
+00a0042c g     O kernelData	00000004 _dstbias
+1000008f g     F .text	00000030 cursorSavePosition
+00a002c0 g     O kernelData	00000004 kATADeviceInfo
+10000350 g     F .text	00000008 cursorGetPosX
+00a00220 g     O kernelData	00000004 debugCR0
+00a00340 g     O kernelData	00000004 kMPConfigTable
+10000a14 g     F .text	00000061 dddd
+00a00278 g     O kernelData	00000004 kPagingExceptionsSinceStart
+00a001f4 g     O kernelData	00000004 exceptionErrorCode
+10002004 g     O .bss	00000008 cpuid_procinfo
+00a003f0 g     O kernelData	00000004 kGDTAvailable
+00a003f4 g     O kernelData	00000004 kTSSAvailable
+00a002ad g     O kernelData	00000001 kPCIBridgeCount
+10000416 g     F .text	00000012 putc
+00a002c4 g     O kernelData	00000004 kATADeviceInfoCount
+00a001b0 g     O kernelData	00000004 exceptionAX
+00a003e8 g     O kernelData	00000004 ahciCaps
+00a002b4 g     O kernelData	00000004 kPCIDeviceHeaders
+00a00248 g     O kernelData	00000004 debugErrorCode
+100009db g     F .text	00000018 sprintf
+100009ab g     F .text	00000030 printd
+00a0000c g     O kernelData	00000004 terminal_buffer
+00a00026 g     O kernelData	00000001 savedPosPointer
+00a002a1 g     O kernelData	00000001 kPagingInitDone
+00a003ec g     O kernelData	00000004 ahciCapsCount
+00a00424 g     O kernelData	00000004 kKeyboardBufferBase
+00a001dc g     O kernelData	00000004 exceptionES
+00a00208 g     O kernelData	00000004 debugBX
+00a001cc g     O kernelData	00000004 exceptionCR0
+00a00288 g     O kernelData	00000004 kSystemStartTime
+00a00344 g     O kernelData	0000000c kCPUFeatures
+00a0044c g     O kernelData	00000006 gdtp
+10000366 g     F .text	00000018 displayGetMaxXY
+00a00218 g     O kernelData	00000004 debugDI
+00a00438 g     O kernelData	00000004 ticksToWait
+00a0021c g     O kernelData	00000004 debugBP
+10000386 g     F .text	00000036 kTermPrint
+00a00214 g     O kernelData	00000004 debugSI
+00a002e0 g     O kernelData	0000004a kPCISATADevice
+00a003e0 g     O kernelData	00000004 kKeyboardBuffer
+1000037e g     F .text	00000008 cursorGetPosY
+00a00454 g     O kernelData	00000004 ahciABAR
+00a00400 g     O kernelData	00000004 kExecLoadInfo
+10000358 g     F .text	00000006 cursorGetMaxX
+100009f4 g     F .text	0000001f strlen
+00a001e0 g     O kernelData	00000004 exceptionFS
+00a00228 g     O kernelData	00000004 debugCR4
+00a00000 g     O kernelData	00000004 terminal_row
+00a00360 g     O kernelData	00000080 kCPU
+10000066 g     F .text	00000029 terminal_putentryat
+00a001c8 g     O kernelData	00000004 exceptionBP
+00a00444 g     O kernelData	00000004 rmGdt
+00a00268 g     O kernelData	00000008 kISRsSinceStart
+00a00010 g     O kernelData	0000000a savedPosX
+00a003fc g     O kernelData	00000004 kTaskTable
+00a00240 g     O kernelData	00000004 debugSavedESP
+00a001f8 g     O kernelData	00000004 exceptionEIP
+
+

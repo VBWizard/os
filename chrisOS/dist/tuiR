@@ -1,0 +1,2 @@
+#!/bin/bash
+gdb -tui --args qemu-system-i386 -args -m 1024 -kernel Release/cross-Linux-x86/chrisos  -hda ~/diskimage.img

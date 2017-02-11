@@ -1,0 +1,6 @@
+#!/bin/bash
+pushd ..
+./make_debug
+popd
+objdump -d -S -l Debug/cross-Linux/myhelloworld -M intel-mnemonic > myhelloworld_all_debug.asm
+vi myhelloworld_all_debug.asm

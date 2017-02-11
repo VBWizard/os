@@ -1,0 +1,6 @@
+#!/bin/bash
+pushd ..
+./make_debug
+popd
+objdump -d -S -l Debug/cross-Linux/chrisoskernel -M intel-mnemonic > chrisoskernel_all_debug.asm
+vi chrisoskernel_all_debug.asm

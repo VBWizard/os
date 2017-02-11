@@ -1,0 +1,718 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="fat" displayName="fat" projectFiles="true">
+      <itemPath>src/fat/API.txt</itemPath>
+      <itemPath>src/fat/COPYRIGHT.txt</itemPath>
+      <itemPath>src/fat/Configuration.txt</itemPath>
+      <itemPath>src/fat/History.txt</itemPath>
+      <itemPath>src/fat/License.txt</itemPath>
+      <itemPath>src/fat/Media Access API.txt</itemPath>
+      <itemPath>src/fat/fat_access.c</itemPath>
+      <itemPath>src/fat/fat_access.h</itemPath>
+      <itemPath>src/fat/fat_cache.c</itemPath>
+      <itemPath>src/fat/fat_cache.h</itemPath>
+      <itemPath>src/fat/fat_defs.h</itemPath>
+      <itemPath>src/fat/fat_filelib.c</itemPath>
+      <itemPath>src/fat/fat_filelib.h</itemPath>
+      <itemPath>src/fat/fat_format.c</itemPath>
+      <itemPath>src/fat/fat_format.h</itemPath>
+      <itemPath>src/fat/fat_list.h</itemPath>
+      <itemPath>src/fat/fat_misc.c</itemPath>
+      <itemPath>src/fat/fat_misc.h</itemPath>
+      <itemPath>src/fat/fat_opts.h</itemPath>
+      <itemPath>src/fat/fat_string.c</itemPath>
+      <itemPath>src/fat/fat_string.h</itemPath>
+      <itemPath>src/fat/fat_table.c</itemPath>
+      <itemPath>src/fat/fat_table.h</itemPath>
+      <itemPath>src/fat/fat_types.h</itemPath>
+      <itemPath>src/fat/fat_write.c</itemPath>
+      <itemPath>src/fat/fat_write.h</itemPath>
+      <itemPath>src/fat/version.txt</itemPath>
+    </logicalFolder>
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>include/acpi.h</itemPath>
+      <itemPath>include/i386/apic.h</itemPath>
+      <itemPath>include/init/ata_disk.h</itemPath>
+      <itemPath>include/bishell.h</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/build_num.h</itemPath>
+      <itemPath>include/charDev.h</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/chrisos.h</itemPath>
+      <itemPath>include/i386/cpu.h</itemPath>
+      <itemPath>include/init/diskPartition.h</itemPath>
+      <itemPath>include/elfloader.h</itemPath>
+      <itemPath>include/filesystem.h</itemPath>
+      <itemPath>include/i386/gdt.h</itemPath>
+      <itemPath>include/init/initVars.h</itemPath>
+      <itemPath>include/io.h</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/i386/irqHandlers.h</itemPath>
+      <itemPath>include/kbd.h</itemPath>
+      <itemPath>include/kernelObjects.h</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/memory.h</itemPath>
+      <itemPath>include/mpspec_def.h</itemPath>
+      <itemPath>include/multiboot.h</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/i386/paging.h</itemPath>
+      <itemPath>include/pci/pci.h</itemPath>
+      <itemPath>include/pci_c_header.h</itemPath>
+      <itemPath>include/pci/pci_ids.h</itemPath>
+      <itemPath>include/pci/pci_reg.h</itemPath>
+      <itemPath>include/pci/pcihdr.h</itemPath>
+      <itemPath>include/printf.h</itemPath>
+      <itemPath>include/i386/smp.h</itemPath>
+      <itemPath>include/strings.h</itemPath>
+      <itemPath>include/time_os.h</itemPath>
+      <itemPath>include/i386/bits/types.h</itemPath>
+      <itemPath>include/utility.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>src/cpu/acpi.c</itemPath>
+      <itemPath>src/cpu/apic.c</itemPath>
+      <itemPath>asm/asmFunctions.s</itemPath>
+      <itemPath>src/init/ata_disk.c</itemPath>
+      <itemPath>src/char/console/basic_display.c</itemPath>
+      <itemPath>src/bishell.c</itemPath>
+      <itemPath>src/cpu/bitops.c</itemPath>
+      <itemPath>asm/boot.s</itemPath>
+      <itemPath>asm/bootCPU.s</itemPath>
+      <itemPath>src/init/cpudet-clean.c</itemPath>
+      <itemPath>src/init/e820.c</itemPath>
+      <itemPath>src/loader/elfloader.c</itemPath>
+      <itemPath>src/cpu/identify_cpu_features.c</itemPath>
+      <itemPath>src/cpu/idt.c</itemPath>
+      <itemPath>src/init/init.c</itemPath>
+      <itemPath>src/cpu/irqHandlers.c</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/asm/isr.s</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c</itemPath>
+      <itemPath>src/filesystem/mbr.c</itemPath>
+      <itemPath>src/memcpy.c</itemPath>
+      <itemPath>src/cpu/msr.c</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/init/paging_init.c</itemPath>
+      <itemPath>src/panic.c</itemPath>
+      <itemPath>src/block/pci.c</itemPath>
+      <itemPath>src/cpu/ports.c</itemPath>
+      <itemPath>src/printf.c</itemPath>
+      <itemPath>src/cpu/smp.c</itemPath>
+      <itemPath>src/strings/strcat.c</itemPath>
+      <itemPath>src/strings/strcpy.c</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c</itemPath>
+      <itemPath>src/strings/strlen.c</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c</itemPath>
+      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c</itemPath>
+      <itemPath>src/strings/stroul.c</itemPath>
+      <itemPath>src/strings/strparts.c</itemPath>
+      <itemPath>src/strings/strtol.c</itemPath>
+      <itemPath>src/strings/strtrim.c</itemPath>
+      <itemPath>src/time.c</itemPath>
+      <itemPath>src/init/utility.c</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <itemPath>linker.ld</itemPath>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>src/fat</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>cross|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <architecture>1</architecture>
+          <standard>3</standard>
+          <commandlineTool>gcc</commandlineTool>
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/libcpuid</pElem>
+          </incDir>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <useLinkerLibraries>false</useLinkerLibraries>
+        </cTool>
+        <asmTool>
+          <commandLine>-msyntax=intel</commandLine>
+        </asmTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>/usr/local/lib</pElem>
+            <pElem>/home/yogi/opt/cross/lib</pElem>
+          </linkerAddLib>
+          <linkerLibItems>
+            <linkerOptionItem>-static</linkerOptionItem>
+            <linkerLibLibItem>cpuid</linkerLibLibItem>
+          </linkerLibItems>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/asm/isr.s"
+            ex="false"
+            tool="4"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/build_num.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/chrisos.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/i386/irqHandlers.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/i386/paging.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/memory.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/paging_init.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="asm/asmFunctions.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="asm/boot.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="asm/bootCPU.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <folder path="SourceFiles">
+        <cTool>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>include/bits</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <item path="include/acpi.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/bishell.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/elfloader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/filesystem.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/apic.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/bits/types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/cpu.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/gdt.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/smp.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/init/ata_disk.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/init/diskPartition.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/init/initVars.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/io.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kbd.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kernelObjects.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/mpspec_def.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/multiboot.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci/pci.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci/pci_ids.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci/pci_reg.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci/pcihdr.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci_c_header.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/printf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/strings.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/time_os.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/utility.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="linker.ld" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/bishell.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/char/console/basic_display.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/acpi.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/apic.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/bitops.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/identify_cpu_features.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/idt.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/irqHandlers.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/msr.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/ports.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/smp.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/COPYRIGHT.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/Configuration.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/History.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/License.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/Media Access API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_access.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_access.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_cache.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_cache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_defs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_filelib.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_filelib.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_format.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_format.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_list.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_misc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_opts.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_string.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_string.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_table.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_table.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_write.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_write.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/filesystem/mbr.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/ata_disk.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/cpudet-clean.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/e820.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/init.c" ex="false" tool="0" flavor2="3">
+        <cTool>
+          <architecture>1</architecture>
+          <commandlineTool>gcc</commandlineTool>
+          <commandLine>-ffreestanding -O2 -Wall -Wextra -masm=intel</commandLine>
+        </cTool>
+      </item>
+      <item path="src/init/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/loader/elfloader.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/panic.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/printf.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strcat.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strcpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strlen.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/stroul.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strparts.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strtol.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/time.c" ex="false" tool="0" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>cross|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+          <architecture>1</architecture>
+          <standard>3</standard>
+          <incDir>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/local/include/libcpuid</pElem>
+          </incDir>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -g</commandLine>
+          <useLinkerLibraries>false</useLinkerLibraries>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+          <commandLine>-msyntax=intel</commandLine>
+        </asmTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>/usr/local/lib</pElem>
+            <pElem>/home/yogi/opt/cross/lib</pElem>
+          </linkerAddLib>
+          <commandlineTool>gcc</commandlineTool>
+          <linkerLibItems>
+            <linkerOptionItem>-static</linkerOptionItem>
+            <linkerLibLibItem>cpuid</linkerLibLibItem>
+          </linkerLibItems>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc -g</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/asm/isr.s"
+            ex="false"
+            tool="4"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/build_num.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/chrisos.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/i386/irqHandlers.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/i386/paging.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/include/memory.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/paging_init.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="asm/asmFunctions.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="asm/boot.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="asm/bootCPU.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <folder path="SourceFiles">
+        <cTool>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>include/bits</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <item path="include/acpi.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/bishell.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/elfloader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/filesystem.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/apic.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/bits/types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/cpu.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/gdt.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/smp.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/init/ata_disk.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/init/diskPartition.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/init/initVars.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/io.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kbd.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kernelObjects.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/mpspec_def.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/multiboot.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci/pci.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci/pci_ids.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci/pci_reg.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci/pcihdr.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/pci_c_header.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/printf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/strings.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/time_os.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/utility.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="linker.ld" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/bishell.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/char/console/basic_display.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/acpi.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/apic.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/bitops.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/identify_cpu_features.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/idt.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/irqHandlers.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/msr.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/ports.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cpu/smp.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/COPYRIGHT.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/Configuration.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/History.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/License.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/Media Access API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_access.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <warningLevel>0</warningLevel>
+        </cTool>
+      </item>
+      <item path="src/fat/fat_access.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_cache.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <warningLevel>0</warningLevel>
+        </cTool>
+      </item>
+      <item path="src/fat/fat_cache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_defs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_filelib.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <warningLevel>0</warningLevel>
+        </cTool>
+      </item>
+      <item path="src/fat/fat_filelib.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_format.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <warningLevel>0</warningLevel>
+        </cTool>
+      </item>
+      <item path="src/fat/fat_format.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_list.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_misc.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <warningLevel>0</warningLevel>
+        </cTool>
+      </item>
+      <item path="src/fat/fat_misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_opts.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_string.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <warningLevel>0</warningLevel>
+        </cTool>
+      </item>
+      <item path="src/fat/fat_string.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_table.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <warningLevel>0</warningLevel>
+        </cTool>
+      </item>
+      <item path="src/fat/fat_table.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_write.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <warningLevel>0</warningLevel>
+        </cTool>
+      </item>
+      <item path="src/fat/fat_write.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/filesystem/mbr.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/ata_disk.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/cpudet-clean.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/e820.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/init.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/init/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/loader/elfloader.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/panic.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/printf.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strcat.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strcpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strlen.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/stroul.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strparts.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strtol.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/time.c" ex="false" tool="0" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
