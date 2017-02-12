@@ -31,3 +31,8 @@
 # Debug files
 *.dSYM/
 *.su
+
+#Chris stuff
+*.iso
+*.bin
+chrisos
