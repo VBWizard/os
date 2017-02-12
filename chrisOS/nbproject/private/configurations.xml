@@ -58,13 +58,13 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
-          <runcommandpicklistitem>/home/yogi/NetBeansProjects/chrisOS/dist/testbinR</runcommandpicklistitem>
+          <runcommandpicklistitem>/home/yogi/src/os//chrisOS/dist/testbinR</runcommandpicklistitem>
           <runcommandpicklistitem>qemu-system-i386 -m 1024 -kernel Release/cross-Linux-x86/chrisos -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img</runcommandpicklistitem>
           <runcommandpicklistitem>bash qemu-system-i386 -m 1024 -kernel ${OUTPUT_PATH} -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img</runcommandpicklistitem>
           <runcommandpicklistitem>qemu-system-i386 -m 1024 -kernel ${OUTPUT_PATH} -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>qemu-system-i386 -m 1024 -kernel ${OUTPUT_PATH} -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img</runcommand>
-        <rundir>/home/yogi/NetBeansProjects/chrisOS/dist</rundir>
+        <rundir>/home/yogi/src/os//chrisOS/dist</rundir>
         <buildfirst>true</buildfirst>
         <console-type>2</console-type>
         <terminal-type>2</terminal-type>
@@ -96,13 +96,13 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
-          <runcommandpicklistitem>/home/yogi/NetBeansProjects/chrisOS/dist/testbinR</runcommandpicklistitem>
+          <runcommandpicklistitem>/home/yogi/src/os//chrisOS/dist/testbinR</runcommandpicklistitem>
           <runcommandpicklistitem>qemu-system-i386 -m 1024 -kernel Release/cross-Linux-x86/chrisos -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img</runcommandpicklistitem>
           <runcommandpicklistitem>bash qemu-system-i386 -m 1024 -kernel ${OUTPUT_PATH} -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img</runcommandpicklistitem>
           <runcommandpicklistitem>qemu-system-i386 -m 1024 -kernel ${OUTPUT_PATH} -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>qemu-system-i386 -m 1024 -kernel ${OUTPUT_PATH} -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img</runcommand>
-        <rundir>/home/yogi/NetBeansProjects/chrisOS/dist</rundir>
+        <rundir>/home/yogi/src/os//chrisOS/dist</rundir>
         <buildfirst>true</buildfirst>
         <console-type>2</console-type>
         <terminal-type>2</terminal-type>

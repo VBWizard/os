@@ -1,4 +1,4 @@
-. = 0x00b00000;
+. = 0x00100000;
    kernelData  BLOCK(8K): ALIGN(8K)  
 
 { 

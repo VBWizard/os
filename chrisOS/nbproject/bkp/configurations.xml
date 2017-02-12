@@ -37,9 +37,9 @@
       <itemPath>include/i386/apic.h</itemPath>
       <itemPath>include/init/ata_disk.h</itemPath>
       <itemPath>include/bishell.h</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/build_num.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/include/build_num.h</itemPath>
       <itemPath>include/charDev.h</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/chrisos.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/include/chrisos.h</itemPath>
       <itemPath>include/i386/cpu.h</itemPath>
       <itemPath>include/init/diskPartition.h</itemPath>
       <itemPath>include/elfloader.h</itemPath>
@@ -47,13 +47,13 @@
       <itemPath>include/i386/gdt.h</itemPath>
       <itemPath>include/init/initVars.h</itemPath>
       <itemPath>include/io.h</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/i386/irqHandlers.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/include/i386/irqHandlers.h</itemPath>
       <itemPath>include/kbd.h</itemPath>
       <itemPath>include/kernelObjects.h</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/memory.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/include/memory.h</itemPath>
       <itemPath>include/mpspec_def.h</itemPath>
       <itemPath>include/multiboot.h</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/include/i386/paging.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/include/i386/paging.h</itemPath>
       <itemPath>include/pci/pci.h</itemPath>
       <itemPath>include/pci_c_header.h</itemPath>
       <itemPath>include/pci/pci_ids.h</itemPath>
@@ -89,12 +89,12 @@
       <itemPath>src/cpu/idt.c</itemPath>
       <itemPath>src/init/init.c</itemPath>
       <itemPath>src/cpu/irqHandlers.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/asm/isr.s</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/asm/isr.s</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/char/keyboard.c</itemPath>
       <itemPath>src/filesystem/mbr.c</itemPath>
       <itemPath>src/memcpy.c</itemPath>
       <itemPath>src/cpu/msr.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/init/paging_init.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/init/paging_init.c</itemPath>
       <itemPath>src/panic.c</itemPath>
       <itemPath>src/block/pci.c</itemPath>
       <itemPath>src/cpu/ports.c</itemPath>
@@ -102,10 +102,10 @@
       <itemPath>src/cpu/smp.c</itemPath>
       <itemPath>src/strings/strcat.c</itemPath>
       <itemPath>src/strings/strcpy.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/char/console/strftime.c</itemPath>
       <itemPath>src/strings/strlen.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/strings/strncmp.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/strings/strncpy.c</itemPath>
       <itemPath>src/strings/stroul.c</itemPath>
       <itemPath>src/strings/strparts.c</itemPath>
       <itemPath>src/strings/strtol.c</itemPath>
@@ -164,57 +164,57 @@
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/asm/isr.s"
+      <item path="/home/yogi/src/os//chrisOS/asm/isr.s"
             ex="false"
             tool="4"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/build_num.h"
+      <item path="/home/yogi/src/os//chrisOS/include/build_num.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/chrisos.h"
+      <item path="/home/yogi/src/os//chrisOS/include/chrisos.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/i386/irqHandlers.h"
+      <item path="/home/yogi/src/os//chrisOS/include/i386/irqHandlers.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/i386/paging.h"
+      <item path="/home/yogi/src/os//chrisOS/include/i386/paging.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/memory.h"
+      <item path="/home/yogi/src/os//chrisOS/include/memory.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c"
+      <item path="/home/yogi/src/os//chrisOS/src/char/console/strftime.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c"
+      <item path="/home/yogi/src/os//chrisOS/src/char/keyboard.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/paging_init.c"
+      <item path="/home/yogi/src/os//chrisOS/src/init/paging_init.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c"
+      <item path="/home/yogi/src/os//chrisOS/src/strings/strncmp.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c"
+      <item path="/home/yogi/src/os//chrisOS/src/strings/strncpy.c"
             ex="false"
             tool="0"
             flavor2="0">
@@ -450,57 +450,57 @@
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc -g</commandLine>
         </linkerTool>
       </compileType>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/asm/isr.s"
+      <item path="/home/yogi/src/os//chrisOS/asm/isr.s"
             ex="false"
             tool="4"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/build_num.h"
+      <item path="/home/yogi/src/os//chrisOS/include/build_num.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/chrisos.h"
+      <item path="/home/yogi/src/os//chrisOS/include/chrisos.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/i386/irqHandlers.h"
+      <item path="/home/yogi/src/os//chrisOS/include/i386/irqHandlers.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/i386/paging.h"
+      <item path="/home/yogi/src/os//chrisOS/include/i386/paging.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/include/memory.h"
+      <item path="/home/yogi/src/os//chrisOS/include/memory.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c"
+      <item path="/home/yogi/src/os//chrisOS/src/char/console/strftime.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c"
+      <item path="/home/yogi/src/os//chrisOS/src/char/keyboard.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/paging_init.c"
+      <item path="/home/yogi/src/os//chrisOS/src/init/paging_init.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c"
+      <item path="/home/yogi/src/os//chrisOS/src/strings/strncmp.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c"
+      <item path="/home/yogi/src/os//chrisOS/src/strings/strncpy.c"
             ex="false"
             tool="0"
             flavor2="0">

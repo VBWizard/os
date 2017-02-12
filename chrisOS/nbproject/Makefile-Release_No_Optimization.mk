@@ -113,34 +113,34 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisos: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	gcc -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisos ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lgcc -g
 
-${OBJECTDIR}/_ext/f965bf6e/isr.o: /home/yogi/NetBeansProjects/chrisOS/asm/isr.s 
+${OBJECTDIR}/_ext/f965bf6e/isr.o: /home/yogi/src/os//chrisOS/asm/isr.s 
 	${MKDIR} -p ${OBJECTDIR}/_ext/f965bf6e
-	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/_ext/f965bf6e/isr.o /home/yogi/NetBeansProjects/chrisOS/asm/isr.s
+	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/_ext/f965bf6e/isr.o /home/yogi/src/os//chrisOS/asm/isr.s
 
-${OBJECTDIR}/_ext/8b36c3d6/strftime.o: /home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c 
+${OBJECTDIR}/_ext/8b36c3d6/strftime.o: /home/yogi/src/os//chrisOS/src/char/console/strftime.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/8b36c3d6
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/8b36c3d6/strftime.o /home/yogi/NetBeansProjects/chrisOS/src/char/console/strftime.c
+	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/8b36c3d6/strftime.o /home/yogi/src/os//chrisOS/src/char/console/strftime.c
 
-${OBJECTDIR}/_ext/d1b20f8e/keyboard.o: /home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c 
+${OBJECTDIR}/_ext/d1b20f8e/keyboard.o: /home/yogi/src/os//chrisOS/src/char/keyboard.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/d1b20f8e
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d1b20f8e/keyboard.o /home/yogi/NetBeansProjects/chrisOS/src/char/keyboard.c
+	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d1b20f8e/keyboard.o /home/yogi/src/os//chrisOS/src/char/keyboard.c
 
-${OBJECTDIR}/_ext/d1b4e148/kpaging.o: /home/yogi/NetBeansProjects/chrisOS/src/init/kpaging.c 
+${OBJECTDIR}/_ext/d1b4e148/kpaging.o: /home/yogi/src/os//chrisOS/src/init/kpaging.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/d1b4e148
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d1b4e148/kpaging.o /home/yogi/NetBeansProjects/chrisOS/src/init/kpaging.c
+	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d1b4e148/kpaging.o /home/yogi/src/os//chrisOS/src/init/kpaging.c
 
-${OBJECTDIR}/_ext/e3eb1b4a/strncmp.o: /home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c 
+${OBJECTDIR}/_ext/e3eb1b4a/strncmp.o: /home/yogi/src/os//chrisOS/src/strings/strncmp.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/e3eb1b4a
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e3eb1b4a/strncmp.o /home/yogi/NetBeansProjects/chrisOS/src/strings/strncmp.c
+	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e3eb1b4a/strncmp.o /home/yogi/src/os//chrisOS/src/strings/strncmp.c
 
-${OBJECTDIR}/_ext/e3eb1b4a/strncpy.o: /home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c 
+${OBJECTDIR}/_ext/e3eb1b4a/strncpy.o: /home/yogi/src/os//chrisOS/src/strings/strncpy.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/e3eb1b4a
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e3eb1b4a/strncpy.o /home/yogi/NetBeansProjects/chrisOS/src/strings/strncpy.c
+	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e3eb1b4a/strncpy.o /home/yogi/src/os//chrisOS/src/strings/strncpy.c
 
 ${OBJECTDIR}/asm/asmFunctions.o: asm/asmFunctions.s 
 	${MKDIR} -p ${OBJECTDIR}/asm

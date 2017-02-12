@@ -4,16 +4,16 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/include/init/atahd.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/include/init/atahd.h</itemPath>
       <itemPath>src/include/charDev.h</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/include/i386/cpu.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/include/i386/cpu.h</itemPath>
       <itemPath>src/include/i386/gdt.h</itemPath>
       <itemPath>src/include/init/initVars.h</itemPath>
       <itemPath>src/include/io.h</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/include/kbd.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/include/kbd.h</itemPath>
       <itemPath>src/include/memory.h</itemPath>
       <itemPath>src/include/multiboot.h</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/include/printf.h</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/include/printf.h</itemPath>
       <itemPath>src/include/strings.h</itemPath>
       <itemPath>src/include/i386/bits/types.h</itemPath>
       <itemPath>src/include/utility.h</itemPath>
@@ -25,27 +25,27 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/cpu/apic.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/init/atahd.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/cpu/apic.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/init/atahd.c</itemPath>
       <itemPath>char/console/basic_display.c</itemPath>
       <itemPath>asm/boot.s</itemPath>
       <itemPath>src/init/confMemory.c</itemPath>
       <itemPath>asm/cpuFunc.s</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/init/cpudet-clean.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/init/e820.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/cpu/identify_cpu_features.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/cpu/idt.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/init/cpudet-clean.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/init/e820.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/cpu/identify_cpu_features.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/cpu/idt.c</itemPath>
       <itemPath>src/init/init.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/cpu/irqHandlers.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/asm/isr.s</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/memcpy.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/cpu/msr.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/cpu/ports.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/cpu/irqHandlers.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/asm/isr.s</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/memcpy.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/cpu/msr.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/cpu/ports.c</itemPath>
       <itemPath>char/console/printf1.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/strings/strcpy.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/char/console/strftime.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/strings/strcpy.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/char/console/strftime.c</itemPath>
       <itemPath>src/strings/strlen.c</itemPath>
-      <itemPath>/home/yogi/NetBeansProjects/chrisOS/src/time.c</itemPath>
+      <itemPath>/home/yogi/src/os//chrisOS/src/time.c</itemPath>
       <itemPath>src/init/utility.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -76,7 +76,7 @@
           <incDir>
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
-            <pElem>/home/yogi/NetBeansProjects/chrisOS/src/include</pElem>
+            <pElem>/home/yogi/src/os//chrisOS/src/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
@@ -93,92 +93,92 @@
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/asm/isr.s"
+      <item path="/home/yogi/src/os//chrisOS/asm/isr.s"
             ex="false"
             tool="4"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/char/console/strftime.c"
+      <item path="/home/yogi/src/os//chrisOS/char/console/strftime.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/apic.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/apic.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/identify_cpu_features.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/identify_cpu_features.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/idt.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/idt.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/irqHandlers.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/irqHandlers.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/msr.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/msr.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/ports.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/ports.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/include/i386/cpu.h"
+      <item path="/home/yogi/src/os//chrisOS/src/include/i386/cpu.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/include/init/atahd.h"
+      <item path="/home/yogi/src/os//chrisOS/src/include/init/atahd.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/include/kbd.h"
+      <item path="/home/yogi/src/os//chrisOS/src/include/kbd.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/include/printf.h"
+      <item path="/home/yogi/src/os//chrisOS/src/include/printf.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/atahd.c"
+      <item path="/home/yogi/src/os//chrisOS/src/init/atahd.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/cpudet-clean.c"
+      <item path="/home/yogi/src/os//chrisOS/src/init/cpudet-clean.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/e820.c"
+      <item path="/home/yogi/src/os//chrisOS/src/init/e820.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/memcpy.c"
+      <item path="/home/yogi/src/os//chrisOS/src/memcpy.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strcpy.c"
+      <item path="/home/yogi/src/os//chrisOS/src/strings/strcpy.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/time.c"
+      <item path="/home/yogi/src/os//chrisOS/src/time.c"
             ex="false"
             tool="0"
             flavor2="0">
@@ -248,7 +248,7 @@
           <incDir>
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
-            <pElem>/home/yogi/NetBeansProjects/chrisOS/src/include</pElem>
+            <pElem>/home/yogi/src/os//chrisOS/src/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
@@ -277,92 +277,92 @@
           <commandLine>-T linker.ld -O2 -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/asm/isr.s"
+      <item path="/home/yogi/src/os//chrisOS/asm/isr.s"
             ex="false"
             tool="4"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/char/console/strftime.c"
+      <item path="/home/yogi/src/os//chrisOS/char/console/strftime.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/apic.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/apic.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/identify_cpu_features.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/identify_cpu_features.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/idt.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/idt.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/irqHandlers.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/irqHandlers.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/msr.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/msr.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/cpu/ports.c"
+      <item path="/home/yogi/src/os//chrisOS/src/cpu/ports.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/include/i386/cpu.h"
+      <item path="/home/yogi/src/os//chrisOS/src/include/i386/cpu.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/include/init/atahd.h"
+      <item path="/home/yogi/src/os//chrisOS/src/include/init/atahd.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/include/kbd.h"
+      <item path="/home/yogi/src/os//chrisOS/src/include/kbd.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/include/printf.h"
+      <item path="/home/yogi/src/os//chrisOS/src/include/printf.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/atahd.c"
+      <item path="/home/yogi/src/os//chrisOS/src/init/atahd.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/cpudet-clean.c"
+      <item path="/home/yogi/src/os//chrisOS/src/init/cpudet-clean.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/init/e820.c"
+      <item path="/home/yogi/src/os//chrisOS/src/init/e820.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/memcpy.c"
+      <item path="/home/yogi/src/os//chrisOS/src/memcpy.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/strings/strcpy.c"
+      <item path="/home/yogi/src/os//chrisOS/src/strings/strcpy.c"
             ex="false"
             tool="0"
             flavor2="0">
       </item>
-      <item path="/home/yogi/NetBeansProjects/chrisOS/src/time.c"
+      <item path="/home/yogi/src/os//chrisOS/src/time.c"
             ex="false"
             tool="0"
             flavor2="0">

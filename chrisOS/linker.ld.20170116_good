@@ -50,7 +50,7 @@ SECTIONS
         /* The compiler may produce other sections, by default it will put them in
            a segment with the same name. Simply add stuff here as needed. */
 
-INCLUDE /home/yogi/NetBeansProjects/chrisOS/kernelData.ld
+INCLUDE /home/yogi/src/os//chrisOS/kernelData.ld
 
 }
 
