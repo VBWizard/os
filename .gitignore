@@ -36,3 +36,4 @@
 *.iso
 *.bin
 chrisos
+build_num.h
