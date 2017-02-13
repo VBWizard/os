@@ -9,8 +9,8 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=cross-Linux
 CND_ARTIFACT_DIR_Debug=dist/Debug/cross-Linux
-CND_ARTIFACT_NAME_Debug=chrisoskernel
-CND_ARTIFACT_PATH_Debug=dist/Debug/cross-Linux/chrisoskernel
+CND_ARTIFACT_NAME_Debug=kernel
+CND_ARTIFACT_PATH_Debug=dist/Debug/cross-Linux/kernel
 CND_PACKAGE_DIR_Debug=dist/Debug/cross-Linux/package
 CND_PACKAGE_NAME_Debug=chrisoskernel.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/cross-Linux/package/chrisoskernel.tar

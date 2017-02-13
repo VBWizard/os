@@ -1,7 +1,8 @@
-. = 0x00100000;
+. = 0x00120000;
    kernelData  BLOCK(8K): ALIGN(8K)  
 
 { 
+kernelDataLoadAddress = .;
     terminal_row =  0x000;
     terminal_column =  0x004;
     terminal_color =  0x008;

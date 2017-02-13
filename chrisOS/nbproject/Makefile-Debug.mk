@@ -35,12 +35,12 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/f965bf6e/isr.o \
-	${OBJECTDIR}/_ext/8b36c3d6/strftime.o \
-	${OBJECTDIR}/_ext/d1b20f8e/keyboard.o \
-	${OBJECTDIR}/_ext/d1b4e148/kpaging.o \
-	${OBJECTDIR}/_ext/e3eb1b4a/strncmp.o \
-	${OBJECTDIR}/_ext/e3eb1b4a/strncpy.o \
+	${OBJECTDIR}/_ext/bed2f502/isr.o \
+	${OBJECTDIR}/_ext/3de03ec2/strftime.o \
+	${OBJECTDIR}/_ext/d5cb367a/keyboard.o \
+	${OBJECTDIR}/_ext/d5ce0834/kpaging.o \
+	${OBJECTDIR}/_ext/cee37cde/strncmp.o \
+	${OBJECTDIR}/_ext/cee37cde/strncpy.o \
 	${OBJECTDIR}/asm/asmFunctions.o \
 	${OBJECTDIR}/asm/boot.o \
 	${OBJECTDIR}/asm/bootCPU.o \
@@ -113,34 +113,34 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisos: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisos ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lgcc
 
-${OBJECTDIR}/_ext/f965bf6e/isr.o: /home/yogi/src/os//chrisOS/asm/isr.s 
-	${MKDIR} -p ${OBJECTDIR}/_ext/f965bf6e
-	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/_ext/f965bf6e/isr.o /home/yogi/src/os//chrisOS/asm/isr.s
+${OBJECTDIR}/_ext/bed2f502/isr.o: /home/yogi/src/os//chrisOS/asm/isr.s 
+	${MKDIR} -p ${OBJECTDIR}/_ext/bed2f502
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/_ext/bed2f502/isr.o /home/yogi/src/os//chrisOS/asm/isr.s
 
-${OBJECTDIR}/_ext/8b36c3d6/strftime.o: /home/yogi/src/os//chrisOS/src/char/console/strftime.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/8b36c3d6
+${OBJECTDIR}/_ext/3de03ec2/strftime.o: /home/yogi/src/os//chrisOS/src/char/console/strftime.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/3de03ec2
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/8b36c3d6/strftime.o /home/yogi/src/os//chrisOS/src/char/console/strftime.c
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3de03ec2/strftime.o /home/yogi/src/os//chrisOS/src/char/console/strftime.c
 
-${OBJECTDIR}/_ext/d1b20f8e/keyboard.o: /home/yogi/src/os//chrisOS/src/char/keyboard.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/d1b20f8e
+${OBJECTDIR}/_ext/d5cb367a/keyboard.o: /home/yogi/src/os//chrisOS/src/char/keyboard.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/d5cb367a
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d1b20f8e/keyboard.o /home/yogi/src/os//chrisOS/src/char/keyboard.c
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d5cb367a/keyboard.o /home/yogi/src/os//chrisOS/src/char/keyboard.c
 
-${OBJECTDIR}/_ext/d1b4e148/kpaging.o: /home/yogi/src/os//chrisOS/src/init/kpaging.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/d1b4e148
+${OBJECTDIR}/_ext/d5ce0834/kpaging.o: /home/yogi/src/os//chrisOS/src/init/kpaging.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/d5ce0834
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d1b4e148/kpaging.o /home/yogi/src/os//chrisOS/src/init/kpaging.c
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d5ce0834/kpaging.o /home/yogi/src/os//chrisOS/src/init/kpaging.c
 
-${OBJECTDIR}/_ext/e3eb1b4a/strncmp.o: /home/yogi/src/os//chrisOS/src/strings/strncmp.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/e3eb1b4a
+${OBJECTDIR}/_ext/cee37cde/strncmp.o: /home/yogi/src/os//chrisOS/src/strings/strncmp.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/cee37cde
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e3eb1b4a/strncmp.o /home/yogi/src/os//chrisOS/src/strings/strncmp.c
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/cee37cde/strncmp.o /home/yogi/src/os//chrisOS/src/strings/strncmp.c
 
-${OBJECTDIR}/_ext/e3eb1b4a/strncpy.o: /home/yogi/src/os//chrisOS/src/strings/strncpy.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/e3eb1b4a
+${OBJECTDIR}/_ext/cee37cde/strncpy.o: /home/yogi/src/os//chrisOS/src/strings/strncpy.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/cee37cde
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e3eb1b4a/strncpy.o /home/yogi/src/os//chrisOS/src/strings/strncpy.c
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/cee37cde/strncpy.o /home/yogi/src/os//chrisOS/src/strings/strncpy.c
 
 ${OBJECTDIR}/asm/asmFunctions.o: asm/asmFunctions.s 
 	${MKDIR} -p ${OBJECTDIR}/asm

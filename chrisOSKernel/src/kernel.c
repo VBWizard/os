@@ -15,6 +15,7 @@
 #include "sysloader.h"
 #include "../../chrisOS/include/strings.h"
 
+extern char kernelDataLoadAddress;
 
 /*
  * 
@@ -22,13 +23,16 @@
 int main(int argc, char** argv) {
     //terminal_clear();
     printk("\nkernel loaded ... \n");
-    printk("Param count=%u\n",argc);
+/*    printk("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
     {
         printk("Param %u=%s\n",cnt,argv[cnt]);
         //if (cnt>5)
         //    break;
     }
+*/
+    
+    printk("kernelDataLoadAddress = 0x%08X \n\n",&kernelDataLoadAddress);
     mmInit();
     
     return (0xbad);

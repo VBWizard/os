@@ -1,14 +1,14 @@
 #!/bin/bash
 basePath=/home/yogi/src/os/
-cd $basePath/myHelloWorld/dist
-./makeit
-cd $basePath/myHelloWorld2/dist
-./makeit
-cd $basePath/testMainProgramEntry/dist
-./makeit
+#cd $basePath/myHelloWorld/dist
+#./makeit
+#cd $basePath/myHelloWorld2/dist
+#./makeit
+#cd $basePath/testMainProgramEntry/dist
+#./makeit
 cd $basePath/chrisOSKernel/dist
 ./makeit
-cd $basePath/fatLib/dist
-./makeit
+#cd $basePath/fatLib/dist
+#./makeit
 cd $pp
 

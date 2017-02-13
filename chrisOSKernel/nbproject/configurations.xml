@@ -85,6 +85,7 @@
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel -O</commandLine>
         </cTool>
         <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>
           <linkerAddLib>
             <pElem>/usr/local/lib</pElem>
             <pElem>/home/yogi/opt/cross/lib</pElem>

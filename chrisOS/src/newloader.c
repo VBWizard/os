@@ -225,8 +225,6 @@ void loadSections(void* file,elfInfo_t* elfInfo, bool isLibrary)
         else if (elfInfo->pgmHdrTable[cnt].p_memsz>0)
         {
             printd(DEBUG_ELF_LOADER,"Section %u not loadable, zeroed 0x%08X bytes at 0x%08X\n",cnt, elfInfo->pgmHdrTable[cnt].p_memsz, loadAddress);
-            //CLR 02/10/2017: Remarked out memset below, as loading the kernelData was overwriting all the existing values.
-            //memset(loadAddress,0,elfInfo->pgmHdrTable[cnt].p_memsz);
         }
 #ifndef DEBUG_NONE
         else

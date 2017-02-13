@@ -37,3 +37,4 @@
 *.bin
 chrisos
 build_num.h
+*.o.d

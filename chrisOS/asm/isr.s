@@ -533,7 +533,7 @@ cli
         pushad
         pushf
         mov     ebp, esp
-        add ebp,4
+        add ebp,36
         mov ax,0x0001
 cld
 #cld #C code following the sysV ABI requires DF to be clear on function entry

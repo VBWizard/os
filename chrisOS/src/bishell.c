@@ -315,7 +315,7 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
                 puts("\t");
                 for (int cnt2=0;cnt2<16;cnt2++)
                 {
-                    if (ISALPHA(lTempS[cnt2]) || ISDIGIT(lTempS[cnt2]) || (lTempS[cnt2]>=32&&lTempS[cnt2]<=47) || (lTempS[cnt2]>=123&&lTempS[cnt2]<=126) || (lTempS[cnt2]>=91&&lTempS[cnt2]<=96))
+                    if (ISALPHA(lTempS[cnt2]) || ISDIGIT(lTempS[cnt2]) || (lTempS[cnt2]>=32&&lTempS[cnt2]<=47) || (lTempS[cnt2]>=123&&lTempS[cnt2]<=126) || (lTempS[cnt2]>=91&&lTempS[cnt2]<=96) || (lTempS[cnt2]>=58&&lTempS[cnt2]<=64) )
                         printk("%c",lTempS[cnt2]);
                     else
                         puts(".");

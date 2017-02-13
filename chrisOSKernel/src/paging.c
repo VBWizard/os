@@ -14,14 +14,14 @@ extern void set_gdt(struct gdt_ptr *);
 extern void doPagingJump();
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
-uint32_t kPagingPageMemoryAddress;
+uint32_t kKernelPoolMemoryAddress;
 
 #define PAGE_SIZE 0x1000
 
 uint32_t pagingAllocatePagingTablePage()
 {
-    uint32_t lRetVal = kPagingPageMemoryAddress;
-    kPagingPageMemoryAddress+=0x1000;
+    uint32_t lRetVal = kKernelPoolMemoryAddress;
+    kKernelPoolMemoryAddress+=0x1000;
 }
 
 uint32_t pagingGet4kPDEntryValue(uintptr_t pageDirAddress, uint32_t address)
