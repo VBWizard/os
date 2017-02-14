@@ -12,12 +12,12 @@
 #pragma pack(1)
 struct GDT
 {
-    unsigned short limit_low;
-    unsigned short base_low;
-    char base_middle;
-    char access;
-    char flags_and_limit;
-    char base_high;
+    unsigned short limit_low;       //2
+    unsigned short base_low;        //2
+    char base_middle;               //1
+    char access;                    //1
+    char flags_and_limit;           //1
+    char base_high;                 //1
 } __attribute__((packed)) ;
 
 struct gdt_ptr 
@@ -49,7 +49,7 @@ enum {
     GDT_16BIT       = 0x00
 };
 
-#define GDT_ENTRIES 50
+#define GDT_ENTRIES 100
 
 void gdt_init();
 void gdtEntry(int entryNo, int base, int limit, char access, char flags,bool inUse);

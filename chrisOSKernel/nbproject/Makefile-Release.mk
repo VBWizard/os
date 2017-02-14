@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/9e029b58/asmFunctions.o \
 	${OBJECTDIR}/_ext/7450142c/basic_display.o \
 	${OBJECTDIR}/_ext/f33415e4/keyboard.o \
 	${OBJECTDIR}/_ext/101a755a/bits.o \
@@ -57,7 +58,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/paging.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
-	${OBJECTDIR}/src/tss.o
+	${OBJECTDIR}/src/task.o
 
 
 # C Compiler Flags
@@ -85,6 +86,10 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisoskernel: ../fatLib/dist/Debug/c
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisoskernel: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/chrisoskernel ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lgcc
+
+${OBJECTDIR}/_ext/9e029b58/asmFunctions.o: ../chrisOS/asm/asmFunctions.s 
+	${MKDIR} -p ${OBJECTDIR}/_ext/9e029b58
+	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/_ext/9e029b58/asmFunctions.o ../chrisOS/asm/asmFunctions.s
 
 ${OBJECTDIR}/_ext/7450142c/basic_display.o: ../chrisOS/src/char/console/basic_display.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/7450142c
@@ -196,10 +201,10 @@ ${OBJECTDIR}/src/sysloader.o: src/sysloader.c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/sysloader.o src/sysloader.c
 
-${OBJECTDIR}/src/tss.o: src/tss.c 
+${OBJECTDIR}/src/task.o: src/task.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tss.o src/tss.c
+	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/task.o src/task.c
 
 # Subprojects
 .build-subprojects:

@@ -35,5 +35,10 @@ dumpregs:
         mov eax, exceptionAX
         ret 
 
-
-
+.global storeGDT
+.type storeGDT, @function
+storeGDT:
+.code32
+    mov eax,[esp+4]
+    sgdt [eax]
+    ret

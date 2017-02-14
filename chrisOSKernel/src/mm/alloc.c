@@ -82,7 +82,7 @@ uintptr_t* allocateBlockFrom(sMemInfo* mInfoToAllocateFrom, uint32_t size)
     mPriorInfo->next=(uintptr_t*)mNewInfo;
     
     //Set up the new sMemInfo
-    mNewInfo->prior=(uintptr_t*)mPriorInfo;
+    mNewInfo->prev=(uintptr_t*)mPriorInfo;
     mNewInfo->address=mInfoToAllocateFrom->address;
     mNewInfo->size=size;
     mNewInfo->inUse=true;

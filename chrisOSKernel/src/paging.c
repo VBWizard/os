@@ -22,6 +22,7 @@ uint32_t pagingAllocatePagingTablePage()
 {
     uint32_t lRetVal = kKernelPoolMemoryAddress;
     kKernelPoolMemoryAddress+=0x1000;
+    return lRetVal;
 }
 
 uint32_t pagingGet4kPDEntryValue(uintptr_t pageDirAddress, uint32_t address)

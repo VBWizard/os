@@ -1,0 +1,7 @@
+#sym Debug/cross-Linux/chrisos
+file Debug/cross-Linux/chrisos
+break kernel_main
+#break initializeKernelPaging
+#break doPagingJump
+target remote localhost:1234
+c

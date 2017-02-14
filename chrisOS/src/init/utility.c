@@ -19,7 +19,7 @@ extern uint32_t  *exceptionSavedStack;
 extern uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR3, debugCR4, 
             debugErrorCode,debugCS, debugEIP, debugSavedESP, debugDS, debugES, debugFS, debugGS, debugSS, debugFlags;
 extern uint32_t  *debugSavedStack;
-extern struct gdt_ptr gdtp;
+extern struct gdt_ptr kernelGDT;
 
 //#include <string.h>
 
@@ -189,7 +189,7 @@ void printDumpedRegs()
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
     printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionGS, exceptionFS);
-    printk("GDT=%08X\n",gdtp.base);
+    printk("GDT=%08X\n",kernelGDT.base);
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
           printk("Bytes at CS:EIP: ");
           for (int cnt=0;cnt<19;cnt++)
@@ -289,7 +289,7 @@ printk("\tAHCI_PORT_BASE_REMAP_ADDRESS=0x%08x\n",AHCI_PORT_BASE_REMAP_ADDRESS);
 printk("\tAHCI_DISK_BUFFER_ADDRESS=0x%08x\n",AHCI_DISK_BUFFER_ADDRESS);
 printk("\tATA_DEVICE_INFO_ADDRESS=0x%08x\n",ATA_DEVICE_INFO_ADDRESS);
 printk("\tAHCI_CAPS_ADDRESS=0x%08x\n",AHCI_CAPS_ADDRESS);
-printk("\tTSS_AVAILABLE_ADDRESS=0x%08x\n",TSS_AVAILABLE_ADDRESS);
+printk("\tTSS_AVAILABLE_ADDRESS=0x%08x\n",TASK_AVAILABLE_ADDRESS);
 printk("\tGDT_AVAILABLE_ADDRESS=0x%08x\n",GDT_AVAILABLE_ADDRESS);
 printk("\tEXEC_FILE_LOAD_INFO=0x%08x\n",EXEC_FILE_LOAD_INFO);
 printk("\tAHCI_ABAR_ADDRESS=0x%08x\n",AHCI_ABAR_ADDRESS);

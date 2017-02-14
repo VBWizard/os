@@ -4,7 +4,7 @@ pushd ..
 ./make_debug
 popd
 #strip --strip-debug --strip-unneeded Debug/cross-Linux-x86/chrisos
-cp Debug/cross-Linux-x86/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
+cp Debug/cross-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
 grub-mkrescue -o myos.iso ~/src/os/build_dir/isodir
 qemu-system-i386 							\
 	-m 1536								\

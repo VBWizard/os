@@ -78,7 +78,7 @@ KERNEL_DATA_SECTION uint32_t kOriginalAddressZeroValue=0;
 KERNEL_DATA_SECTION ahcicaps_t* ahciCaps=(ahcicaps_t*)AHCI_CAPS_ADDRESS;
 KERNEL_DATA_SECTION int ahciCapsCount=0;
 KERNEL_DATA_SECTION uint32_t* kGDTSlotAvailableInd=(uint32_t*)GDT_AVAILABLE_ADDRESS;
-KERNEL_DATA_SECTION uint32_t* kTSSSlotAvailableInd=(uint32_t*)TSS_AVAILABLE_ADDRESS;
+KERNEL_DATA_SECTION uint32_t* kTaskSlotAvailableInd=(uint32_t*)TASK_AVAILABLE_ADDRESS;
 KERNEL_DATA_SECTION tss_t* kTSSTable=(tss_t*)TSS_TABLE_ADDRESS;
 KERNEL_DATA_SECTION task_t* kTaskTable=(task_t*)TASK_TABLE_ADDRESS;
 KERNEL_DATA_SECTION elfInfo_t* kExecLoadInfo=(elfInfo_t*)EXEC_FILE_LOAD_INFO;
@@ -98,8 +98,8 @@ KERNEL_DATA_SECTION int ticksToWait;
 //NOTE: This is a temporary table in the .asm section.  It is copied to smap_table_ptr as soon as the E820 reading is complete
 KERNEL_DATA_SECTION struct gdt_ptr rmGdtp;
 KERNEL_DATA_SECTION struct GDT* rmGdt = (struct GDT*)GDT_PMODE_16BIT_TABLE_ADDRESS;
-KERNEL_DATA_SECTION struct GDT* gdt = (struct GDT*)INIT_GDT_TABLE_ADDRESS;
-KERNEL_DATA_SECTION struct gdt_ptr gdtp;
+KERNEL_DATA_SECTION struct GDT* bootGdt = (struct GDT*)INIT_GDT_TABLE_ADDRESS;
+KERNEL_DATA_SECTION struct gdt_ptr kernelGDT;
 
 //AHCI
 KERNEL_DATA_SECTION HBA_MEM* ahciABAR = (struct HBA_MEM*)AHCI_ABAR_ADDRESS;

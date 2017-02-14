@@ -10,7 +10,7 @@
 
 typedef struct smeminfo
 {
-    uintptr_t* prior;       //4
+    uintptr_t* prev;       //4
     uint32_t address;       //4
     uint32_t size;          //4
     bool inUse;             //4

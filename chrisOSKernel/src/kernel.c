@@ -14,9 +14,10 @@
 #include "syscall.h"
 #include "sysloader.h"
 #include "../../chrisOS/include/strings.h"
+#include "../../chrisOS/include/i386/gdt.h"
 
 extern char kernelDataLoadAddress;
-
+extern struct gdt_ptr kernelGDT;
 /*
  * 
  */
@@ -34,7 +35,11 @@ int main(int argc, char** argv) {
     
     printk("kernelDataLoadAddress = 0x%08X \n\n",&kernelDataLoadAddress);
     mmInit();
+    taskInit();
     
+    task_t* task=createTask(true);
+    
+    printk("kernelGDT=0x%08X, base=0x%08X, limit=%u\n",&kernelGDT, kernelGDT.base,kernelGDT.limit);
     return (0xbad);
 }
 

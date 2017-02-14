@@ -14,7 +14,7 @@ typedef struct s_task
 {
     tss_t* tss;
     uint32_t* pageTable;
-    uintptr_t* next, previous;
+    uintptr_t* next, prev;
 } task_t;
 
 task_t* createTask(bool kernelTSS);

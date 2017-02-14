@@ -4,18 +4,18 @@
 #include "i386/bits/bits.h"
 
 extern struct KERNEL_DATA_SECTION GDT* rmGdt;
-extern struct KERNEL_DATA_SECTION GDT* gdt;
+extern struct KERNEL_DATA_SECTION GDT* bootGdt;
 extern uint32_t* kGDTSlotAvailableInd;
 
 //Create/modify entries in the protected mode GDT
 void HIGH_CODE_SECTION gdtEntry(int entryNo, int base, int limit, char access, char flags,bool inUse)
 {
-    gdt[entryNo].base_low        = base & 0xFFFF;
-    gdt[entryNo].base_middle     = base >> 16 & 0xFF;
-    gdt[entryNo].base_high       = base >> 24 & 0xFF;
-    gdt[entryNo].limit_low       = limit & 0xFFFF;
-    gdt[entryNo].flags_and_limit = flags | (limit >> 16 & 0xF);
-    gdt[entryNo].access          = access | 0x10;
+    bootGdt[entryNo].base_low        = base & 0xFFFF;
+    bootGdt[entryNo].base_middle     = base >> 16 & 0xFF;
+    bootGdt[entryNo].base_high       = base >> 24 & 0xFF;
+    bootGdt[entryNo].limit_low       = limit & 0xFFFF;
+    bootGdt[entryNo].flags_and_limit = flags | (limit >> 16 & 0xF);
+    bootGdt[entryNo].access          = access | 0x10;
     if (inUse)
         bitsReset(kGDTSlotAvailableInd,entryNo);
     else

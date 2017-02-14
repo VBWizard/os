@@ -45,12 +45,12 @@ void mmInitHeapTracking()
     heapMemoryInfo->address=kmmHeapMemoryBaseAddress;
     heapMemoryInfo->size=kmmHeapMemoryTotal;
     heapMemoryInfo->next=NULL;
-    heapMemoryInfo->prior=NULL;
+    heapMemoryInfo->prev=NULL;
     
     for (int cnt=1;cnt<1000;cnt++)
     {
         heapMemoryInfo[cnt].address=0;
-        heapMemoryInfo[cnt].prior=NULL;
+        heapMemoryInfo[cnt].prev=NULL;
         if (cnt<999)
             heapMemoryInfo[cnt].next=NULL;
         heapMemoryInfo[cnt].inUse=false;

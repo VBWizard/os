@@ -27,6 +27,7 @@
 #include "ahci.h"
 #include "kernelObjects.h"
 
+extern storeGDT(struct gdt_ptr* gdtp);
 extern void set_gdt(struct gdt_ptr *);
 extern int detect_cpu();
 extern bool kInitDone;
@@ -52,6 +53,7 @@ bool ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char* cmdToFind,
 char kBootParams[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
 char kBootCmd[150];
 int kBootParamCount;
+struct gdt_ptr lGDT;
 
 //CLR 04/27/2016: Even though we are working on our cross compiler env, somehow __linus is set
 //so unset it
@@ -96,11 +98,10 @@ void HIGH_CODE_SECTION gdt_init()
     gdtEntryRM(3, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_WRITABLE,
               GDT_GRANULAR | GDT_32BIT);
 
-    gdtp.limit = sizeof(struct GDT) * GDT_ENTRIES - 1;
-    gdtp.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
+    kernelGDT.limit = (sizeof(struct GDT) * GDT_ENTRIES) - 1;
+    kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
     rmGdtp.limit = sizeof(struct GDT) * GDT_ENTRIES - 1;
     rmGdtp.base = (unsigned int)rmGdt;
-    set_gdt(&gdtp);
 }
 
 void HIGH_CODE_SECTION quietHardware()
@@ -201,8 +202,8 @@ struct tm theDateTime;
     kTicksPerMS=1000/kTicksPerSecond;
     kDebugStartsNow=false;
     memset(kATADeviceInfo,0x0,sizeof(struct ataDeviceInfo_t)*20);
-    memset(kGDTSlotAvailableInd,0xFA,0x4096);
-    memset(kTSSSlotAvailableInd,0xFA,TSS_TABLE_RECORD_COUNT*0x68);
+    memset(kGDTSlotAvailableInd,0xFF,GDT_TABLE_SIZE);
+    memset(kTaskSlotAvailableInd,0xFF,TASK_TABLE_SIZE);
 
     __asm__("mov esp,0xff00\n" /*\
             "mov eax,0\nmov dr6,eax":::"eax"*/);
@@ -212,6 +213,7 @@ struct tm theDateTime;
     terminal_clear();
     printk("Booting ...\n");
     gdt_init();
+
     quietHardware();
     int lLowMemKB = getInt12Memory();
     kE820Status = isE820Available(); //

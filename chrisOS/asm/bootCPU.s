@@ -110,7 +110,7 @@ mov ax,0x10
 mov ds,ax
 mov es,ax
 mov gs,ax
-lgdt [gdtp]
+lgdt [kernelGDT]
 ljmp 0x8:reenterProtMode32Jmp
 reenterProtMode32Jmp:
 .code16

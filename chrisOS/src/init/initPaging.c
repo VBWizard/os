@@ -7,6 +7,7 @@ extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 extern struct idt_entry kInitialIDT[0x30];
 extern struct idt_ptr kInitialIDTReg;
+extern struct gdt_ptr kernelGDT;
 
 void initializeKernelPaging()
 {
@@ -63,10 +64,9 @@ void initializeKernelPaging()
  2 (0x10) - data @ 0xC0000000
 */
 
-        struct gdt_ptr gdtp;
-        gdtp.limit = sizeof(struct GDT) * GDT_ENTRIES - 1;
-        gdtp.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
-        set_gdt(&gdtp);
+        kernelGDT.limit = sizeof(struct GDT) * GDT_ENTRIES - 1;
+        kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
+        set_gdt(&kernelGDT);
         idt_init(&kInitialIDTReg, PIC_REMAP_OFFSET);
         doPagingJump();
 
