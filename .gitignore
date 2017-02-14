@@ -36,5 +36,9 @@
 *.iso
 *.bin
 chrisos
+kernel
+testmainprogramentry
+myhelloworld
+myhelloworld2
 build_num.h
 *.o.d
