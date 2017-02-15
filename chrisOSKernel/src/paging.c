@@ -1,12 +1,14 @@
 #include <stdbool.h>
 #include "chrisos.h"
 #include "../../chrisOS/include/i386/bits/types.h"
+#include "../../chrisOS/include/utility.h"  //for panic
 #include "printf.h"
 #include "i386/cpu.h"
 #include "i386/gdt.h"
 #include "i386/kPaging.h"
 #include "kbd.h"
 #include "paging.h"
+#include "alloc.h"
 
 extern uint64_t kE820MemoryBytes;
 extern bool kDebugStartsNow;
@@ -16,7 +18,107 @@ extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 uint32_t kKernelPoolMemoryAddress;
 
-#define PAGE_SIZE 0x1000
+
+
+uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToFind)
+{
+    uint32_t* dir;
+    dir=(uint32_t*)pageDirAddress;
+    uint32_t* tablePtr;
+    uint32_t* currentPDE,*lastPDE;
+    int foundEntryCount;
+    bool found=false;
+    uint32_t foundPageTableEntry;
+    uint32_t foundPageTableEntryNum;
+    int dirEntryNumber=0;
+    uint32_t lRetVal;
+    currentPDE=dir;
+    lastPDE=dir+(PAGE_SIZE/4);
+    
+    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding page entries to accomodate 0x%08X pages\n",pagesToFind);
+    //Scan the page directory for an entry that is in use
+    do
+    {
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding existing page directory entry\n");
+        for (uint32_t* cnt=currentPDE;cnt<=lastPDE;cnt++)
+        {
+            if (*dir==0)
+            {
+                dir++;
+                dirEntryNumber++;
+            }
+            else
+                break;
+        }
+
+        //If we didn't find a page directory in use, put the first entry into use
+        if (*dir==0)
+        {
+            dir=(uint32_t*)pageDirAddress;
+            *dir=(uint32_t)allocPages(PAGE_SIZE);
+            *dir &= 0xFFFFF000;
+            *dir |= 0x7;
+            dirEntryNumber=0;
+            printd(DEBUG_PAGING,"pagingFindAvailablePageTable: No available directory entry, allocated one at 0x%08X, placed at PDE entry 0 (0x%08X)\n",*dir,dir);
+        }
+
+        currentPDE=dir;
+        foundEntryCount=0;
+        foundPageTableEntry=0;
+        foundPageTableEntryNum=0;
+        
+        tablePtr=(uint32_t*)*dir;
+        tablePtr=(uint32_t*)((uint32_t)tablePtr & 0xFFFFF000);
+        
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found PDE=0x%08X (0x%08X)\n",currentPDE,*currentPDE);
+        
+        //Find sequential table entries large enough to hold the requested amount of memory
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding free page table entries\n");
+        for (int cnt=0;cnt<(PAGE_SIZE/4)-1;cnt++)
+        {
+            //If entry is in use
+            if (*tablePtr!=0)
+            {
+                //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u is in use (0x%08X=0x%08X), starting again\n",foundEntryCount+1,pagesToFind,tablePtr,*tablePtr);
+                //reset the found entry count and move to the next entry
+                foundEntryCount=0;
+                tablePtr++;
+                foundPageTableEntry=0;
+                foundPageTableEntryNum=0;
+            }
+            else
+            {
+                //Entry not in use, increment the found entry count
+                foundEntryCount++;
+                printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u available ... continuing\n",foundEntryCount,pagesToFind);
+                if (foundPageTableEntry==0)
+                {
+                    foundPageTableEntry=(uint32_t)tablePtr;
+                    foundPageTableEntryNum=cnt;
+                }
+                //If we found enough entries which aren't in use, bail out of the FOR
+                if (foundEntryCount==pagesToFind)
+                {
+                    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found available page entries at entry 0x%08X\n",foundPageTableEntry);
+                    found=true;
+                    break;
+                }
+            }
+        }
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Not enough pages at dir entry 0x%08X (%u-%u)\n",currentPDE,foundEntryCount,pagesToFind);
+        dir++;
+        dirEntryNumber++;
+    } while ( !found && currentPDE<lastPDE);
+    
+    if (!found)
+        panic("pagingFindAvailablePageTable: Could not find a free PTE, PDE=0x%08X\n",pageDirAddress);
+
+    printd(DEBUG_PAGING,"dirEntryNumber=0x%08X, foundPageTableEntry=0x%08X\n",dirEntryNumber,foundPageTableEntryNum);
+    lRetVal=(uint32_t)((dirEntryNumber*0x400000) + (foundPageTableEntryNum*4096));
+    printd(DEBUG_PAGING,"Found page directory entry 0x%08X, starting page entry 0x%08X\n",currentPDE,foundPageTableEntry);
+    printd(DEBUG_PAGING,"\tfor 0x%08X bytes of memory starting at address 0x%08X\n",pagesToFind*PAGE_SIZE,lRetVal);
+    return lRetVal;
+}
 
 uint32_t pagingAllocatePagingTablePage()
 {
@@ -37,7 +139,7 @@ uint32_t pagingGet4kPDEntryAddress(uintptr_t pageDirAddress, uint32_t address)
 {
     address&=0xFFFFF000;
     uintptr_t lTemp=((pageDirAddress  | (((address & 0xFFC00000) >> 22) << 2)));
-    printd(DEBUG_PAGING,"dirEntryAddress=0x%08x\n", lTemp);
+    printd(DEBUG_PAGING,"pagingGet4kPDEntryAddress: dirEntryAddress=0x%08x\n", lTemp);
     return (uint32_t)lTemp & 0xFFFFFFFF;
 }
 
@@ -107,9 +209,7 @@ void pagingUpdatePresentFlagV(uintptr_t pageDirAddress,uint32_t address, bool pr
 }
 
 ///Map a page to a new address
-///mapFrom is the original address
-///mapTo is the new address that the page will be available at
-void pagingMapPage(uintptr_t pageDirAddress, uintptr_t mapTo, uintptr_t mapFrom, uint8_t flags)
+void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, uint8_t flags)
 {
     uint32_t *ptr;
     uint32_t ptrVal;
@@ -118,29 +218,29 @@ void pagingMapPage(uintptr_t pageDirAddress, uintptr_t mapTo, uintptr_t mapFrom,
     //Get pointer to the page directory
     ptr=(uint32_t*)pageDirAddress;
     //Get the appropriate entry in the page table
-    ptrVal=ptr[(mapTo>>22)];
+    ptrVal=ptr[(virtualAddress>>22)];
     if (ptrVal==0)
     {
         //Get a page for the page table
         *ptrT=(uint32_t*)pagingAllocatePagingTablePage();
-        printd(DEBUG_PAGING,"pagingMapPage: Page table didn't exist for address 0x%08X (CR3=0x%08X)\n\tAllocated page @ 0x%08X for the page table\n",mapTo,pageDirAddress,  *ptrT);
-        ptr[(mapTo>>22)]=0x20000063;
-        ptrT[(mapTo&0x003FFFFF/4096)]=mapFrom | flags;
-        printd(DEBUG_PAGING,"kMapPage: Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)],ptrT[(mapTo&0x003FFFFF/4096)]);
+        printd(DEBUG_PAGING,"pagingMapPage: Page table didn't exist for address 0x%08X (CR3=0x%08X)\n\tAllocated page @ 0x%08X for the page table\n",virtualAddress,pageDirAddress,  *ptrT);
+        ptr[(virtualAddress>>22)]=0x20000063;
+        ptrT[(virtualAddress&0x003FFFFF/4096)]=physicalAddress | flags;
+        printd(DEBUG_PAGING,"kMapPage: Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", virtualAddress, &ptr[(virtualAddress>>22)], &ptrT[(virtualAddress&0x003FFFFF/4096)],ptrT[(virtualAddress&0x003FFFFF/4096)]);
     }
     else
     {
         //ptrVal right now points to the pdir entry
         ptr=(uint32_t*)pageDirAddress;
-        if (ptr[(mapTo>>22)]==0)
-            ptr[mapTo>>22]=(KERNEL_PAGE_TABLE_BASE_ADDRESS + ((mapTo&0x003FFFFF)/4096)) | 0x63;
-        ptrVal=ptr[mapTo>>22];
+        if (ptr[(virtualAddress>>22)]==0)
+            ptr[virtualAddress>>22]=(KERNEL_PAGE_TABLE_BASE_ADDRESS + ((virtualAddress&0x003FFFFF)/4096)) | 0x63;
+        ptrVal=ptr[virtualAddress>>22];
         ptrVal=(ptrVal&0xFFFFF000);
         ptrT=(uint32_t*)ptrVal;
         //Now ptrVal will point to offset within page table
-        ptrVal=(mapTo&0x003FFFFF)/4096;
-        ptrT[ptrVal]=mapFrom | flags;
-        printd(DEBUG_PAGING,"2) Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal],ptrT[ptrVal]);
+        ptrVal=(virtualAddress&0x003FFFFF)/4096;
+        ptrT[ptrVal]=physicalAddress | flags;
+        printd(DEBUG_PAGING,"kMapPage:(2) Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", virtualAddress, &ptr[(virtualAddress>>22)], &ptrT[ptrVal],ptrT[ptrVal]);
     }
 }
 
@@ -151,31 +251,31 @@ bool isPageMapped(uintptr_t pageDirAddress, uintptr_t Address)
     return true;
 }
 
-void unMapPage(uintptr_t pageDirAddress, uintptr_t mapTo, uint8_t newFlags)
+void unMapPage(uintptr_t pageDirAddress, uintptr_t pageToUnmap, uint8_t newFlags)
 {
     uint32_t *ptr;
     uint32_t ptrVal;
     uint32_t *ptrT;
     ptr=(uint32_t*)pageDirAddress;
-    ptrVal=ptr[(mapTo>>22)];
-    if (ptrVal==0 && mapTo < kE820MemoryBytes)
+    ptrVal=ptr[(pageToUnmap>>22)];
+    if (ptrVal==0 && pageToUnmap < kE820MemoryBytes)
     {
         ptrT=(uint32_t*)0x20000000;
-        ptr[(mapTo>>22)]=0x20000063;
-        ptrT[(mapTo&0x003FFFFF/4096)]=0 | newFlags;
-        printd(DEBUG_PAGING,"kMapPage: Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)]);
+        ptr[(pageToUnmap>>22)]=0x20000063;
+        ptrT[(pageToUnmap&0x003FFFFF/4096)]=0 | newFlags;
+        printd(DEBUG_PAGING,"kMapPage: Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", pageToUnmap, &ptr[(pageToUnmap>>22)], &ptrT[(pageToUnmap&0x003FFFFF/4096)]);
     }
     else
     {
         //ptrVal right now points to the pdir entry
         ptr=(uint32_t*)pageDirAddress;
-        ptrVal=ptr[mapTo>>22];
+        ptrVal=ptr[pageToUnmap>>22];
         ptrVal=(ptrVal&0xFFFFF000);
         ptrT=(uint32_t*)ptrVal;
         //Now ptrVal will point to offset within page table
-        ptrVal=(mapTo&0x003FFFFF)/4096;
+        ptrVal=(pageToUnmap&0x003FFFFF)/4096;
         ptrT[ptrVal]=0 | newFlags;
-        printd(DEBUG_PAGING,"2) Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal]);
+        printd(DEBUG_PAGING,"2) Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", pageToUnmap, &ptr[(pageToUnmap>>22)], &ptrT[ptrVal]);
     }
 }
 

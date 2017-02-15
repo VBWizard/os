@@ -12,8 +12,10 @@
       <itemPath>../chrisOS/include/i386/kPaging.h</itemPath>
       <itemPath>include/kernel.h</itemPath>
       <itemPath>../chrisOS/include/kernelObjects.h</itemPath>
+      <itemPath>include/malloc.h</itemPath>
       <itemPath>include/mm.h</itemPath>
       <itemPath>include/paging.h</itemPath>
+      <itemPath>include/process.h</itemPath>
       <itemPath>../chrisOS/include/strings.h</itemPath>
       <itemPath>include/syscall.h</itemPath>
       <itemPath>include/sysloader.h</itemPath>
@@ -37,11 +39,13 @@
       <itemPath>src/kernel.c</itemPath>
       <itemPath>../chrisOS/src/char/keyboard.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
+      <itemPath>src/mm/malloc.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
       <itemPath>src/mm/mm.c</itemPath>
       <itemPath>src/paging.c</itemPath>
       <itemPath>../chrisOS/src/panic.c</itemPath>
       <itemPath>../chrisOS/src/printf.c</itemPath>
+      <itemPath>src/process.c</itemPath>
       <itemPath>../chrisOS/src/strings/strcpy.c</itemPath>
       <itemPath>../chrisOS/src/strings/strlen.c</itemPath>
       <itemPath>../chrisOS/src/strings/strncmp.c</itemPath>
@@ -152,9 +156,13 @@
       </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/process.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -170,9 +178,13 @@
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/mm/malloc.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/mm/mm.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/process.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -280,9 +292,13 @@
       </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/process.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -298,9 +314,13 @@
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/mm/malloc.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/mm/mm.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/process.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>

@@ -8,6 +8,7 @@
 #ifndef TASK_H
 #define	TASK_H
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "tss.h"
 typedef struct s_task

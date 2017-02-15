@@ -42,3 +42,10 @@ storeGDT:
     mov eax,[esp+4]
     sgdt [eax]
     ret
+.global getCS
+.type getCS, @function
+getCS:
+.code32
+    push cs
+    pop eax
+    ret

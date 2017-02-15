@@ -15,6 +15,8 @@
 #include "sysloader.h"
 #include "../../chrisOS/include/strings.h"
 #include "../../chrisOS/include/i386/gdt.h"
+#include "process.h"
+#include <stddef.h>
 
 extern char kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -32,14 +34,27 @@ int main(int argc, char** argv) {
         //    break;
     }
 */
-    
-    printk("kernelDataLoadAddress = 0x%08X \n\n",&kernelDataLoadAddress);
+    printk("Initializing memory management ...\n");
+    kDebugLevel |= DEBUG_KERNEL_PAGING;
     mmInit();
+//    kDebugLevel |= DEBUG_MEMORY_MANAGEMENT;
+//    kDebugLevel |= DEBUG_PAGING;
+    kDebugLevel |= DEBUG_MALLOC;
+    printk("Done initializing memory management.\n\nInitializing malloc ...\n");
+    initMalloc();
+    printk("Done initializing malloc\n\nInitializing task management ...\n");
     taskInit();
+    printk("Done initializing task management\n\n");
     
-    task_t* task=createTask(true);
+    //process_t* process = createProcess(false,'/myhelloworld');
+
+    int* a = malloc(50);
+    a[0]=0xDEADBEEF;
+    printk("a[0](0x%08X)=0x%08X\n",&a[0],a[0]);
+    a[1]=0xBEADFEED;
+    return 0;
+    char* b = malloc(512);
     
-    printk("kernelGDT=0x%08X, base=0x%08X, limit=%u\n",&kernelGDT, kernelGDT.base,kernelGDT.limit);
     return (0xbad);
 }
 

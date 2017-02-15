@@ -9,6 +9,10 @@
 #include "paging.h"
 #include "alloc.h"
 
+#define CURRENT_CR3 ({uint32_t cr3Val; \
+                      __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
+                      cr3Val;})
+
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 extern uint32_t kKernelPoolMemoryAddress;       //Address to locate page defs at
@@ -100,13 +104,13 @@ void mmInit()
             0x1000, /*page size*/
             true);
 
-/*    startAddr=kmmHeapMemoryBaseAddress; 
-    printd(DEBUG_KERNEL_PAGING,"Setting kernel range 0x%08X-0x%08X not present ",startAddr,0x9FFFFFFF);
+    startAddr=kmmHeapMemoryBaseAddress; 
+    printd(DEBUG_KERNEL_PAGING,"Zeroing page entries for memory range 0x%08X-0x%08X",startAddr,0x9FFFFFFF);
     for (uintptr_t cnt=startAddr;cnt<=0x9FFFFFFF;cnt+=0x1000)
     {
         if (cnt<0xC0000000 || cnt>0xCFFFFFFF)
         {
-            kpagingUpdatePresentFlagA(cnt,false);
+            unMapPage(CURRENT_CR3,cnt,0x0);
             if (cnt%0x10000000==0)
             {
 //                printk("0x%08X-0x%08X\n",cnt,kPagingGet4kPTEntryValue(cnt));
@@ -115,27 +119,27 @@ void mmInit()
             }
         }
     }
- */  
+ 
     printk("\n");
-    
+/*    
     printd(DEBUG_KERNEL_PAGING,"Test mallocs:\n");
-    uintptr_t* b1 = malloc(50);
+    uintptr_t* b1 = allocPages(50);
     sprintf(b1,"The value of b1 = 0x%08X",b1);
     printd(DEBUG_KERNEL_PAGING,"b1=malloc(1) returned 0x%08X\n\n",b1);
-    uintptr_t* b2 = malloc(4095);
+    uintptr_t* b2 = allocPages(4095);
     *b2=0xBEEFDEAD;
     printd(DEBUG_KERNEL_PAGING,"b2=malloc(4095) returned 0x%08X\n\n",b2);
-    uintptr_t* b5 = malloc(1024*1024*100);
+    uintptr_t* b5 = allocPages(1024*1024*100);
     printd(DEBUG_KERNEL_PAGING,"b4=malloc(100MB) returned 0x%08X\n\n",b5);
-    uintptr_t* b6 = malloc(1024*1024*200);
+    uintptr_t* b6 = allocPages(1024*1024*200);
     printd(DEBUG_KERNEL_PAGING,"b4=malloc(200MB) returned 0x%08X\n\n",b6);
     printd(DEBUG_KERNEL_PAGING,"freeing b2\n");
-    free(b5);
-    b5=malloc(100);
+    freePage(b5);
+    b5=allocPages(100);
     printd(DEBUG_KERNEL_PAGING,"b5=malloc(100) returned 0x%08X\n\n",b5);
     printd(DEBUG_KERNEL_PAGING,"Available memory: %u\n",memAvailable());
     return;
-    
+  */  
 //    for (int cnt=KERNEL_VIRTUAL_EXEC_ADDRESS;cnt<KERNEL_VIRTUAL_EXEC_ADDRESS+0x10000000;cnt+=4096)
 //        pagingMapPage
 }

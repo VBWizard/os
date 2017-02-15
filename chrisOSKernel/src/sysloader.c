@@ -27,7 +27,7 @@ uintptr_t switchCR3(uintptr_t newCR3)
 }
 
 
-uint32_t sysLoadElf(void* file, task_t* task)   //returns entry point
+uint32_t sysLoadElf(void* file, task_t* task, bool isLibrary)   //returns entry point
 {
     Elf32_Ehdr hdr;
     Elf32_Shdr secHdrTable[50];
@@ -117,18 +117,11 @@ uint32_t sysLoadElf(void* file, task_t* task)   //returns entry point
     return hdr.e_entry;
 }
 
-int sysExec(char* fileName,int argc,char** argv)
+int sysExec(char* fileName,int argc,char** argv,)
 {
     int lsysExecRetVal=0;
     register int *eax __asm__("eax");
     
-    struct mbr_t mbr;
-/*
-    ahciSetCurrentDisk((HBA_PORT*)kATADeviceInfo[kAHCISelectedDiskNum].ioPort);
-    parseMBR(&kATADeviceInfo[kAHCISelectedDiskNum],&mbr);
-    ahciSetCurrentPart(mbr.parts[kAHCISelectedPartNum]);
-    int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
-*/
     printd(DEBUG_LOADER,"sysExec: Entered ... executing '%s'\n",fileName);
     void* fPtr=fopen(fileName, "r");
     printd(DEBUG_LOADER,"fopen returned %u\n",fPtr);
@@ -139,6 +132,7 @@ int sysExec(char* fileName,int argc,char** argv)
     }   
 
     task_t* task = createTask(true);
+    sysLoadElf(fPtr,task)
 
     //printd(DEBUG_ELF_LOADER,"exec: Executing %s at 0x%08X, return address is =0x%08X\n", fileName, testFunction, __builtin_return_address(0));
 

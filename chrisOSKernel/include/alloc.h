@@ -5,8 +5,12 @@
  * Created on June 9, 2016, 11:40 PM
  */
 
+#include <stdint.h>
+
 #ifndef ALLOC_H
 #define	ALLOC_H
+
+#include "chrisos.h"
 
 typedef struct smeminfo
 {
@@ -20,7 +24,8 @@ typedef struct smeminfo
 } sMemInfo;                 //28
 
 
-uintptr_t* malloc(uint32_t size);
+void* allocPages(uint32_t size);
+void freePage(void* address);
 uintptr_t* kMalloc(uint32_t size, uint32_t align);
 uint32_t memAvailable();
 

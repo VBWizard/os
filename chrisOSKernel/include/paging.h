@@ -8,7 +8,8 @@
 #ifndef PAGING_H
 #define	PAGING_H
 
-void pagingMapPage(uintptr_t pageDirAddress, uintptr_t mapTo, uintptr_t mapFrom, uint8_t flags);
+void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, uint8_t flags);
+uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToFind);
 
 #endif	/* PAGING_H */
 

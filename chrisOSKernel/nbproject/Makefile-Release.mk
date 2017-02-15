@@ -54,8 +54,10 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
 	${OBJECTDIR}/src/kernel.o \
 	${OBJECTDIR}/src/mm/alloc.o \
+	${OBJECTDIR}/src/mm/malloc.o \
 	${OBJECTDIR}/src/mm/mm.o \
 	${OBJECTDIR}/src/paging.o \
+	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o
@@ -181,6 +183,11 @@ ${OBJECTDIR}/src/mm/alloc.o: src/mm/alloc.c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/alloc.o src/mm/alloc.c
 
+${OBJECTDIR}/src/mm/malloc.o: src/mm/malloc.c 
+	${MKDIR} -p ${OBJECTDIR}/src/mm
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/malloc.o src/mm/malloc.c
+
 ${OBJECTDIR}/src/mm/mm.o: src/mm/mm.c 
 	${MKDIR} -p ${OBJECTDIR}/src/mm
 	${RM} "$@.d"
@@ -190,6 +197,11 @@ ${OBJECTDIR}/src/paging.o: src/paging.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/paging.o src/paging.c
+
+${OBJECTDIR}/src/process.o: src/process.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/process.o src/process.c
 
 ${OBJECTDIR}/src/syscall.o: src/syscall.c 
 	${MKDIR} -p ${OBJECTDIR}/src

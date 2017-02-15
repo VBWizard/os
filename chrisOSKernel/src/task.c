@@ -59,7 +59,7 @@ void mmMapKernelIntoTask(task_t* task)
 
 task_t* createTask(bool kernelTSS)
 {
-    task_t* task=getTaskSlot();
+    task_t* task=getTaskSlot();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
     
     if (task==0)
         return NULL;
@@ -76,7 +76,7 @@ task_t* createTask(bool kernelTSS)
     else
         panic("write non-kernel segment pop code");
     task->tss->IOPB=0xFFFF;
-    task->tss->CR3=(uint32_t)malloc(0x1000);
+    task->tss->CR3=(uint32_t)allocPages(0x1000);
     printd(DEBUG_TASK,"Malloc'd 1k task page directory @ 0x%08X\n",task->tss->CR3);
     task->pageTable=(uint32_t*)task->tss->CR3;
     mmMapKernelIntoTask(task);

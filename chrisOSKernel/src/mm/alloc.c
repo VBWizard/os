@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include "chrisos.h"
 #include "printf.h"
 #include "paging.h"
 #include "alloc.h"
@@ -9,8 +8,6 @@ extern uint32_t kmmHeapMemoryBaseAddress,kMallocBaseAddress,kMallocCurrAddress;
 extern int heapMemoryBlockAvailIndMax;
 extern uint32_t* heapMemoryBlockAvailInd;
 extern sMemInfo* heapMemoryInfo;
-
-#define MEMORY_BLOCK_SIZE 0x1000
 
 #define CURRENT_CR3 ({uint32_t cr3Val; \
                       __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
@@ -94,13 +91,13 @@ uintptr_t* allocateBlockFrom(sMemInfo* mInfoToAllocateFrom, uint32_t size)
     return (uintptr_t*)mNewInfo->address;
 }
 
-uintptr_t* malloc(uint32_t size)
+void* allocPages(uint32_t size)
 {
     uint32_t newSize=size;
-    if (newSize%MEMORY_BLOCK_SIZE)
+    if (newSize%PAGE_SIZE)
     {
-        newSize+=(MEMORY_BLOCK_SIZE-(size % MEMORY_BLOCK_SIZE));
-        printd(DEBUG_MEMORY_MANAGEMENT,"malloc: Size adjusted from %u to %u\n",size,newSize);
+        newSize+=(PAGE_SIZE-(size % PAGE_SIZE));
+        printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Size adjusted from %u to %u\n",size,newSize);
     }
     uintptr_t* lRetVal;
     uintptr_t* block=findAvailableBlockBySize(newSize);
@@ -108,14 +105,16 @@ uintptr_t* malloc(uint32_t size)
        lRetVal=allocateBlockFrom((sMemInfo*)block,newSize);
     else
         lRetVal=((sMemInfo*)(block))->address;
-    printd(DEBUG_MEMORY_MANAGEMENT,"malloc: Returning address 0x%08X\n",lRetVal);
+    //Map page into our address space
+    pagingMapPage(CURRENT_CR3,lRetVal,lRetVal,0x7);
     //Zero out the memory
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Zeroing out page(s) at 0x%08X for 0x%08X\n",lRetVal,newSize);
     memset(lRetVal,0,newSize);
-    //pagingMapPage();
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Returning address 0x%08X\n",lRetVal);
     return lRetVal;
 }
 
-void free(uintptr_t* address)
+void freePage(void* address)
 {
     sMemInfo* mInfo = findBlockByMemoryAddress(address);
     if (mInfo!=NULL)

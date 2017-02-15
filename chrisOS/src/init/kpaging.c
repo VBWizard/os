@@ -171,7 +171,7 @@ bool kIsPageMapped(uintptr_t Address)
     return true;
 }
 
-void kUnMapPage(uintptr_t mapTo, uint8_t newFlags)
+void kUnMapPage(uintptr_t mapTo)
 {
     uint32_t *ptr;
     uint32_t ptrVal;
@@ -182,7 +182,7 @@ void kUnMapPage(uintptr_t mapTo, uint8_t newFlags)
     {
         ptrT=(uint32_t*)0x20000000;
         ptr[(mapTo>>22)]=0x20000063;
-        ptrT[(mapTo&0x003FFFFF/4096)]=0 | newFlags;
+        ptrT[(mapTo&0x003FFFFF/4096)]=0;
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
             printk("kMapPage: Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)]);
@@ -197,7 +197,7 @@ void kUnMapPage(uintptr_t mapTo, uint8_t newFlags)
         ptrT=(uint32_t*)ptrVal;
         //Now ptrVal will point to offset within page table
         ptrVal=(mapTo&0x003FFFFF)/4096;
-        ptrT[ptrVal]=0 | newFlags;
+        ptrT[ptrVal]=0;
 //                printk("ptrT=%X(%X)\n",&ptrT[ptrVal],ptrT[ptrVal]);
 //                STOPHERE2
 #ifndef DEBUG_NONE

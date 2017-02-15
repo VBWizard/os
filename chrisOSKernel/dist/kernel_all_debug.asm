@@ -371,7 +371,7 @@ void terminal_copyline(unsigned dstLine, unsigned srcLine)
  1000203:	c1 e0 05             	shl    eax,0x5
  1000206:	05 00 80 0b 00       	add    eax,0xb8000
  100020b:	50                   	push   eax
- 100020c:	e8 f7 1d 00 00       	call   1002008 <memcpy>
+ 100020c:	e8 fb 1d 00 00       	call   100200c <memcpy>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/console/basic_display.c:108
 }
  1000211:	83 c4 1c             	add    esp,0x1c
@@ -697,7 +697,7 @@ void kTermPrint(const char* data) {
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/console/basic_display.c:214
         size_t datalen = strlen(data);
  10003df:	56                   	push   esi
- 10003e0:	e8 3f 22 00 00       	call   1002624 <strlen>
+ 10003e0:	e8 43 22 00 00       	call   1002628 <strlen>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/console/basic_display.c:215
         for (size_t i = 0; i < datalen; i++)
  10003e5:	83 c4 10             	add    esp,0x10
@@ -890,17 +890,17 @@ char waitForKeyboardKey()
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:38
     printd(DEBUG_KEYBOARD,"gKbd-W, %04X\t", kKeyboardBuffer);
  10004bc:	ff 35 e0 03 12 00    	push   DWORD PTR ds:0x1203e0
- 10004c2:	68 5c 73 00 01       	push   0x100735c
+ 10004c2:	68 58 76 00 01       	push   0x1007658
  10004c7:	6a 10                	push   0x10
- 10004c9:	e8 c1 20 00 00       	call   100258f <printd>
+ 10004c9:	e8 c5 20 00 00       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:40
     char lTemp=0;
     printd(DEBUG_KEYBOARD,"kKeyboardBuffer=%04X\n", kKeyboardBuffer);
  10004ce:	83 c4 0c             	add    esp,0xc
  10004d1:	ff 35 e0 03 12 00    	push   DWORD PTR ds:0x1203e0
- 10004d7:	68 6a 73 00 01       	push   0x100736a
+ 10004d7:	68 66 76 00 01       	push   0x1007666
  10004dc:	6a 10                	push   0x10
- 10004de:	e8 ac 20 00 00       	call   100258f <printd>
+ 10004de:	e8 b0 20 00 00       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:42
 
     while (kKeyboardBuffer==(char*)KEYBOARD_BUFFER_ADDRESS)
@@ -913,16 +913,16 @@ char waitForKeyboardKey()
         printd(DEBUG_KEYBOARD,"kKeyboardBuffer=%04X\n", kKeyboardBuffer);
  10004f2:	83 ec 04             	sub    esp,0x4
  10004f5:	68 b0 24 15 00       	push   0x1524b0
- 10004fa:	68 6a 73 00 01       	push   0x100736a
+ 10004fa:	68 66 76 00 01       	push   0x1007666
  10004ff:	6a 10                	push   0x10
- 1000501:	e8 89 20 00 00       	call   100258f <printd>
+ 1000501:	e8 8d 20 00 00       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:45
         __asm__("sti\n");
  1000506:	fb                   	sti    
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:46
         waitTicks(1);
  1000507:	c7 04 24 01 00 00 00 	mov    DWORD PTR [esp],0x1
- 100050e:	e8 fa 29 00 00       	call   1002f0d <waitTicks>
+ 100050e:	e8 fe 29 00 00       	call   1002f11 <waitTicks>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:42
 {
     printd(DEBUG_KEYBOARD,"gKbd-W, %04X\t", kKeyboardBuffer);
@@ -948,9 +948,9 @@ char waitForKeyboardKey()
  1000529:	83 ec 04             	sub    esp,0x4
  100052c:	0f be c0             	movsx  eax,al
  100052f:	50                   	push   eax
- 1000530:	68 80 73 00 01       	push   0x1007380
+ 1000530:	68 7c 76 00 01       	push   0x100767c
  1000535:	6a 10                	push   0x10
- 1000537:	e8 53 20 00 00       	call   100258f <printd>
+ 1000537:	e8 57 20 00 00       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:51
     return lTemp;
 }
@@ -991,7 +991,7 @@ void gets(char* buffer, int len)
  100055d:	56                   	push   esi
  100055e:	6a 00                	push   0x0
  1000560:	57                   	push   edi
- 1000561:	e8 7d 13 00 00       	call   10018e3 <memset>
+ 1000561:	e8 81 13 00 00       	call   10018e7 <memset>
  1000566:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:60
         return keyboardGetKeyFromBuffer();
@@ -1035,7 +1035,7 @@ void gets(char* buffer, int len)
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:69
             puts("\b");
  100058e:	83 ec 0c             	sub    esp,0xc
- 1000591:	68 8f 73 00 01       	push   0x100738f
+ 1000591:	68 8b 76 00 01       	push   0x100768b
  1000596:	e8 9e fe ff ff       	call   1000439 <puts>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:66
     memset(buffer,0,len);
@@ -1068,8 +1068,8 @@ void gets(char* buffer, int len)
  10005b7:	83 ec 08             	sub    esp,0x8
  10005ba:	0f be c0             	movsx  eax,al
  10005bd:	50                   	push   eax
- 10005be:	68 91 73 00 01       	push   0x1007391
- 10005c3:	e8 af 1f 00 00       	call   1002577 <printk>
+ 10005be:	68 8d 76 00 01       	push   0x100768d
+ 10005c3:	e8 b3 1f 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:76
                 return;
  10005c8:	83 c4 10             	add    esp,0x10
@@ -1086,8 +1086,8 @@ void gets(char* buffer, int len)
  10005d6:	83 ec 08             	sub    esp,0x8
  10005d9:	0f be c0             	movsx  eax,al
  10005dc:	50                   	push   eax
- 10005dd:	68 91 73 00 01       	push   0x1007391
- 10005e2:	e8 90 1f 00 00       	call   1002577 <printk>
+ 10005dd:	68 8d 76 00 01       	push   0x100768d
+ 10005e2:	e8 94 1f 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/char/keyboard.c:81
                 buffer[cnt++]=inchar;
  10005e7:	0f b6 44 24 1f       	movzx  eax,BYTE PTR [esp+0x1f]
@@ -1341,7 +1341,7 @@ ataWaitForDRQ():
     }
     hdError=inb(devInfo->ioPort+ATA_PORT_ERROR);
  10006d4:	0f b6 d0             	movzx  edx,al
- 10006d7:	89 15 68 3a 01 01    	mov    DWORD PTR ds:0x1013a68,edx
+ 10006d7:	89 15 74 4a 01 01    	mov    DWORD PTR ds:0x1014a74,edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:38
     if ((hdError & 0x4)==0x4)
  10006dd:	83 e0 04             	and    eax,0x4
@@ -1393,7 +1393,7 @@ ataWaitForIdle():
     if ((lValue & ATA_STATUS_DRQ) == ATA_STATUS_DRQ && ticks)
         inw(devInfo->ioPort+ATA_PORT_DATA);
     while (ticks++<=ATA_STANDARD_WAIT_MS*kTicksPerMS)
- 1000707:	c7 05 5c 3a 01 01 00 	mov    DWORD PTR ds:0x1013a5c,0x3f800000
+ 1000707:	c7 05 68 4a 01 01 00 	mov    DWORD PTR ds:0x1014a68,0x3f800000
  100070e:	00 80 3f 
  1000711:	a1 84 02 12 00       	mov    eax,ds:0x120284
  1000716:	8d 04 80             	lea    eax,[eax+eax*4]
@@ -1451,7 +1451,7 @@ ataWaitForIdle():
  100074f:	75 0c                	jne    100075d <ataWaitForIdle+0x6a>
  1000751:	dd d8                	fstp   st(0)
  1000753:	dd d8                	fstp   st(0)
- 1000755:	d9 1d 5c 3a 01 01    	fstp   DWORD PTR ds:0x1013a5c
+ 1000755:	d9 1d 68 4a 01 01    	fstp   DWORD PTR ds:0x1014a68
  100075b:	eb 44                	jmp    10007a1 <ataWaitForIdle+0xae>
  100075d:	d9 ca                	fxch   st(2)
  100075f:	d9 c9                	fxch   st(1)
@@ -1479,7 +1479,7 @@ ataWaitForIdle():
  100077f:	73 c4                	jae    1000745 <ataWaitForIdle+0x52>
  1000781:	dd d8                	fstp   st(0)
  1000783:	dd d8                	fstp   st(0)
- 1000785:	d9 1d 5c 3a 01 01    	fstp   DWORD PTR ds:0x1013a5c
+ 1000785:	d9 1d 68 4a 01 01    	fstp   DWORD PTR ds:0x1014a68
  100078b:	eb 02                	jmp    100078f <ataWaitForIdle+0x9c>
  100078d:	dd d8                	fstp   st(0)
 inb():
@@ -1495,7 +1495,7 @@ ataWaitForIdle():
     }
     hdError=inb(devInfo->ioPort+ATA_PORT_ERROR);
  1000793:	0f b6 c0             	movzx  eax,al
- 1000796:	a3 68 3a 01 01       	mov    ds:0x1013a68,eax
+ 1000796:	a3 74 4a 01 01       	mov    ds:0x1014a74,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:61
     return lValue;
  100079b:	89 c8                	mov    eax,ecx
@@ -1553,7 +1553,7 @@ ataControllerIsReady():
         wait(1);
  10007ca:	83 ec 0c             	sub    esp,0xc
  10007cd:	6a 01                	push   0x1
- 10007cf:	e8 4c 27 00 00       	call   1002f20 <wait>
+ 10007cf:	e8 50 27 00 00       	call   1002f24 <wait>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:76
         ticks++;
  10007d4:	83 c6 02             	add    esi,0x2
@@ -1605,9 +1605,9 @@ ataControllerIsReady():
  100080e:	0f b6 c0             	movzx  eax,al
  1000811:	50                   	push   eax
  1000812:	68 80 00 00 00       	push   0x80
- 1000817:	68 e4 77 00 01       	push   0x10077e4
+ 1000817:	68 dc 7a 00 01       	push   0x1007adc
  100081c:	6a 08                	push   0x8
- 100081e:	e8 6c 1d 00 00       	call   100258f <printd>
+ 100081e:	e8 70 1d 00 00       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:90
 #endif
     }
@@ -1631,8 +1631,8 @@ ataControllerIsReady():
             printk("ataControllerIsReady: returning %02X\n",lStatus);
  1000847:	83 ec 08             	sub    esp,0x8
  100084a:	55                   	push   ebp
- 100084b:	68 24 78 00 01       	push   0x1007824
- 1000850:	e8 22 1d 00 00       	call   1002577 <printk>
+ 100084b:	68 1c 7b 00 01       	push   0x1007b1c
+ 1000850:	e8 26 1d 00 00       	call   100257b <printk>
  1000855:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:97
 #endif
@@ -1739,8 +1739,8 @@ ataSelectDrive():
  10008b2:	50                   	push   eax
  10008b3:	ff b6 61 02 00 00    	push   DWORD PTR [esi+0x261]
  10008b9:	ff b6 65 02 00 00    	push   DWORD PTR [esi+0x265]
- 10008bf:	68 4c 78 00 01       	push   0x100784c
- 10008c4:	e8 ae 1c 00 00       	call   1002577 <printk>
+ 10008bf:	68 44 7b 00 01       	push   0x1007b44
+ 10008c4:	e8 b2 1c 00 00       	call   100257b <printk>
  10008c9:	83 c4 10             	add    esp,0x10
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
@@ -1762,7 +1762,7 @@ ataSelectDrive():
         wait(10);
  10008dd:	83 ec 0c             	sub    esp,0xc
  10008e0:	6a 0a                	push   0xa
- 10008e2:	e8 39 26 00 00       	call   1002f20 <wait>
+ 10008e2:	e8 3d 26 00 00       	call   1002f24 <wait>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:131
         unsigned lDrive=inb(devInfo->ioPort+ATA_DRIVE_SELECT);
  10008e7:	8b 8e 69 02 00 00    	mov    ecx,DWORD PTR [esi+0x269]
@@ -1783,15 +1783,15 @@ ataSelectDrive():
             printk("ataSelectDrive: Drive selected: %s (%u, 0x%02X), err=0x%02X\n", (lDrive & (1<<4)) == 1<<4?"Slave":"Master", devInfo->driveNo, lDrive, inb(devInfo->ioPort+ATA_PORT_ERROR));
  10008fa:	0f b6 c8             	movzx  ecx,al
  10008fd:	83 e3 10             	and    ebx,0x10
- 1000900:	ba 9a 73 00 01       	mov    edx,0x100739a
- 1000905:	b8 94 73 00 01       	mov    eax,0x1007394
+ 1000900:	ba 96 76 00 01       	mov    edx,0x1007696
+ 1000905:	b8 90 76 00 01       	mov    eax,0x1007690
  100090a:	0f 44 c2             	cmove  eax,edx
  100090d:	89 0c 24             	mov    DWORD PTR [esp],ecx
  1000910:	57                   	push   edi
  1000911:	ff b6 65 02 00 00    	push   DWORD PTR [esi+0x265]
  1000917:	50                   	push   eax
- 1000918:	68 98 78 00 01       	push   0x1007898
- 100091d:	e8 55 1c 00 00       	call   1002577 <printk>
+ 1000918:	68 90 7b 00 01       	push   0x1007b90
+ 100091d:	e8 59 1c 00 00       	call   100257b <printk>
  1000922:	83 c4 20             	add    esp,0x20
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:136
     }
@@ -1864,7 +1864,7 @@ static void ataResetController(struct ataDeviceInfo_t* devInfo)
  100096a:	c1 f9 1f             	sar    ecx,0x1f
  100096d:	29 ca                	sub    edx,ecx
  100096f:	52                   	push   edx
- 1000970:	e8 98 25 00 00       	call   1002f0d <waitTicks>
+ 1000970:	e8 9c 25 00 00       	call   1002f11 <waitTicks>
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
  1000975:	0f b7 86 69 02 00 00 	movzx  eax,WORD PTR [esi+0x269]
@@ -1876,7 +1876,7 @@ ataResetController():
         outb(devInfo->ioPort+ATA_PORT_CONTROL, 1<<2);
         wait(10);
  1000988:	c7 04 24 0a 00 00 00 	mov    DWORD PTR [esp],0xa
- 100098f:	e8 8c 25 00 00       	call   1002f20 <wait>
+ 100098f:	e8 90 25 00 00       	call   1002f24 <wait>
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
  1000994:	0f b7 86 69 02 00 00 	movzx  eax,WORD PTR [esi+0x269]
@@ -1900,8 +1900,8 @@ ataResetController():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:170
             printk("HD-controller still busy\n");
  10009bf:	83 ec 0c             	sub    esp,0xc
- 10009c2:	68 b3 73 00 01       	push   0x10073b3
- 10009c7:	e8 ab 1b 00 00       	call   1002577 <printk>
+ 10009c2:	68 af 76 00 01       	push   0x10076af
+ 10009c7:	e8 af 1b 00 00       	call   100257b <printk>
  10009cc:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:172
 #endif
@@ -1921,7 +1921,7 @@ ataResetController():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:172
  10009da:	84 c0                	test   al,al
  10009dc:	75 0c                	jne    10009ea <ataInit+0xac>
- 10009de:	c7 05 68 3a 01 01 00 	mov    DWORD PTR ds:0x1013a68,0x0
+ 10009de:	c7 05 74 4a 01 01 00 	mov    DWORD PTR ds:0x1014a74,0x0
  10009e5:	00 00 00 
  10009e8:	eb 34                	jmp    1000a1e <ataInit+0xe0>
 inb():
@@ -1930,20 +1930,20 @@ inb():
 ataResetController():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:172
  10009eb:	0f b6 c0             	movzx  eax,al
- 10009ee:	a3 68 3a 01 01       	mov    ds:0x1013a68,eax
+ 10009ee:	a3 74 4a 01 01       	mov    ds:0x1014a74,eax
  10009f3:	83 f8 04             	cmp    eax,0x4
  10009f6:	74 26                	je     1000a1e <ataInit+0xe0>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:173
             printk("Controller reset failed on %s bus: %02x\n",devInfo->bus==0?"Primary":"Secondary", hdError);
  10009f8:	83 be 61 02 00 00 00 	cmp    DWORD PTR [esi+0x261],0x0
- 10009ff:	b9 a9 73 00 01       	mov    ecx,0x10073a9
- 1000a04:	ba a1 73 00 01       	mov    edx,0x10073a1
+ 10009ff:	b9 a5 76 00 01       	mov    ecx,0x10076a5
+ 1000a04:	ba 9d 76 00 01       	mov    edx,0x100769d
  1000a09:	0f 45 d1             	cmovne edx,ecx
  1000a0c:	83 ec 04             	sub    esp,0x4
  1000a0f:	50                   	push   eax
  1000a10:	52                   	push   edx
- 1000a11:	68 d8 78 00 01       	push   0x10078d8
- 1000a16:	e8 5c 1b 00 00       	call   1002577 <printk>
+ 1000a11:	68 d0 7b 00 01       	push   0x1007bd0
+ 1000a16:	e8 60 1b 00 00       	call   100257b <printk>
  1000a1b:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:175
 #ifndef DEBUG_NONE
@@ -1953,8 +1953,8 @@ ataResetController():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:176
             printk("ataResetController: controller is ready\n");
  1000a27:	83 ec 0c             	sub    esp,0xc
- 1000a2a:	68 04 79 00 01       	push   0x1007904
- 1000a2f:	e8 43 1b 00 00       	call   1002577 <printk>
+ 1000a2a:	68 fc 7b 00 01       	push   0x1007bfc
+ 1000a2f:	e8 47 1b 00 00       	call   100257b <printk>
  1000a34:	83 c4 10             	add    esp,0x10
 ataInit():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:183
@@ -2005,7 +2005,7 @@ ataInit():
  1000a7a:	8d 04 80             	lea    eax,[eax+eax*4]
  1000a7d:	01 c0                	add    eax,eax
  1000a7f:	89 04 24             	mov    DWORD PTR [esp],eax
- 1000a82:	e8 99 24 00 00       	call   1002f20 <wait>
+ 1000a82:	e8 9d 24 00 00       	call   1002f24 <wait>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:190
     cStatus = inb(devInfo->ioPort+ATA_PORT_STATUS);
  1000a87:	8b 8e 69 02 00 00    	mov    ecx,DWORD PTR [esi+0x269]
@@ -2049,8 +2049,8 @@ ataInit():
  1000aad:	83 ec 04             	sub    esp,0x4
  1000ab0:	6a 00                	push   0x0
  1000ab2:	ff b6 65 02 00 00    	push   DWORD PTR [esi+0x265]
- 1000ab8:	68 cd 73 00 01       	push   0x10073cd
- 1000abd:	e8 b5 1a 00 00       	call   1002577 <printk>
+ 1000ab8:	68 c9 76 00 01       	push   0x10076c9
+ 1000abd:	e8 b9 1a 00 00       	call   100257b <printk>
  1000ac2:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:197
 #endif
@@ -2081,8 +2081,8 @@ ataInit():
  1000ae7:	57                   	push   edi
  1000ae8:	53                   	push   ebx
  1000ae9:	ff b6 65 02 00 00    	push   DWORD PTR [esi+0x265]
- 1000aef:	68 30 79 00 01       	push   0x1007930
- 1000af4:	e8 7e 1a 00 00       	call   1002577 <printk>
+ 1000aef:	68 28 7c 00 01       	push   0x1007c28
+ 1000af4:	e8 82 1a 00 00       	call   100257b <printk>
  1000af9:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:207
 #endif
@@ -2101,7 +2101,7 @@ ataInit():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:208
             return false;
         useCDROMIdentify = true;
- 1000b0a:	c6 05 6c 3a 01 01 01 	mov    BYTE PTR ds:0x1013a6c,0x1
+ 1000b0a:	c6 05 78 4a 01 01 01 	mov    BYTE PTR ds:0x1014a78,0x1
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
  1000b11:	0f b7 86 69 02 00 00 	movzx  eax,WORD PTR [esi+0x269]
@@ -2137,8 +2137,8 @@ ataInit():
  1000b35:	83 ec 04             	sub    esp,0x4
  1000b38:	6a 00                	push   0x0
  1000b3a:	ff b6 65 02 00 00    	push   DWORD PTR [esi+0x265]
- 1000b40:	68 cd 73 00 01       	push   0x10073cd
- 1000b45:	e8 2d 1a 00 00       	call   1002577 <printk>
+ 1000b40:	68 c9 76 00 01       	push   0x10076c9
+ 1000b45:	e8 31 1a 00 00       	call   100257b <printk>
  1000b4a:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:216
 #endif
@@ -2173,7 +2173,7 @@ ataInit():
         wait(1);
  1000b7b:	83 ec 0c             	sub    esp,0xc
  1000b7e:	6a 01                	push   0x1
- 1000b80:	e8 9b 23 00 00       	call   1002f20 <wait>
+ 1000b80:	e8 9f 23 00 00       	call   1002f24 <wait>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:224
         ticks--;
  1000b85:	83 ef 01             	sub    edi,0x1
@@ -2255,8 +2255,8 @@ ataInit():
  1000bda:	51                   	push   ecx
  1000bdb:	0f b6 c0             	movzx  eax,al
  1000bde:	50                   	push   eax
- 1000bdf:	68 58 79 00 01       	push   0x1007958
- 1000be4:	e8 8e 19 00 00       	call   1002577 <printk>
+ 1000bdf:	68 50 7c 00 01       	push   0x1007c50
+ 1000be4:	e8 92 19 00 00       	call   100257b <printk>
  1000be9:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:197
     {
@@ -2265,7 +2265,7 @@ ataInit():
             printk("Drive %02X, not ready(%02X)\n",devInfo->driveNo, cStatus);
 #endif
         return false;
- 1000bec:	0f b6 05 6c 3a 01 01 	movzx  eax,BYTE PTR ds:0x1013a6c
+ 1000bec:	0f b6 05 78 4a 01 01 	movzx  eax,BYTE PTR ds:0x1014a78
  1000bf3:	eb 05                	jmp    1000bfa <ataInit+0x2bc>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:239
         if (useCDROMIdentify)
@@ -2349,7 +2349,7 @@ int ataIdentify(struct ataDeviceInfo_t* devInfo)
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:258
     {
         if (useCDROMIdentify)
- 1000c46:	80 3d 6c 3a 01 01 00 	cmp    BYTE PTR ds:0x1013a6c,0x0
+ 1000c46:	80 3d 78 4a 01 01 00 	cmp    BYTE PTR ds:0x1014a78,0x0
  1000c4d:	74 12                	je     1000c61 <ataIdentify+0x2d>
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
@@ -2379,7 +2379,7 @@ ataIdentify():
  1000c79:	8d 04 80             	lea    eax,[eax+eax*4]
  1000c7c:	01 c0                	add    eax,eax
  1000c7e:	50                   	push   eax
- 1000c7f:	e8 9c 22 00 00       	call   1002f20 <wait>
+ 1000c7f:	e8 a0 22 00 00       	call   1002f24 <wait>
  1000c84:	0f b7 96 69 02 00 00 	movzx  edx,WORD PTR [esi+0x269]
  1000c8b:	89 f1                	mov    ecx,esi
  1000c8d:	8d 9e 00 02 00 00    	lea    ebx,[esi+0x200]
@@ -2471,8 +2471,8 @@ ataIdentify():
  1000d27:	8d 86 00 02 00 00    	lea    eax,[esi+0x200]
  1000d2d:	50                   	push   eax
  1000d2e:	ff b6 65 02 00 00    	push   DWORD PTR [esi+0x265]
- 1000d34:	68 ea 73 00 01       	push   0x10073ea
- 1000d39:	e8 39 18 00 00       	call   1002577 <printk>
+ 1000d34:	68 e6 76 00 01       	push   0x10076e6
+ 1000d39:	e8 3d 18 00 00       	call   100257b <printk>
  1000d3e:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:282
 #endif
@@ -2534,7 +2534,7 @@ int ataScanForHarddrives()
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:296
         if (useCDROMIdentify)
  1000daf:	83 c4 10             	add    esp,0x10
- 1000db2:	80 3d 6c 3a 01 01 00 	cmp    BYTE PTR ds:0x1013a6c,0x0
+ 1000db2:	80 3d 78 4a 01 01 00 	cmp    BYTE PTR ds:0x1014a78,0x0
  1000db9:	74 11                	je     1000dcc <ataScanForHarddrives+0x80>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:297
             kATADeviceInfo[0].ATADeviceType=ATA_DEVICE_TYPE_CD;
@@ -2551,7 +2551,7 @@ int ataScanForHarddrives()
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:301
     }
     useCDROMIdentify=false;
- 1000ddb:	c6 05 6c 3a 01 01 00 	mov    BYTE PTR ds:0x1013a6c,0x0
+ 1000ddb:	c6 05 78 4a 01 01 00 	mov    BYTE PTR ds:0x1014a78,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:303
 
     kATADeviceInfo[1].bus=ATAPrimary;
@@ -2598,7 +2598,7 @@ int ataScanForHarddrives()
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:313
         if (useCDROMIdentify)
  1000e4f:	83 c4 10             	add    esp,0x10
- 1000e52:	80 3d 6c 3a 01 01 00 	cmp    BYTE PTR ds:0x1013a6c,0x0
+ 1000e52:	80 3d 78 4a 01 01 00 	cmp    BYTE PTR ds:0x1014a78,0x0
  1000e59:	74 11                	je     1000e6c <ataScanForHarddrives+0x120>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:314
             kATADeviceInfo[1].ATADeviceType=ATA_DEVICE_TYPE_CD;
@@ -2658,7 +2658,7 @@ int ataScanForHarddrives()
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:328
         if (useCDROMIdentify)
  1000ee8:	83 c4 10             	add    esp,0x10
- 1000eeb:	80 3d 6c 3a 01 01 00 	cmp    BYTE PTR ds:0x1013a6c,0x0
+ 1000eeb:	80 3d 78 4a 01 01 00 	cmp    BYTE PTR ds:0x1014a78,0x0
  1000ef2:	74 11                	je     1000f05 <ataScanForHarddrives+0x1b9>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:329
             kATADeviceInfo[2].ATADeviceType=ATA_DEVICE_TYPE_CD;
@@ -2719,7 +2719,7 @@ int ataScanForHarddrives()
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:344
         if (useCDROMIdentify)
  1000f81:	83 c4 10             	add    esp,0x10
- 1000f84:	80 3d 6c 3a 01 01 00 	cmp    BYTE PTR ds:0x1013a6c,0x0
+ 1000f84:	80 3d 78 4a 01 01 00 	cmp    BYTE PTR ds:0x1014a78,0x0
  1000f8b:	74 11                	je     1000f9e <ataScanForHarddrives+0x252>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:345
             kATADeviceInfo[3].ATADeviceType=ATA_DEVICE_TYPE_CD;
@@ -2748,8 +2748,8 @@ int ataScanForHarddrives()
  1000fc4:	52                   	push   edx
  1000fc5:	05 00 02 00 00       	add    eax,0x200
  1000fca:	50                   	push   eax
- 1000fcb:	68 fe 73 00 01       	push   0x10073fe
- 1000fd0:	e8 a2 15 00 00       	call   1002577 <printk>
+ 1000fcb:	68 fa 76 00 01       	push   0x10076fa
+ 1000fd0:	e8 a6 15 00 00       	call   100257b <printk>
  1000fd5:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:355
 #endif
@@ -2781,7 +2781,7 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
     uint8_t* bufp=buffer;
     uint32_t lSectorsLeft=sector_count;
     uint32_t lSector=sector+partOffset; //this represents the start of the partition
- 1000fed:	a1 64 3a 01 01       	mov    eax,ds:0x1013a64
+ 1000fed:	a1 70 4a 01 01       	mov    eax,ds:0x1014a70
  1000ff2:	03 44 24 30          	add    eax,DWORD PTR [esp+0x30]
  1000ff6:	89 c5                	mov    ebp,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:373
@@ -2796,8 +2796,8 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
  1001001:	ff 74 24 38          	push   DWORD PTR [esp+0x38]
  1001005:	56                   	push   esi
  1001006:	50                   	push   eax
- 1001007:	68 8c 79 00 01       	push   0x100798c
- 100100c:	e8 66 15 00 00       	call   1002577 <printk>
+ 1001007:	68 84 7c 00 01       	push   0x1007c84
+ 100100c:	e8 6a 15 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:376
             waitForKeyboardKey();
  1001011:	e8 a2 f4 ff ff       	call   10004b8 <waitForKeyboardKey>
@@ -2807,7 +2807,7 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
 #endif
     lResult=ataWaitForIdle(atablockingReadDev);
  1001019:	83 ec 0c             	sub    esp,0xc
- 100101c:	ff 35 20 90 00 01    	push   DWORD PTR ds:0x1009020
+ 100101c:	ff 35 20 a0 00 01    	push   DWORD PTR ds:0x100a020
  1001022:	e8 cc f6 ff ff       	call   10006f3 <ataWaitForIdle>
  1001027:	0f b6 c0             	movzx  eax,al
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:380
@@ -2819,8 +2819,8 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
         panic("ataBlockingRead28: Timeout waiting for DRQ and BSY to be clear (0x%02X)", lResult);
  1001031:	83 ec 08             	sub    esp,0x8
  1001034:	50                   	push   eax
- 1001035:	68 c4 79 00 01       	push   0x10079c4
- 100103a:	e8 b1 10 00 00       	call   10020f0 <panic>
+ 1001035:	68 bc 7c 00 01       	push   0x1007cbc
+ 100103a:	e8 b5 10 00 00       	call   10020f4 <panic>
  100103f:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:386
         //Select the drive we want
@@ -2828,7 +2828,7 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
         //ataSelectDrive(drive,0);
         //Magic bit (6) to set LBA mode and top 4 bits of LBA28 sector # go in bottom 4
     outb(atablockingReadDev->ioPort+ATA_DRIVE_SELECT, inb(atablockingReadDev->ioPort+ATA_DRIVE_SELECT) | (1 << 6) | ((lSector >> 24) & 0x0F));
- 1001042:	8b 1d 20 90 00 01    	mov    ebx,DWORD PTR ds:0x1009020
+ 1001042:	8b 1d 20 a0 00 01    	mov    ebx,DWORD PTR ds:0x100a020
  1001048:	8b 8b 69 02 00 00    	mov    ecx,DWORD PTR [ebx+0x269]
  100104e:	8d 51 06             	lea    edx,[ecx+0x6]
 inb():
@@ -2897,10 +2897,10 @@ ataBlockingRead28():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:398
         panic("ataBlockingRead28: Timeout waiting for DRQ to be set Stts=0x%02X, Err=0x%02X", lResult, hdError);
  10010ac:	83 ec 04             	sub    esp,0x4
- 10010af:	ff 35 68 3a 01 01    	push   DWORD PTR ds:0x1013a68
+ 10010af:	ff 35 74 4a 01 01    	push   DWORD PTR ds:0x1014a74
  10010b5:	50                   	push   eax
- 10010b6:	68 0c 7a 00 01       	push   0x1007a0c
- 10010bb:	e8 30 10 00 00       	call   10020f0 <panic>
+ 10010b6:	68 04 7d 00 01       	push   0x1007d04
+ 10010bb:	e8 34 10 00 00       	call   10020f4 <panic>
  10010c0:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:399
     while (lSectorsLeft)
@@ -2911,7 +2911,7 @@ ataBlockingRead28():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:401
     {
         insw(atablockingReadDev->ioPort+ATA_PORT_DATA, bufp, 256);
- 10010d6:	a1 20 90 00 01       	mov    eax,ds:0x1009020
+ 10010d6:	a1 20 a0 00 01       	mov    eax,ds:0x100a020
 insw():
 /home/yogi/src/os/chrisOSKernel/include/io.h:87
 		      : "d" (__port));
@@ -2935,8 +2935,8 @@ ataBlockingRead28():
             {
                 printk("ataBlockingRead28: Debugging: ");
  10010f5:	83 ec 0c             	sub    esp,0xc
- 10010f8:	68 5c 7a 00 01       	push   0x1007a5c
- 10010fd:	e8 75 14 00 00       	call   1002577 <printk>
+ 10010f8:	68 54 7d 00 01       	push   0x1007d54
+ 10010fd:	e8 79 14 00 00       	call   100257b <printk>
  1001102:	89 f3                	mov    ebx,esi
  1001104:	8d 7e 14             	lea    edi,[esi+0x14]
  1001107:	83 c4 10             	add    esp,0x10
@@ -2946,8 +2946,8 @@ ataBlockingRead28():
  100110a:	83 ec 08             	sub    esp,0x8
  100110d:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
  1001110:	50                   	push   eax
- 1001111:	68 18 74 00 01       	push   0x1007418
- 1001116:	e8 5c 14 00 00       	call   1002577 <printk>
+ 1001111:	68 14 77 00 01       	push   0x1007714
+ 1001116:	e8 60 14 00 00       	call   100257b <printk>
  100111b:	83 c3 01             	add    ebx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:406 (discriminator 3)
         insw(atablockingReadDev->ioPort+ATA_PORT_DATA, bufp, 256);
@@ -2963,8 +2963,8 @@ ataBlockingRead28():
                     printk("%02X ", bufp[cnt2]);
                 printk("\n");
  1001125:	83 ec 0c             	sub    esp,0xc
- 1001128:	68 3f 77 00 01       	push   0x100773f
- 100112d:	e8 45 14 00 00       	call   1002577 <printk>
+ 1001128:	68 66 7a 00 01       	push   0x1007a66
+ 100112d:	e8 49 14 00 00       	call   100257b <printk>
  1001132:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:411
             }
@@ -2977,7 +2977,7 @@ ataBlockingRead28():
             wait(50);
  100113c:	83 ec 0c             	sub    esp,0xc
  100113f:	6a 32                	push   0x32
- 1001141:	e8 da 1d 00 00       	call   1002f20 <wait>
+ 1001141:	e8 de 1d 00 00       	call   1002f24 <wait>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:414
             lResult=ataWaitForDRQ(atablockingReadDev, true, ATA_STANDARD_WAIT_MS*kTicksPerMS);
  1001146:	83 c4 0c             	add    esp,0xc
@@ -2986,7 +2986,7 @@ ataBlockingRead28():
  1001151:	01 c0                	add    eax,eax
  1001153:	50                   	push   eax
  1001154:	6a 01                	push   0x1
- 1001156:	ff 35 20 90 00 01    	push   DWORD PTR ds:0x1009020
+ 1001156:	ff 35 20 a0 00 01    	push   DWORD PTR ds:0x100a020
  100115c:	e8 23 f5 ff ff       	call   1000684 <ataWaitForDRQ>
  1001161:	0f b6 c0             	movzx  eax,al
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:415
@@ -3003,10 +3003,10 @@ ataBlockingRead28():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:418
                 panic("ataBlockingRead28: Timeout in read loop, waiting for DRQ to be set Stts=0x%02X, Err=0x%02X", lResult, hdError);
  1001174:	83 ec 04             	sub    esp,0x4
- 1001177:	ff 35 68 3a 01 01    	push   DWORD PTR ds:0x1013a68
+ 1001177:	ff 35 74 4a 01 01    	push   DWORD PTR ds:0x1014a74
  100117d:	50                   	push   eax
- 100117e:	68 7c 7a 00 01       	push   0x1007a7c
- 1001183:	e8 68 0f 00 00       	call   10020f0 <panic>
+ 100117e:	68 74 7d 00 01       	push   0x1007d74
+ 1001183:	e8 6c 0f 00 00       	call   10020f4 <panic>
  1001188:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:420
 #ifndef DEBUG_NONE
@@ -3019,8 +3019,8 @@ ataBlockingRead28():
  1001198:	ff 74 24 0c          	push   DWORD PTR [esp+0xc]
  100119c:	56                   	push   esi
  100119d:	55                   	push   ebp
- 100119e:	68 d8 7a 00 01       	push   0x1007ad8
- 10011a3:	e8 cf 13 00 00       	call   1002577 <printk>
+ 100119e:	68 d0 7d 00 01       	push   0x1007dd0
+ 10011a3:	e8 d3 13 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:423
             waitForKeyboardKey();
  10011a8:	e8 0b f3 ff ff       	call   10004b8 <waitForKeyboardKey>
@@ -3057,7 +3057,7 @@ int ataReadDisk(struct ataDeviceInfo_t* devInfo, uint32_t sector, uint8_t *buffe
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:358
     atablockingReadDev = devInfo;
  10011cb:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
- 10011cf:	89 15 20 90 00 01    	mov    DWORD PTR ds:0x1009020,edx
+ 10011cf:	89 15 20 a0 00 01    	mov    DWORD PTR ds:0x100a020,edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/ata_disk.c:359
     if (sector_count==0)    //this function can be called with a sector_count of 0 in order to set partOffset
  10011d5:	85 c0                	test   eax,eax
@@ -3123,8 +3123,8 @@ uint32_t kPagingGet4kPDEntryValue(uint32_t address)
             printk("pagingGet4kPDEntryValue: dirAddressPtr=0x%08x\n", *lTemp);
  1001210:	83 ec 08             	sub    esp,0x8
  1001213:	ff 34 9d 00 90 4a 00 	push   DWORD PTR [ebx*4+0x4a9000]
- 100121a:	68 14 7b 00 01       	push   0x1007b14
- 100121f:	e8 53 13 00 00       	call   1002577 <printk>
+ 100121a:	68 0c 7e 00 01       	push   0x1007e0c
+ 100121f:	e8 57 13 00 00       	call   100257b <printk>
  1001224:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:26
 #endif
@@ -3160,8 +3160,8 @@ uint32_t kPagingGet4kPDEntryAddress(uint32_t address)
             printk("dirEntryAddress=0x%08x\n", lTemp);
  1001250:	83 ec 08             	sub    esp,0x8
  1001253:	53                   	push   ebx
- 1001254:	68 1e 74 00 01       	push   0x100741e
- 1001259:	e8 19 13 00 00       	call   1002577 <printk>
+ 1001254:	68 1a 77 00 01       	push   0x100771a
+ 1001259:	e8 1d 13 00 00       	call   100257b <printk>
  100125e:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:38
 #endif
@@ -3226,8 +3226,8 @@ uint32_t kPagingGet4kPTEntryValue(uint32_t address)
              printk("pagingGet4kPTEntryValue: pageEntryAddress=0x%08X\n", pTablePtr);
  10012b3:	83 ec 08             	sub    esp,0x8
  10012b6:	50                   	push   eax
- 10012b7:	68 44 7b 00 01       	push   0x1007b44
- 10012bc:	e8 b6 12 00 00       	call   1002577 <printk>
+ 10012b7:	68 3c 7e 00 01       	push   0x1007e3c
+ 10012bc:	e8 ba 12 00 00       	call   100257b <printk>
  10012c1:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:56
              //printf("pageEntryValue=0x%08X\n", *pTablePtr);
@@ -3261,8 +3261,8 @@ void kPagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
  10012e1:	83 ec 04             	sub    esp,0x4
  10012e4:	ff 33                	push   DWORD PTR [ebx]
  10012e6:	53                   	push   ebx
- 10012e7:	68 78 7b 00 01       	push   0x1007b78
- 10012ec:	e8 86 12 00 00       	call   1002577 <printk>
+ 10012e7:	68 70 7e 00 01       	push   0x1007e70
+ 10012ec:	e8 8a 12 00 00       	call   100257b <printk>
  10012f1:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:65
 #endif
@@ -3291,8 +3291,8 @@ void kPagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
             printk("0x%08X\n", *ptEntry);
  1001311:	83 ec 08             	sub    esp,0x8
  1001314:	ff 33                	push   DWORD PTR [ebx]
- 1001316:	68 66 77 00 01       	push   0x1007766
- 100131b:	e8 57 12 00 00       	call   1002577 <printk>
+ 1001316:	68 8d 7a 00 01       	push   0x1007a8d
+ 100131b:	e8 5b 12 00 00       	call   100257b <printk>
  1001320:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:74
 #endif
@@ -3317,9 +3317,9 @@ void kPagingUpdatePTEPresentFlag(uintptr_t* ptEntry, bool present)
          printd(DEBUG_PAGING,"pagingUpdatePTEPresentFlag: 0x%08X - before/after: 0x%08X/", ptEntry, *ptEntry);
  1001336:	ff 33                	push   DWORD PTR [ebx]
  1001338:	53                   	push   ebx
- 1001339:	68 b0 7b 00 01       	push   0x1007bb0
+ 1001339:	68 a8 7e 00 01       	push   0x1007ea8
  100133e:	6a 40                	push   0x40
- 1001340:	e8 4a 12 00 00       	call   100258f <printd>
+ 1001340:	e8 4e 12 00 00       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:79
          if (present)
  1001345:	83 c4 10             	add    esp,0x10
@@ -3342,9 +3342,9 @@ void kPagingUpdatePTEPresentFlag(uintptr_t* ptEntry, bool present)
          printd(DEBUG_PAGING,"0x%08X\n", *ptEntry);
  100135c:	83 ec 04             	sub    esp,0x4
  100135f:	ff 33                	push   DWORD PTR [ebx]
- 1001361:	68 66 77 00 01       	push   0x1007766
+ 1001361:	68 8d 7a 00 01       	push   0x1007a8d
  1001366:	6a 40                	push   0x40
- 1001368:	e8 22 12 00 00       	call   100258f <printd>
+ 1001368:	e8 26 12 00 00       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:85
 }
  100136d:	83 c4 14             	add    esp,0x14
@@ -3378,8 +3378,8 @@ void kSetVirtualRangeRO(uint32_t startAddy, uint32_t endAddy, bool readOnly)
  1001391:	83 ec 04             	sub    esp,0x4
  1001394:	55                   	push   ebp
  1001395:	53                   	push   ebx
- 1001396:	68 ec 7b 00 01       	push   0x1007bec
- 100139b:	e8 d7 11 00 00       	call   1002577 <printk>
+ 1001396:	68 e4 7e 00 01       	push   0x1007ee4
+ 100139b:	e8 db 11 00 00       	call   100257b <printk>
  10013a0:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:94 (discriminator 1)
 #endif
@@ -3389,8 +3389,8 @@ void kSetVirtualRangeRO(uint32_t startAddy, uint32_t endAddy, bool readOnly)
  10013a8:	77 5b                	ja     1001405 <kSetVirtualRangeRO+0x92>
  10013aa:	89 f0                	mov    eax,esi
  10013ac:	84 c0                	test   al,al
- 10013ae:	b8 39 74 00 01       	mov    eax,0x1007439
- 10013b3:	ba 36 74 00 01       	mov    edx,0x1007436
+ 10013ae:	b8 35 77 00 01       	mov    eax,0x1007735
+ 10013b3:	ba 32 77 00 01       	mov    edx,0x1007732
  10013b8:	0f 45 c2             	cmovne eax,edx
  10013bb:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:101
@@ -3424,8 +3424,8 @@ void kSetVirtualRangeRO(uint32_t startAddy, uint32_t endAddy, bool readOnly)
  10013db:	ff 74 24 0c          	push   DWORD PTR [esp+0xc]
  10013df:	50                   	push   eax
  10013e0:	53                   	push   ebx
- 10013e1:	68 3c 74 00 01       	push   0x100743c
- 10013e6:	e8 8c 11 00 00       	call   1002577 <printk>
+ 10013e1:	68 38 77 00 01       	push   0x1007738
+ 10013e6:	e8 90 11 00 00       	call   100257b <printk>
  10013eb:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:101 (discriminator 2)
 #endif
@@ -3479,14 +3479,14 @@ void kpagingUpdatePresentFlagA(uint32_t address, bool present)
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:112
             printk("kpagingUpdatePresentFlagA: Make 0x%08X %s\n", address, present?"present":"not present");
  1001423:	84 db                	test   bl,bl
- 1001425:	ba 54 74 00 01       	mov    edx,0x1007454
- 100142a:	b8 58 74 00 01       	mov    eax,0x1007458
+ 1001425:	ba 50 77 00 01       	mov    edx,0x1007750
+ 100142a:	b8 54 77 00 01       	mov    eax,0x1007754
  100142f:	0f 44 c2             	cmove  eax,edx
  1001432:	83 ec 04             	sub    esp,0x4
  1001435:	50                   	push   eax
  1001436:	56                   	push   esi
- 1001437:	68 1c 7c 00 01       	push   0x1007c1c
- 100143c:	e8 36 11 00 00       	call   1002577 <printk>
+ 1001437:	68 14 7f 00 01       	push   0x1007f14
+ 100143c:	e8 3a 11 00 00       	call   100257b <printk>
  1001441:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:114
 #endif
@@ -3506,8 +3506,8 @@ void kpagingUpdatePresentFlagA(uint32_t address, bool present)
             printk("kpagingUpdatePresentFlagA: updating entry 0x%08X\n", pagePTE);
  1001461:	83 ec 08             	sub    esp,0x8
  1001464:	50                   	push   eax
- 1001465:	68 48 7c 00 01       	push   0x1007c48
- 100146a:	e8 08 11 00 00       	call   1002577 <printk>
+ 1001465:	68 40 7f 00 01       	push   0x1007f40
+ 100146a:	e8 0c 11 00 00       	call   100257b <printk>
  100146f:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:119
 #endif
@@ -3601,8 +3601,8 @@ void kMapPage(uintptr_t mapTo, uintptr_t mapFrom, uint8_t flags)
  1001502:	56                   	push   esi
  1001503:	53                   	push   ebx
  1001504:	51                   	push   ecx
- 1001505:	68 7c 7c 00 01       	push   0x1007c7c
- 100150a:	e8 68 10 00 00       	call   1002577 <printk>
+ 1001505:	68 74 7f 00 01       	push   0x1007f74
+ 100150a:	e8 6c 10 00 00       	call   100257b <printk>
  100150f:	83 c4 20             	add    esp,0x20
  1001512:	eb 4e                	jmp    1001562 <kMapPage+0xc1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:150
@@ -3648,8 +3648,8 @@ void kMapPage(uintptr_t mapTo, uintptr_t mapFrom, uint8_t flags)
  1001552:	50                   	push   eax
  1001553:	53                   	push   ebx
  1001554:	51                   	push   ecx
- 1001555:	68 bc 7c 00 01       	push   0x1007cbc
- 100155a:	e8 18 10 00 00       	call   1002577 <printk>
+ 1001555:	68 b4 7f 00 01       	push   0x1007fb4
+ 100155a:	e8 1c 10 00 00       	call   100257b <printk>
  100155f:	83 c4 20             	add    esp,0x20
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:165
 #endif
@@ -3685,75 +3685,73 @@ bool kIsPageMapped(uintptr_t Address)
 kUnMapPage():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:175
 
-void kUnMapPage(uintptr_t mapTo, uint8_t newFlags)
+void kUnMapPage(uintptr_t mapTo)
 {
  100157b:	57                   	push   edi
  100157c:	56                   	push   esi
- 100157d:	53                   	push   ebx
- 100157e:	8b 4c 24 10          	mov    ecx,DWORD PTR [esp+0x10]
- 1001582:	8b 54 24 14          	mov    edx,DWORD PTR [esp+0x14]
+ 100157d:	83 ec 04             	sub    esp,0x4
+ 1001580:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:180
     uint32_t *ptr;
     uint32_t ptrVal;
     uint32_t *ptrT;
     ptr=(uint32_t*)kKernelPageDir;
     ptrVal=ptr[(mapTo>>22)];
- 1001586:	89 cb                	mov    ebx,ecx
- 1001588:	c1 eb 16             	shr    ebx,0x16
- 100158b:	a1 a4 02 12 00       	mov    eax,ds:0x1202a4
- 1001590:	8d 1c 98             	lea    ebx,[eax+ebx*4]
- 1001593:	8b 03                	mov    eax,DWORD PTR [ebx]
+ 1001584:	89 d1                	mov    ecx,edx
+ 1001586:	c1 e9 16             	shr    ecx,0x16
+ 1001589:	a1 a4 02 12 00       	mov    eax,ds:0x1202a4
+ 100158e:	8d 0c 88             	lea    ecx,[eax+ecx*4]
+ 1001591:	8b 01                	mov    eax,DWORD PTR [ecx]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:181
     if (ptrVal==0 && mapTo < kE820MemoryBytes)
- 1001595:	85 c0                	test   eax,eax
- 1001597:	75 4e                	jne    10015e7 <kUnMapPage+0x6c>
+ 1001593:	85 c0                	test   eax,eax
+ 1001595:	75 4f                	jne    10015e6 <kUnMapPage+0x6b>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:181 (discriminator 1)
- 1001599:	bf 00 00 00 00       	mov    edi,0x0
- 100159e:	3b 3d 4c 00 12 00    	cmp    edi,DWORD PTR ds:0x12004c
- 10015a4:	72 08                	jb     10015ae <kUnMapPage+0x33>
- 10015a6:	3b 0d 48 00 12 00    	cmp    ecx,DWORD PTR ds:0x120048
- 10015ac:	73 39                	jae    10015e7 <kUnMapPage+0x6c>
+ 1001597:	bf 00 00 00 00       	mov    edi,0x0
+ 100159c:	3b 3d 4c 00 12 00    	cmp    edi,DWORD PTR ds:0x12004c
+ 10015a2:	72 08                	jb     10015ac <kUnMapPage+0x31>
+ 10015a4:	3b 15 48 00 12 00    	cmp    edx,DWORD PTR ds:0x120048
+ 10015aa:	73 3a                	jae    10015e6 <kUnMapPage+0x6b>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:184
     {
         ptrT=(uint32_t*)0x20000000;
         ptr[(mapTo>>22)]=0x20000063;
- 10015ae:	c7 03 63 00 00 20    	mov    DWORD PTR [ebx],0x20000063
+ 10015ac:	c7 01 63 00 00 20    	mov    DWORD PTR [ecx],0x20000063
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:185
-        ptrT[(mapTo&0x003FFFFF/4096)]=0 | newFlags;
- 10015b4:	89 c8                	mov    eax,ecx
- 10015b6:	25 ff 03 00 00       	and    eax,0x3ff
- 10015bb:	8d 34 85 00 00 00 20 	lea    esi,[eax*4+0x20000000]
- 10015c2:	0f b6 d2             	movzx  edx,dl
- 10015c5:	89 14 85 00 00 00 20 	mov    DWORD PTR [eax*4+0x20000000],edx
+        ptrT[(mapTo&0x003FFFFF/4096)]=0;
+ 10015b2:	89 d0                	mov    eax,edx
+ 10015b4:	25 ff 03 00 00       	and    eax,0x3ff
+ 10015b9:	8d 34 85 00 00 00 20 	lea    esi,[eax*4+0x20000000]
+ 10015c0:	c7 04 85 00 00 00 20 	mov    DWORD PTR [eax*4+0x20000000],0x0
+ 10015c7:	00 00 00 00 
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:187
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
- 10015cc:	f6 05 38 03 12 00 40 	test   BYTE PTR ds:0x120338,0x40
- 10015d3:	74 43                	je     1001618 <kUnMapPage+0x9d>
+ 10015cb:	f6 05 38 03 12 00 40 	test   BYTE PTR ds:0x120338,0x40
+ 10015d2:	74 44                	je     1001618 <kUnMapPage+0x9d>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:188
             printk("kMapPage: Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)]);
- 10015d5:	56                   	push   esi
- 10015d6:	53                   	push   ebx
- 10015d7:	51                   	push   ecx
- 10015d8:	68 f8 7c 00 01       	push   0x1007cf8
- 10015dd:	e8 95 0f 00 00       	call   1002577 <printk>
- 10015e2:	83 c4 10             	add    esp,0x10
- 10015e5:	eb 31                	jmp    1001618 <kUnMapPage+0x9d>
+ 10015d4:	56                   	push   esi
+ 10015d5:	51                   	push   ecx
+ 10015d6:	52                   	push   edx
+ 10015d7:	68 f0 7f 00 01       	push   0x1007ff0
+ 10015dc:	e8 9a 0f 00 00       	call   100257b <printk>
+ 10015e1:	83 c4 10             	add    esp,0x10
+ 10015e4:	eb 32                	jmp    1001618 <kUnMapPage+0x9d>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:200
         ptrVal=ptr[mapTo>>22];
         ptrVal=(ptrVal&0xFFFFF000);
         ptrT=(uint32_t*)ptrVal;
         //Now ptrVal will point to offset within page table
         ptrVal=(mapTo&0x003FFFFF)/4096;
-        ptrT[ptrVal]=0 | newFlags;
- 10015e7:	25 00 f0 ff ff       	and    eax,0xfffff000
- 10015ec:	89 c6                	mov    esi,eax
- 10015ee:	89 c8                	mov    eax,ecx
- 10015f0:	c1 e8 0a             	shr    eax,0xa
- 10015f3:	25 fc 0f 00 00       	and    eax,0xffc
- 10015f8:	01 f0                	add    eax,esi
- 10015fa:	0f b6 d2             	movzx  edx,dl
- 10015fd:	89 10                	mov    DWORD PTR [eax],edx
+        ptrT[ptrVal]=0;
+ 10015e6:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 10015eb:	89 c6                	mov    esi,eax
+ 10015ed:	89 d0                	mov    eax,edx
+ 10015ef:	c1 e8 0a             	shr    eax,0xa
+ 10015f2:	25 fc 0f 00 00       	and    eax,0xffc
+ 10015f7:	01 f0                	add    eax,esi
+ 10015f9:	c7 00 00 00 00 00    	mov    DWORD PTR [eax],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:204
 //                printk("ptrT=%X(%X)\n",&ptrT[ptrVal],ptrT[ptrVal]);
 //                STOPHERE2
@@ -3764,168 +3762,168 @@ void kUnMapPage(uintptr_t mapTo, uint8_t newFlags)
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:205
             printk("2) Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal]);
  1001608:	50                   	push   eax
- 1001609:	53                   	push   ebx
- 100160a:	51                   	push   ecx
- 100160b:	68 30 7d 00 01       	push   0x1007d30
- 1001610:	e8 62 0f 00 00       	call   1002577 <printk>
+ 1001609:	51                   	push   ecx
+ 100160a:	52                   	push   edx
+ 100160b:	68 28 80 00 01       	push   0x1008028
+ 1001610:	e8 66 0f 00 00       	call   100257b <printk>
  1001615:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:209
 #endif
     }
 //    if (ptrT[(src&0x003FFFFF/1000)]==0)
 }
- 1001618:	5b                   	pop    ebx
- 1001619:	5e                   	pop    esi
- 100161a:	5f                   	pop    edi
- 100161b:	c3                   	ret    
+ 1001618:	83 c4 04             	add    esp,0x4
+ 100161b:	5e                   	pop    esi
+ 100161c:	5f                   	pop    edi
+ 100161d:	c3                   	ret    
 
-0100161c <kSetPhysicalRangeRO>:
+0100161e <kSetPhysicalRangeRO>:
 kSetPhysicalRangeRO():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:212
 
 void kSetPhysicalRangeRO(uint32_t startAddy, uint32_t endAddy, bool readOnly)
 {
- 100161c:	55                   	push   ebp
- 100161d:	57                   	push   edi
- 100161e:	56                   	push   esi
- 100161f:	53                   	push   ebx
- 1001620:	83 ec 0c             	sub    esp,0xc
- 1001623:	8b 6c 24 20          	mov    ebp,DWORD PTR [esp+0x20]
- 1001627:	8b 74 24 24          	mov    esi,DWORD PTR [esp+0x24]
- 100162b:	8b 5c 24 28          	mov    ebx,DWORD PTR [esp+0x28]
+ 100161e:	55                   	push   ebp
+ 100161f:	57                   	push   edi
+ 1001620:	56                   	push   esi
+ 1001621:	53                   	push   ebx
+ 1001622:	83 ec 0c             	sub    esp,0xc
+ 1001625:	8b 6c 24 20          	mov    ebp,DWORD PTR [esp+0x20]
+ 1001629:	8b 74 24 24          	mov    esi,DWORD PTR [esp+0x24]
+ 100162d:	8b 5c 24 28          	mov    ebx,DWORD PTR [esp+0x28]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:214
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
- 100162f:	f6 05 38 03 12 00 40 	test   BYTE PTR ds:0x120338,0x40
- 1001636:	74 22                	je     100165a <kSetPhysicalRangeRO+0x3e>
+ 1001631:	f6 05 38 03 12 00 40 	test   BYTE PTR ds:0x120338,0x40
+ 1001638:	74 22                	je     100165c <kSetPhysicalRangeRO+0x3e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:215
             printk("kMakePhysicalRangeRO: Make 0x%08X(0x%08X)-0x%08X(0x%08X) r/o\n", startAddy, startAddy&0xFffff000, endAddy, endAddy&0xFFFFF000);
- 1001638:	83 ec 0c             	sub    esp,0xc
- 100163b:	89 f0                	mov    eax,esi
- 100163d:	25 00 f0 ff ff       	and    eax,0xfffff000
- 1001642:	50                   	push   eax
- 1001643:	56                   	push   esi
- 1001644:	89 e8                	mov    eax,ebp
- 1001646:	25 00 f0 ff ff       	and    eax,0xfffff000
- 100164b:	50                   	push   eax
- 100164c:	55                   	push   ebp
- 100164d:	68 60 7d 00 01       	push   0x1007d60
- 1001652:	e8 20 0f 00 00       	call   1002577 <printk>
- 1001657:	83 c4 20             	add    esp,0x20
+ 100163a:	83 ec 0c             	sub    esp,0xc
+ 100163d:	89 f0                	mov    eax,esi
+ 100163f:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 1001644:	50                   	push   eax
+ 1001645:	56                   	push   esi
+ 1001646:	89 e8                	mov    eax,ebp
+ 1001648:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 100164d:	50                   	push   eax
+ 100164e:	55                   	push   ebp
+ 100164f:	68 58 80 00 01       	push   0x1008058
+ 1001654:	e8 22 0f 00 00       	call   100257b <printk>
+ 1001659:	83 c4 20             	add    esp,0x20
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:217
 #endif
     kSetVirtualRangeRO((startAddy + KERNEL_PAGED_BASE_ADDRESS) & 0xFFFFF000, (endAddy + KERNEL_PAGED_BASE_ADDRESS) & 0xFFFFF000, readOnly);
- 100165a:	83 ec 04             	sub    esp,0x4
- 100165d:	0f b6 fb             	movzx  edi,bl
- 1001660:	57                   	push   edi
- 1001661:	81 ee 00 00 00 40    	sub    esi,0x40000000
- 1001667:	81 e6 00 f0 ff ff    	and    esi,0xfffff000
- 100166d:	56                   	push   esi
- 100166e:	8d 9d 00 00 00 c0    	lea    ebx,[ebp-0x40000000]
- 1001674:	81 e3 00 f0 ff ff    	and    ebx,0xfffff000
- 100167a:	53                   	push   ebx
- 100167b:	e8 f3 fc ff ff       	call   1001373 <kSetVirtualRangeRO>
+ 100165c:	83 ec 04             	sub    esp,0x4
+ 100165f:	0f b6 fb             	movzx  edi,bl
+ 1001662:	57                   	push   edi
+ 1001663:	81 ee 00 00 00 40    	sub    esi,0x40000000
+ 1001669:	81 e6 00 f0 ff ff    	and    esi,0xfffff000
+ 100166f:	56                   	push   esi
+ 1001670:	8d 9d 00 00 00 c0    	lea    ebx,[ebp-0x40000000]
+ 1001676:	81 e3 00 f0 ff ff    	and    ebx,0xfffff000
+ 100167c:	53                   	push   ebx
+ 100167d:	e8 f1 fc ff ff       	call   1001373 <kSetVirtualRangeRO>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:218
 }
- 1001680:	83 c4 1c             	add    esp,0x1c
- 1001683:	5b                   	pop    ebx
- 1001684:	5e                   	pop    esi
- 1001685:	5f                   	pop    edi
- 1001686:	5d                   	pop    ebp
- 1001687:	c3                   	ret    
+ 1001682:	83 c4 1c             	add    esp,0x1c
+ 1001685:	5b                   	pop    ebx
+ 1001686:	5e                   	pop    esi
+ 1001687:	5f                   	pop    edi
+ 1001688:	5d                   	pop    ebp
+ 1001689:	c3                   	ret    
 
-01001688 <mmKernelSetPageInUseFlag>:
+0100168a <mmKernelSetPageInUseFlag>:
 mmKernelSetPageInUseFlag():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:221
 
 void mmKernelSetPageInUseFlag(uintptr_t address, bool inUse)
 {
- 1001688:	56                   	push   esi
- 1001689:	53                   	push   ebx
- 100168a:	83 ec 04             	sub    esp,0x4
- 100168d:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
- 1001691:	8b 74 24 14          	mov    esi,DWORD PTR [esp+0x14]
+ 100168a:	56                   	push   esi
+ 100168b:	53                   	push   ebx
+ 100168c:	83 ec 04             	sub    esp,0x4
+ 100168f:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
+ 1001693:	8b 74 24 14          	mov    esi,DWORD PTR [esp+0x14]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:224
     uintptr_t* ptEntry;
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
- 1001695:	f6 05 38 03 12 00 40 	test   BYTE PTR ds:0x120338,0x40
- 100169c:	74 22                	je     10016c0 <mmKernelSetPageInUseFlag+0x38>
+ 1001697:	f6 05 38 03 12 00 40 	test   BYTE PTR ds:0x120338,0x40
+ 100169e:	74 22                	je     10016c2 <mmKernelSetPageInUseFlag+0x38>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:225
            printd(DEBUG_PAGING, "mmKernelSetPageInUseFlag: Marking page with address 0x%08X as %s\n", address, inUse?"in use":"not in use");
- 100169e:	89 f0                	mov    eax,esi
- 10016a0:	84 c0                	test   al,al
- 10016a2:	ba 60 74 00 01       	mov    edx,0x1007460
- 10016a7:	b8 64 74 00 01       	mov    eax,0x1007464
- 10016ac:	0f 44 c2             	cmove  eax,edx
- 10016af:	50                   	push   eax
- 10016b0:	53                   	push   ebx
- 10016b1:	68 a0 7d 00 01       	push   0x1007da0
- 10016b6:	6a 40                	push   0x40
- 10016b8:	e8 d2 0e 00 00       	call   100258f <printd>
- 10016bd:	83 c4 10             	add    esp,0x10
+ 10016a0:	89 f0                	mov    eax,esi
+ 10016a2:	84 c0                	test   al,al
+ 10016a4:	ba 5c 77 00 01       	mov    edx,0x100775c
+ 10016a9:	b8 60 77 00 01       	mov    eax,0x1007760
+ 10016ae:	0f 44 c2             	cmove  eax,edx
+ 10016b1:	50                   	push   eax
+ 10016b2:	53                   	push   ebx
+ 10016b3:	68 98 80 00 01       	push   0x1008098
+ 10016b8:	6a 40                	push   0x40
+ 10016ba:	e8 d4 0e 00 00       	call   1002593 <printd>
+ 10016bf:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:227
 #endif
         ptEntry=(uintptr_t*)kPagingGet4kPTEntryAddress(address);
- 10016c0:	83 ec 0c             	sub    esp,0xc
- 10016c3:	53                   	push   ebx
- 10016c4:	e8 9f fb ff ff       	call   1001268 <kPagingGet4kPTEntryAddress>
- 10016c9:	89 c3                	mov    ebx,eax
+ 10016c2:	83 ec 0c             	sub    esp,0xc
+ 10016c5:	53                   	push   ebx
+ 10016c6:	e8 9d fb ff ff       	call   1001268 <kPagingGet4kPTEntryAddress>
+ 10016cb:	89 c3                	mov    ebx,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:228
         printd(DEBUG_PAGING,"mmKernelSetPageInUseFlag: PTE=0x%08X, Before PTE value=0x%08X\n",ptEntry,*ptEntry);
- 10016cb:	ff 30                	push   DWORD PTR [eax]
- 10016cd:	50                   	push   eax
- 10016ce:	68 e4 7d 00 01       	push   0x1007de4
- 10016d3:	6a 40                	push   0x40
- 10016d5:	e8 b5 0e 00 00       	call   100258f <printd>
+ 10016cd:	ff 30                	push   DWORD PTR [eax]
+ 10016cf:	50                   	push   eax
+ 10016d0:	68 dc 80 00 01       	push   0x10080dc
+ 10016d5:	6a 40                	push   0x40
+ 10016d7:	e8 b7 0e 00 00       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:229
         if (inUse)
- 10016da:	83 c4 20             	add    esp,0x20
- 10016dd:	89 f0                	mov    eax,esi
- 10016df:	84 c0                	test   al,al
- 10016e1:	74 08                	je     10016eb <mmKernelSetPageInUseFlag+0x63>
+ 10016dc:	83 c4 20             	add    esp,0x20
+ 10016df:	89 f0                	mov    eax,esi
+ 10016e1:	84 c0                	test   al,al
+ 10016e3:	74 08                	je     10016ed <mmKernelSetPageInUseFlag+0x63>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:230
             *ptEntry|=PAGING_IN_USE_FLAG_MASK;
- 10016e3:	81 0b 00 08 00 00    	or     DWORD PTR [ebx],0x800
- 10016e9:	eb 06                	jmp    10016f1 <mmKernelSetPageInUseFlag+0x69>
+ 10016e5:	81 0b 00 08 00 00    	or     DWORD PTR [ebx],0x800
+ 10016eb:	eb 06                	jmp    10016f3 <mmKernelSetPageInUseFlag+0x69>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:232
         else
             *ptEntry&=~PAGING_IN_USE_FLAG_MASK;
- 10016eb:	81 23 ff f7 ff ff    	and    DWORD PTR [ebx],0xfffff7ff
+ 10016ed:	81 23 ff f7 ff ff    	and    DWORD PTR [ebx],0xfffff7ff
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:233
 }
- 10016f1:	83 c4 04             	add    esp,0x4
- 10016f4:	5b                   	pop    ebx
- 10016f5:	5e                   	pop    esi
- 10016f6:	c3                   	ret    
+ 10016f3:	83 c4 04             	add    esp,0x4
+ 10016f6:	5b                   	pop    ebx
+ 10016f7:	5e                   	pop    esi
+ 10016f8:	c3                   	ret    
 
-010016f7 <mmKernelSetPageRangeInUseFlag>:
+010016f9 <mmKernelSetPageRangeInUseFlag>:
 mmKernelSetPageRangeInUseFlag():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:236
 
 void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse)
 {
- 10016f7:	55                   	push   ebp
- 10016f8:	57                   	push   edi
- 10016f9:	56                   	push   esi
- 10016fa:	53                   	push   ebx
- 10016fb:	83 ec 0c             	sub    esp,0xc
- 10016fe:	8b 5c 24 20          	mov    ebx,DWORD PTR [esp+0x20]
- 1001702:	8b 7c 24 24          	mov    edi,DWORD PTR [esp+0x24]
- 1001706:	8b 6c 24 28          	mov    ebp,DWORD PTR [esp+0x28]
- 100170a:	0f b6 44 24 2c       	movzx  eax,BYTE PTR [esp+0x2c]
+ 10016f9:	55                   	push   ebp
+ 10016fa:	57                   	push   edi
+ 10016fb:	56                   	push   esi
+ 10016fc:	53                   	push   ebx
+ 10016fd:	83 ec 0c             	sub    esp,0xc
+ 1001700:	8b 5c 24 20          	mov    ebx,DWORD PTR [esp+0x20]
+ 1001704:	8b 7c 24 24          	mov    edi,DWORD PTR [esp+0x24]
+ 1001708:	8b 6c 24 28          	mov    ebp,DWORD PTR [esp+0x28]
+ 100170c:	0f b6 44 24 2c       	movzx  eax,BYTE PTR [esp+0x2c]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:237
     for (uintptr_t cnt=startAddress;cnt<endAddress;cnt+=pageSize)
- 100170f:	39 fb                	cmp    ebx,edi
- 1001711:	73 16                	jae    1001729 <mmKernelSetPageRangeInUseFlag+0x32>
+ 1001711:	39 fb                	cmp    ebx,edi
+ 1001713:	73 16                	jae    100172b <mmKernelSetPageRangeInUseFlag+0x32>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:238 (discriminator 3)
         mmKernelSetPageInUseFlag(cnt,inUse);
- 1001713:	0f b6 f0             	movzx  esi,al
- 1001716:	83 ec 08             	sub    esp,0x8
- 1001719:	56                   	push   esi
- 100171a:	53                   	push   ebx
- 100171b:	e8 68 ff ff ff       	call   1001688 <mmKernelSetPageInUseFlag>
- 1001720:	01 eb                	add    ebx,ebp
+ 1001715:	0f b6 f0             	movzx  esi,al
+ 1001718:	83 ec 08             	sub    esp,0x8
+ 100171b:	56                   	push   esi
+ 100171c:	53                   	push   ebx
+ 100171d:	e8 68 ff ff ff       	call   100168a <mmKernelSetPageInUseFlag>
+ 1001722:	01 eb                	add    ebx,ebp
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:237 (discriminator 3)
             *ptEntry&=~PAGING_IN_USE_FLAG_MASK;
 }
@@ -3933,29 +3931,30 @@ void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress,
 void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse)
 {
     for (uintptr_t cnt=startAddress;cnt<endAddress;cnt+=pageSize)
- 1001722:	83 c4 10             	add    esp,0x10
- 1001725:	39 fb                	cmp    ebx,edi
- 1001727:	72 ed                	jb     1001716 <mmKernelSetPageRangeInUseFlag+0x1f>
+ 1001724:	83 c4 10             	add    esp,0x10
+ 1001727:	39 fb                	cmp    ebx,edi
+ 1001729:	72 ed                	jb     1001718 <mmKernelSetPageRangeInUseFlag+0x1f>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:239
         mmKernelSetPageInUseFlag(cnt,inUse);
 }
- 1001729:	83 c4 0c             	add    esp,0xc
- 100172c:	5b                   	pop    ebx
- 100172d:	5e                   	pop    esi
- 100172e:	5f                   	pop    edi
- 100172f:	5d                   	pop    ebp
- 1001730:	c3                   	ret    
+ 100172b:	83 c4 0c             	add    esp,0xc
+ 100172e:	5b                   	pop    ebx
+ 100172f:	5e                   	pop    esi
+ 1001730:	5f                   	pop    edi
+ 1001731:	5d                   	pop    ebp
+ 1001732:	c3                   	ret    
 
-01001731 <mmUnusePageRange>:
+01001733 <mmUnusePageRange>:
 mmUnusePageRange():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/kpaging.c:242
 
 void mmUnusePageRange()
 {
- 1001731:	f3 c3                	repz ret 
- 1001733:	90                   	nop
+ 1001733:	f3 c3                	repz ret 
+ 1001735:	66 90                	xchg   ax,ax
+ 1001737:	90                   	nop
 
-01001734 <reverse>:
+01001738 <reverse>:
 reverse():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:29
 //#include <string.h>
@@ -3964,33 +3963,33 @@ reverse():
 extern int strlen(char*);
  void reverse(char s[])
  {
- 1001734:	56                   	push   esi
- 1001735:	53                   	push   ebx
- 1001736:	83 ec 10             	sub    esp,0x10
- 1001739:	8b 5c 24 1c          	mov    ebx,DWORD PTR [esp+0x1c]
+ 1001738:	56                   	push   esi
+ 1001739:	53                   	push   ebx
+ 100173a:	83 ec 10             	sub    esp,0x10
+ 100173d:	8b 5c 24 1c          	mov    ebx,DWORD PTR [esp+0x1c]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:33
      int i, j;
      char c;
 
      for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
- 100173d:	53                   	push   ebx
- 100173e:	e8 e1 0e 00 00       	call   1002624 <strlen>
- 1001743:	83 e8 01             	sub    eax,0x1
- 1001746:	83 c4 10             	add    esp,0x10
- 1001749:	85 c0                	test   eax,eax
- 100174b:	7e 1f                	jle    100176c <reverse+0x38>
- 100174d:	ba 00 00 00 00       	mov    edx,0x0
+ 1001741:	53                   	push   ebx
+ 1001742:	e8 e1 0e 00 00       	call   1002628 <strlen>
+ 1001747:	83 e8 01             	sub    eax,0x1
+ 100174a:	83 c4 10             	add    esp,0x10
+ 100174d:	85 c0                	test   eax,eax
+ 100174f:	7e 1f                	jle    1001770 <reverse+0x38>
+ 1001751:	ba 00 00 00 00       	mov    edx,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:34 (discriminator 3)
          c = s[i];
- 1001752:	0f b6 34 13          	movzx  esi,BYTE PTR [ebx+edx*1]
+ 1001756:	0f b6 34 13          	movzx  esi,BYTE PTR [ebx+edx*1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:35 (discriminator 3)
          s[i] = s[j];
- 1001756:	0f b6 0c 03          	movzx  ecx,BYTE PTR [ebx+eax*1]
- 100175a:	88 0c 13             	mov    BYTE PTR [ebx+edx*1],cl
+ 100175a:	0f b6 0c 03          	movzx  ecx,BYTE PTR [ebx+eax*1]
+ 100175e:	88 0c 13             	mov    BYTE PTR [ebx+edx*1],cl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:36 (discriminator 3)
          s[j] = c;
- 100175d:	89 f1                	mov    ecx,esi
- 100175f:	88 0c 03             	mov    BYTE PTR [ebx+eax*1],cl
+ 1001761:	89 f1                	mov    ecx,esi
+ 1001763:	88 0c 03             	mov    BYTE PTR [ebx+eax*1],cl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:33 (discriminator 3)
  void reverse(char s[])
  {
@@ -3998,38 +3997,38 @@ extern int strlen(char*);
      char c;
 
      for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
- 1001762:	83 c2 01             	add    edx,0x1
- 1001765:	83 e8 01             	sub    eax,0x1
- 1001768:	39 c2                	cmp    edx,eax
- 100176a:	7c e6                	jl     1001752 <reverse+0x1e>
+ 1001766:	83 c2 01             	add    edx,0x1
+ 1001769:	83 e8 01             	sub    eax,0x1
+ 100176c:	39 c2                	cmp    edx,eax
+ 100176e:	7c e6                	jl     1001756 <reverse+0x1e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:38
          c = s[i];
          s[i] = s[j];
          s[j] = c;
      }
  }
- 100176c:	83 c4 04             	add    esp,0x4
- 100176f:	5b                   	pop    ebx
- 1001770:	5e                   	pop    esi
- 1001771:	c3                   	ret    
+ 1001770:	83 c4 04             	add    esp,0x4
+ 1001773:	5b                   	pop    ebx
+ 1001774:	5e                   	pop    esi
+ 1001775:	c3                   	ret    
 
-01001772 <itoa>:
+01001776 <itoa>:
 itoa():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:40
  void itoa(int n, char s[])
  {
- 1001772:	55                   	push   ebp
- 1001773:	57                   	push   edi
- 1001774:	56                   	push   esi
- 1001775:	53                   	push   ebx
- 1001776:	83 ec 1c             	sub    esp,0x1c
- 1001779:	8b 7c 24 34          	mov    edi,DWORD PTR [esp+0x34]
- 100177d:	8b 44 24 30          	mov    eax,DWORD PTR [esp+0x30]
- 1001781:	c1 f8 1f             	sar    eax,0x1f
- 1001784:	89 c1                	mov    ecx,eax
- 1001786:	33 4c 24 30          	xor    ecx,DWORD PTR [esp+0x30]
- 100178a:	29 c1                	sub    ecx,eax
- 100178c:	be 00 00 00 00       	mov    esi,0x0
+ 1001776:	55                   	push   ebp
+ 1001777:	57                   	push   edi
+ 1001778:	56                   	push   esi
+ 1001779:	53                   	push   ebx
+ 100177a:	83 ec 1c             	sub    esp,0x1c
+ 100177d:	8b 7c 24 34          	mov    edi,DWORD PTR [esp+0x34]
+ 1001781:	8b 44 24 30          	mov    eax,DWORD PTR [esp+0x30]
+ 1001785:	c1 f8 1f             	sar    eax,0x1f
+ 1001788:	89 c1                	mov    ecx,eax
+ 100178a:	33 4c 24 30          	xor    ecx,DWORD PTR [esp+0x30]
+ 100178e:	29 c1                	sub    ecx,eax
+ 1001790:	be 00 00 00 00       	mov    esi,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:47
 
      if ((sign = n) < 0)  /* record sign */
@@ -4037,83 +4036,83 @@ itoa():
      i = 0;
      do {       /* generate digits in reverse order */
          s[i++] = n % 10 + '0';   /* get next digit */
- 1001791:	bd 67 66 66 66       	mov    ebp,0x66666667
- 1001796:	eb 02                	jmp    100179a <itoa+0x28>
- 1001798:	89 de                	mov    esi,ebx
+ 1001795:	bd 67 66 66 66       	mov    ebp,0x66666667
+ 100179a:	eb 02                	jmp    100179e <itoa+0x28>
+ 100179c:	89 de                	mov    esi,ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:47 (discriminator 1)
- 100179a:	8d 5e 01             	lea    ebx,[esi+0x1]
- 100179d:	89 5c 24 0c          	mov    DWORD PTR [esp+0xc],ebx
- 10017a1:	89 c8                	mov    eax,ecx
- 10017a3:	f7 ed                	imul   ebp
- 10017a5:	c1 fa 02             	sar    edx,0x2
- 10017a8:	89 c8                	mov    eax,ecx
- 10017aa:	c1 f8 1f             	sar    eax,0x1f
- 10017ad:	29 c2                	sub    edx,eax
- 10017af:	8d 04 92             	lea    eax,[edx+edx*4]
- 10017b2:	01 c0                	add    eax,eax
- 10017b4:	29 c1                	sub    ecx,eax
- 10017b6:	83 c1 30             	add    ecx,0x30
- 10017b9:	88 4c 1f ff          	mov    BYTE PTR [edi+ebx*1-0x1],cl
+ 100179e:	8d 5e 01             	lea    ebx,[esi+0x1]
+ 10017a1:	89 5c 24 0c          	mov    DWORD PTR [esp+0xc],ebx
+ 10017a5:	89 c8                	mov    eax,ecx
+ 10017a7:	f7 ed                	imul   ebp
+ 10017a9:	c1 fa 02             	sar    edx,0x2
+ 10017ac:	89 c8                	mov    eax,ecx
+ 10017ae:	c1 f8 1f             	sar    eax,0x1f
+ 10017b1:	29 c2                	sub    edx,eax
+ 10017b3:	8d 04 92             	lea    eax,[edx+edx*4]
+ 10017b6:	01 c0                	add    eax,eax
+ 10017b8:	29 c1                	sub    ecx,eax
+ 10017ba:	83 c1 30             	add    ecx,0x30
+ 10017bd:	88 4c 1f ff          	mov    BYTE PTR [edi+ebx*1-0x1],cl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:48 (discriminator 1)
      } while ((n /= 10) > 0);     /* delete it */
- 10017bd:	89 d1                	mov    ecx,edx
- 10017bf:	85 d2                	test   edx,edx
- 10017c1:	7f d5                	jg     1001798 <itoa+0x26>
+ 10017c1:	89 d1                	mov    ecx,edx
+ 10017c3:	85 d2                	test   edx,edx
+ 10017c5:	7f d5                	jg     100179c <itoa+0x26>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:49
      if (sign < 0)
- 10017c3:	83 7c 24 30 00       	cmp    DWORD PTR [esp+0x30],0x0
- 10017c8:	79 0b                	jns    10017d5 <itoa+0x63>
+ 10017c7:	83 7c 24 30 00       	cmp    DWORD PTR [esp+0x30],0x0
+ 10017cc:	79 0b                	jns    10017d9 <itoa+0x63>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:50
          s[i++] = '-';
- 10017ca:	8d 5e 02             	lea    ebx,[esi+0x2]
- 10017cd:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
- 10017d1:	c6 04 07 2d          	mov    BYTE PTR [edi+eax*1],0x2d
+ 10017ce:	8d 5e 02             	lea    ebx,[esi+0x2]
+ 10017d1:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+ 10017d5:	c6 04 07 2d          	mov    BYTE PTR [edi+eax*1],0x2d
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:51
      s[i] = '\0';
- 10017d5:	c6 04 1f 00          	mov    BYTE PTR [edi+ebx*1],0x0
+ 10017d9:	c6 04 1f 00          	mov    BYTE PTR [edi+ebx*1],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:52
      reverse(s);
- 10017d9:	83 ec 0c             	sub    esp,0xc
- 10017dc:	57                   	push   edi
- 10017dd:	e8 52 ff ff ff       	call   1001734 <reverse>
+ 10017dd:	83 ec 0c             	sub    esp,0xc
+ 10017e0:	57                   	push   edi
+ 10017e1:	e8 52 ff ff ff       	call   1001738 <reverse>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:53
  }
- 10017e2:	83 c4 2c             	add    esp,0x2c
- 10017e5:	5b                   	pop    ebx
- 10017e6:	5e                   	pop    esi
- 10017e7:	5f                   	pop    edi
- 10017e8:	5d                   	pop    ebp
- 10017e9:	c3                   	ret    
+ 10017e6:	83 c4 2c             	add    esp,0x2c
+ 10017e9:	5b                   	pop    ebx
+ 10017ea:	5e                   	pop    esi
+ 10017eb:	5f                   	pop    edi
+ 10017ec:	5d                   	pop    ebp
+ 10017ed:	c3                   	ret    
 
-010017ea <itox>:
+010017ee <itox>:
 itox():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:55
 void itox(unsigned int i, char *s)
 {
- 10017ea:	53                   	push   ebx
- 10017eb:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
- 10017ef:	8b 5c 24 0c          	mov    ebx,DWORD PTR [esp+0xc]
+ 10017ee:	53                   	push   ebx
+ 10017ef:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+ 10017f3:	8b 5c 24 0c          	mov    ebx,DWORD PTR [esp+0xc]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:58
     unsigned char n;
 
     s += 4;
- 10017f3:	8d 43 04             	lea    eax,[ebx+0x4]
+ 10017f7:	8d 43 04             	lea    eax,[ebx+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:59
     *s = '\0';
- 10017f6:	c6 43 04 00          	mov    BYTE PTR [ebx+0x4],0x0
- 10017fa:	83 eb 04             	sub    ebx,0x4
+ 10017fa:	c6 43 04 00          	mov    BYTE PTR [ebx+0x4],0x0
+ 10017fe:	83 eb 04             	sub    ebx,0x4
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:62 (discriminator 3)
 
     for (n = 8; n != 0; --n) {
         *--s = "0123456789ABCDEF"[i & 0x0F];
- 10017fd:	83 e8 01             	sub    eax,0x1
- 1001800:	89 d1                	mov    ecx,edx
- 1001802:	83 e1 0f             	and    ecx,0xf
- 1001805:	0f b6 89 6b 74 00 01 	movzx  ecx,BYTE PTR [ecx+0x100746b]
- 100180c:	88 08                	mov    BYTE PTR [eax],cl
+ 1001801:	83 e8 01             	sub    eax,0x1
+ 1001804:	89 d1                	mov    ecx,edx
+ 1001806:	83 e1 0f             	and    ecx,0xf
+ 1001809:	0f b6 89 67 77 00 01 	movzx  ecx,BYTE PTR [ecx+0x1007767]
+ 1001810:	88 08                	mov    BYTE PTR [eax],cl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:63 (discriminator 3)
         i >>= 4;
- 100180e:	c1 ea 04             	shr    edx,0x4
+ 1001812:	c1 ea 04             	shr    edx,0x4
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:61 (discriminator 3)
     unsigned char n;
 
@@ -4121,40 +4120,40 @@ void itox(unsigned int i, char *s)
     *s = '\0';
 
     for (n = 8; n != 0; --n) {
- 1001811:	39 c3                	cmp    ebx,eax
- 1001813:	75 e8                	jne    10017fd <itox+0x13>
+ 1001815:	39 c3                	cmp    ebx,eax
+ 1001817:	75 e8                	jne    1001801 <itox+0x13>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:65
         *--s = "0123456789ABCDEF"[i & 0x0F];
         i >>= 4;
     }
 }
- 1001815:	5b                   	pop    ebx
- 1001816:	c3                   	ret    
+ 1001819:	5b                   	pop    ebx
+ 100181a:	c3                   	ret    
 
-01001817 <atoi>:
+0100181b <atoi>:
 atoi():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:68
 // A simple atoi() function - from http://www.geeksforgeeks.org/write-your-own-atoi
 int atoi(char *str)
 {
- 1001817:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+ 100181b:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:73
     int res = 0; // Initialize result
   
     // Iterate through all characters of input string and
     // update result
     for (int i = 0; str[i] != '\0'; ++i)
- 100181b:	0f b6 11             	movzx  edx,BYTE PTR [ecx]
- 100181e:	84 d2                	test   dl,dl
- 1001820:	74 1f                	je     1001841 <atoi+0x2a>
- 1001822:	83 c1 01             	add    ecx,0x1
- 1001825:	b8 00 00 00 00       	mov    eax,0x0
+ 100181f:	0f b6 11             	movzx  edx,BYTE PTR [ecx]
+ 1001822:	84 d2                	test   dl,dl
+ 1001824:	74 1f                	je     1001845 <atoi+0x2a>
+ 1001826:	83 c1 01             	add    ecx,0x1
+ 1001829:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:74 (discriminator 3)
         res = res*10 + str[i] - '0';
- 100182a:	8d 04 80             	lea    eax,[eax+eax*4]
- 100182d:	0f be d2             	movsx  edx,dl
- 1001830:	8d 44 42 d0          	lea    eax,[edx+eax*2-0x30]
- 1001834:	83 c1 01             	add    ecx,0x1
+ 100182e:	8d 04 80             	lea    eax,[eax+eax*4]
+ 1001831:	0f be d2             	movsx  edx,dl
+ 1001834:	8d 44 42 d0          	lea    eax,[edx+eax*2-0x30]
+ 1001838:	83 c1 01             	add    ecx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:73 (discriminator 3)
 {
     int res = 0; // Initialize result
@@ -4162,10 +4161,10 @@ int atoi(char *str)
     // Iterate through all characters of input string and
     // update result
     for (int i = 0; str[i] != '\0'; ++i)
- 1001837:	0f b6 51 ff          	movzx  edx,BYTE PTR [ecx-0x1]
- 100183b:	84 d2                	test   dl,dl
- 100183d:	75 eb                	jne    100182a <atoi+0x13>
- 100183f:	f3 c3                	repz ret 
+ 100183b:	0f b6 51 ff          	movzx  edx,BYTE PTR [ecx-0x1]
+ 100183f:	84 d2                	test   dl,dl
+ 1001841:	75 eb                	jne    100182e <atoi+0x13>
+ 1001843:	f3 c3                	repz ret 
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:69
     }
 }
@@ -4173,7 +4172,7 @@ int atoi(char *str)
 int atoi(char *str)
 {
     int res = 0; // Initialize result
- 1001841:	b8 00 00 00 00       	mov    eax,0x0
+ 1001845:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:78
     for (int i = 0; str[i] != '\0'; ++i)
         res = res*10 + str[i] - '0';
@@ -4181,75 +4180,75 @@ int atoi(char *str)
     // return result.
     return res;
 }
- 1001846:	c3                   	ret    
+ 100184a:	c3                   	ret    
 
-01001847 <convert>:
+0100184b <convert>:
 convert():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:81
 
 int convert(int s)
 {
- 1001847:	83 ec 10             	sub    esp,0x10
- 100184a:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
+ 100184b:	83 ec 10             	sub    esp,0x10
+ 100184e:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:83
   int c;
   char hex[] = {'A', 'B', 'C', 'D', 'E', 'F'};
- 100184e:	c6 44 24 0a 41       	mov    BYTE PTR [esp+0xa],0x41
- 1001853:	c6 44 24 0b 42       	mov    BYTE PTR [esp+0xb],0x42
- 1001858:	c6 44 24 0c 43       	mov    BYTE PTR [esp+0xc],0x43
- 100185d:	c6 44 24 0d 44       	mov    BYTE PTR [esp+0xd],0x44
- 1001862:	c6 44 24 0e 45       	mov    BYTE PTR [esp+0xe],0x45
- 1001867:	c6 44 24 0f 46       	mov    BYTE PTR [esp+0xf],0x46
+ 1001852:	c6 44 24 0a 41       	mov    BYTE PTR [esp+0xa],0x41
+ 1001857:	c6 44 24 0b 42       	mov    BYTE PTR [esp+0xb],0x42
+ 100185c:	c6 44 24 0c 43       	mov    BYTE PTR [esp+0xc],0x43
+ 1001861:	c6 44 24 0d 44       	mov    BYTE PTR [esp+0xd],0x44
+ 1001866:	c6 44 24 0e 45       	mov    BYTE PTR [esp+0xe],0x45
+ 100186b:	c6 44 24 0f 46       	mov    BYTE PTR [esp+0xf],0x46
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:84
   c = (s >= 0 && s < 9) ? s + '0' : hex[s - 10];
- 100186c:	83 f8 08             	cmp    eax,0x8
- 100186f:	77 05                	ja     1001876 <convert+0x2f>
+ 1001870:	83 f8 08             	cmp    eax,0x8
+ 1001873:	77 05                	ja     100187a <convert+0x2f>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:84 (discriminator 1)
- 1001871:	83 c0 30             	add    eax,0x30
- 1001874:	eb 04                	jmp    100187a <convert+0x33>
+ 1001875:	83 c0 30             	add    eax,0x30
+ 1001878:	eb 04                	jmp    100187e <convert+0x33>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:84 (discriminator 2)
- 1001876:	0f be 04 04          	movsx  eax,BYTE PTR [esp+eax*1]
+ 100187a:	0f be 04 04          	movsx  eax,BYTE PTR [esp+eax*1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:86 (discriminator 4)
   return c;
 }
- 100187a:	83 c4 10             	add    esp,0x10
- 100187d:	c3                   	ret    
+ 100187e:	83 c4 10             	add    esp,0x10
+ 1001881:	c3                   	ret    
 
-0100187e <itoha>:
+01001882 <itoha>:
 itoha():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:89
 
 void itoha(unsigned int n, char *buf)
 {
- 100187e:	55                   	push   ebp
- 100187f:	57                   	push   edi
- 1001880:	56                   	push   esi
- 1001881:	53                   	push   ebx
- 1001882:	8b 5c 24 14          	mov    ebx,DWORD PTR [esp+0x14]
- 1001886:	8b 7c 24 18          	mov    edi,DWORD PTR [esp+0x18]
+ 1001882:	55                   	push   ebp
+ 1001883:	57                   	push   edi
+ 1001884:	56                   	push   esi
+ 1001885:	53                   	push   ebx
+ 1001886:	8b 5c 24 14          	mov    ebx,DWORD PTR [esp+0x14]
+ 100188a:	8b 7c 24 18          	mov    edi,DWORD PTR [esp+0x18]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:92
   int i = 0, j =0;
   j=7;
   while(n != 0)
- 100188a:	85 db                	test   ebx,ebx
- 100188c:	74 25                	je     10018b3 <itoha+0x35>
- 100188e:	be 07 00 00 00       	mov    esi,0x7
+ 100188e:	85 db                	test   ebx,ebx
+ 1001890:	74 25                	je     10018b7 <itoha+0x35>
+ 1001892:	be 07 00 00 00       	mov    esi,0x7
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:94
   {
     i = n % 16;
- 1001893:	89 dd                	mov    ebp,ebx
- 1001895:	83 e5 0f             	and    ebp,0xf
+ 1001897:	89 dd                	mov    ebp,ebx
+ 1001899:	83 e5 0f             	and    ebp,0xf
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:95
       buf[j--] = convert(i);
- 1001898:	83 ee 01             	sub    esi,0x1
- 100189b:	55                   	push   ebp
- 100189c:	e8 a6 ff ff ff       	call   1001847 <convert>
- 10018a1:	83 c4 04             	add    esp,0x4
- 10018a4:	88 44 37 01          	mov    BYTE PTR [edi+esi*1+0x1],al
+ 100189c:	83 ee 01             	sub    esi,0x1
+ 100189f:	55                   	push   ebp
+ 10018a0:	e8 a6 ff ff ff       	call   100184b <convert>
+ 10018a5:	83 c4 04             	add    esp,0x4
+ 10018a8:	88 44 37 01          	mov    BYTE PTR [edi+esi*1+0x1],al
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:96
       n = (n - i) / 16;
- 10018a8:	29 eb                	sub    ebx,ebp
- 10018aa:	c1 eb 04             	shr    ebx,0x4
+ 10018ac:	29 eb                	sub    ebx,ebp
+ 10018ae:	c1 eb 04             	shr    ebx,0x4
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:92
 
 void itoha(unsigned int n, char *buf)
@@ -4257,9 +4256,9 @@ void itoha(unsigned int n, char *buf)
   int i = 0, j =0;
   j=7;
   while(n != 0)
- 10018ad:	85 db                	test   ebx,ebx
- 10018af:	75 e2                	jne    1001893 <itoha+0x15>
- 10018b1:	eb 05                	jmp    10018b8 <itoha+0x3a>
+ 10018b1:	85 db                	test   ebx,ebx
+ 10018b3:	75 e2                	jne    1001897 <itoha+0x15>
+ 10018b5:	eb 05                	jmp    10018bc <itoha+0x3a>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:91
 }
 
@@ -4267,7 +4266,7 @@ void itoha(unsigned int n, char *buf)
 {
   int i = 0, j =0;
   j=7;
- 10018b3:	be 07 00 00 00       	mov    esi,0x7
+ 10018b7:	be 07 00 00 00       	mov    esi,0x7
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:98
   {
     i = n % 16;
@@ -4275,74 +4274,74 @@ void itoha(unsigned int n, char *buf)
       n = (n - i) / 16;
   }
   buf[j] = '\0';
- 10018b8:	c6 04 37 00          	mov    BYTE PTR [edi+esi*1],0x0
+ 10018bc:	c6 04 37 00          	mov    BYTE PTR [edi+esi*1],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:99
 }
- 10018bc:	5b                   	pop    ebx
- 10018bd:	5e                   	pop    esi
- 10018be:	5f                   	pop    edi
- 10018bf:	5d                   	pop    ebp
- 10018c0:	c3                   	ret    
+ 10018c0:	5b                   	pop    ebx
+ 10018c1:	5e                   	pop    esi
+ 10018c2:	5f                   	pop    edi
+ 10018c3:	5d                   	pop    ebp
+ 10018c4:	c3                   	ret    
 
-010018c1 <identify_data_sizes>:
+010018c5 <identify_data_sizes>:
 identify_data_sizes():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:102
 
 void identify_data_sizes(sizeof_t* sizes)
 {
- 10018c1:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
+ 10018c5:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:103
     sizes->shortSize = sizeof(short);
- 10018c5:	66 c7 00 02 00       	mov    WORD PTR [eax],0x2
+ 10018c9:	66 c7 00 02 00       	mov    WORD PTR [eax],0x2
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:104
     sizes->intSize = sizeof(int);
- 10018ca:	66 c7 40 02 04 00    	mov    WORD PTR [eax+0x2],0x4
+ 10018ce:	66 c7 40 02 04 00    	mov    WORD PTR [eax+0x2],0x4
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:105
     sizes->longSize = sizeof(long);
- 10018d0:	66 c7 40 04 04 00    	mov    WORD PTR [eax+0x4],0x4
+ 10018d4:	66 c7 40 04 04 00    	mov    WORD PTR [eax+0x4],0x4
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:106
     sizes->longLongSize = sizeof(long long);
- 10018d6:	66 c7 40 06 08 00    	mov    WORD PTR [eax+0x6],0x8
+ 10018da:	66 c7 40 06 08 00    	mov    WORD PTR [eax+0x6],0x8
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:107
     sizes->longLongIntSize = sizeof(long long int);
- 10018dc:	66 c7 40 08 08 00    	mov    WORD PTR [eax+0x8],0x8
- 10018e2:	c3                   	ret    
+ 10018e0:	66 c7 40 08 08 00    	mov    WORD PTR [eax+0x8],0x8
+ 10018e6:	c3                   	ret    
 
-010018e3 <memset>:
+010018e7 <memset>:
 memset():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:111
 }
 
 void *memset(void *d1, int val, size_t len)
 {
- 10018e3:	56                   	push   esi
- 10018e4:	53                   	push   ebx
- 10018e5:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
- 10018e9:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
- 10018ed:	8b 54 24 14          	mov    edx,DWORD PTR [esp+0x14]
+ 10018e7:	56                   	push   esi
+ 10018e8:	53                   	push   ebx
+ 10018e9:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+ 10018ed:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+ 10018f1:	8b 54 24 14          	mov    edx,DWORD PTR [esp+0x14]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:114
     uint8_t *d = d1;
     uint16_t*e = d1;
     uint16_t eVal=(val << 16) | (val << 8) | val;
- 10018f1:	89 f1                	mov    ecx,esi
- 10018f3:	c1 e1 08             	shl    ecx,0x8
+ 10018f5:	89 f1                	mov    ecx,esi
+ 10018f7:	c1 e1 08             	shl    ecx,0x8
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:118
     uint32_t*f = d1;
     uint32_t fVal=(val << 24) | (val << 16) | (val << 8) | val;
     
     if ((len%4)==0)
- 10018f6:	f6 c2 03             	test   dl,0x3
- 10018f9:	75 16                	jne    1001911 <memset+0x2e>
+ 10018fa:	f6 c2 03             	test   dl,0x3
+ 10018fd:	75 16                	jne    1001915 <memset+0x2e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:119
     while (len-=4) {
- 10018fb:	83 ea 04             	sub    edx,0x4
- 10018fe:	74 43                	je     1001943 <memset+0x60>
+ 10018ff:	83 ea 04             	sub    edx,0x4
+ 1001902:	74 43                	je     1001947 <memset+0x60>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:120
         *d++ = fVal;
- 1001900:	89 f3                	mov    ebx,esi
- 1001902:	89 c1                	mov    ecx,eax
- 1001904:	83 c1 01             	add    ecx,0x1
- 1001907:	88 59 ff             	mov    BYTE PTR [ecx-0x1],bl
+ 1001904:	89 f3                	mov    ebx,esi
+ 1001906:	89 c1                	mov    ecx,eax
+ 1001908:	83 c1 01             	add    ecx,0x1
+ 100190b:	88 59 ff             	mov    BYTE PTR [ecx-0x1],bl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:119
     uint16_t eVal=(val << 16) | (val << 8) | val;
     uint32_t*f = d1;
@@ -4350,26 +4349,26 @@ void *memset(void *d1, int val, size_t len)
     
     if ((len%4)==0)
     while (len-=4) {
- 100190a:	83 ea 04             	sub    edx,0x4
- 100190d:	75 f5                	jne    1001904 <memset+0x21>
- 100190f:	eb 32                	jmp    1001943 <memset+0x60>
+ 100190e:	83 ea 04             	sub    edx,0x4
+ 1001911:	75 f5                	jne    1001908 <memset+0x21>
+ 1001913:	eb 32                	jmp    1001947 <memset+0x60>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:122
         *d++ = fVal;
     }
     else if (((len%2)==0))
- 1001911:	f6 c2 01             	test   dl,0x1
- 1001914:	74 0b                	je     1001921 <memset+0x3e>
- 1001916:	8d 1c 10             	lea    ebx,[eax+edx*1]
+ 1001915:	f6 c2 01             	test   dl,0x1
+ 1001918:	74 0b                	je     1001925 <memset+0x3e>
+ 100191a:	8d 1c 10             	lea    ebx,[eax+edx*1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:127
     while (len-=2) {
         *d++ = eVal;
     }
     else
     while (len--) {
- 1001919:	89 c1                	mov    ecx,eax
- 100191b:	85 d2                	test   edx,edx
- 100191d:	75 18                	jne    1001937 <memset+0x54>
- 100191f:	eb 22                	jmp    1001943 <memset+0x60>
+ 100191d:	89 c1                	mov    ecx,eax
+ 100191f:	85 d2                	test   edx,edx
+ 1001921:	75 18                	jne    100193b <memset+0x54>
+ 1001923:	eb 22                	jmp    1001947 <memset+0x60>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:123
     if ((len%4)==0)
     while (len-=4) {
@@ -4377,14 +4376,14 @@ void *memset(void *d1, int val, size_t len)
     }
     else if (((len%2)==0))
     while (len-=2) {
- 1001921:	83 ea 02             	sub    edx,0x2
- 1001924:	74 1d                	je     1001943 <memset+0x60>
- 1001926:	89 c3                	mov    ebx,eax
+ 1001925:	83 ea 02             	sub    edx,0x2
+ 1001928:	74 1d                	je     1001947 <memset+0x60>
+ 100192a:	89 c3                	mov    ebx,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:124
         *d++ = eVal;
- 1001928:	09 f1                	or     ecx,esi
- 100192a:	83 c3 01             	add    ebx,0x1
- 100192d:	88 4b ff             	mov    BYTE PTR [ebx-0x1],cl
+ 100192c:	09 f1                	or     ecx,esi
+ 100192e:	83 c3 01             	add    ebx,0x1
+ 1001931:	88 4b ff             	mov    BYTE PTR [ebx-0x1],cl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:123
     if ((len%4)==0)
     while (len-=4) {
@@ -4392,18 +4391,18 @@ void *memset(void *d1, int val, size_t len)
     }
     else if (((len%2)==0))
     while (len-=2) {
- 1001930:	83 ea 02             	sub    edx,0x2
- 1001933:	75 f5                	jne    100192a <memset+0x47>
- 1001935:	eb 0c                	jmp    1001943 <memset+0x60>
+ 1001934:	83 ea 02             	sub    edx,0x2
+ 1001937:	75 f5                	jne    100192e <memset+0x47>
+ 1001939:	eb 0c                	jmp    1001947 <memset+0x60>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:128
         *d++ = eVal;
     }
     else
     while (len--) {
         *d++ = val;
- 1001937:	83 c1 01             	add    ecx,0x1
- 100193a:	89 f2                	mov    edx,esi
- 100193c:	88 51 ff             	mov    BYTE PTR [ecx-0x1],dl
+ 100193b:	83 c1 01             	add    ecx,0x1
+ 100193e:	89 f2                	mov    edx,esi
+ 1001940:	88 51 ff             	mov    BYTE PTR [ecx-0x1],dl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:127
     else if (((len%2)==0))
     while (len-=2) {
@@ -4411,65 +4410,65 @@ void *memset(void *d1, int val, size_t len)
     }
     else
     while (len--) {
- 100193f:	39 cb                	cmp    ebx,ecx
- 1001941:	75 f4                	jne    1001937 <memset+0x54>
+ 1001943:	39 cb                	cmp    ebx,ecx
+ 1001945:	75 f4                	jne    100193b <memset+0x54>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:131
         *d++ = val;
     }
     return d1;
 }
- 1001943:	5b                   	pop    ebx
- 1001944:	5e                   	pop    esi
- 1001945:	c3                   	ret    
+ 1001947:	5b                   	pop    ebx
+ 1001948:	5e                   	pop    esi
+ 1001949:	c3                   	ret    
 
-01001946 <bcdToDec>:
+0100194a <bcdToDec>:
 bcdToDec():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:134
 
 uint8_t bcdToDec(uint8_t val)
 {
- 1001946:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
+ 100194a:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:135
   return ( (val/16*10) + (val%16) );
- 100194a:	89 c2                	mov    edx,eax
- 100194c:	c0 ea 04             	shr    dl,0x4
- 100194f:	8d 14 92             	lea    edx,[edx+edx*4]
- 1001952:	83 e0 0f             	and    eax,0xf
- 1001955:	8d 04 50             	lea    eax,[eax+edx*2]
+ 100194e:	89 c2                	mov    edx,eax
+ 1001950:	c0 ea 04             	shr    dl,0x4
+ 1001953:	8d 14 92             	lea    edx,[edx+edx*4]
+ 1001956:	83 e0 0f             	and    eax,0xf
+ 1001959:	8d 04 50             	lea    eax,[eax+edx*2]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:136
 }
- 1001958:	c3                   	ret    
+ 100195c:	c3                   	ret    
 
-01001959 <decToBcd>:
+0100195d <decToBcd>:
 decToBcd():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:139
 
 uint8_t decToBcd(uint8_t val)
 {
- 1001959:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
+ 100195d:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:140
   return ( (val/10*16) + (val%10) );
- 100195d:	0f b6 c8             	movzx  ecx,al
- 1001960:	8d 14 89             	lea    edx,[ecx+ecx*4]
- 1001963:	8d 14 d1             	lea    edx,[ecx+edx*8]
- 1001966:	8d 14 92             	lea    edx,[edx+edx*4]
- 1001969:	66 c1 ea 0b          	shr    dx,0xb
- 100196d:	89 d1                	mov    ecx,edx
- 100196f:	c1 e1 04             	shl    ecx,0x4
- 1001972:	8d 14 92             	lea    edx,[edx+edx*4]
- 1001975:	01 d2                	add    edx,edx
- 1001977:	29 d0                	sub    eax,edx
- 1001979:	01 c8                	add    eax,ecx
+ 1001961:	0f b6 c8             	movzx  ecx,al
+ 1001964:	8d 14 89             	lea    edx,[ecx+ecx*4]
+ 1001967:	8d 14 d1             	lea    edx,[ecx+edx*8]
+ 100196a:	8d 14 92             	lea    edx,[edx+edx*4]
+ 100196d:	66 c1 ea 0b          	shr    dx,0xb
+ 1001971:	89 d1                	mov    ecx,edx
+ 1001973:	c1 e1 04             	shl    ecx,0x4
+ 1001976:	8d 14 92             	lea    edx,[edx+edx*4]
+ 1001979:	01 d2                	add    edx,edx
+ 100197b:	29 d0                	sub    eax,edx
+ 100197d:	01 c8                	add    eax,ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:141
 }
- 100197b:	c3                   	ret    
+ 100197f:	c3                   	ret    
 
-0100197c <initSystemDate>:
+01001980 <initSystemDate>:
 initSystemDate():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:143
 void initSystemDate()
 {
- 100197c:	83 ec 3c             	sub    esp,0x3c
+ 1001980:	83 ec 3c             	sub    esp,0x3c
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -4478,8 +4477,8 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 100197f:	b8 00 00 00 00       	mov    eax,0x0
- 1001984:	e6 70                	out    0x70,al
+ 1001983:	b8 00 00 00 00       	mov    eax,0x0
+ 1001988:	e6 70                	out    0x70,al
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
 }
@@ -4488,18 +4487,18 @@ static __inline unsigned char inb(unsigned short __port)
 {
 	unsigned char __val;
 	__asm__ volatile ("inb %0, %1" : "=a" (__val) : "dN" (__port));
- 1001986:	e4 71                	in     al,0x71
+ 100198a:	e4 71                	in     al,0x71
 initSystemDate():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:147
     struct tm tmbuf;
 
     outb(0x70, 0x00);
     tmbuf.tm_sec = bcdToDec(inb(0x71));
- 1001988:	0f b6 c0             	movzx  eax,al
- 100198b:	50                   	push   eax
- 100198c:	e8 b5 ff ff ff       	call   1001946 <bcdToDec>
- 1001991:	0f b6 c0             	movzx  eax,al
- 1001994:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
+ 100198c:	0f b6 c0             	movzx  eax,al
+ 100198f:	50                   	push   eax
+ 1001990:	e8 b5 ff ff ff       	call   100194a <bcdToDec>
+ 1001995:	0f b6 c0             	movzx  eax,al
+ 1001998:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -4508,8 +4507,8 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 1001998:	b8 02 00 00 00       	mov    eax,0x2
- 100199d:	e6 70                	out    0x70,al
+ 100199c:	b8 02 00 00 00       	mov    eax,0x2
+ 10019a1:	e6 70                	out    0x70,al
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
 }
@@ -4518,16 +4517,16 @@ static __inline unsigned char inb(unsigned short __port)
 {
 	unsigned char __val;
 	__asm__ volatile ("inb %0, %1" : "=a" (__val) : "dN" (__port));
- 100199f:	e4 71                	in     al,0x71
+ 10019a3:	e4 71                	in     al,0x71
 initSystemDate():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:149
     outb(0x70, 0x02);
     tmbuf.tm_min = bcdToDec(inb(0x71));
- 10019a1:	0f b6 c0             	movzx  eax,al
- 10019a4:	89 04 24             	mov    DWORD PTR [esp],eax
- 10019a7:	e8 9a ff ff ff       	call   1001946 <bcdToDec>
- 10019ac:	0f b6 c0             	movzx  eax,al
- 10019af:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
+ 10019a5:	0f b6 c0             	movzx  eax,al
+ 10019a8:	89 04 24             	mov    DWORD PTR [esp],eax
+ 10019ab:	e8 9a ff ff ff       	call   100194a <bcdToDec>
+ 10019b0:	0f b6 c0             	movzx  eax,al
+ 10019b3:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -4536,8 +4535,8 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 10019b3:	b8 04 00 00 00       	mov    eax,0x4
- 10019b8:	e6 70                	out    0x70,al
+ 10019b7:	b8 04 00 00 00       	mov    eax,0x4
+ 10019bc:	e6 70                	out    0x70,al
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
 }
@@ -4546,16 +4545,16 @@ static __inline unsigned char inb(unsigned short __port)
 {
 	unsigned char __val;
 	__asm__ volatile ("inb %0, %1" : "=a" (__val) : "dN" (__port));
- 10019ba:	e4 71                	in     al,0x71
+ 10019be:	e4 71                	in     al,0x71
 initSystemDate():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:151
     outb(0x70, 0x04);
     tmbuf.tm_hour = bcdToDec(inb(0x71));
- 10019bc:	0f b6 c0             	movzx  eax,al
- 10019bf:	89 04 24             	mov    DWORD PTR [esp],eax
- 10019c2:	e8 7f ff ff ff       	call   1001946 <bcdToDec>
- 10019c7:	0f b6 c0             	movzx  eax,al
- 10019ca:	89 44 24 10          	mov    DWORD PTR [esp+0x10],eax
+ 10019c0:	0f b6 c0             	movzx  eax,al
+ 10019c3:	89 04 24             	mov    DWORD PTR [esp],eax
+ 10019c6:	e8 7f ff ff ff       	call   100194a <bcdToDec>
+ 10019cb:	0f b6 c0             	movzx  eax,al
+ 10019ce:	89 44 24 10          	mov    DWORD PTR [esp+0x10],eax
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -4564,8 +4563,8 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 10019ce:	b8 07 00 00 00       	mov    eax,0x7
- 10019d3:	e6 70                	out    0x70,al
+ 10019d2:	b8 07 00 00 00       	mov    eax,0x7
+ 10019d7:	e6 70                	out    0x70,al
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
 }
@@ -4574,16 +4573,16 @@ static __inline unsigned char inb(unsigned short __port)
 {
 	unsigned char __val;
 	__asm__ volatile ("inb %0, %1" : "=a" (__val) : "dN" (__port));
- 10019d5:	e4 71                	in     al,0x71
+ 10019d9:	e4 71                	in     al,0x71
 initSystemDate():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:153
     outb(0x70, 0x07);
     tmbuf.tm_mday = bcdToDec(inb(0x71));
- 10019d7:	0f b6 c0             	movzx  eax,al
- 10019da:	89 04 24             	mov    DWORD PTR [esp],eax
- 10019dd:	e8 64 ff ff ff       	call   1001946 <bcdToDec>
- 10019e2:	0f b6 c0             	movzx  eax,al
- 10019e5:	89 44 24 14          	mov    DWORD PTR [esp+0x14],eax
+ 10019db:	0f b6 c0             	movzx  eax,al
+ 10019de:	89 04 24             	mov    DWORD PTR [esp],eax
+ 10019e1:	e8 64 ff ff ff       	call   100194a <bcdToDec>
+ 10019e6:	0f b6 c0             	movzx  eax,al
+ 10019e9:	89 44 24 14          	mov    DWORD PTR [esp+0x14],eax
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -4592,8 +4591,8 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 10019e9:	b8 08 00 00 00       	mov    eax,0x8
- 10019ee:	e6 70                	out    0x70,al
+ 10019ed:	b8 08 00 00 00       	mov    eax,0x8
+ 10019f2:	e6 70                	out    0x70,al
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
 }
@@ -4602,16 +4601,16 @@ static __inline unsigned char inb(unsigned short __port)
 {
 	unsigned char __val;
 	__asm__ volatile ("inb %0, %1" : "=a" (__val) : "dN" (__port));
- 10019f0:	e4 71                	in     al,0x71
+ 10019f4:	e4 71                	in     al,0x71
 initSystemDate():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:155
     outb(0x70, 0x08);
     tmbuf.tm_mon = bcdToDec(inb(0x71));
- 10019f2:	0f b6 c0             	movzx  eax,al
- 10019f5:	89 04 24             	mov    DWORD PTR [esp],eax
- 10019f8:	e8 49 ff ff ff       	call   1001946 <bcdToDec>
- 10019fd:	0f b6 c0             	movzx  eax,al
- 1001a00:	89 44 24 18          	mov    DWORD PTR [esp+0x18],eax
+ 10019f6:	0f b6 c0             	movzx  eax,al
+ 10019f9:	89 04 24             	mov    DWORD PTR [esp],eax
+ 10019fc:	e8 49 ff ff ff       	call   100194a <bcdToDec>
+ 1001a01:	0f b6 c0             	movzx  eax,al
+ 1001a04:	89 44 24 18          	mov    DWORD PTR [esp+0x18],eax
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -4620,8 +4619,8 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 1001a04:	b8 09 00 00 00       	mov    eax,0x9
- 1001a09:	e6 70                	out    0x70,al
+ 1001a08:	b8 09 00 00 00       	mov    eax,0x9
+ 1001a0d:	e6 70                	out    0x70,al
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
 }
@@ -4630,77 +4629,77 @@ static __inline unsigned char inb(unsigned short __port)
 {
 	unsigned char __val;
 	__asm__ volatile ("inb %0, %1" : "=a" (__val) : "dN" (__port));
- 1001a0b:	e4 71                	in     al,0x71
+ 1001a0f:	e4 71                	in     al,0x71
 initSystemDate():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:157
     outb(0x70, 0x09);
     tmbuf.tm_year = bcdToDec(inb(0x71));
- 1001a0d:	0f b6 c0             	movzx  eax,al
- 1001a10:	89 04 24             	mov    DWORD PTR [esp],eax
- 1001a13:	e8 2e ff ff ff       	call   1001946 <bcdToDec>
- 1001a18:	83 ec 08             	sub    esp,0x8
+ 1001a11:	0f b6 c0             	movzx  eax,al
+ 1001a14:	89 04 24             	mov    DWORD PTR [esp],eax
+ 1001a17:	e8 2e ff ff ff       	call   100194a <bcdToDec>
+ 1001a1c:	83 ec 08             	sub    esp,0x8
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:158
     tmbuf.tm_isdst = -1;
- 1001a1b:	c7 44 24 30 ff ff ff 	mov    DWORD PTR [esp+0x30],0xffffffff
- 1001a22:	ff 
+ 1001a1f:	c7 44 24 30 ff ff ff 	mov    DWORD PTR [esp+0x30],0xffffffff
+ 1001a26:	ff 
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:160
     tmbuf.tm_year += 2000;
     tmbuf.tm_year = tmbuf.tm_year - 1900;
- 1001a23:	0f b6 c0             	movzx  eax,al
- 1001a26:	83 c0 64             	add    eax,0x64
- 1001a29:	89 44 24 24          	mov    DWORD PTR [esp+0x24],eax
+ 1001a27:	0f b6 c0             	movzx  eax,al
+ 1001a2a:	83 c0 64             	add    eax,0x64
+ 1001a2d:	89 44 24 24          	mov    DWORD PTR [esp+0x24],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:161
     kSystemStartTime = mktime(&tmbuf);
- 1001a2d:	8d 44 24 10          	lea    eax,[esp+0x10]
- 1001a31:	50                   	push   eax
- 1001a32:	e8 ab 0f 00 00       	call   10029e2 <mktime>
- 1001a37:	a3 88 02 12 00       	mov    ds:0x120288,eax
+ 1001a31:	8d 44 24 10          	lea    eax,[esp+0x10]
+ 1001a35:	50                   	push   eax
+ 1001a36:	e8 ab 0f 00 00       	call   10029e6 <mktime>
+ 1001a3b:	a3 88 02 12 00       	mov    ds:0x120288,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:162
     kSystemCurrentTime = kSystemStartTime;
- 1001a3c:	a3 8c 02 12 00       	mov    ds:0x12028c,eax
+ 1001a40:	a3 8c 02 12 00       	mov    ds:0x12028c,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:164
 //printf("System Date = %d/%d/%d %d:%d:%d\n", tmbuf.tm_mon, tmbuf.tm_mday, tmbuf.tm_year, tmbuf.tm_hour, tmbuf.tm_min, tmbuf.tm_sec, tmbuf.tm_hour, tmbuf.tm_min, tmbuf.tm_sec);
 }
- 1001a41:	83 c4 4c             	add    esp,0x4c
- 1001a44:	c3                   	ret    
+ 1001a45:	83 c4 4c             	add    esp,0x4c
+ 1001a48:	c3                   	ret    
 
-01001a45 <strtoupper>:
+01001a49 <strtoupper>:
 strtoupper():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:166
 char * strtoupper(char* pointerToString)
 {
- 1001a45:	56                   	push   esi
- 1001a46:	53                   	push   ebx
- 1001a47:	83 ec 10             	sub    esp,0x10
- 1001a4a:	8b 5c 24 1c          	mov    ebx,DWORD PTR [esp+0x1c]
+ 1001a49:	56                   	push   esi
+ 1001a4a:	53                   	push   ebx
+ 1001a4b:	83 ec 10             	sub    esp,0x10
+ 1001a4e:	8b 5c 24 1c          	mov    ebx,DWORD PTR [esp+0x1c]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:167
     uint8_t start=0, length=strlen(pointerToString);
- 1001a4e:	53                   	push   ebx
- 1001a4f:	e8 d0 0b 00 00       	call   1002624 <strlen>
+ 1001a52:	53                   	push   ebx
+ 1001a53:	e8 d0 0b 00 00       	call   1002628 <strlen>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:171
     char* myPtr=pointerToString;
     
         // Trim.Start:
         while (start<length)
- 1001a54:	83 c4 10             	add    esp,0x10
- 1001a57:	84 c0                	test   al,al
- 1001a59:	74 23                	je     1001a7e <strtoupper+0x39>
- 1001a5b:	89 da                	mov    edx,ebx
- 1001a5d:	83 e8 01             	sub    eax,0x1
- 1001a60:	0f b6 c0             	movzx  eax,al
- 1001a63:	8d 74 03 01          	lea    esi,[ebx+eax*1+0x1]
+ 1001a58:	83 c4 10             	add    esp,0x10
+ 1001a5b:	84 c0                	test   al,al
+ 1001a5d:	74 23                	je     1001a82 <strtoupper+0x39>
+ 1001a5f:	89 da                	mov    edx,ebx
+ 1001a61:	83 e8 01             	sub    eax,0x1
+ 1001a64:	0f b6 c0             	movzx  eax,al
+ 1001a67:	8d 74 03 01          	lea    esi,[ebx+eax*1+0x1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:173
         {
             if (myPtr[start]>='a' && myPtr[start]<='z')
- 1001a67:	0f b6 02             	movzx  eax,BYTE PTR [edx]
- 1001a6a:	8d 48 9f             	lea    ecx,[eax-0x61]
- 1001a6d:	80 f9 19             	cmp    cl,0x19
- 1001a70:	77 05                	ja     1001a77 <strtoupper+0x32>
+ 1001a6b:	0f b6 02             	movzx  eax,BYTE PTR [edx]
+ 1001a6e:	8d 48 9f             	lea    ecx,[eax-0x61]
+ 1001a71:	80 f9 19             	cmp    cl,0x19
+ 1001a74:	77 05                	ja     1001a7b <strtoupper+0x32>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:174
                 myPtr[start]-=32;
- 1001a72:	83 e8 20             	sub    eax,0x20
- 1001a75:	88 02                	mov    BYTE PTR [edx],al
- 1001a77:	83 c2 01             	add    edx,0x1
+ 1001a76:	83 e8 20             	sub    eax,0x20
+ 1001a79:	88 02                	mov    BYTE PTR [edx],al
+ 1001a7b:	83 c2 01             	add    edx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:171
 {
     uint8_t start=0, length=strlen(pointerToString);
@@ -4708,8 +4707,8 @@ char * strtoupper(char* pointerToString)
     
         // Trim.Start:
         while (start<length)
- 1001a7a:	39 f2                	cmp    edx,esi
- 1001a7c:	75 e9                	jne    1001a67 <strtoupper+0x22>
+ 1001a7e:	39 f2                	cmp    edx,esi
+ 1001a80:	75 e9                	jne    1001a6b <strtoupper+0x22>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:179
                 myPtr[start]-=32;
             start++;
@@ -4717,96 +4716,96 @@ char * strtoupper(char* pointerToString)
 
     return pointerToString;
 }
- 1001a7e:	89 d8                	mov    eax,ebx
- 1001a80:	83 c4 04             	add    esp,0x4
- 1001a83:	5b                   	pop    ebx
- 1001a84:	5e                   	pop    esi
- 1001a85:	c3                   	ret    
+ 1001a82:	89 d8                	mov    eax,ebx
+ 1001a84:	83 c4 04             	add    esp,0x4
+ 1001a87:	5b                   	pop    ebx
+ 1001a88:	5e                   	pop    esi
+ 1001a89:	c3                   	ret    
 
-01001a86 <printDumpedRegs>:
+01001a8a <printDumpedRegs>:
 printDumpedRegs():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:182
 
 void printDumpedRegs()
 {
- 1001a86:	57                   	push   edi
- 1001a87:	56                   	push   esi
- 1001a88:	53                   	push   ebx
+ 1001a8a:	57                   	push   edi
+ 1001a8b:	56                   	push   esi
+ 1001a8c:	53                   	push   ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:183
     uint32_t esp = exceptionSavedESP;
- 1001a89:	8b 35 ec 01 12 00    	mov    esi,DWORD PTR ds:0x1201ec
+ 1001a8d:	8b 35 ec 01 12 00    	mov    esi,DWORD PTR ds:0x1201ec
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:187
     uint8_t* lCSIPPtr;
 
     
     lCSIPPtr=(uint8_t*)(exceptionEIP);
- 1001a8f:	8b 1d f8 01 12 00    	mov    ebx,DWORD PTR ds:0x1201f8
+ 1001a93:	8b 1d f8 01 12 00    	mov    ebx,DWORD PTR ds:0x1201f8
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:188
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
- 1001a95:	83 ec 08             	sub    esp,0x8
- 1001a98:	ff 35 f0 01 12 00    	push   DWORD PTR ds:0x1201f0
- 1001a9e:	ff 35 bc 01 12 00    	push   DWORD PTR ds:0x1201bc
- 1001aa4:	ff 35 b8 01 12 00    	push   DWORD PTR ds:0x1201b8
- 1001aaa:	ff 35 b4 01 12 00    	push   DWORD PTR ds:0x1201b4
- 1001ab0:	ff 35 b0 01 12 00    	push   DWORD PTR ds:0x1201b0
- 1001ab6:	68 24 7e 00 01       	push   0x1007e24
- 1001abb:	e8 b7 0a 00 00       	call   1002577 <printk>
+ 1001a99:	83 ec 08             	sub    esp,0x8
+ 1001a9c:	ff 35 f0 01 12 00    	push   DWORD PTR ds:0x1201f0
+ 1001aa2:	ff 35 bc 01 12 00    	push   DWORD PTR ds:0x1201bc
+ 1001aa8:	ff 35 b8 01 12 00    	push   DWORD PTR ds:0x1201b8
+ 1001aae:	ff 35 b4 01 12 00    	push   DWORD PTR ds:0x1201b4
+ 1001ab4:	ff 35 b0 01 12 00    	push   DWORD PTR ds:0x1201b0
+ 1001aba:	68 1c 81 00 01       	push   0x100811c
+ 1001abf:	e8 b7 0a 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:189
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
- 1001ac0:	83 c4 14             	add    esp,0x14
- 1001ac3:	ff 35 ec 01 12 00    	push   DWORD PTR ds:0x1201ec
- 1001ac9:	ff 35 c4 01 12 00    	push   DWORD PTR ds:0x1201c4
- 1001acf:	ff 35 c0 01 12 00    	push   DWORD PTR ds:0x1201c0
- 1001ad5:	ff 35 c8 01 12 00    	push   DWORD PTR ds:0x1201c8
- 1001adb:	68 54 7e 00 01       	push   0x1007e54
- 1001ae0:	e8 92 0a 00 00       	call   1002577 <printk>
+ 1001ac4:	83 c4 14             	add    esp,0x14
+ 1001ac7:	ff 35 ec 01 12 00    	push   DWORD PTR ds:0x1201ec
+ 1001acd:	ff 35 c4 01 12 00    	push   DWORD PTR ds:0x1201c4
+ 1001ad3:	ff 35 c0 01 12 00    	push   DWORD PTR ds:0x1201c0
+ 1001ad9:	ff 35 c8 01 12 00    	push   DWORD PTR ds:0x1201c8
+ 1001adf:	68 4c 81 00 01       	push   0x100814c
+ 1001ae4:	e8 92 0a 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:190
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
- 1001ae5:	83 c4 14             	add    esp,0x14
- 1001ae8:	ff 35 d4 01 12 00    	push   DWORD PTR ds:0x1201d4
- 1001aee:	ff 35 d0 01 12 00    	push   DWORD PTR ds:0x1201d0
- 1001af4:	ff 35 00 02 12 00    	push   DWORD PTR ds:0x120200
- 1001afa:	ff 35 cc 01 12 00    	push   DWORD PTR ds:0x1201cc
- 1001b00:	68 7c 7e 00 01       	push   0x1007e7c
- 1001b05:	e8 6d 0a 00 00       	call   1002577 <printk>
+ 1001ae9:	83 c4 14             	add    esp,0x14
+ 1001aec:	ff 35 d4 01 12 00    	push   DWORD PTR ds:0x1201d4
+ 1001af2:	ff 35 d0 01 12 00    	push   DWORD PTR ds:0x1201d0
+ 1001af8:	ff 35 00 02 12 00    	push   DWORD PTR ds:0x120200
+ 1001afe:	ff 35 cc 01 12 00    	push   DWORD PTR ds:0x1201cc
+ 1001b04:	68 74 81 00 01       	push   0x1008174
+ 1001b09:	e8 6d 0a 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:191
     printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionGS, exceptionFS);
- 1001b0a:	83 c4 14             	add    esp,0x14
- 1001b0d:	ff 35 e0 01 12 00    	push   DWORD PTR ds:0x1201e0
- 1001b13:	ff 35 e4 01 12 00    	push   DWORD PTR ds:0x1201e4
- 1001b19:	ff 35 dc 01 12 00    	push   DWORD PTR ds:0x1201dc
- 1001b1f:	ff 35 d8 01 12 00    	push   DWORD PTR ds:0x1201d8
- 1001b25:	68 a4 7e 00 01       	push   0x1007ea4
- 1001b2a:	e8 48 0a 00 00       	call   1002577 <printk>
+ 1001b0e:	83 c4 14             	add    esp,0x14
+ 1001b11:	ff 35 e0 01 12 00    	push   DWORD PTR ds:0x1201e0
+ 1001b17:	ff 35 e4 01 12 00    	push   DWORD PTR ds:0x1201e4
+ 1001b1d:	ff 35 dc 01 12 00    	push   DWORD PTR ds:0x1201dc
+ 1001b23:	ff 35 d8 01 12 00    	push   DWORD PTR ds:0x1201d8
+ 1001b29:	68 9c 81 00 01       	push   0x100819c
+ 1001b2e:	e8 48 0a 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:192
     printk("GDT=%08X\n",kernelGDT.base);
- 1001b2f:	83 c4 18             	add    esp,0x18
- 1001b32:	ff 35 4e 04 12 00    	push   DWORD PTR ds:0x12044e
- 1001b38:	68 7c 74 00 01       	push   0x100747c
- 1001b3d:	e8 35 0a 00 00       	call   1002577 <printk>
+ 1001b33:	83 c4 18             	add    esp,0x18
+ 1001b36:	ff 35 4e 04 12 00    	push   DWORD PTR ds:0x12044e
+ 1001b3c:	68 78 77 00 01       	push   0x1007778
+ 1001b41:	e8 35 0a 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:193
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
- 1001b42:	ff 35 f4 01 12 00    	push   DWORD PTR ds:0x1201f4
- 1001b48:	ff 35 f8 01 12 00    	push   DWORD PTR ds:0x1201f8
- 1001b4e:	ff 35 fc 01 12 00    	push   DWORD PTR ds:0x1201fc
- 1001b54:	68 cc 7e 00 01       	push   0x1007ecc
- 1001b59:	e8 19 0a 00 00       	call   1002577 <printk>
+ 1001b46:	ff 35 f4 01 12 00    	push   DWORD PTR ds:0x1201f4
+ 1001b4c:	ff 35 f8 01 12 00    	push   DWORD PTR ds:0x1201f8
+ 1001b52:	ff 35 fc 01 12 00    	push   DWORD PTR ds:0x1201fc
+ 1001b58:	68 c4 81 00 01       	push   0x10081c4
+ 1001b5d:	e8 19 0a 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:194
           printk("Bytes at CS:EIP: ");
- 1001b5e:	83 c4 14             	add    esp,0x14
- 1001b61:	68 86 74 00 01       	push   0x1007486
- 1001b66:	e8 0c 0a 00 00       	call   1002577 <printk>
- 1001b6b:	8d 7b 13             	lea    edi,[ebx+0x13]
- 1001b6e:	83 c4 10             	add    esp,0x10
+ 1001b62:	83 c4 14             	add    esp,0x14
+ 1001b65:	68 82 77 00 01       	push   0x1007782
+ 1001b6a:	e8 0c 0a 00 00       	call   100257b <printk>
+ 1001b6f:	8d 7b 13             	lea    edi,[ebx+0x13]
+ 1001b72:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:196 (discriminator 3)
           for (int cnt=0;cnt<19;cnt++)
               printk("%02X ", lCSIPPtr[cnt]);
- 1001b71:	83 ec 08             	sub    esp,0x8
- 1001b74:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
- 1001b77:	50                   	push   eax
- 1001b78:	68 18 74 00 01       	push   0x1007418
- 1001b7d:	e8 f5 09 00 00       	call   1002577 <printk>
- 1001b82:	83 c3 01             	add    ebx,0x1
+ 1001b75:	83 ec 08             	sub    esp,0x8
+ 1001b78:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
+ 1001b7b:	50                   	push   eax
+ 1001b7c:	68 14 77 00 01       	push   0x1007714
+ 1001b81:	e8 f5 09 00 00       	call   100257b <printk>
+ 1001b86:	83 c3 01             	add    ebx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:195 (discriminator 3)
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
     printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionGS, exceptionFS);
@@ -4814,36 +4813,36 @@ void printDumpedRegs()
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
           printk("Bytes at CS:EIP: ");
           for (int cnt=0;cnt<19;cnt++)
- 1001b85:	83 c4 10             	add    esp,0x10
- 1001b88:	39 df                	cmp    edi,ebx
- 1001b8a:	75 e5                	jne    1001b71 <printDumpedRegs+0xeb>
+ 1001b89:	83 c4 10             	add    esp,0x10
+ 1001b8c:	39 df                	cmp    edi,ebx
+ 1001b8e:	75 e5                	jne    1001b75 <printDumpedRegs+0xeb>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:197
               printk("%02X ", lCSIPPtr[cnt]);
           printk("\n");
- 1001b8c:	83 ec 0c             	sub    esp,0xc
- 1001b8f:	68 3f 77 00 01       	push   0x100773f
- 1001b94:	e8 de 09 00 00       	call   1002577 <printk>
+ 1001b90:	83 ec 0c             	sub    esp,0xc
+ 1001b93:	68 66 7a 00 01       	push   0x1007a66
+ 1001b98:	e8 de 09 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:198
           printk ("Stack @ 0x%08x:0x%08X:\n",exceptionSS, esp);
- 1001b99:	83 c4 0c             	add    esp,0xc
- 1001b9c:	56                   	push   esi
- 1001b9d:	ff 35 e8 01 12 00    	push   DWORD PTR ds:0x1201e8
- 1001ba3:	68 98 74 00 01       	push   0x1007498
- 1001ba8:	e8 ca 09 00 00       	call   1002577 <printk>
- 1001bad:	83 c4 10             	add    esp,0x10
- 1001bb0:	bb 00 00 00 00       	mov    ebx,0x0
- 1001bb5:	8d 04 33             	lea    eax,[ebx+esi*1]
+ 1001b9d:	83 c4 0c             	add    esp,0xc
+ 1001ba0:	56                   	push   esi
+ 1001ba1:	ff 35 e8 01 12 00    	push   DWORD PTR ds:0x1201e8
+ 1001ba7:	68 94 77 00 01       	push   0x1007794
+ 1001bac:	e8 ca 09 00 00       	call   100257b <printk>
+ 1001bb1:	83 c4 10             	add    esp,0x10
+ 1001bb4:	bb 00 00 00 00       	mov    ebx,0x0
+ 1001bb9:	8d 04 33             	lea    eax,[ebx+esi*1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:201 (discriminator 3)
           for (int cnt=0;cnt<10;cnt++)
           {
               printk("\t0x%08X%: 0x%08X\n",esp, exceptionSavedStack[cnt]);
- 1001bb8:	83 ec 04             	sub    esp,0x4
- 1001bbb:	8b 15 a8 01 12 00    	mov    edx,DWORD PTR ds:0x1201a8
- 1001bc1:	ff 34 1a             	push   DWORD PTR [edx+ebx*1]
- 1001bc4:	50                   	push   eax
- 1001bc5:	68 b0 74 00 01       	push   0x10074b0
- 1001bca:	e8 a8 09 00 00       	call   1002577 <printk>
- 1001bcf:	83 c3 04             	add    ebx,0x4
+ 1001bbc:	83 ec 04             	sub    esp,0x4
+ 1001bbf:	8b 15 a8 01 12 00    	mov    edx,DWORD PTR ds:0x1201a8
+ 1001bc5:	ff 34 1a             	push   DWORD PTR [edx+ebx*1]
+ 1001bc8:	50                   	push   eax
+ 1001bc9:	68 ac 77 00 01       	push   0x10077ac
+ 1001bce:	e8 a8 09 00 00       	call   100257b <printk>
+ 1001bd3:	83 c3 04             	add    ebx,0x4
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:199 (discriminator 3)
           printk("Bytes at CS:EIP: ");
           for (int cnt=0;cnt<19;cnt++)
@@ -4851,9 +4850,9 @@ void printDumpedRegs()
           printk("\n");
           printk ("Stack @ 0x%08x:0x%08X:\n",exceptionSS, esp);
           for (int cnt=0;cnt<10;cnt++)
- 1001bd2:	83 c4 10             	add    esp,0x10
- 1001bd5:	83 fb 28             	cmp    ebx,0x28
- 1001bd8:	75 db                	jne    1001bb5 <printDumpedRegs+0x12f>
+ 1001bd6:	83 c4 10             	add    esp,0x10
+ 1001bd9:	83 fb 28             	cmp    ebx,0x28
+ 1001bdc:	75 db                	jne    1001bb9 <printDumpedRegs+0x12f>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:206
               printk("\t0x%08X%: 0x%08X\n",esp, exceptionSavedStack[cnt]);
               esp+=4;
@@ -4861,87 +4860,87 @@ void printDumpedRegs()
 
 
 }
- 1001bda:	5b                   	pop    ebx
- 1001bdb:	5e                   	pop    esi
- 1001bdc:	5f                   	pop    edi
- 1001bdd:	c3                   	ret    
+ 1001bde:	5b                   	pop    ebx
+ 1001bdf:	5e                   	pop    esi
+ 1001be0:	5f                   	pop    edi
+ 1001be1:	c3                   	ret    
 
-01001bde <printDebugRegs>:
+01001be2 <printDebugRegs>:
 printDebugRegs():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:209
 
 void printDebugRegs()
 {
- 1001bde:	57                   	push   edi
- 1001bdf:	56                   	push   esi
- 1001be0:	53                   	push   ebx
+ 1001be2:	57                   	push   edi
+ 1001be3:	56                   	push   esi
+ 1001be4:	53                   	push   ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:210
     uint32_t esp = debugSavedESP;
- 1001be1:	8b 35 40 02 12 00    	mov    esi,DWORD PTR ds:0x120240
+ 1001be5:	8b 35 40 02 12 00    	mov    esi,DWORD PTR ds:0x120240
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:213
     uint8_t* lCSIPPtr;
 
     lCSIPPtr=(uint8_t*)(debugEIP);
- 1001be7:	8b 1d 50 02 12 00    	mov    ebx,DWORD PTR ds:0x120250
+ 1001beb:	8b 1d 50 02 12 00    	mov    ebx,DWORD PTR ds:0x120250
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:214
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", debugAX, debugBX, debugCX, debugDX,debugFlags);
- 1001bed:	83 ec 08             	sub    esp,0x8
- 1001bf0:	ff 35 44 02 12 00    	push   DWORD PTR ds:0x120244
- 1001bf6:	ff 35 10 02 12 00    	push   DWORD PTR ds:0x120210
- 1001bfc:	ff 35 0c 02 12 00    	push   DWORD PTR ds:0x12020c
- 1001c02:	ff 35 08 02 12 00    	push   DWORD PTR ds:0x120208
- 1001c08:	ff 35 04 02 12 00    	push   DWORD PTR ds:0x120204
- 1001c0e:	68 24 7e 00 01       	push   0x1007e24
- 1001c13:	e8 5f 09 00 00       	call   1002577 <printk>
+ 1001bf1:	83 ec 08             	sub    esp,0x8
+ 1001bf4:	ff 35 44 02 12 00    	push   DWORD PTR ds:0x120244
+ 1001bfa:	ff 35 10 02 12 00    	push   DWORD PTR ds:0x120210
+ 1001c00:	ff 35 0c 02 12 00    	push   DWORD PTR ds:0x12020c
+ 1001c06:	ff 35 08 02 12 00    	push   DWORD PTR ds:0x120208
+ 1001c0c:	ff 35 04 02 12 00    	push   DWORD PTR ds:0x120204
+ 1001c12:	68 1c 81 00 01       	push   0x100811c
+ 1001c17:	e8 5f 09 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:215
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", debugBP, debugSI, debugDI, debugSavedESP);
- 1001c18:	83 c4 14             	add    esp,0x14
- 1001c1b:	ff 35 40 02 12 00    	push   DWORD PTR ds:0x120240
- 1001c21:	ff 35 18 02 12 00    	push   DWORD PTR ds:0x120218
- 1001c27:	ff 35 14 02 12 00    	push   DWORD PTR ds:0x120214
- 1001c2d:	ff 35 1c 02 12 00    	push   DWORD PTR ds:0x12021c
- 1001c33:	68 54 7e 00 01       	push   0x1007e54
- 1001c38:	e8 3a 09 00 00       	call   1002577 <printk>
+ 1001c1c:	83 c4 14             	add    esp,0x14
+ 1001c1f:	ff 35 40 02 12 00    	push   DWORD PTR ds:0x120240
+ 1001c25:	ff 35 18 02 12 00    	push   DWORD PTR ds:0x120218
+ 1001c2b:	ff 35 14 02 12 00    	push   DWORD PTR ds:0x120214
+ 1001c31:	ff 35 1c 02 12 00    	push   DWORD PTR ds:0x12021c
+ 1001c37:	68 4c 81 00 01       	push   0x100814c
+ 1001c3c:	e8 3a 09 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:216
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\n", debugCR0, debugCR3, debugCR4);
- 1001c3d:	83 c4 20             	add    esp,0x20
- 1001c40:	ff 35 28 02 12 00    	push   DWORD PTR ds:0x120228
- 1001c46:	ff 35 24 02 12 00    	push   DWORD PTR ds:0x120224
- 1001c4c:	ff 35 20 02 12 00    	push   DWORD PTR ds:0x120220
- 1001c52:	68 c2 74 00 01       	push   0x10074c2
- 1001c57:	e8 1b 09 00 00       	call   1002577 <printk>
+ 1001c41:	83 c4 20             	add    esp,0x20
+ 1001c44:	ff 35 28 02 12 00    	push   DWORD PTR ds:0x120228
+ 1001c4a:	ff 35 24 02 12 00    	push   DWORD PTR ds:0x120224
+ 1001c50:	ff 35 20 02 12 00    	push   DWORD PTR ds:0x120220
+ 1001c56:	68 be 77 00 01       	push   0x10077be
+ 1001c5b:	e8 1b 09 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:217
     printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", debugDS, debugES, debugGS, debugFS);
- 1001c5c:	83 c4 04             	add    esp,0x4
- 1001c5f:	ff 35 34 02 12 00    	push   DWORD PTR ds:0x120234
- 1001c65:	ff 35 38 02 12 00    	push   DWORD PTR ds:0x120238
- 1001c6b:	ff 35 30 02 12 00    	push   DWORD PTR ds:0x120230
- 1001c71:	ff 35 2c 02 12 00    	push   DWORD PTR ds:0x12022c
- 1001c77:	68 a4 7e 00 01       	push   0x1007ea4
- 1001c7c:	e8 f6 08 00 00       	call   1002577 <printk>
+ 1001c60:	83 c4 04             	add    esp,0x4
+ 1001c63:	ff 35 34 02 12 00    	push   DWORD PTR ds:0x120234
+ 1001c69:	ff 35 38 02 12 00    	push   DWORD PTR ds:0x120238
+ 1001c6f:	ff 35 30 02 12 00    	push   DWORD PTR ds:0x120230
+ 1001c75:	ff 35 2c 02 12 00    	push   DWORD PTR ds:0x12022c
+ 1001c7b:	68 9c 81 00 01       	push   0x100819c
+ 1001c80:	e8 f6 08 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:218
     printk("CS:EIP = %04X:%08X, error code=%08X\n", debugCS, debugEIP, debugErrorCode);
- 1001c81:	83 c4 20             	add    esp,0x20
- 1001c84:	ff 35 48 02 12 00    	push   DWORD PTR ds:0x120248
- 1001c8a:	ff 35 50 02 12 00    	push   DWORD PTR ds:0x120250
- 1001c90:	ff 35 4c 02 12 00    	push   DWORD PTR ds:0x12024c
- 1001c96:	68 cc 7e 00 01       	push   0x1007ecc
- 1001c9b:	e8 d7 08 00 00       	call   1002577 <printk>
+ 1001c85:	83 c4 20             	add    esp,0x20
+ 1001c88:	ff 35 48 02 12 00    	push   DWORD PTR ds:0x120248
+ 1001c8e:	ff 35 50 02 12 00    	push   DWORD PTR ds:0x120250
+ 1001c94:	ff 35 4c 02 12 00    	push   DWORD PTR ds:0x12024c
+ 1001c9a:	68 c4 81 00 01       	push   0x10081c4
+ 1001c9f:	e8 d7 08 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:219
           printk("Bytes at CS:EIP: ");
- 1001ca0:	c7 04 24 86 74 00 01 	mov    DWORD PTR [esp],0x1007486
- 1001ca7:	e8 cb 08 00 00       	call   1002577 <printk>
- 1001cac:	8d 7b 13             	lea    edi,[ebx+0x13]
- 1001caf:	83 c4 10             	add    esp,0x10
+ 1001ca4:	c7 04 24 82 77 00 01 	mov    DWORD PTR [esp],0x1007782
+ 1001cab:	e8 cb 08 00 00       	call   100257b <printk>
+ 1001cb0:	8d 7b 13             	lea    edi,[ebx+0x13]
+ 1001cb3:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:221 (discriminator 3)
           for (int cnt=0;cnt<19;cnt++)
               printk("%02X ", lCSIPPtr[cnt]);
- 1001cb2:	83 ec 08             	sub    esp,0x8
- 1001cb5:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
- 1001cb8:	50                   	push   eax
- 1001cb9:	68 18 74 00 01       	push   0x1007418
- 1001cbe:	e8 b4 08 00 00       	call   1002577 <printk>
- 1001cc3:	83 c3 01             	add    ebx,0x1
+ 1001cb6:	83 ec 08             	sub    esp,0x8
+ 1001cb9:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
+ 1001cbc:	50                   	push   eax
+ 1001cbd:	68 14 77 00 01       	push   0x1007714
+ 1001cc2:	e8 b4 08 00 00       	call   100257b <printk>
+ 1001cc7:	83 c3 01             	add    ebx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:220 (discriminator 3)
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", debugBP, debugSI, debugDI, debugSavedESP);
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\n", debugCR0, debugCR3, debugCR4);
@@ -4949,36 +4948,36 @@ void printDebugRegs()
     printk("CS:EIP = %04X:%08X, error code=%08X\n", debugCS, debugEIP, debugErrorCode);
           printk("Bytes at CS:EIP: ");
           for (int cnt=0;cnt<19;cnt++)
- 1001cc6:	83 c4 10             	add    esp,0x10
- 1001cc9:	39 df                	cmp    edi,ebx
- 1001ccb:	75 e5                	jne    1001cb2 <printDebugRegs+0xd4>
+ 1001cca:	83 c4 10             	add    esp,0x10
+ 1001ccd:	39 df                	cmp    edi,ebx
+ 1001ccf:	75 e5                	jne    1001cb6 <printDebugRegs+0xd4>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:222
               printk("%02X ", lCSIPPtr[cnt]);
           printk("\n");
- 1001ccd:	83 ec 0c             	sub    esp,0xc
- 1001cd0:	68 3f 77 00 01       	push   0x100773f
- 1001cd5:	e8 9d 08 00 00       	call   1002577 <printk>
+ 1001cd1:	83 ec 0c             	sub    esp,0xc
+ 1001cd4:	68 66 7a 00 01       	push   0x1007a66
+ 1001cd9:	e8 9d 08 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:223
           printk ("Stack @ 0x%08x:0x%08X:\n",debugSS, esp);
- 1001cda:	83 c4 0c             	add    esp,0xc
- 1001cdd:	56                   	push   esi
- 1001cde:	ff 35 3c 02 12 00    	push   DWORD PTR ds:0x12023c
- 1001ce4:	68 98 74 00 01       	push   0x1007498
- 1001ce9:	e8 89 08 00 00       	call   1002577 <printk>
- 1001cee:	83 c4 10             	add    esp,0x10
- 1001cf1:	bb 00 00 00 00       	mov    ebx,0x0
- 1001cf6:	8d 04 33             	lea    eax,[ebx+esi*1]
+ 1001cde:	83 c4 0c             	add    esp,0xc
+ 1001ce1:	56                   	push   esi
+ 1001ce2:	ff 35 3c 02 12 00    	push   DWORD PTR ds:0x12023c
+ 1001ce8:	68 94 77 00 01       	push   0x1007794
+ 1001ced:	e8 89 08 00 00       	call   100257b <printk>
+ 1001cf2:	83 c4 10             	add    esp,0x10
+ 1001cf5:	bb 00 00 00 00       	mov    ebx,0x0
+ 1001cfa:	8d 04 33             	lea    eax,[ebx+esi*1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:226 (discriminator 3)
           for (int cnt=0;cnt<10;cnt++)
           {
               printk("\t0x%08X%: 0x%08X\n",esp, debugSavedStack[cnt]);
- 1001cf9:	83 ec 04             	sub    esp,0x4
- 1001cfc:	8b 15 ac 01 12 00    	mov    edx,DWORD PTR ds:0x1201ac
- 1001d02:	ff 34 1a             	push   DWORD PTR [edx+ebx*1]
- 1001d05:	50                   	push   eax
- 1001d06:	68 b0 74 00 01       	push   0x10074b0
- 1001d0b:	e8 67 08 00 00       	call   1002577 <printk>
- 1001d10:	83 c3 04             	add    ebx,0x4
+ 1001cfd:	83 ec 04             	sub    esp,0x4
+ 1001d00:	8b 15 ac 01 12 00    	mov    edx,DWORD PTR ds:0x1201ac
+ 1001d06:	ff 34 1a             	push   DWORD PTR [edx+ebx*1]
+ 1001d09:	50                   	push   eax
+ 1001d0a:	68 ac 77 00 01       	push   0x10077ac
+ 1001d0f:	e8 67 08 00 00       	call   100257b <printk>
+ 1001d14:	83 c3 04             	add    ebx,0x4
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:224 (discriminator 3)
           printk("Bytes at CS:EIP: ");
           for (int cnt=0;cnt<19;cnt++)
@@ -4986,9 +4985,9 @@ void printDebugRegs()
           printk("\n");
           printk ("Stack @ 0x%08x:0x%08X:\n",debugSS, esp);
           for (int cnt=0;cnt<10;cnt++)
- 1001d13:	83 c4 10             	add    esp,0x10
- 1001d16:	83 fb 28             	cmp    ebx,0x28
- 1001d19:	75 db                	jne    1001cf6 <printDebugRegs+0x118>
+ 1001d17:	83 c4 10             	add    esp,0x10
+ 1001d1a:	83 fb 28             	cmp    ebx,0x28
+ 1001d1d:	75 db                	jne    1001cfa <printDebugRegs+0x118>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:231
               printk("\t0x%08X%: 0x%08X\n",esp, debugSavedStack[cnt]);
               esp+=4;
@@ -4996,12 +4995,12 @@ void printDebugRegs()
 
 
 }
- 1001d1b:	5b                   	pop    ebx
- 1001d1c:	5e                   	pop    esi
- 1001d1d:	5f                   	pop    edi
- 1001d1e:	c3                   	ret    
+ 1001d1f:	5b                   	pop    ebx
+ 1001d20:	5e                   	pop    esi
+ 1001d21:	5f                   	pop    edi
+ 1001d22:	c3                   	ret    
 
-01001d1f <reboot>:
+01001d23 <reboot>:
 reboot():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:239
 /* keyboard interface IO port: data and control
@@ -5010,35 +5009,35 @@ reboot():
  
 void reboot(bool waitFirst)
 {
- 1001d1f:	83 ec 0c             	sub    esp,0xc
+ 1001d23:	83 ec 0c             	sub    esp,0xc
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:242
     uint8_t temp;
  
     if (waitFirst)
- 1001d22:	80 7c 24 10 00       	cmp    BYTE PTR [esp+0x10],0x0
- 1001d27:	74 1d                	je     1001d46 <reboot+0x27>
+ 1001d26:	80 7c 24 10 00       	cmp    BYTE PTR [esp+0x10],0x0
+ 1001d2b:	74 1d                	je     1001d4a <reboot+0x27>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:244
     {
         puts("Rebooting ... ");
- 1001d29:	83 ec 0c             	sub    esp,0xc
- 1001d2c:	68 de 74 00 01       	push   0x10074de
- 1001d31:	e8 03 e7 ff ff       	call   1000439 <puts>
+ 1001d2d:	83 ec 0c             	sub    esp,0xc
+ 1001d30:	68 da 77 00 01       	push   0x10077da
+ 1001d35:	e8 ff e6 ff ff       	call   1000439 <puts>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:245
         __asm__("sti\n");
- 1001d36:	fb                   	sti    
+ 1001d3a:	fb                   	sti    
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:246
         wait(3000);
- 1001d37:	c7 04 24 b8 0b 00 00 	mov    DWORD PTR [esp],0xbb8
- 1001d3e:	e8 dd 11 00 00       	call   1002f20 <wait>
- 1001d43:	83 c4 10             	add    esp,0x10
+ 1001d3b:	c7 04 24 b8 0b 00 00 	mov    DWORD PTR [esp],0xbb8
+ 1001d42:	e8 dd 11 00 00       	call   1002f24 <wait>
+ 1001d47:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:248
     }
     __asm__ volatile ("cli"); /* disable all interrupts */
- 1001d46:	fa                   	cli    
+ 1001d4a:	fa                   	cli    
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
- 1001d47:	e4 64                	in     al,0x64
- 1001d49:	89 c2                	mov    edx,eax
+ 1001d4b:	e4 64                	in     al,0x64
+ 1001d4d:	89 c2                	mov    edx,eax
 reboot():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:254
  
@@ -5047,17 +5046,17 @@ reboot():
     {
         temp = inb(KBRD_INTRFC); /* empty user data */
         if (check_flag(temp, KBRD_BIT_KDATA) != 0)
- 1001d4b:	a8 01                	test   al,0x1
- 1001d4d:	74 02                	je     1001d51 <reboot+0x32>
+ 1001d4f:	a8 01                	test   al,0x1
+ 1001d51:	74 02                	je     1001d55 <reboot+0x32>
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
- 1001d4f:	e4 60                	in     al,0x60
+ 1001d53:	e4 60                	in     al,0x60
 reboot():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:256
             inb(KBRD_IO); /* empty keyboard data */
     } while (check_flag(temp, KBRD_BIT_UDATA) != 0);
- 1001d51:	f6 c2 02             	test   dl,0x2
- 1001d54:	75 f1                	jne    1001d47 <reboot+0x28>
+ 1001d55:	f6 c2 02             	test   dl,0x2
+ 1001d58:	75 f1                	jne    1001d4b <reboot+0x28>
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -5066,18 +5065,18 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 1001d56:	b8 fe ff ff ff       	mov    eax,0xfffffffe
- 1001d5b:	e6 64                	out    0x64,al
+ 1001d5a:	b8 fe ff ff ff       	mov    eax,0xfffffffe
+ 1001d5f:	e6 64                	out    0x64,al
 reboot():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:260 (discriminator 1)
  
     outb(KBRD_INTRFC, KBRD_RESET); /* pulse CPU reset line */
 loop:
     __asm__ volatile ("hlt"); /* if that didn't work, halt the CPU */
- 1001d5d:	f4                   	hlt    
- 1001d5e:	eb fd                	jmp    1001d5d <reboot+0x3e>
+ 1001d61:	f4                   	hlt    
+ 1001d62:	eb fd                	jmp    1001d61 <reboot+0x3e>
 
-01001d60 <dumpKernelAddresses>:
+01001d64 <dumpKernelAddresses>:
 dumpKernelAddresses():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:265
     goto loop; /* if a NMI is received, halt again */
@@ -5085,256 +5084,256 @@ dumpKernelAddresses():
 
 void dumpKernelAddresses()
 {
- 1001d60:	83 ec 18             	sub    esp,0x18
+ 1001d64:	83 ec 18             	sub    esp,0x18
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:266
 printk("Kernel Variable List:\n");
- 1001d63:	68 ed 74 00 01       	push   0x10074ed
- 1001d68:	e8 0a 08 00 00       	call   1002577 <printk>
+ 1001d67:	68 e9 77 00 01       	push   0x10077e9
+ 1001d6c:	e8 0a 08 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:267
 printk("\tKERNEL_OBJECT_BASE_ADDRESS=0x%08x\n",KERNEL_OBJECT_BASE_ADDRESS);
- 1001d6d:	83 c4 08             	add    esp,0x8
- 1001d70:	68 00 00 15 00       	push   0x150000
- 1001d75:	68 f4 7e 00 01       	push   0x1007ef4
- 1001d7a:	e8 f8 07 00 00       	call   1002577 <printk>
+ 1001d71:	83 c4 08             	add    esp,0x8
+ 1001d74:	68 00 00 15 00       	push   0x150000
+ 1001d79:	68 ec 81 00 01       	push   0x10081ec
+ 1001d7e:	e8 f8 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:268
 printk("\tE820_TABLE_ADDRESS=0x%08x (0x%08X)\n",E820_TABLE_ADDRESS);
- 1001d7f:	83 c4 08             	add    esp,0x8
- 1001d82:	68 00 00 15 00       	push   0x150000
- 1001d87:	68 18 7f 00 01       	push   0x1007f18
- 1001d8c:	e8 e6 07 00 00       	call   1002577 <printk>
+ 1001d83:	83 c4 08             	add    esp,0x8
+ 1001d86:	68 00 00 15 00       	push   0x150000
+ 1001d8b:	68 10 82 00 01       	push   0x1008210
+ 1001d90:	e8 e6 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:269
 printk("\tMP_CONFIG_TABLE_ADDRESS=0x%08x\n",MP_CONFIG_TABLE_ADDRESS);
- 1001d91:	83 c4 08             	add    esp,0x8
- 1001d94:	68 b0 04 15 00       	push   0x1504b0
- 1001d99:	68 40 7f 00 01       	push   0x1007f40
- 1001d9e:	e8 d4 07 00 00       	call   1002577 <printk>
+ 1001d95:	83 c4 08             	add    esp,0x8
+ 1001d98:	68 b0 04 15 00       	push   0x1504b0
+ 1001d9d:	68 38 82 00 01       	push   0x1008238
+ 1001da2:	e8 d4 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:270
 printk("\tKEYBOARD_BUFFER_ADDRESS=0x%08x\n",KEYBOARD_BUFFER_ADDRESS);
- 1001da3:	83 c4 08             	add    esp,0x8
- 1001da6:	68 b0 24 15 00       	push   0x1524b0
- 1001dab:	68 64 7f 00 01       	push   0x1007f64
- 1001db0:	e8 c2 07 00 00       	call   1002577 <printk>
+ 1001da7:	83 c4 08             	add    esp,0x8
+ 1001daa:	68 b0 24 15 00       	push   0x1524b0
+ 1001daf:	68 5c 82 00 01       	push   0x100825c
+ 1001db4:	e8 c2 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:271
 printk("\tIDT_TABLE_ADDRESS=0x%08x\n",IDT_TABLE_ADDRESS);
- 1001db5:	83 c4 08             	add    esp,0x8
- 1001db8:	68 00 30 15 00       	push   0x153000
- 1001dbd:	68 04 75 00 01       	push   0x1007504
- 1001dc2:	e8 b0 07 00 00       	call   1002577 <printk>
+ 1001db9:	83 c4 08             	add    esp,0x8
+ 1001dbc:	68 00 30 15 00       	push   0x153000
+ 1001dc1:	68 00 78 00 01       	push   0x1007800
+ 1001dc6:	e8 b0 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:272
 printk("\tINIT_GDT_TABLE_ADDRESS=0x%08x\n",INIT_GDT_TABLE_ADDRESS);
- 1001dc7:	83 c4 08             	add    esp,0x8
- 1001dca:	68 00 40 15 00       	push   0x154000
- 1001dcf:	68 88 7f 00 01       	push   0x1007f88
- 1001dd4:	e8 9e 07 00 00       	call   1002577 <printk>
+ 1001dcb:	83 c4 08             	add    esp,0x8
+ 1001dce:	68 00 40 15 00       	push   0x154000
+ 1001dd3:	68 80 82 00 01       	push   0x1008280
+ 1001dd8:	e8 9e 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:273
 printk("\tTASK_TABLE_ADDRESS=0x%08x\n",TASK_TABLE_ADDRESS);
- 1001dd9:	83 c4 08             	add    esp,0x8
- 1001ddc:	68 00 50 15 00       	push   0x155000
- 1001de1:	68 1f 75 00 01       	push   0x100751f
- 1001de6:	e8 8c 07 00 00       	call   1002577 <printk>
+ 1001ddd:	83 c4 08             	add    esp,0x8
+ 1001de0:	68 00 50 15 00       	push   0x155000
+ 1001de5:	68 1b 78 00 01       	push   0x100781b
+ 1001dea:	e8 8c 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:274
 printk("\tTSS_TABLE_ADDRESS=0x%08x\n",TSS_TABLE_ADDRESS);
- 1001deb:	83 c4 08             	add    esp,0x8
- 1001dee:	68 00 60 2e 00       	push   0x2e6000
- 1001df3:	68 3b 75 00 01       	push   0x100753b
- 1001df8:	e8 7a 07 00 00       	call   1002577 <printk>
+ 1001def:	83 c4 08             	add    esp,0x8
+ 1001df2:	68 00 60 2e 00       	push   0x2e6000
+ 1001df7:	68 37 78 00 01       	push   0x1007837
+ 1001dfc:	e8 7a 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:275
 printk("\tATA_MBR_ARRAY_ADDRESS=0x%08x\n",ATA_MBR_ARRAY_ADDRESS);
- 1001dfd:	83 c4 08             	add    esp,0x8
- 1001e00:	68 00 60 48 00       	push   0x486000
- 1001e05:	68 a8 7f 00 01       	push   0x1007fa8
- 1001e0a:	e8 68 07 00 00       	call   1002577 <printk>
+ 1001e01:	83 c4 08             	add    esp,0x8
+ 1001e04:	68 00 60 48 00       	push   0x486000
+ 1001e09:	68 a0 82 00 01       	push   0x10082a0
+ 1001e0e:	e8 68 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:276
 printk("\tPCI_DEVICE_LIST_ADDRESS=0x%08x\n",PCI_DEVICE_LIST_ADDRESS);
- 1001e0f:	83 c4 08             	add    esp,0x8
- 1001e12:	68 00 70 48 00       	push   0x487000
- 1001e17:	68 c8 7f 00 01       	push   0x1007fc8
- 1001e1c:	e8 56 07 00 00       	call   1002577 <printk>
+ 1001e13:	83 c4 08             	add    esp,0x8
+ 1001e16:	68 00 70 48 00       	push   0x487000
+ 1001e1b:	68 c0 82 00 01       	push   0x10082c0
+ 1001e20:	e8 56 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:277
 printk("\tPCI_BRIDGE_LIST_ADDRESS=0x%08x\n",PCI_BRIDGE_LIST_ADDRESS);
- 1001e21:	83 c4 08             	add    esp,0x8
- 1001e24:	68 00 70 49 00       	push   0x497000
- 1001e29:	68 ec 7f 00 01       	push   0x1007fec
- 1001e2e:	e8 44 07 00 00       	call   1002577 <printk>
+ 1001e25:	83 c4 08             	add    esp,0x8
+ 1001e28:	68 00 70 49 00       	push   0x497000
+ 1001e2d:	68 e4 82 00 01       	push   0x10082e4
+ 1001e32:	e8 44 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:278
 printk("\tPCI_FUNCTION_LIST_ADDRESS=0x%08x\n",PCI_FUNCTION_LIST_ADDRESS);
- 1001e33:	83 c4 08             	add    esp,0x8
- 1001e36:	68 00 70 4a 00       	push   0x4a7000
- 1001e3b:	68 10 80 00 01       	push   0x1008010
- 1001e40:	e8 32 07 00 00       	call   1002577 <printk>
+ 1001e37:	83 c4 08             	add    esp,0x8
+ 1001e3a:	68 00 70 4a 00       	push   0x4a7000
+ 1001e3f:	68 08 83 00 01       	push   0x1008308
+ 1001e44:	e8 32 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:279
 printk("\tGDT_PMODE_16BIT_TABLE_ADDRESS=0x%08x\n",GDT_PMODE_16BIT_TABLE_ADDRESS);
- 1001e45:	83 c4 08             	add    esp,0x8
- 1001e48:	68 00 80 4a 00       	push   0x4a8000
- 1001e4d:	68 34 80 00 01       	push   0x1008034
- 1001e52:	e8 20 07 00 00       	call   1002577 <printk>
+ 1001e49:	83 c4 08             	add    esp,0x8
+ 1001e4c:	68 00 80 4a 00       	push   0x4a8000
+ 1001e51:	68 2c 83 00 01       	push   0x100832c
+ 1001e56:	e8 20 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:280
 printk("\tKERNEL_PAGE_DIR_ADDRESS=0x%08x\n",KERNEL_PAGE_DIR_ADDRESS);
- 1001e57:	83 c4 08             	add    esp,0x8
- 1001e5a:	68 00 90 4a 00       	push   0x4a9000
- 1001e5f:	68 5c 80 00 01       	push   0x100805c
- 1001e64:	e8 0e 07 00 00       	call   1002577 <printk>
+ 1001e5b:	83 c4 08             	add    esp,0x8
+ 1001e5e:	68 00 90 4a 00       	push   0x4a9000
+ 1001e63:	68 54 83 00 01       	push   0x1008354
+ 1001e68:	e8 0e 07 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:281
 printk("\tKERNEL_PAGE_TABLE_BASE_ADDRESS=0x%08x\n",KERNEL_PAGE_TABLE_BASE_ADDRESS);
- 1001e69:	83 c4 08             	add    esp,0x8
- 1001e6c:	68 00 b0 4b 00       	push   0x4bb000
- 1001e71:	68 80 80 00 01       	push   0x1008080
- 1001e76:	e8 fc 06 00 00       	call   1002577 <printk>
+ 1001e6d:	83 c4 08             	add    esp,0x8
+ 1001e70:	68 00 b0 4b 00       	push   0x4bb000
+ 1001e75:	68 78 83 00 01       	push   0x1008378
+ 1001e7a:	e8 fc 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:282
 printk("\tSAVED_STACK_FOR_EXCEPTIONS_ADDRESS=0x%08x\n",SAVED_STACK_FOR_EXCEPTIONS_ADDRESS);
- 1001e7b:	83 c4 08             	add    esp,0x8
- 1001e7e:	68 00 c0 8b 00       	push   0x8bc000
- 1001e83:	68 a8 80 00 01       	push   0x10080a8
- 1001e88:	e8 ea 06 00 00       	call   1002577 <printk>
+ 1001e7f:	83 c4 08             	add    esp,0x8
+ 1001e82:	68 00 c0 8b 00       	push   0x8bc000
+ 1001e87:	68 a0 83 00 01       	push   0x10083a0
+ 1001e8c:	e8 ea 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:283
 printk("\tSAVED_STACK_FOR_DEBUGGING_ADDRESS=0x%08x\n",SAVED_STACK_FOR_DEBUGGING_ADDRESS);
- 1001e8d:	83 c4 08             	add    esp,0x8
- 1001e90:	68 00 e0 8b 00       	push   0x8be000
- 1001e95:	68 d4 80 00 01       	push   0x10080d4
- 1001e9a:	e8 d8 06 00 00       	call   1002577 <printk>
+ 1001e91:	83 c4 08             	add    esp,0x8
+ 1001e94:	68 00 e0 8b 00       	push   0x8be000
+ 1001e99:	68 cc 83 00 01       	push   0x10083cc
+ 1001e9e:	e8 d8 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:284
 printk("\tCPU_APIC_REGISTER_REMAP_BASE_ADDRESS=0x%08x\n",CPU_APIC_REGISTER_REMAP_BASE_ADDRESS);
- 1001e9f:	83 c4 08             	add    esp,0x8
- 1001ea2:	68 00 00 8c 00       	push   0x8c0000
- 1001ea7:	68 00 81 00 01       	push   0x1008100
- 1001eac:	e8 c6 06 00 00       	call   1002577 <printk>
+ 1001ea3:	83 c4 08             	add    esp,0x8
+ 1001ea6:	68 00 00 8c 00       	push   0x8c0000
+ 1001eab:	68 f8 83 00 01       	push   0x10083f8
+ 1001eb0:	e8 c6 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:285
 printk("\tCPU_IOAPIC_REGISTER_REMAP_BASE_ADDRESS=0x%08x\n",CPU_IOAPIC_REGISTER_REMAP_BASE_ADDRESS);
- 1001eb1:	83 c4 08             	add    esp,0x8
- 1001eb4:	68 00 10 8c 00       	push   0x8c1000
- 1001eb9:	68 30 81 00 01       	push   0x1008130
- 1001ebe:	e8 b4 06 00 00       	call   1002577 <printk>
+ 1001eb5:	83 c4 08             	add    esp,0x8
+ 1001eb8:	68 00 10 8c 00       	push   0x8c1000
+ 1001ebd:	68 28 84 00 01       	push   0x1008428
+ 1001ec2:	e8 b4 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:286
 printk("\tKERNEL_TICKS_SINCE_START_VARIABLE_ADDRESS=0x%08x\n",KERNEL_TICKS_SINCE_START_VARIABLE_ADDRESS);
- 1001ec3:	83 c4 08             	add    esp,0x8
- 1001ec6:	68 04 10 8c 00       	push   0x8c1004
- 1001ecb:	68 60 81 00 01       	push   0x1008160
- 1001ed0:	e8 a2 06 00 00       	call   1002577 <printk>
+ 1001ec7:	83 c4 08             	add    esp,0x8
+ 1001eca:	68 04 10 8c 00       	push   0x8c1004
+ 1001ecf:	68 58 84 00 01       	push   0x1008458
+ 1001ed4:	e8 a2 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:287
 printk("\tAHCI_ABAR_REMAPPED_ADDRESS=0x%08x\n",AHCI_ABAR_REMAPPED_ADDRESS);
- 1001ed5:	83 c4 08             	add    esp,0x8
- 1001ed8:	68 00 20 8c 00       	push   0x8c2000
- 1001edd:	68 94 81 00 01       	push   0x1008194
- 1001ee2:	e8 90 06 00 00       	call   1002577 <printk>
+ 1001ed9:	83 c4 08             	add    esp,0x8
+ 1001edc:	68 00 20 8c 00       	push   0x8c2000
+ 1001ee1:	68 8c 84 00 01       	push   0x100848c
+ 1001ee6:	e8 90 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:288
 printk("\tAHCI_PORT_BASE_REMAP_ADDRESS=0x%08x\n",AHCI_PORT_BASE_REMAP_ADDRESS);
- 1001ee7:	83 c4 08             	add    esp,0x8
- 1001eea:	68 00 20 90 00       	push   0x902000
- 1001eef:	68 b8 81 00 01       	push   0x10081b8
- 1001ef4:	e8 7e 06 00 00       	call   1002577 <printk>
+ 1001eeb:	83 c4 08             	add    esp,0x8
+ 1001eee:	68 00 20 90 00       	push   0x902000
+ 1001ef3:	68 b0 84 00 01       	push   0x10084b0
+ 1001ef8:	e8 7e 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:289
 printk("\tAHCI_DISK_BUFFER_ADDRESS=0x%08x\n",AHCI_DISK_BUFFER_ADDRESS);
- 1001ef9:	83 c4 08             	add    esp,0x8
- 1001efc:	68 00 20 a4 00       	push   0xa42000
- 1001f01:	68 e0 81 00 01       	push   0x10081e0
- 1001f06:	e8 6c 06 00 00       	call   1002577 <printk>
+ 1001efd:	83 c4 08             	add    esp,0x8
+ 1001f00:	68 00 20 a4 00       	push   0xa42000
+ 1001f05:	68 d8 84 00 01       	push   0x10084d8
+ 1001f0a:	e8 6c 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:290
 printk("\tATA_DEVICE_INFO_ADDRESS=0x%08x\n",ATA_DEVICE_INFO_ADDRESS);
- 1001f0b:	83 c4 08             	add    esp,0x8
- 1001f0e:	68 00 20 b8 00       	push   0xb82000
- 1001f13:	68 04 82 00 01       	push   0x1008204
- 1001f18:	e8 5a 06 00 00       	call   1002577 <printk>
+ 1001f0f:	83 c4 08             	add    esp,0x8
+ 1001f12:	68 00 20 b8 00       	push   0xb82000
+ 1001f17:	68 fc 84 00 01       	push   0x10084fc
+ 1001f1c:	e8 5a 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:291
 printk("\tAHCI_CAPS_ADDRESS=0x%08x\n",AHCI_CAPS_ADDRESS);
- 1001f1d:	83 c4 08             	add    esp,0x8
- 1001f20:	68 20 6e b8 00       	push   0xb86e20
- 1001f25:	68 56 75 00 01       	push   0x1007556
- 1001f2a:	e8 48 06 00 00       	call   1002577 <printk>
+ 1001f21:	83 c4 08             	add    esp,0x8
+ 1001f24:	68 20 6e b8 00       	push   0xb86e20
+ 1001f29:	68 52 78 00 01       	push   0x1007852
+ 1001f2e:	e8 48 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:292
 printk("\tTSS_AVAILABLE_ADDRESS=0x%08x\n",TASK_AVAILABLE_ADDRESS);
- 1001f2f:	83 c4 08             	add    esp,0x8
- 1001f32:	68 40 bc b8 00       	push   0xb8bc40
- 1001f37:	68 28 82 00 01       	push   0x1008228
- 1001f3c:	e8 36 06 00 00       	call   1002577 <printk>
+ 1001f33:	83 c4 08             	add    esp,0x8
+ 1001f36:	68 40 bc b8 00       	push   0xb8bc40
+ 1001f3b:	68 20 85 00 01       	push   0x1008520
+ 1001f40:	e8 36 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:293
 printk("\tGDT_AVAILABLE_ADDRESS=0x%08x\n",GDT_AVAILABLE_ADDRESS);
- 1001f41:	83 c4 08             	add    esp,0x8
- 1001f44:	68 40 c4 b8 00       	push   0xb8c440
- 1001f49:	68 48 82 00 01       	push   0x1008248
- 1001f4e:	e8 24 06 00 00       	call   1002577 <printk>
+ 1001f45:	83 c4 08             	add    esp,0x8
+ 1001f48:	68 40 c4 b8 00       	push   0xb8c440
+ 1001f4d:	68 40 85 00 01       	push   0x1008540
+ 1001f52:	e8 24 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:294
 printk("\tEXEC_FILE_LOAD_INFO=0x%08x\n",EXEC_FILE_LOAD_INFO);
- 1001f53:	83 c4 08             	add    esp,0x8
- 1001f56:	68 40 cc b8 00       	push   0xb8cc40
- 1001f5b:	68 71 75 00 01       	push   0x1007571
- 1001f60:	e8 12 06 00 00       	call   1002577 <printk>
+ 1001f57:	83 c4 08             	add    esp,0x8
+ 1001f5a:	68 40 cc b8 00       	push   0xb8cc40
+ 1001f5f:	68 6d 78 00 01       	push   0x100786d
+ 1001f64:	e8 12 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:295
 printk("\tAHCI_ABAR_ADDRESS=0x%08x\n",AHCI_ABAR_ADDRESS);
- 1001f65:	83 c4 08             	add    esp,0x8
- 1001f68:	68 e0 52 ba 00       	push   0xba52e0
- 1001f6d:	68 8e 75 00 01       	push   0x100758e
- 1001f72:	e8 00 06 00 00       	call   1002577 <printk>
+ 1001f69:	83 c4 08             	add    esp,0x8
+ 1001f6c:	68 e0 52 ba 00       	push   0xba52e0
+ 1001f71:	68 8a 78 00 01       	push   0x100788a
+ 1001f76:	e8 00 06 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:296
 printk("\tEND_OF_KERNEL_OBJECTS_ADDRESS=0x%08x\n",END_OF_KERNEL_OBJECTS_ADDRESS);
- 1001f77:	83 c4 08             	add    esp,0x8
- 1001f7a:	68 e0 52 ca 00       	push   0xca52e0
- 1001f7f:	68 68 82 00 01       	push   0x1008268
- 1001f84:	e8 ee 05 00 00       	call   1002577 <printk>
+ 1001f7b:	83 c4 08             	add    esp,0x8
+ 1001f7e:	68 e0 52 ca 00       	push   0xca52e0
+ 1001f83:	68 60 85 00 01       	push   0x1008560
+ 1001f88:	e8 ee 05 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:297
 }
- 1001f89:	83 c4 1c             	add    esp,0x1c
- 1001f8c:	c3                   	ret    
+ 1001f8d:	83 c4 1c             	add    esp,0x1c
+ 1001f90:	c3                   	ret    
 
-01001f8d <pauseDisplay>:
+01001f91 <pauseDisplay>:
 pauseDisplay():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:300
 
 bool pauseDisplay(bool offerToQuit)
 {
- 1001f8d:	56                   	push   esi
- 1001f8e:	53                   	push   ebx
- 1001f8f:	83 ec 04             	sub    esp,0x4
- 1001f92:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
+ 1001f91:	56                   	push   esi
+ 1001f92:	53                   	push   ebx
+ 1001f93:	83 ec 04             	sub    esp,0x4
+ 1001f96:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:301
     if (offerToQuit)
- 1001f96:	84 db                	test   bl,bl
- 1001f98:	74 12                	je     1001fac <pauseDisplay+0x1f>
+ 1001f9a:	84 db                	test   bl,bl
+ 1001f9c:	74 12                	je     1001fb0 <pauseDisplay+0x1f>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:302
         printk("Press q to quit, any other key to continue ...");
- 1001f9a:	83 ec 0c             	sub    esp,0xc
- 1001f9d:	68 90 82 00 01       	push   0x1008290
- 1001fa2:	e8 d0 05 00 00       	call   1002577 <printk>
- 1001fa7:	83 c4 10             	add    esp,0x10
- 1001faa:	eb 10                	jmp    1001fbc <pauseDisplay+0x2f>
+ 1001f9e:	83 ec 0c             	sub    esp,0xc
+ 1001fa1:	68 88 85 00 01       	push   0x1008588
+ 1001fa6:	e8 d0 05 00 00       	call   100257b <printk>
+ 1001fab:	83 c4 10             	add    esp,0x10
+ 1001fae:	eb 10                	jmp    1001fc0 <pauseDisplay+0x2f>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:304
     else
         printk("Press a key to continue ... ");
- 1001fac:	83 ec 0c             	sub    esp,0xc
- 1001faf:	68 a9 75 00 01       	push   0x10075a9
- 1001fb4:	e8 be 05 00 00       	call   1002577 <printk>
- 1001fb9:	83 c4 10             	add    esp,0x10
+ 1001fb0:	83 ec 0c             	sub    esp,0xc
+ 1001fb3:	68 a5 78 00 01       	push   0x10078a5
+ 1001fb8:	e8 be 05 00 00       	call   100257b <printk>
+ 1001fbd:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:305
     char lPressedKey=waitForKeyboardKey();
- 1001fbc:	e8 f7 e4 ff ff       	call   10004b8 <waitForKeyboardKey>
- 1001fc1:	89 c6                	mov    esi,eax
+ 1001fc0:	e8 f3 e4 ff ff       	call   10004b8 <waitForKeyboardKey>
+ 1001fc5:	89 c6                	mov    esi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:306
     cursorMoveToX(0);
- 1001fc3:	83 ec 0c             	sub    esp,0xc
- 1001fc6:	6a 00                	push   0x0
- 1001fc8:	e8 bd e3 ff ff       	call   100038a <cursorMoveToX>
+ 1001fc7:	83 ec 0c             	sub    esp,0xc
+ 1001fca:	6a 00                	push   0x0
+ 1001fcc:	e8 b9 e3 ff ff       	call   100038a <cursorMoveToX>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:307
     printk("                                           ");
- 1001fcd:	c7 04 24 c0 82 00 01 	mov    DWORD PTR [esp],0x10082c0
- 1001fd4:	e8 9e 05 00 00       	call   1002577 <printk>
+ 1001fd1:	c7 04 24 b8 85 00 01 	mov    DWORD PTR [esp],0x10085b8
+ 1001fd8:	e8 9e 05 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:308
     cursorMoveToX(0);
- 1001fd9:	c7 04 24 00 00 00 00 	mov    DWORD PTR [esp],0x0
- 1001fe0:	e8 a5 e3 ff ff       	call   100038a <cursorMoveToX>
- 1001fe5:	89 f0                	mov    eax,esi
- 1001fe7:	3c 71                	cmp    al,0x71
- 1001fe9:	0f 94 c0             	sete   al
- 1001fec:	21 d8                	and    eax,ebx
+ 1001fdd:	c7 04 24 00 00 00 00 	mov    DWORD PTR [esp],0x0
+ 1001fe4:	e8 a1 e3 ff ff       	call   100038a <cursorMoveToX>
+ 1001fe9:	89 f0                	mov    eax,esi
+ 1001feb:	3c 71                	cmp    al,0x71
+ 1001fed:	0f 94 c0             	sete   al
+ 1001ff0:	21 d8                	and    eax,ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:312
     if (lPressedKey=='q' && offerToQuit)
         return true;
     return false;
 }
- 1001fee:	83 c4 14             	add    esp,0x14
- 1001ff1:	5b                   	pop    ebx
- 1001ff2:	5e                   	pop    esi
- 1001ff3:	c3                   	ret    
+ 1001ff2:	83 c4 14             	add    esp,0x14
+ 1001ff5:	5b                   	pop    ebx
+ 1001ff6:	5e                   	pop    esi
+ 1001ff7:	c3                   	ret    
 
-01001ff4 <mallocTemp>:
+01001ff8 <mallocTemp>:
 mallocTemp():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:317
 
@@ -5342,18 +5341,18 @@ int memPtr=0xe00000;
 uintptr_t* mallocTemp(int size)
 {
     uintptr_t lRetVal = memPtr;
- 1001ff4:	a1 00 40 00 01       	mov    eax,ds:0x1004000
+ 1001ff8:	a1 00 48 00 01       	mov    eax,ds:0x1004800
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:318
     memPtr+=size;
- 1001ff9:	89 c2                	mov    edx,eax
- 1001ffb:	03 54 24 04          	add    edx,DWORD PTR [esp+0x4]
- 1001fff:	89 15 00 40 00 01    	mov    DWORD PTR ds:0x1004000,edx
+ 1001ffd:	89 c2                	mov    edx,eax
+ 1001fff:	03 54 24 04          	add    edx,DWORD PTR [esp+0x4]
+ 1002003:	89 15 00 48 00 01    	mov    DWORD PTR ds:0x1004800,edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/init/utility.c:320
     return (uintptr_t*)lRetVal;
- 1002005:	c3                   	ret    
- 1002006:	66 90                	xchg   ax,ax
+ 1002009:	c3                   	ret    
+ 100200a:	66 90                	xchg   ax,ax
 
-01002008 <memcpy>:
+0100200c <memcpy>:
 memcpy():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:12
  */
@@ -5362,32 +5361,32 @@ memcpy():
 //copied a byte at a time
 void * memcpy(void *dest, const void *src, size_t n)
 {
- 1002008:	57                   	push   edi
- 1002009:	56                   	push   esi
- 100200a:	53                   	push   ebx
- 100200b:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
- 100200f:	8b 5c 24 14          	mov    ebx,DWORD PTR [esp+0x14]
- 1002013:	8b 54 24 18          	mov    edx,DWORD PTR [esp+0x18]
+ 100200c:	57                   	push   edi
+ 100200d:	56                   	push   esi
+ 100200e:	53                   	push   ebx
+ 100200f:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
+ 1002013:	8b 5c 24 14          	mov    ebx,DWORD PTR [esp+0x14]
+ 1002017:	8b 54 24 18          	mov    edx,DWORD PTR [esp+0x18]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:17
     bool dw,dd;
     
     dd=n%4==0;
     dw=n%2==0;
     if (dd)
- 1002017:	89 d1                	mov    ecx,edx
- 1002019:	83 e1 03             	and    ecx,0x3
- 100201c:	75 4d                	jne    100206b <memcpy+0x63>
+ 100201b:	89 d1                	mov    ecx,edx
+ 100201d:	83 e1 03             	and    ecx,0x3
+ 1002020:	75 4d                	jne    100206f <memcpy+0x63>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:19
     {
         n /=4;
- 100201e:	c1 ea 02             	shr    edx,0x2
+ 1002022:	c1 ea 02             	shr    edx,0x2
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:23
         const uint32_t *f = src;
         uint32_t *t = dest;
 
         if (f < t) {
- 1002021:	39 c3                	cmp    ebx,eax
- 1002023:	72 0e                	jb     1002033 <memcpy+0x2b>
+ 1002025:	39 c3                	cmp    ebx,eax
+ 1002027:	72 0e                	jb     1002037 <memcpy+0x2b>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:29
                 f += n;
                 t += n;
@@ -5395,10 +5394,10 @@ void * memcpy(void *dest, const void *src, size_t n)
                         *--t = *--f;
         } else
                 while ( (n)-- > 0)
- 1002025:	b9 00 00 00 00       	mov    ecx,0x0
- 100202a:	85 d2                	test   edx,edx
- 100202c:	75 2e                	jne    100205c <memcpy+0x54>
- 100202e:	e9 b6 00 00 00       	jmp    10020e9 <memcpy+0xe1>
+ 1002029:	b9 00 00 00 00       	mov    ecx,0x0
+ 100202e:	85 d2                	test   edx,edx
+ 1002030:	75 2e                	jne    1002060 <memcpy+0x54>
+ 1002032:	e9 b6 00 00 00       	jmp    10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:24
         n /=4;
         const uint32_t *f = src;
@@ -5406,21 +5405,21 @@ void * memcpy(void *dest, const void *src, size_t n)
 
         if (f < t) {
                 f += n;
- 1002033:	8d 3c 95 00 00 00 00 	lea    edi,[edx*4+0x0]
- 100203a:	01 fb                	add    ebx,edi
+ 1002037:	8d 3c 95 00 00 00 00 	lea    edi,[edx*4+0x0]
+ 100203e:	01 fb                	add    ebx,edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:25
                 t += n;
- 100203c:	01 c7                	add    edi,eax
+ 1002040:	01 c7                	add    edi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:26
                 while ( (n)-- > 0)
- 100203e:	85 d2                	test   edx,edx
- 1002040:	0f 84 a3 00 00 00    	je     10020e9 <memcpy+0xe1>
- 1002046:	f7 da                	neg    edx
+ 1002042:	85 d2                	test   edx,edx
+ 1002044:	0f 84 a3 00 00 00    	je     10020ed <memcpy+0xe1>
+ 100204a:	f7 da                	neg    edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:27
                         *--t = *--f;
- 1002048:	8b 74 8b fc          	mov    esi,DWORD PTR [ebx+ecx*4-0x4]
- 100204c:	89 74 8f fc          	mov    DWORD PTR [edi+ecx*4-0x4],esi
- 1002050:	83 e9 01             	sub    ecx,0x1
+ 100204c:	8b 74 8b fc          	mov    esi,DWORD PTR [ebx+ecx*4-0x4]
+ 1002050:	89 74 8f fc          	mov    DWORD PTR [edi+ecx*4-0x4],esi
+ 1002054:	83 e9 01             	sub    ecx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:26
         uint32_t *t = dest;
 
@@ -5428,17 +5427,17 @@ void * memcpy(void *dest, const void *src, size_t n)
                 f += n;
                 t += n;
                 while ( (n)-- > 0)
- 1002053:	39 d1                	cmp    ecx,edx
- 1002055:	75 f1                	jne    1002048 <memcpy+0x40>
- 1002057:	e9 8d 00 00 00       	jmp    10020e9 <memcpy+0xe1>
+ 1002057:	39 d1                	cmp    ecx,edx
+ 1002059:	75 f1                	jne    100204c <memcpy+0x40>
+ 100205b:	e9 8d 00 00 00       	jmp    10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:30
                         *--t = *--f;
         } else
                 while ( (n)-- > 0)
                         *t++ = *f++;
- 100205c:	8b 34 8b             	mov    esi,DWORD PTR [ebx+ecx*4]
- 100205f:	89 34 88             	mov    DWORD PTR [eax+ecx*4],esi
- 1002062:	83 c1 01             	add    ecx,0x1
+ 1002060:	8b 34 8b             	mov    esi,DWORD PTR [ebx+ecx*4]
+ 1002063:	89 34 88             	mov    DWORD PTR [eax+ecx*4],esi
+ 1002066:	83 c1 01             	add    ecx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:29
                 f += n;
                 t += n;
@@ -5446,28 +5445,28 @@ void * memcpy(void *dest, const void *src, size_t n)
                         *--t = *--f;
         } else
                 while ( (n)-- > 0)
- 1002065:	39 ca                	cmp    edx,ecx
- 1002067:	75 f3                	jne    100205c <memcpy+0x54>
- 1002069:	eb 7e                	jmp    10020e9 <memcpy+0xe1>
+ 1002069:	39 ca                	cmp    edx,ecx
+ 100206b:	75 f3                	jne    1002060 <memcpy+0x54>
+ 100206d:	eb 7e                	jmp    10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:33
                         *t++ = *f++;
         return dest;
     }
     else if (dw)
- 100206b:	89 d1                	mov    ecx,edx
- 100206d:	83 e1 01             	and    ecx,0x1
- 1002070:	75 42                	jne    10020b4 <memcpy+0xac>
+ 100206f:	89 d1                	mov    ecx,edx
+ 1002071:	83 e1 01             	and    ecx,0x1
+ 1002074:	75 42                	jne    10020b8 <memcpy+0xac>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:35
     {
         n /=2;
- 1002072:	d1 ea                	shr    edx,1
+ 1002076:	d1 ea                	shr    edx,1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:39
         const uint32_t *f = src;
         uint32_t *t = dest;
 
         if (f < t) {
- 1002074:	39 c3                	cmp    ebx,eax
- 1002076:	72 0b                	jb     1002083 <memcpy+0x7b>
+ 1002078:	39 c3                	cmp    ebx,eax
+ 100207a:	72 0b                	jb     1002087 <memcpy+0x7b>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:45
                 f += n;
                 t += n;
@@ -5475,10 +5474,10 @@ void * memcpy(void *dest, const void *src, size_t n)
                         *--t = *--f;
         } else
                 while ( (n)-- > 0)
- 1002078:	b9 00 00 00 00       	mov    ecx,0x0
- 100207d:	85 d2                	test   edx,edx
- 100207f:	75 24                	jne    10020a5 <memcpy+0x9d>
- 1002081:	eb 66                	jmp    10020e9 <memcpy+0xe1>
+ 100207c:	b9 00 00 00 00       	mov    ecx,0x0
+ 1002081:	85 d2                	test   edx,edx
+ 1002083:	75 24                	jne    10020a9 <memcpy+0x9d>
+ 1002085:	eb 66                	jmp    10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:40
         n /=2;
         const uint32_t *f = src;
@@ -5486,21 +5485,21 @@ void * memcpy(void *dest, const void *src, size_t n)
 
         if (f < t) {
                 f += n;
- 1002083:	8d 3c 95 00 00 00 00 	lea    edi,[edx*4+0x0]
- 100208a:	01 fb                	add    ebx,edi
+ 1002087:	8d 3c 95 00 00 00 00 	lea    edi,[edx*4+0x0]
+ 100208e:	01 fb                	add    ebx,edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:41
                 t += n;
- 100208c:	01 c7                	add    edi,eax
+ 1002090:	01 c7                	add    edi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:42
                 while ( (n)-- > 0)
- 100208e:	85 d2                	test   edx,edx
- 1002090:	74 57                	je     10020e9 <memcpy+0xe1>
- 1002092:	f7 da                	neg    edx
+ 1002092:	85 d2                	test   edx,edx
+ 1002094:	74 57                	je     10020ed <memcpy+0xe1>
+ 1002096:	f7 da                	neg    edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:43
                         *--t = *--f;
- 1002094:	8b 74 8b fc          	mov    esi,DWORD PTR [ebx+ecx*4-0x4]
- 1002098:	89 74 8f fc          	mov    DWORD PTR [edi+ecx*4-0x4],esi
- 100209c:	83 e9 01             	sub    ecx,0x1
+ 1002098:	8b 74 8b fc          	mov    esi,DWORD PTR [ebx+ecx*4-0x4]
+ 100209c:	89 74 8f fc          	mov    DWORD PTR [edi+ecx*4-0x4],esi
+ 10020a0:	83 e9 01             	sub    ecx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:42
         uint32_t *t = dest;
 
@@ -5508,17 +5507,17 @@ void * memcpy(void *dest, const void *src, size_t n)
                 f += n;
                 t += n;
                 while ( (n)-- > 0)
- 100209f:	39 ca                	cmp    edx,ecx
- 10020a1:	75 f1                	jne    1002094 <memcpy+0x8c>
- 10020a3:	eb 44                	jmp    10020e9 <memcpy+0xe1>
+ 10020a3:	39 ca                	cmp    edx,ecx
+ 10020a5:	75 f1                	jne    1002098 <memcpy+0x8c>
+ 10020a7:	eb 44                	jmp    10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:46
                         *--t = *--f;
         } else
                 while ( (n)-- > 0)
                         *t++ = *f++;
- 10020a5:	8b 34 8b             	mov    esi,DWORD PTR [ebx+ecx*4]
- 10020a8:	89 34 88             	mov    DWORD PTR [eax+ecx*4],esi
- 10020ab:	83 c1 01             	add    ecx,0x1
+ 10020a9:	8b 34 8b             	mov    esi,DWORD PTR [ebx+ecx*4]
+ 10020ac:	89 34 88             	mov    DWORD PTR [eax+ecx*4],esi
+ 10020af:	83 c1 01             	add    ecx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:45
                 f += n;
                 t += n;
@@ -5526,9 +5525,9 @@ void * memcpy(void *dest, const void *src, size_t n)
                         *--t = *--f;
         } else
                 while ( (n)-- > 0)
- 10020ae:	39 ca                	cmp    edx,ecx
- 10020b0:	75 f3                	jne    10020a5 <memcpy+0x9d>
- 10020b2:	eb 35                	jmp    10020e9 <memcpy+0xe1>
+ 10020b2:	39 ca                	cmp    edx,ecx
+ 10020b4:	75 f3                	jne    10020a9 <memcpy+0x9d>
+ 10020b6:	eb 35                	jmp    10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:54
     else
     {
@@ -5536,8 +5535,8 @@ void * memcpy(void *dest, const void *src, size_t n)
         char *t = dest;
 
         if (f < t) {
- 10020b4:	39 c3                	cmp    ebx,eax
- 10020b6:	72 0b                	jb     10020c3 <memcpy+0xbb>
+ 10020b8:	39 c3                	cmp    ebx,eax
+ 10020ba:	72 0b                	jb     10020c7 <memcpy+0xbb>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:60
                 f += n;
                 t += n;
@@ -5545,10 +5544,10 @@ void * memcpy(void *dest, const void *src, size_t n)
                         *--t = *--f;
         } else
                 while (n-- > 0)
- 10020b8:	be 00 00 00 00       	mov    esi,0x0
- 10020bd:	85 d2                	test   edx,edx
- 10020bf:	75 1a                	jne    10020db <memcpy+0xd3>
- 10020c1:	eb 26                	jmp    10020e9 <memcpy+0xe1>
+ 10020bc:	be 00 00 00 00       	mov    esi,0x0
+ 10020c1:	85 d2                	test   edx,edx
+ 10020c3:	75 1a                	jne    10020df <memcpy+0xd3>
+ 10020c5:	eb 26                	jmp    10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:57
         char *t = dest;
 
@@ -5556,13 +5555,13 @@ void * memcpy(void *dest, const void *src, size_t n)
                 f += n;
                 t += n;
                 while (n-- > 0)
- 10020c3:	8d 4a ff             	lea    ecx,[edx-0x1]
- 10020c6:	85 d2                	test   edx,edx
- 10020c8:	74 1f                	je     10020e9 <memcpy+0xe1>
+ 10020c7:	8d 4a ff             	lea    ecx,[edx-0x1]
+ 10020ca:	85 d2                	test   edx,edx
+ 10020cc:	74 1f                	je     10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:58
                         *--t = *--f;
- 10020ca:	0f b6 14 0b          	movzx  edx,BYTE PTR [ebx+ecx*1]
- 10020ce:	88 14 08             	mov    BYTE PTR [eax+ecx*1],dl
+ 10020ce:	0f b6 14 0b          	movzx  edx,BYTE PTR [ebx+ecx*1]
+ 10020d2:	88 14 08             	mov    BYTE PTR [eax+ecx*1],dl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:57
         char *t = dest;
 
@@ -5570,18 +5569,18 @@ void * memcpy(void *dest, const void *src, size_t n)
                 f += n;
                 t += n;
                 while (n-- > 0)
- 10020d1:	83 e9 01             	sub    ecx,0x1
- 10020d4:	83 f9 ff             	cmp    ecx,0xffffffff
- 10020d7:	75 f1                	jne    10020ca <memcpy+0xc2>
- 10020d9:	eb 0e                	jmp    10020e9 <memcpy+0xe1>
+ 10020d5:	83 e9 01             	sub    ecx,0x1
+ 10020d8:	83 f9 ff             	cmp    ecx,0xffffffff
+ 10020db:	75 f1                	jne    10020ce <memcpy+0xc2>
+ 10020dd:	eb 0e                	jmp    10020ed <memcpy+0xe1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:61
                         *--t = *--f;
         } else
                 while (n-- > 0)
                         *t++ = *f++;
- 10020db:	0f b6 0c 33          	movzx  ecx,BYTE PTR [ebx+esi*1]
- 10020df:	88 0c 30             	mov    BYTE PTR [eax+esi*1],cl
- 10020e2:	83 c6 01             	add    esi,0x1
+ 10020df:	0f b6 0c 33          	movzx  ecx,BYTE PTR [ebx+esi*1]
+ 10020e3:	88 0c 30             	mov    BYTE PTR [eax+esi*1],cl
+ 10020e6:	83 c6 01             	add    esi,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:60
                 f += n;
                 t += n;
@@ -5589,20 +5588,20 @@ void * memcpy(void *dest, const void *src, size_t n)
                         *--t = *--f;
         } else
                 while (n-- > 0)
- 10020e5:	39 f2                	cmp    edx,esi
- 10020e7:	75 f2                	jne    10020db <memcpy+0xd3>
+ 10020e9:	39 f2                	cmp    edx,esi
+ 10020eb:	75 f2                	jne    10020df <memcpy+0xd3>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/memcpy.c:64
                         *t++ = *f++;
         return dest;
     }
- 10020e9:	5b                   	pop    ebx
- 10020ea:	5e                   	pop    esi
- 10020eb:	5f                   	pop    edi
- 10020ec:	c3                   	ret    
- 10020ed:	66 90                	xchg   ax,ax
- 10020ef:	90                   	nop
+ 10020ed:	5b                   	pop    ebx
+ 10020ee:	5e                   	pop    esi
+ 10020ef:	5f                   	pop    edi
+ 10020f0:	c3                   	ret    
+ 10020f1:	66 90                	xchg   ax,ax
+ 10020f3:	90                   	nop
 
-010020f0 <panic>:
+010020f4 <panic>:
 panic():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/panic.c:8
 #include <stdarg.h>
@@ -5611,39 +5610,39 @@ panic():
 
 void __attribute__((noinline))panic(const char *format, ...)
 {
- 10020f0:	53                   	push   ebx
- 10020f1:	83 ec 08             	sub    esp,0x8
+ 10020f4:	53                   	push   ebx
+ 10020f5:	83 ec 08             	sub    esp,0x8
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/panic.c:10
     va_list args;
     va_start( args, format );
- 10020f4:	8d 5c 24 14          	lea    ebx,[esp+0x14]
+ 10020f8:	8d 5c 24 14          	lea    ebx,[esp+0x14]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/panic.c:11
     printk("\n>>>panic at instruction prior to address 0x%08X<<<\n", __builtin_return_address(0));
- 10020f8:	83 ec 08             	sub    esp,0x8
- 10020fb:	ff 74 24 14          	push   DWORD PTR [esp+0x14]
- 10020ff:	68 ec 82 00 01       	push   0x10082ec
- 1002104:	e8 6e 04 00 00       	call   1002577 <printk>
+ 10020fc:	83 ec 08             	sub    esp,0x8
+ 10020ff:	ff 74 24 14          	push   DWORD PTR [esp+0x14]
+ 1002103:	68 e4 85 00 01       	push   0x10085e4
+ 1002108:	e8 6e 04 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/panic.c:12
     printk("  >>>");
- 1002109:	c7 04 24 c6 75 00 01 	mov    DWORD PTR [esp],0x10075c6
- 1002110:	e8 62 04 00 00       	call   1002577 <printk>
+ 100210d:	c7 04 24 c2 78 00 01 	mov    DWORD PTR [esp],0x10078c2
+ 1002114:	e8 62 04 00 00       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/panic.c:13
     printk_valist( format,args);
- 1002115:	83 c4 08             	add    esp,0x8
- 1002118:	53                   	push   ebx
- 1002119:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
- 100211d:	e8 3c 04 00 00       	call   100255e <printk_valist>
- 1002122:	83 c4 10             	add    esp,0x10
+ 1002119:	83 c4 08             	add    esp,0x8
+ 100211c:	53                   	push   ebx
+ 100211d:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1002121:	e8 3c 04 00 00       	call   1002562 <printk_valist>
+ 1002126:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/panic.c:15 (discriminator 1)
     panicLoop: 
     __asm__("cli\nhlt\n");
- 1002125:	fa                   	cli    
- 1002126:	f4                   	hlt    
- 1002127:	eb fc                	jmp    1002125 <panic+0x35>
- 1002129:	66 90                	xchg   ax,ax
- 100212b:	90                   	nop
+ 1002129:	fa                   	cli    
+ 100212a:	f4                   	hlt    
+ 100212b:	eb fc                	jmp    1002129 <panic+0x35>
+ 100212d:	66 90                	xchg   ax,ax
+ 100212f:	90                   	nop
 
-0100212c <printchar>:
+01002130 <printchar>:
 printchar():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:43
 uint8_t printDLineCount;
@@ -5652,16 +5651,16 @@ static void printchar(char **str, int c)
 {
 	
 	if (str) {
- 100212c:	85 c0                	test   eax,eax
- 100212e:	74 08                	je     1002138 <printchar+0xc>
+ 1002130:	85 c0                	test   eax,eax
+ 1002132:	74 08                	je     100213c <printchar+0xc>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:44
 		**str = c;
- 1002130:	8b 08                	mov    ecx,DWORD PTR [eax]
- 1002132:	88 11                	mov    BYTE PTR [ecx],dl
+ 1002134:	8b 08                	mov    ecx,DWORD PTR [eax]
+ 1002136:	88 11                	mov    BYTE PTR [ecx],dl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:45
 		++(*str);
- 1002134:	83 00 01             	add    DWORD PTR [eax],0x1
- 1002137:	c3                   	ret    
+ 1002138:	83 00 01             	add    DWORD PTR [eax],0x1
+ 100213b:	c3                   	ret    
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:41
 //extern bool pauseDisplay(bool offerToQuit);
 extern uint32_t kDebugLevel;
@@ -5669,7 +5668,7 @@ uint8_t printDLineCount;
 
 static void printchar(char **str, int c)
 {
- 1002138:	83 ec 18             	sub    esp,0x18
+ 100213c:	83 ec 18             	sub    esp,0x18
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:47
 	
 	if (str) {
@@ -5677,15 +5676,15 @@ static void printchar(char **str, int c)
 		++(*str);
 	}
 	else terminal_putchar((unsigned char)c);
- 100213b:	0f b6 d2             	movzx  edx,dl
- 100213e:	52                   	push   edx
- 100213f:	e8 d1 e0 ff ff       	call   1000215 <terminal_putchar>
+ 100213f:	0f b6 d2             	movzx  edx,dl
+ 1002142:	52                   	push   edx
+ 1002143:	e8 cd e0 ff ff       	call   1000215 <terminal_putchar>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:48
 }
- 1002144:	83 c4 1c             	add    esp,0x1c
- 1002147:	c3                   	ret    
+ 1002148:	83 c4 1c             	add    esp,0x1c
+ 100214b:	c3                   	ret    
 
-01002148 <prints>:
+0100214c <prints>:
 prints():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:54
 
@@ -5694,39 +5693,39 @@ prints():
 
 static int prints(char **out, const char *string, int width, int pad)
 {
- 1002148:	55                   	push   ebp
- 1002149:	57                   	push   edi
- 100214a:	56                   	push   esi
- 100214b:	53                   	push   ebx
- 100214c:	83 ec 1c             	sub    esp,0x1c
- 100214f:	89 c7                	mov    edi,eax
- 1002151:	89 d6                	mov    esi,edx
- 1002153:	89 4c 24 0c          	mov    DWORD PTR [esp+0xc],ecx
- 1002157:	8b 54 24 30          	mov    edx,DWORD PTR [esp+0x30]
+ 100214c:	55                   	push   ebp
+ 100214d:	57                   	push   edi
+ 100214e:	56                   	push   esi
+ 100214f:	53                   	push   ebx
+ 1002150:	83 ec 1c             	sub    esp,0x1c
+ 1002153:	89 c7                	mov    edi,eax
+ 1002155:	89 d6                	mov    esi,edx
+ 1002157:	89 4c 24 0c          	mov    DWORD PTR [esp+0xc],ecx
+ 100215b:	8b 54 24 30          	mov    edx,DWORD PTR [esp+0x30]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:57
 	register int pc = 0, padchar = ' ';
 
 	if (width > 0) {
- 100215b:	85 c9                	test   ecx,ecx
- 100215d:	0f 8e cb 00 00 00    	jle    100222e <prints+0xe6>
+ 100215f:	85 c9                	test   ecx,ecx
+ 1002161:	0f 8e cb 00 00 00    	jle    1002232 <prints+0xe6>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:60 (discriminator 1)
 		register int len = 0;
 		register const char *ptr;
 		for (ptr = string; *ptr; ++ptr) ++len;
- 1002163:	80 3e 00             	cmp    BYTE PTR [esi],0x0
- 1002166:	74 1b                	je     1002183 <prints+0x3b>
+ 1002167:	80 3e 00             	cmp    BYTE PTR [esi],0x0
+ 100216a:	74 1b                	je     1002187 <prints+0x3b>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:60
- 1002168:	b8 00 00 00 00       	mov    eax,0x0
+ 100216c:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:60 (discriminator 3)
- 100216d:	83 c0 01             	add    eax,0x1
- 1002170:	80 3c 06 00          	cmp    BYTE PTR [esi+eax*1],0x0
- 1002174:	75 f7                	jne    100216d <prints+0x25>
+ 1002171:	83 c0 01             	add    eax,0x1
+ 1002174:	80 3c 06 00          	cmp    BYTE PTR [esi+eax*1],0x0
+ 1002178:	75 f7                	jne    1002171 <prints+0x25>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:61
 		if (len >= width) width = 0;
- 1002176:	bb 00 00 00 00       	mov    ebx,0x0
- 100217b:	39 44 24 0c          	cmp    DWORD PTR [esp+0xc],eax
- 100217f:	7e 0f                	jle    1002190 <prints+0x48>
- 1002181:	eb 05                	jmp    1002188 <prints+0x40>
+ 100217a:	bb 00 00 00 00       	mov    ebx,0x0
+ 100217f:	39 44 24 0c          	cmp    DWORD PTR [esp+0xc],eax
+ 1002183:	7e 0f                	jle    1002194 <prints+0x48>
+ 1002185:	eb 05                	jmp    100218c <prints+0x40>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:60
 	register int pc = 0, padchar = ' ';
 
@@ -5734,37 +5733,37 @@ static int prints(char **out, const char *string, int width, int pad)
 		register int len = 0;
 		register const char *ptr;
 		for (ptr = string; *ptr; ++ptr) ++len;
- 1002183:	b8 00 00 00 00       	mov    eax,0x0
+ 1002187:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:62
 		if (len >= width) width = 0;
 		else width -= len;
- 1002188:	8b 4c 24 0c          	mov    ecx,DWORD PTR [esp+0xc]
- 100218c:	29 c1                	sub    ecx,eax
- 100218e:	89 cb                	mov    ebx,ecx
+ 100218c:	8b 4c 24 0c          	mov    ecx,DWORD PTR [esp+0xc]
+ 1002190:	29 c1                	sub    ecx,eax
+ 1002192:	89 cb                	mov    ebx,ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:63
 		if (pad & PAD_ZERO) padchar = '0';
- 1002190:	89 d0                	mov    eax,edx
- 1002192:	83 e0 02             	and    eax,0x2
- 1002195:	83 f8 01             	cmp    eax,0x1
- 1002198:	19 ed                	sbb    ebp,ebp
- 100219a:	83 e5 f0             	and    ebp,0xfffffff0
- 100219d:	83 c5 30             	add    ebp,0x30
+ 1002194:	89 d0                	mov    eax,edx
+ 1002196:	83 e0 02             	and    eax,0x2
+ 1002199:	83 f8 01             	cmp    eax,0x1
+ 100219c:	19 ed                	sbb    ebp,ebp
+ 100219e:	83 e5 f0             	and    ebp,0xfffffff0
+ 10021a1:	83 c5 30             	add    ebp,0x30
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:65
 	}
 	if (!(pad & PAD_RIGHT)) {
- 10021a0:	f6 c2 01             	test   dl,0x1
- 10021a3:	75 1a                	jne    10021bf <prints+0x77>
+ 10021a4:	f6 c2 01             	test   dl,0x1
+ 10021a7:	75 1a                	jne    10021c3 <prints+0x77>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:66 (discriminator 1)
 		for ( ; width > 0; --width) {
- 10021a5:	85 db                	test   ebx,ebx
- 10021a7:	7e 67                	jle    1002210 <prints+0xc8>
+ 10021a9:	85 db                	test   ebx,ebx
+ 10021ab:	7e 67                	jle    1002214 <prints+0xc8>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:66
- 10021a9:	89 5c 24 0c          	mov    DWORD PTR [esp+0xc],ebx
+ 10021ad:	89 5c 24 0c          	mov    DWORD PTR [esp+0xc],ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:67 (discriminator 2)
 			printchar (out, padchar);
- 10021ad:	89 ea                	mov    edx,ebp
- 10021af:	89 f8                	mov    eax,edi
- 10021b1:	e8 76 ff ff ff       	call   100212c <printchar>
+ 10021b1:	89 ea                	mov    edx,ebp
+ 10021b3:	89 f8                	mov    eax,edi
+ 10021b5:	e8 76 ff ff ff       	call   1002130 <printchar>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:66 (discriminator 2)
 		if (len >= width) width = 0;
 		else width -= len;
@@ -5772,19 +5771,19 @@ static int prints(char **out, const char *string, int width, int pad)
 	}
 	if (!(pad & PAD_RIGHT)) {
 		for ( ; width > 0; --width) {
- 10021b6:	83 6c 24 0c 01       	sub    DWORD PTR [esp+0xc],0x1
- 10021bb:	75 f0                	jne    10021ad <prints+0x65>
- 10021bd:	eb 66                	jmp    1002225 <prints+0xdd>
- 10021bf:	89 5c 24 0c          	mov    DWORD PTR [esp+0xc],ebx
+ 10021ba:	83 6c 24 0c 01       	sub    DWORD PTR [esp+0xc],0x1
+ 10021bf:	75 f0                	jne    10021b1 <prints+0x65>
+ 10021c1:	eb 66                	jmp    1002229 <prints+0xdd>
+ 10021c3:	89 5c 24 0c          	mov    DWORD PTR [esp+0xc],ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:71 (discriminator 1)
 			printchar (out, padchar);
 			++pc;
 		}
 	}
 	for ( ; *string ; ++string) {
- 10021c3:	0f b6 16             	movzx  edx,BYTE PTR [esi]
- 10021c6:	84 d2                	test   dl,dl
- 10021c8:	74 1e                	je     10021e8 <prints+0xa0>
+ 10021c7:	0f b6 16             	movzx  edx,BYTE PTR [esi]
+ 10021ca:	84 d2                	test   dl,dl
+ 10021cc:	74 1e                	je     10021ec <prints+0xa0>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:55
 #define PAD_RIGHT 1
 #define PAD_ZERO 2
@@ -5792,7 +5791,7 @@ static int prints(char **out, const char *string, int width, int pad)
 static int prints(char **out, const char *string, int width, int pad)
 {
 	register int pc = 0, padchar = ' ';
- 10021ca:	bb 00 00 00 00       	mov    ebx,0x0
+ 10021ce:	bb 00 00 00 00       	mov    ebx,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:71 (discriminator 2)
 		for ( ; width > 0; --width) {
 			printchar (out, padchar);
@@ -5800,15 +5799,15 @@ static int prints(char **out, const char *string, int width, int pad)
 		}
 	}
 	for ( ; *string ; ++string) {
- 10021cf:	29 de                	sub    esi,ebx
+ 10021d3:	29 de                	sub    esi,ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:72 (discriminator 2)
 		printchar (out, *string);
- 10021d1:	0f be d2             	movsx  edx,dl
- 10021d4:	89 f8                	mov    eax,edi
- 10021d6:	e8 51 ff ff ff       	call   100212c <printchar>
+ 10021d5:	0f be d2             	movsx  edx,dl
+ 10021d8:	89 f8                	mov    eax,edi
+ 10021da:	e8 51 ff ff ff       	call   1002130 <printchar>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:73 (discriminator 2)
 		++pc;
- 10021db:	83 c3 01             	add    ebx,0x1
+ 10021df:	83 c3 01             	add    ebx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:71 (discriminator 2)
 		for ( ; width > 0; --width) {
 			printchar (out, padchar);
@@ -5816,10 +5815,10 @@ static int prints(char **out, const char *string, int width, int pad)
 		}
 	}
 	for ( ; *string ; ++string) {
- 10021de:	0f b6 14 1e          	movzx  edx,BYTE PTR [esi+ebx*1]
- 10021e2:	84 d2                	test   dl,dl
- 10021e4:	75 eb                	jne    10021d1 <prints+0x89>
- 10021e6:	eb 05                	jmp    10021ed <prints+0xa5>
+ 10021e2:	0f b6 14 1e          	movzx  edx,BYTE PTR [esi+ebx*1]
+ 10021e6:	84 d2                	test   dl,dl
+ 10021e8:	75 eb                	jne    10021d5 <prints+0x89>
+ 10021ea:	eb 05                	jmp    10021f1 <prints+0xa5>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:55
 #define PAD_RIGHT 1
 #define PAD_ZERO 2
@@ -5827,7 +5826,7 @@ static int prints(char **out, const char *string, int width, int pad)
 static int prints(char **out, const char *string, int width, int pad)
 {
 	register int pc = 0, padchar = ' ';
- 10021e8:	bb 00 00 00 00       	mov    ebx,0x0
+ 10021ec:	bb 00 00 00 00       	mov    ebx,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:75 (discriminator 1)
 	}
 	for ( ; *string ; ++string) {
@@ -5835,16 +5834,16 @@ static int prints(char **out, const char *string, int width, int pad)
 		++pc;
 	}
 	for ( ; width > 0; --width) {
- 10021ed:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
- 10021f1:	85 c0                	test   eax,eax
- 10021f3:	7e 45                	jle    100223a <prints+0xf2>
+ 10021f1:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+ 10021f5:	85 c0                	test   eax,eax
+ 10021f7:	7e 45                	jle    100223e <prints+0xf2>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:75
- 10021f5:	89 c6                	mov    esi,eax
+ 10021f9:	89 c6                	mov    esi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:76 (discriminator 2)
 		printchar (out, padchar);
- 10021f7:	89 ea                	mov    edx,ebp
- 10021f9:	89 f8                	mov    eax,edi
- 10021fb:	e8 2c ff ff ff       	call   100212c <printchar>
+ 10021fb:	89 ea                	mov    edx,ebp
+ 10021fd:	89 f8                	mov    eax,edi
+ 10021ff:	e8 2c ff ff ff       	call   1002130 <printchar>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:75 (discriminator 2)
 	}
 	for ( ; *string ; ++string) {
@@ -5852,12 +5851,12 @@ static int prints(char **out, const char *string, int width, int pad)
 		++pc;
 	}
 	for ( ; width > 0; --width) {
- 1002200:	83 ee 01             	sub    esi,0x1
- 1002203:	75 f2                	jne    10021f7 <prints+0xaf>
- 1002205:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
- 1002209:	8d 04 03             	lea    eax,[ebx+eax*1]
- 100220c:	89 c3                	mov    ebx,eax
- 100220e:	eb 2a                	jmp    100223a <prints+0xf2>
+ 1002204:	83 ee 01             	sub    esi,0x1
+ 1002207:	75 f2                	jne    10021fb <prints+0xaf>
+ 1002209:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+ 100220d:	8d 04 03             	lea    eax,[ebx+eax*1]
+ 1002210:	89 c3                	mov    ebx,eax
+ 1002212:	eb 2a                	jmp    100223e <prints+0xf2>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:66
 		if (len >= width) width = 0;
 		else width -= len;
@@ -5865,9 +5864,9 @@ static int prints(char **out, const char *string, int width, int pad)
 	}
 	if (!(pad & PAD_RIGHT)) {
 		for ( ; width > 0; --width) {
- 1002210:	89 5c 24 0c          	mov    DWORD PTR [esp+0xc],ebx
- 1002214:	bb 00 00 00 00       	mov    ebx,0x0
- 1002219:	eb 0a                	jmp    1002225 <prints+0xdd>
+ 1002214:	89 5c 24 0c          	mov    DWORD PTR [esp+0xc],ebx
+ 1002218:	bb 00 00 00 00       	mov    ebx,0x0
+ 100221d:	eb 0a                	jmp    1002229 <prints+0xdd>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:55
 #define PAD_RIGHT 1
 #define PAD_ZERO 2
@@ -5875,7 +5874,7 @@ static int prints(char **out, const char *string, int width, int pad)
 static int prints(char **out, const char *string, int width, int pad)
 {
 	register int pc = 0, padchar = ' ';
- 100221b:	bd 20 00 00 00       	mov    ebp,0x20
+ 100221f:	bd 20 00 00 00       	mov    ebp,0x20
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:65
 		for (ptr = string; *ptr; ++ptr) ++len;
 		if (len >= width) width = 0;
@@ -5883,7 +5882,7 @@ static int prints(char **out, const char *string, int width, int pad)
 		if (pad & PAD_ZERO) padchar = '0';
 	}
 	if (!(pad & PAD_RIGHT)) {
- 1002220:	bb 00 00 00 00       	mov    ebx,0x0
+ 1002224:	bb 00 00 00 00       	mov    ebx,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:71
 		for ( ; width > 0; --width) {
 			printchar (out, padchar);
@@ -5891,10 +5890,10 @@ static int prints(char **out, const char *string, int width, int pad)
 		}
 	}
 	for ( ; *string ; ++string) {
- 1002225:	0f b6 16             	movzx  edx,BYTE PTR [esi]
- 1002228:	84 d2                	test   dl,dl
- 100222a:	75 a3                	jne    10021cf <prints+0x87>
- 100222c:	eb 0c                	jmp    100223a <prints+0xf2>
+ 1002229:	0f b6 16             	movzx  edx,BYTE PTR [esi]
+ 100222c:	84 d2                	test   dl,dl
+ 100222e:	75 a3                	jne    10021d3 <prints+0x87>
+ 1002230:	eb 0c                	jmp    100223e <prints+0xf2>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:65
 		for (ptr = string; *ptr; ++ptr) ++len;
 		if (len >= width) width = 0;
@@ -5902,8 +5901,8 @@ static int prints(char **out, const char *string, int width, int pad)
 		if (pad & PAD_ZERO) padchar = '0';
 	}
 	if (!(pad & PAD_RIGHT)) {
- 100222e:	f6 c2 01             	test   dl,0x1
- 1002231:	74 e8                	je     100221b <prints+0xd3>
+ 1002232:	f6 c2 01             	test   dl,0x1
+ 1002235:	74 e8                	je     100221f <prints+0xd3>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:55
 #define PAD_RIGHT 1
 #define PAD_ZERO 2
@@ -5911,8 +5910,8 @@ static int prints(char **out, const char *string, int width, int pad)
 static int prints(char **out, const char *string, int width, int pad)
 {
 	register int pc = 0, padchar = ' ';
- 1002233:	bd 20 00 00 00       	mov    ebp,0x20
- 1002238:	eb 89                	jmp    10021c3 <prints+0x7b>
+ 1002237:	bd 20 00 00 00       	mov    ebp,0x20
+ 100223c:	eb 89                	jmp    10021c7 <prints+0x7b>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:81
 		printchar (out, padchar);
 		++pc;
@@ -5920,15 +5919,15 @@ static int prints(char **out, const char *string, int width, int pad)
 
 	return pc;
 }
- 100223a:	89 d8                	mov    eax,ebx
- 100223c:	83 c4 1c             	add    esp,0x1c
- 100223f:	5b                   	pop    ebx
- 1002240:	5e                   	pop    esi
- 1002241:	5f                   	pop    edi
- 1002242:	5d                   	pop    ebp
- 1002243:	c3                   	ret    
+ 100223e:	89 d8                	mov    eax,ebx
+ 1002240:	83 c4 1c             	add    esp,0x1c
+ 1002243:	5b                   	pop    ebx
+ 1002244:	5e                   	pop    esi
+ 1002245:	5f                   	pop    edi
+ 1002246:	5d                   	pop    ebp
+ 1002247:	c3                   	ret    
 
-01002244 <printi>:
+01002248 <printi>:
 printi():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:87
 
@@ -5937,12 +5936,12 @@ printi():
 
 static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
 {
- 1002244:	55                   	push   ebp
- 1002245:	57                   	push   edi
- 1002246:	56                   	push   esi
- 1002247:	53                   	push   ebx
- 1002248:	83 ec 2c             	sub    esp,0x2c
- 100224b:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
+ 1002248:	55                   	push   ebp
+ 1002249:	57                   	push   edi
+ 100224a:	56                   	push   esi
+ 100224b:	53                   	push   ebx
+ 100224c:	83 ec 2c             	sub    esp,0x2c
+ 100224f:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:93
 	char print_buf[PRINT_BUF_LEN];
 	register char *s;
@@ -5950,38 +5949,38 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	register unsigned int u = i;
 
 	if (i == 0) {
- 100224f:	85 d2                	test   edx,edx
- 1002251:	75 2a                	jne    100227d <printi+0x39>
+ 1002253:	85 d2                	test   edx,edx
+ 1002255:	75 2a                	jne    1002281 <printi+0x39>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:94
 		print_buf[0] = '0';
- 1002253:	c6 44 24 14 30       	mov    BYTE PTR [esp+0x14],0x30
+ 1002257:	c6 44 24 14 30       	mov    BYTE PTR [esp+0x14],0x30
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:95
 		print_buf[1] = '\0';
- 1002258:	c6 44 24 15 00       	mov    BYTE PTR [esp+0x15],0x0
+ 100225c:	c6 44 24 15 00       	mov    BYTE PTR [esp+0x15],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:96
 		return prints (out, print_buf, width, pad);
- 100225d:	83 ec 0c             	sub    esp,0xc
- 1002260:	ff 74 24 54          	push   DWORD PTR [esp+0x54]
- 1002264:	8b 4c 24 54          	mov    ecx,DWORD PTR [esp+0x54]
- 1002268:	8d 54 24 24          	lea    edx,[esp+0x24]
- 100226c:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
- 1002270:	e8 d3 fe ff ff       	call   1002148 <prints>
- 1002275:	83 c4 10             	add    esp,0x10
- 1002278:	e9 f1 00 00 00       	jmp    100236e <printi+0x12a>
+ 1002261:	83 ec 0c             	sub    esp,0xc
+ 1002264:	ff 74 24 54          	push   DWORD PTR [esp+0x54]
+ 1002268:	8b 4c 24 54          	mov    ecx,DWORD PTR [esp+0x54]
+ 100226c:	8d 54 24 24          	lea    edx,[esp+0x24]
+ 1002270:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
+ 1002274:	e8 d3 fe ff ff       	call   100214c <prints>
+ 1002279:	83 c4 10             	add    esp,0x10
+ 100227c:	e9 f1 00 00 00       	jmp    1002372 <printi+0x12a>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:99
 	}
 
 	if (sg && b == 10 && i < 0) {
- 100227d:	83 7c 24 40 00       	cmp    DWORD PTR [esp+0x40],0x0
- 1002282:	0f 95 c3             	setne  bl
- 1002285:	83 f9 0a             	cmp    ecx,0xa
- 1002288:	0f 94 c0             	sete   al
- 100228b:	84 c3                	test   bl,al
- 100228d:	0f 84 c1 00 00 00    	je     1002354 <printi+0x110>
- 1002293:	89 d0                	mov    eax,edx
- 1002295:	c1 e8 1f             	shr    eax,0x1f
- 1002298:	84 c0                	test   al,al
- 100229a:	0f 84 b4 00 00 00    	je     1002354 <printi+0x110>
+ 1002281:	83 7c 24 40 00       	cmp    DWORD PTR [esp+0x40],0x0
+ 1002286:	0f 95 c3             	setne  bl
+ 1002289:	83 f9 0a             	cmp    ecx,0xa
+ 100228c:	0f 94 c0             	sete   al
+ 100228f:	84 c3                	test   bl,al
+ 1002291:	0f 84 c1 00 00 00    	je     1002358 <printi+0x110>
+ 1002297:	89 d0                	mov    eax,edx
+ 1002299:	c1 e8 1f             	shr    eax,0x1f
+ 100229c:	84 c0                	test   al,al
+ 100229e:	0f 84 b4 00 00 00    	je     1002358 <printi+0x110>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:105
 		neg = 1;
 		u = -i;
@@ -5989,7 +5988,7 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 
 	s = print_buf + PRINT_BUF_LEN-1;
 	*s = '\0';
- 10022a0:	c6 44 24 1f 00       	mov    BYTE PTR [esp+0x1f],0x0
+ 10022a4:	c6 44 24 1f 00       	mov    BYTE PTR [esp+0x1f],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:104
 	if (sg && b == 10 && i < 0) {
 		neg = 1;
@@ -5997,14 +5996,14 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	}
 
 	s = print_buf + PRINT_BUF_LEN-1;
- 10022a5:	8d 74 24 1f          	lea    esi,[esp+0x1f]
+ 10022a9:	8d 74 24 1f          	lea    esi,[esp+0x1f]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:107
 	*s = '\0';
 
 	while (u) {
- 10022a9:	89 d3                	mov    ebx,edx
- 10022ab:	f7 db                	neg    ebx
- 10022ad:	74 54                	je     1002303 <printi+0xbf>
+ 10022ad:	89 d3                	mov    ebx,edx
+ 10022af:	f7 db                	neg    ebx
+ 10022b1:	74 54                	je     1002307 <printi+0xbf>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:100
 		print_buf[1] = '\0';
 		return prints (out, print_buf, width, pad);
@@ -6012,9 +6011,9 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 
 	if (sg && b == 10 && i < 0) {
 		neg = 1;
- 10022af:	c7 44 24 0c 01 00 00 	mov    DWORD PTR [esp+0xc],0x1
- 10022b6:	00 
- 10022b7:	eb 08                	jmp    10022c1 <printi+0x7d>
+ 10022b3:	c7 44 24 0c 01 00 00 	mov    DWORD PTR [esp+0xc],0x1
+ 10022ba:	00 
+ 10022bb:	eb 08                	jmp    10022c5 <printi+0x7d>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:90
 
 static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
@@ -6022,9 +6021,9 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	char print_buf[PRINT_BUF_LEN];
 	register char *s;
 	register int t, neg = 0, pc = 0;
- 10022b9:	c7 44 24 0c 00 00 00 	mov    DWORD PTR [esp+0xc],0x0
- 10022c0:	00 
- 10022c1:	8d 74 24 1f          	lea    esi,[esp+0x1f]
+ 10022bd:	c7 44 24 0c 00 00 00 	mov    DWORD PTR [esp+0xc],0x0
+ 10022c4:	00 
+ 10022c5:	8d 74 24 1f          	lea    esi,[esp+0x1f]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:108
 
 	s = print_buf + PRINT_BUF_LEN-1;
@@ -6032,12 +6031,12 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 
 	while (u) {
 		t = u % b;
- 10022c5:	89 cf                	mov    edi,ecx
+ 10022c9:	89 cf                	mov    edi,ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:110
 		if( t >= 10 )
 			t += letbase - '0' - 10;
- 10022c7:	8b 44 24 4c          	mov    eax,DWORD PTR [esp+0x4c]
- 10022cb:	8d 68 c6             	lea    ebp,[eax-0x3a]
+ 10022cb:	8b 44 24 4c          	mov    eax,DWORD PTR [esp+0x4c]
+ 10022cf:	8d 68 c6             	lea    ebp,[eax-0x3a]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:108
 
 	s = print_buf + PRINT_BUF_LEN-1;
@@ -6045,26 +6044,26 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 
 	while (u) {
 		t = u % b;
- 10022ce:	89 d8                	mov    eax,ebx
- 10022d0:	ba 00 00 00 00       	mov    edx,0x0
- 10022d5:	f7 f1                	div    ecx
+ 10022d2:	89 d8                	mov    eax,ebx
+ 10022d4:	ba 00 00 00 00       	mov    edx,0x0
+ 10022d9:	f7 f1                	div    ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:110
 		if( t >= 10 )
 			t += letbase - '0' - 10;
- 10022d7:	8d 04 2a             	lea    eax,[edx+ebp*1]
- 10022da:	83 fa 0a             	cmp    edx,0xa
- 10022dd:	0f 4c c2             	cmovl  eax,edx
+ 10022db:	8d 04 2a             	lea    eax,[edx+ebp*1]
+ 10022de:	83 fa 0a             	cmp    edx,0xa
+ 10022e1:	0f 4c c2             	cmovl  eax,edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:111
 		*--s = t + '0';
- 10022e0:	83 ee 01             	sub    esi,0x1
- 10022e3:	83 c0 30             	add    eax,0x30
- 10022e6:	88 06                	mov    BYTE PTR [esi],al
+ 10022e4:	83 ee 01             	sub    esi,0x1
+ 10022e7:	83 c0 30             	add    eax,0x30
+ 10022ea:	88 06                	mov    BYTE PTR [esi],al
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:112
 		u /= b;
- 10022e8:	89 d8                	mov    eax,ebx
- 10022ea:	ba 00 00 00 00       	mov    edx,0x0
- 10022ef:	f7 f7                	div    edi
- 10022f1:	89 c3                	mov    ebx,eax
+ 10022ec:	89 d8                	mov    eax,ebx
+ 10022ee:	ba 00 00 00 00       	mov    edx,0x0
+ 10022f3:	f7 f7                	div    edi
+ 10022f5:	89 c3                	mov    ebx,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:107
 	}
 
@@ -6072,8 +6071,8 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	*s = '\0';
 
 	while (u) {
- 10022f3:	85 c0                	test   eax,eax
- 10022f5:	75 d7                	jne    10022ce <printi+0x8a>
+ 10022f7:	85 c0                	test   eax,eax
+ 10022f9:	75 d7                	jne    10022d2 <printi+0x8a>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:90
 
 static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
@@ -6081,7 +6080,7 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	char print_buf[PRINT_BUF_LEN];
 	register char *s;
 	register int t, neg = 0, pc = 0;
- 10022f7:	bb 00 00 00 00       	mov    ebx,0x0
+ 10022fb:	bb 00 00 00 00       	mov    ebx,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:115
 			t += letbase - '0' - 10;
 		*--s = t + '0';
@@ -6089,24 +6088,24 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	}
 
 	if (neg) {
- 10022fc:	83 7c 24 0c 00       	cmp    DWORD PTR [esp+0xc],0x0
- 1002301:	74 34                	je     1002337 <printi+0xf3>
+ 1002300:	83 7c 24 0c 00       	cmp    DWORD PTR [esp+0xc],0x0
+ 1002305:	74 34                	je     100233b <printi+0xf3>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:116
 		if( width && (pad & PAD_ZERO) ) {
- 1002303:	83 7c 24 44 00       	cmp    DWORD PTR [esp+0x44],0x0
- 1002308:	74 21                	je     100232b <printi+0xe7>
+ 1002307:	83 7c 24 44 00       	cmp    DWORD PTR [esp+0x44],0x0
+ 100230c:	74 21                	je     100232f <printi+0xe7>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:116 (discriminator 1)
- 100230a:	f6 44 24 48 02       	test   BYTE PTR [esp+0x48],0x2
- 100230f:	74 1a                	je     100232b <printi+0xe7>
+ 100230e:	f6 44 24 48 02       	test   BYTE PTR [esp+0x48],0x2
+ 1002313:	74 1a                	je     100232f <printi+0xe7>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:117
 			printchar (out, '-');
- 1002311:	ba 2d 00 00 00       	mov    edx,0x2d
- 1002316:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
- 100231a:	e8 0d fe ff ff       	call   100212c <printchar>
+ 1002315:	ba 2d 00 00 00       	mov    edx,0x2d
+ 100231a:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+ 100231e:	e8 0d fe ff ff       	call   1002130 <printchar>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:119
 			++pc;
 			--width;
- 100231f:	83 6c 24 44 01       	sub    DWORD PTR [esp+0x44],0x1
+ 1002323:	83 6c 24 44 01       	sub    DWORD PTR [esp+0x44],0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:118
 	}
 
@@ -6114,16 +6113,16 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 		if( width && (pad & PAD_ZERO) ) {
 			printchar (out, '-');
 			++pc;
- 1002324:	bb 01 00 00 00       	mov    ebx,0x1
+ 1002328:	bb 01 00 00 00       	mov    ebx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:119
 			--width;
- 1002329:	eb 0c                	jmp    1002337 <printi+0xf3>
+ 100232d:	eb 0c                	jmp    100233b <printi+0xf3>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:122
 		}
 		else {
 			*--s = '-';
- 100232b:	c6 46 ff 2d          	mov    BYTE PTR [esi-0x1],0x2d
- 100232f:	8d 76 ff             	lea    esi,[esi-0x1]
+ 100232f:	c6 46 ff 2d          	mov    BYTE PTR [esi-0x1],0x2d
+ 1002333:	8d 76 ff             	lea    esi,[esi-0x1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:90
 
 static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
@@ -6131,7 +6130,7 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	char print_buf[PRINT_BUF_LEN];
 	register char *s;
 	register int t, neg = 0, pc = 0;
- 1002332:	bb 00 00 00 00       	mov    ebx,0x0
+ 1002336:	bb 00 00 00 00       	mov    ebx,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:126
 		else {
 			*--s = '-';
@@ -6139,15 +6138,15 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	}
 
 	return pc + prints (out, s, width, pad);
- 1002337:	83 ec 0c             	sub    esp,0xc
- 100233a:	ff 74 24 54          	push   DWORD PTR [esp+0x54]
- 100233e:	8b 4c 24 54          	mov    ecx,DWORD PTR [esp+0x54]
- 1002342:	89 f2                	mov    edx,esi
- 1002344:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
- 1002348:	e8 fb fd ff ff       	call   1002148 <prints>
- 100234d:	01 d8                	add    eax,ebx
- 100234f:	83 c4 10             	add    esp,0x10
- 1002352:	eb 1a                	jmp    100236e <printi+0x12a>
+ 100233b:	83 ec 0c             	sub    esp,0xc
+ 100233e:	ff 74 24 54          	push   DWORD PTR [esp+0x54]
+ 1002342:	8b 4c 24 54          	mov    ecx,DWORD PTR [esp+0x54]
+ 1002346:	89 f2                	mov    edx,esi
+ 1002348:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
+ 100234c:	e8 fb fd ff ff       	call   100214c <prints>
+ 1002351:	01 d8                	add    eax,ebx
+ 1002353:	83 c4 10             	add    esp,0x10
+ 1002356:	eb 1a                	jmp    1002372 <printi+0x12a>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:91
 static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
 {
@@ -6155,7 +6154,7 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	register char *s;
 	register int t, neg = 0, pc = 0;
 	register unsigned int u = i;
- 1002354:	89 d3                	mov    ebx,edx
+ 1002358:	89 d3                	mov    ebx,edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:105
 		neg = 1;
 		u = -i;
@@ -6163,12 +6162,12 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 
 	s = print_buf + PRINT_BUF_LEN-1;
 	*s = '\0';
- 1002356:	c6 44 24 1f 00       	mov    BYTE PTR [esp+0x1f],0x0
+ 100235a:	c6 44 24 1f 00       	mov    BYTE PTR [esp+0x1f],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:107
 
 	while (u) {
- 100235b:	85 d2                	test   edx,edx
- 100235d:	0f 85 56 ff ff ff    	jne    10022b9 <printi+0x75>
+ 100235f:	85 d2                	test   edx,edx
+ 1002361:	0f 85 56 ff ff ff    	jne    10022bd <printi+0x75>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:90
 
 static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
@@ -6176,7 +6175,7 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	char print_buf[PRINT_BUF_LEN];
 	register char *s;
 	register int t, neg = 0, pc = 0;
- 1002363:	bb 00 00 00 00       	mov    ebx,0x0
+ 1002367:	bb 00 00 00 00       	mov    ebx,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:104
 	if (sg && b == 10 && i < 0) {
 		neg = 1;
@@ -6184,8 +6183,8 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	}
 
 	s = print_buf + PRINT_BUF_LEN-1;
- 1002368:	8d 74 24 1f          	lea    esi,[esp+0x1f]
- 100236c:	eb c9                	jmp    1002337 <printi+0xf3>
+ 100236c:	8d 74 24 1f          	lea    esi,[esp+0x1f]
+ 1002370:	eb c9                	jmp    100233b <printi+0xf3>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:127
 			*--s = '-';
 		}
@@ -6193,54 +6192,54 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 
 	return pc + prints (out, s, width, pad);
 }
- 100236e:	83 c4 2c             	add    esp,0x2c
- 1002371:	5b                   	pop    ebx
- 1002372:	5e                   	pop    esi
- 1002373:	5f                   	pop    edi
- 1002374:	5d                   	pop    ebp
- 1002375:	c3                   	ret    
+ 1002372:	83 c4 2c             	add    esp,0x2c
+ 1002375:	5b                   	pop    ebx
+ 1002376:	5e                   	pop    esi
+ 1002377:	5f                   	pop    edi
+ 1002378:	5d                   	pop    ebp
+ 1002379:	c3                   	ret    
 
-01002376 <print>:
+0100237a <print>:
 print():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:130
 
 static int print(char **out, const char *format, va_list args )
 {
- 1002376:	55                   	push   ebp
- 1002377:	57                   	push   edi
- 1002378:	56                   	push   esi
- 1002379:	53                   	push   ebx
- 100237a:	83 ec 2c             	sub    esp,0x2c
- 100237d:	89 c7                	mov    edi,eax
- 100237f:	89 4c 24 0c          	mov    DWORD PTR [esp+0xc],ecx
+ 100237a:	55                   	push   ebp
+ 100237b:	57                   	push   edi
+ 100237c:	56                   	push   esi
+ 100237d:	53                   	push   ebx
+ 100237e:	83 ec 2c             	sub    esp,0x2c
+ 1002381:	89 c7                	mov    edi,eax
+ 1002383:	89 4c 24 0c          	mov    DWORD PTR [esp+0xc],ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:135
 	register int width, pad;
 	register int pc = 0;
 	char scr[2];
 
 	for (; *format != 0; ++format) {
- 1002383:	0f b6 02             	movzx  eax,BYTE PTR [edx]
- 1002386:	84 c0                	test   al,al
- 1002388:	0f 84 b8 01 00 00    	je     1002546 <print+0x1d0>
- 100238e:	89 d5                	mov    ebp,edx
- 1002390:	be 00 00 00 00       	mov    esi,0x0
+ 1002387:	0f b6 02             	movzx  eax,BYTE PTR [edx]
+ 100238a:	84 c0                	test   al,al
+ 100238c:	0f 84 b8 01 00 00    	je     100254a <print+0x1d0>
+ 1002392:	89 d5                	mov    ebp,edx
+ 1002394:	be 00 00 00 00       	mov    esi,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:136
 		if (*format == '%') {
- 1002395:	3c 25                	cmp    al,0x25
- 1002397:	0f 85 88 01 00 00    	jne    1002525 <print+0x1af>
+ 1002399:	3c 25                	cmp    al,0x25
+ 100239b:	0f 85 88 01 00 00    	jne    1002529 <print+0x1af>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:137
 			++format;
- 100239d:	8d 5d 01             	lea    ebx,[ebp+0x1]
+ 10023a1:	8d 5d 01             	lea    ebx,[ebp+0x1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:139
 			width = pad = 0;
 			if (*format == '\0') break;
- 10023a0:	0f b6 55 01          	movzx  edx,BYTE PTR [ebp+0x1]
- 10023a4:	84 d2                	test   dl,dl
- 10023a6:	0f 84 9f 01 00 00    	je     100254b <print+0x1d5>
+ 10023a4:	0f b6 55 01          	movzx  edx,BYTE PTR [ebp+0x1]
+ 10023a8:	84 d2                	test   dl,dl
+ 10023aa:	0f 84 9f 01 00 00    	je     100254f <print+0x1d5>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:140
 			if (*format == '%') goto out;
- 10023ac:	80 fa 25             	cmp    dl,0x25
- 10023af:	0f 84 6e 01 00 00    	je     1002523 <print+0x1ad>
+ 10023b0:	80 fa 25             	cmp    dl,0x25
+ 10023b3:	0f 84 6e 01 00 00    	je     1002527 <print+0x1ad>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:138
 	char scr[2];
 
@@ -6248,30 +6247,30 @@ static int print(char **out, const char *format, va_list args )
 		if (*format == '%') {
 			++format;
 			width = pad = 0;
- 10023b5:	b8 00 00 00 00       	mov    eax,0x0
+ 10023b9:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:141
 			if (*format == '\0') break;
 			if (*format == '%') goto out;
 			if (*format == '-') {
- 10023ba:	80 fa 2d             	cmp    dl,0x2d
- 10023bd:	75 08                	jne    10023c7 <print+0x51>
+ 10023be:	80 fa 2d             	cmp    dl,0x2d
+ 10023c1:	75 08                	jne    10023cb <print+0x51>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:142
 				++format;
- 10023bf:	8d 5d 02             	lea    ebx,[ebp+0x2]
+ 10023c3:	8d 5d 02             	lea    ebx,[ebp+0x2]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:143
 				pad = PAD_RIGHT;
- 10023c2:	b8 01 00 00 00       	mov    eax,0x1
+ 10023c6:	b8 01 00 00 00       	mov    eax,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:145
 			}
 			while (*format == '0') {
- 10023c7:	80 3b 30             	cmp    BYTE PTR [ebx],0x30
- 10023ca:	75 0b                	jne    10023d7 <print+0x61>
+ 10023cb:	80 3b 30             	cmp    BYTE PTR [ebx],0x30
+ 10023ce:	75 0b                	jne    10023db <print+0x61>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:146
 				++format;
- 10023cc:	83 c3 01             	add    ebx,0x1
+ 10023d0:	83 c3 01             	add    ebx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:147
 				pad |= PAD_ZERO;
- 10023cf:	83 c8 02             	or     eax,0x2
+ 10023d3:	83 c8 02             	or     eax,0x2
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:145
 			if (*format == '%') goto out;
 			if (*format == '-') {
@@ -6279,27 +6278,27 @@ static int print(char **out, const char *format, va_list args )
 				pad = PAD_RIGHT;
 			}
 			while (*format == '0') {
- 10023d2:	80 3b 30             	cmp    BYTE PTR [ebx],0x30
- 10023d5:	74 f5                	je     10023cc <print+0x56>
+ 10023d6:	80 3b 30             	cmp    BYTE PTR [ebx],0x30
+ 10023d9:	74 f5                	je     10023d0 <print+0x56>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:149 (discriminator 1)
 				++format;
 				pad |= PAD_ZERO;
 			}
 			for ( ; *format >= '0' && *format <= '9'; ++format) {
- 10023d7:	0f b6 13             	movzx  edx,BYTE PTR [ebx]
- 10023da:	8d 4a d0             	lea    ecx,[edx-0x30]
- 10023dd:	80 f9 09             	cmp    cl,0x9
- 10023e0:	77 22                	ja     1002404 <print+0x8e>
+ 10023db:	0f b6 13             	movzx  edx,BYTE PTR [ebx]
+ 10023de:	8d 4a d0             	lea    ecx,[edx-0x30]
+ 10023e1:	80 f9 09             	cmp    cl,0x9
+ 10023e4:	77 22                	ja     1002408 <print+0x8e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:149
- 10023e2:	b9 00 00 00 00       	mov    ecx,0x0
- 10023e7:	89 c5                	mov    ebp,eax
+ 10023e6:	b9 00 00 00 00       	mov    ecx,0x0
+ 10023eb:	89 c5                	mov    ebp,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:150 (discriminator 2)
 				width *= 10;
- 10023e9:	8d 04 89             	lea    eax,[ecx+ecx*4]
+ 10023ed:	8d 04 89             	lea    eax,[ecx+ecx*4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:151 (discriminator 2)
 				width += *format - '0';
- 10023ec:	0f be d2             	movsx  edx,dl
- 10023ef:	8d 4c 42 d0          	lea    ecx,[edx+eax*2-0x30]
+ 10023f0:	0f be d2             	movsx  edx,dl
+ 10023f3:	8d 4c 42 d0          	lea    ecx,[edx+eax*2-0x30]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:149 (discriminator 2)
 			}
 			while (*format == '0') {
@@ -6307,63 +6306,63 @@ static int print(char **out, const char *format, va_list args )
 				pad |= PAD_ZERO;
 			}
 			for ( ; *format >= '0' && *format <= '9'; ++format) {
- 10023f3:	83 c3 01             	add    ebx,0x1
- 10023f6:	0f b6 13             	movzx  edx,BYTE PTR [ebx]
- 10023f9:	8d 42 d0             	lea    eax,[edx-0x30]
- 10023fc:	3c 09                	cmp    al,0x9
- 10023fe:	76 e9                	jbe    10023e9 <print+0x73>
- 1002400:	89 e8                	mov    eax,ebp
- 1002402:	eb 05                	jmp    1002409 <print+0x93>
+ 10023f7:	83 c3 01             	add    ebx,0x1
+ 10023fa:	0f b6 13             	movzx  edx,BYTE PTR [ebx]
+ 10023fd:	8d 42 d0             	lea    eax,[edx-0x30]
+ 1002400:	3c 09                	cmp    al,0x9
+ 1002402:	76 e9                	jbe    10023ed <print+0x73>
+ 1002404:	89 e8                	mov    eax,ebp
+ 1002406:	eb 05                	jmp    100240d <print+0x93>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:149
- 1002404:	b9 00 00 00 00       	mov    ecx,0x0
+ 1002408:	b9 00 00 00 00       	mov    ecx,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:153
 				width *= 10;
 				width += *format - '0';
 			}
 			if( *format == 's' ) {
- 1002409:	80 fa 73             	cmp    dl,0x73
- 100240c:	75 2c                	jne    100243a <print+0xc4>
+ 100240d:	80 fa 73             	cmp    dl,0x73
+ 1002410:	75 2c                	jne    100243e <print+0xc4>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:154
 				register char *s = (char *)va_arg( args, int );
- 100240e:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
- 1002412:	8d 6a 04             	lea    ebp,[edx+0x4]
- 1002415:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
- 1002419:	8b 12                	mov    edx,DWORD PTR [edx]
+ 1002412:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+ 1002416:	8d 6a 04             	lea    ebp,[edx+0x4]
+ 1002419:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
+ 100241d:	8b 12                	mov    edx,DWORD PTR [edx]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:155
 				pc += prints (out, s?s:"(null)", width, pad);
- 100241b:	85 d2                	test   edx,edx
- 100241d:	bd cc 75 00 01       	mov    ebp,0x10075cc
- 1002422:	0f 44 d5             	cmove  edx,ebp
- 1002425:	83 ec 0c             	sub    esp,0xc
- 1002428:	50                   	push   eax
- 1002429:	89 f8                	mov    eax,edi
- 100242b:	e8 18 fd ff ff       	call   1002148 <prints>
- 1002430:	01 c6                	add    esi,eax
+ 100241f:	85 d2                	test   edx,edx
+ 1002421:	bd c8 78 00 01       	mov    ebp,0x10078c8
+ 1002426:	0f 44 d5             	cmove  edx,ebp
+ 1002429:	83 ec 0c             	sub    esp,0xc
+ 100242c:	50                   	push   eax
+ 100242d:	89 f8                	mov    eax,edi
+ 100242f:	e8 18 fd ff ff       	call   100214c <prints>
+ 1002434:	01 c6                	add    esi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:156
 				continue;
- 1002432:	83 c4 10             	add    esp,0x10
- 1002435:	e9 fb 00 00 00       	jmp    1002535 <print+0x1bf>
+ 1002436:	83 c4 10             	add    esp,0x10
+ 1002439:	e9 fb 00 00 00       	jmp    1002539 <print+0x1bf>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:158
 			}
 			if( *format == 'd' ) {
- 100243a:	80 fa 64             	cmp    dl,0x64
- 100243d:	75 29                	jne    1002468 <print+0xf2>
+ 100243e:	80 fa 64             	cmp    dl,0x64
+ 1002441:	75 29                	jne    100246c <print+0xf2>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:159
 				pc += printi (out, va_arg( args, int ), 10, 1, width, pad, 'a');
- 100243f:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
- 1002443:	8d 6a 04             	lea    ebp,[edx+0x4]
- 1002446:	6a 61                	push   0x61
- 1002448:	50                   	push   eax
- 1002449:	51                   	push   ecx
- 100244a:	6a 01                	push   0x1
- 100244c:	b9 0a 00 00 00       	mov    ecx,0xa
- 1002451:	8b 12                	mov    edx,DWORD PTR [edx]
- 1002453:	89 f8                	mov    eax,edi
- 1002455:	e8 ea fd ff ff       	call   1002244 <printi>
- 100245a:	01 c6                	add    esi,eax
+ 1002443:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+ 1002447:	8d 6a 04             	lea    ebp,[edx+0x4]
+ 100244a:	6a 61                	push   0x61
+ 100244c:	50                   	push   eax
+ 100244d:	51                   	push   ecx
+ 100244e:	6a 01                	push   0x1
+ 1002450:	b9 0a 00 00 00       	mov    ecx,0xa
+ 1002455:	8b 12                	mov    edx,DWORD PTR [edx]
+ 1002457:	89 f8                	mov    eax,edi
+ 1002459:	e8 ea fd ff ff       	call   1002248 <printi>
+ 100245e:	01 c6                	add    esi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:160
 				continue;
- 100245c:	83 c4 10             	add    esp,0x10
+ 1002460:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:159
 				register char *s = (char *)va_arg( args, int );
 				pc += prints (out, s?s:"(null)", width, pad);
@@ -6371,55 +6370,55 @@ static int print(char **out, const char *format, va_list args )
 			}
 			if( *format == 'd' ) {
 				pc += printi (out, va_arg( args, int ), 10, 1, width, pad, 'a');
- 100245f:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
+ 1002463:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:160
 				continue;
- 1002463:	e9 cd 00 00 00       	jmp    1002535 <print+0x1bf>
+ 1002467:	e9 cd 00 00 00       	jmp    1002539 <print+0x1bf>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:162
 			}
 			if( *format == 'x' ) {
- 1002468:	80 fa 78             	cmp    dl,0x78
- 100246b:	75 2b                	jne    1002498 <print+0x122>
+ 100246c:	80 fa 78             	cmp    dl,0x78
+ 100246f:	75 2b                	jne    100249c <print+0x122>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:163
 				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'a');
- 100246d:	8b 6c 24 0c          	mov    ebp,DWORD PTR [esp+0xc]
- 1002471:	89 ea                	mov    edx,ebp
- 1002473:	83 c5 04             	add    ebp,0x4
- 1002476:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
- 100247a:	6a 61                	push   0x61
- 100247c:	50                   	push   eax
- 100247d:	51                   	push   ecx
- 100247e:	6a 00                	push   0x0
- 1002480:	b9 10 00 00 00       	mov    ecx,0x10
- 1002485:	8b 12                	mov    edx,DWORD PTR [edx]
- 1002487:	89 f8                	mov    eax,edi
- 1002489:	e8 b6 fd ff ff       	call   1002244 <printi>
- 100248e:	01 c6                	add    esi,eax
+ 1002471:	8b 6c 24 0c          	mov    ebp,DWORD PTR [esp+0xc]
+ 1002475:	89 ea                	mov    edx,ebp
+ 1002477:	83 c5 04             	add    ebp,0x4
+ 100247a:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
+ 100247e:	6a 61                	push   0x61
+ 1002480:	50                   	push   eax
+ 1002481:	51                   	push   ecx
+ 1002482:	6a 00                	push   0x0
+ 1002484:	b9 10 00 00 00       	mov    ecx,0x10
+ 1002489:	8b 12                	mov    edx,DWORD PTR [edx]
+ 100248b:	89 f8                	mov    eax,edi
+ 100248d:	e8 b6 fd ff ff       	call   1002248 <printi>
+ 1002492:	01 c6                	add    esi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:164
 				continue;
- 1002490:	83 c4 10             	add    esp,0x10
- 1002493:	e9 9d 00 00 00       	jmp    1002535 <print+0x1bf>
+ 1002494:	83 c4 10             	add    esp,0x10
+ 1002497:	e9 9d 00 00 00       	jmp    1002539 <print+0x1bf>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:166
 			}
 			if( *format == 'X' ) {
- 1002498:	80 fa 58             	cmp    dl,0x58
- 100249b:	75 26                	jne    10024c3 <print+0x14d>
+ 100249c:	80 fa 58             	cmp    dl,0x58
+ 100249f:	75 26                	jne    10024c7 <print+0x14d>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:167
 				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'A');
- 100249d:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
- 10024a1:	8d 6a 04             	lea    ebp,[edx+0x4]
- 10024a4:	6a 41                	push   0x41
- 10024a6:	50                   	push   eax
- 10024a7:	51                   	push   ecx
- 10024a8:	6a 00                	push   0x0
- 10024aa:	b9 10 00 00 00       	mov    ecx,0x10
- 10024af:	8b 12                	mov    edx,DWORD PTR [edx]
- 10024b1:	89 f8                	mov    eax,edi
- 10024b3:	e8 8c fd ff ff       	call   1002244 <printi>
- 10024b8:	01 c6                	add    esi,eax
+ 10024a1:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+ 10024a5:	8d 6a 04             	lea    ebp,[edx+0x4]
+ 10024a8:	6a 41                	push   0x41
+ 10024aa:	50                   	push   eax
+ 10024ab:	51                   	push   ecx
+ 10024ac:	6a 00                	push   0x0
+ 10024ae:	b9 10 00 00 00       	mov    ecx,0x10
+ 10024b3:	8b 12                	mov    edx,DWORD PTR [edx]
+ 10024b5:	89 f8                	mov    eax,edi
+ 10024b7:	e8 8c fd ff ff       	call   1002248 <printi>
+ 10024bc:	01 c6                	add    esi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:168
 				continue;
- 10024ba:	83 c4 10             	add    esp,0x10
+ 10024be:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:167
 			if( *format == 'x' ) {
 				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'a');
@@ -6427,63 +6426,63 @@ static int print(char **out, const char *format, va_list args )
 			}
 			if( *format == 'X' ) {
 				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'A');
- 10024bd:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
+ 10024c1:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:168
 				continue;
- 10024c1:	eb 72                	jmp    1002535 <print+0x1bf>
+ 10024c5:	eb 72                	jmp    1002539 <print+0x1bf>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:170
 			}
 			if( *format == 'u' ) {
- 10024c3:	80 fa 75             	cmp    dl,0x75
- 10024c6:	75 28                	jne    10024f0 <print+0x17a>
+ 10024c7:	80 fa 75             	cmp    dl,0x75
+ 10024ca:	75 28                	jne    10024f4 <print+0x17a>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:171
 				pc += printi (out, va_arg( args, int ), 10, 0, width, pad, 'a');
- 10024c8:	8b 6c 24 0c          	mov    ebp,DWORD PTR [esp+0xc]
- 10024cc:	89 ea                	mov    edx,ebp
- 10024ce:	83 c5 04             	add    ebp,0x4
- 10024d1:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
- 10024d5:	6a 61                	push   0x61
- 10024d7:	50                   	push   eax
- 10024d8:	51                   	push   ecx
- 10024d9:	6a 00                	push   0x0
- 10024db:	b9 0a 00 00 00       	mov    ecx,0xa
- 10024e0:	8b 12                	mov    edx,DWORD PTR [edx]
- 10024e2:	89 f8                	mov    eax,edi
- 10024e4:	e8 5b fd ff ff       	call   1002244 <printi>
- 10024e9:	01 c6                	add    esi,eax
+ 10024cc:	8b 6c 24 0c          	mov    ebp,DWORD PTR [esp+0xc]
+ 10024d0:	89 ea                	mov    edx,ebp
+ 10024d2:	83 c5 04             	add    ebp,0x4
+ 10024d5:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
+ 10024d9:	6a 61                	push   0x61
+ 10024db:	50                   	push   eax
+ 10024dc:	51                   	push   ecx
+ 10024dd:	6a 00                	push   0x0
+ 10024df:	b9 0a 00 00 00       	mov    ecx,0xa
+ 10024e4:	8b 12                	mov    edx,DWORD PTR [edx]
+ 10024e6:	89 f8                	mov    eax,edi
+ 10024e8:	e8 5b fd ff ff       	call   1002248 <printi>
+ 10024ed:	01 c6                	add    esi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:172
 				continue;
- 10024eb:	83 c4 10             	add    esp,0x10
- 10024ee:	eb 45                	jmp    1002535 <print+0x1bf>
+ 10024ef:	83 c4 10             	add    esp,0x10
+ 10024f2:	eb 45                	jmp    1002539 <print+0x1bf>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:174
 			}
 			if( *format == 'c' ) {
- 10024f0:	80 fa 63             	cmp    dl,0x63
- 10024f3:	75 40                	jne    1002535 <print+0x1bf>
+ 10024f4:	80 fa 63             	cmp    dl,0x63
+ 10024f7:	75 40                	jne    1002539 <print+0x1bf>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:176
 				/* char are converted to int then pushed on the stack */
 				scr[0] = (char)va_arg( args, int );
- 10024f5:	8b 6c 24 0c          	mov    ebp,DWORD PTR [esp+0xc]
- 10024f9:	89 ea                	mov    edx,ebp
- 10024fb:	83 c5 04             	add    ebp,0x4
- 10024fe:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
- 1002502:	8b 12                	mov    edx,DWORD PTR [edx]
- 1002504:	88 54 24 1e          	mov    BYTE PTR [esp+0x1e],dl
+ 10024f9:	8b 6c 24 0c          	mov    ebp,DWORD PTR [esp+0xc]
+ 10024fd:	89 ea                	mov    edx,ebp
+ 10024ff:	83 c5 04             	add    ebp,0x4
+ 1002502:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
+ 1002506:	8b 12                	mov    edx,DWORD PTR [edx]
+ 1002508:	88 54 24 1e          	mov    BYTE PTR [esp+0x1e],dl
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:177
 				scr[1] = '\0';
- 1002508:	c6 44 24 1f 00       	mov    BYTE PTR [esp+0x1f],0x0
+ 100250c:	c6 44 24 1f 00       	mov    BYTE PTR [esp+0x1f],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:178
 				pc += prints (out, scr, width, pad);
- 100250d:	83 ec 0c             	sub    esp,0xc
- 1002510:	50                   	push   eax
- 1002511:	8d 54 24 2e          	lea    edx,[esp+0x2e]
- 1002515:	89 f8                	mov    eax,edi
- 1002517:	e8 2c fc ff ff       	call   1002148 <prints>
- 100251c:	01 c6                	add    esi,eax
+ 1002511:	83 ec 0c             	sub    esp,0xc
+ 1002514:	50                   	push   eax
+ 1002515:	8d 54 24 2e          	lea    edx,[esp+0x2e]
+ 1002519:	89 f8                	mov    eax,edi
+ 100251b:	e8 2c fc ff ff       	call   100214c <prints>
+ 1002520:	01 c6                	add    esi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:179
 				continue;
- 100251e:	83 c4 10             	add    esp,0x10
- 1002521:	eb 12                	jmp    1002535 <print+0x1bf>
+ 1002522:	83 c4 10             	add    esp,0x10
+ 1002525:	eb 12                	jmp    1002539 <print+0x1bf>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:137
 	register int pc = 0;
 	char scr[2];
@@ -6491,7 +6490,7 @@ static int print(char **out, const char *format, va_list args )
 	for (; *format != 0; ++format) {
 		if (*format == '%') {
 			++format;
- 1002523:	89 dd                	mov    ebp,ebx
+ 1002527:	89 dd                	mov    ebp,ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:184
 				continue;
 			}
@@ -6499,13 +6498,13 @@ static int print(char **out, const char *format, va_list args )
 		else {
 		out:
 			printchar (out, *format);
- 1002525:	0f be 55 00          	movsx  edx,BYTE PTR [ebp+0x0]
- 1002529:	89 f8                	mov    eax,edi
- 100252b:	e8 fc fb ff ff       	call   100212c <printchar>
+ 1002529:	0f be 55 00          	movsx  edx,BYTE PTR [ebp+0x0]
+ 100252d:	89 f8                	mov    eax,edi
+ 100252f:	e8 fc fb ff ff       	call   1002130 <printchar>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:185
 			++pc;
- 1002530:	83 c6 01             	add    esi,0x1
- 1002533:	89 eb                	mov    ebx,ebp
+ 1002534:	83 c6 01             	add    esi,0x1
+ 1002537:	89 eb                	mov    ebx,ebp
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:135
 {
 	register int width, pad;
@@ -6513,11 +6512,11 @@ static int print(char **out, const char *format, va_list args )
 	char scr[2];
 
 	for (; *format != 0; ++format) {
- 1002535:	8d 6b 01             	lea    ebp,[ebx+0x1]
- 1002538:	0f b6 43 01          	movzx  eax,BYTE PTR [ebx+0x1]
- 100253c:	84 c0                	test   al,al
- 100253e:	0f 85 51 fe ff ff    	jne    1002395 <print+0x1f>
- 1002544:	eb 05                	jmp    100254b <print+0x1d5>
+ 1002539:	8d 6b 01             	lea    ebp,[ebx+0x1]
+ 100253c:	0f b6 43 01          	movzx  eax,BYTE PTR [ebx+0x1]
+ 1002540:	84 c0                	test   al,al
+ 1002542:	0f 85 51 fe ff ff    	jne    1002399 <print+0x1f>
+ 1002548:	eb 05                	jmp    100254f <print+0x1d5>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:132
 }
 
@@ -6525,7 +6524,7 @@ static int print(char **out, const char *format, va_list args )
 {
 	register int width, pad;
 	register int pc = 0;
- 1002546:	be 00 00 00 00       	mov    esi,0x0
+ 100254a:	be 00 00 00 00       	mov    esi,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:188
 		out:
 			printchar (out, *format);
@@ -6533,64 +6532,64 @@ static int print(char **out, const char *format, va_list args )
 		}
 	}
 	if (out) **out = '\0';
- 100254b:	85 ff                	test   edi,edi
- 100254d:	74 05                	je     1002554 <print+0x1de>
+ 100254f:	85 ff                	test   edi,edi
+ 1002551:	74 05                	je     1002558 <print+0x1de>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:188 (discriminator 1)
- 100254f:	8b 07                	mov    eax,DWORD PTR [edi]
- 1002551:	c6 00 00             	mov    BYTE PTR [eax],0x0
+ 1002553:	8b 07                	mov    eax,DWORD PTR [edi]
+ 1002555:	c6 00 00             	mov    BYTE PTR [eax],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:191
 	va_end( args );
 	return pc;
 }
- 1002554:	89 f0                	mov    eax,esi
- 1002556:	83 c4 2c             	add    esp,0x2c
- 1002559:	5b                   	pop    ebx
- 100255a:	5e                   	pop    esi
- 100255b:	5f                   	pop    edi
- 100255c:	5d                   	pop    ebp
- 100255d:	c3                   	ret    
+ 1002558:	89 f0                	mov    eax,esi
+ 100255a:	83 c4 2c             	add    esp,0x2c
+ 100255d:	5b                   	pop    ebx
+ 100255e:	5e                   	pop    esi
+ 100255f:	5f                   	pop    edi
+ 1002560:	5d                   	pop    ebp
+ 1002561:	c3                   	ret    
 
-0100255e <printk_valist>:
+01002562 <printk_valist>:
 printk_valist():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:194
 
 int printk_valist(const char *format, va_list args)
 {
- 100255e:	83 ec 0c             	sub    esp,0xc
+ 1002562:	83 ec 0c             	sub    esp,0xc
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:195
     return print(0, format, args);
- 1002561:	8b 4c 24 14          	mov    ecx,DWORD PTR [esp+0x14]
- 1002565:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
- 1002569:	b8 00 00 00 00       	mov    eax,0x0
- 100256e:	e8 03 fe ff ff       	call   1002376 <print>
+ 1002565:	8b 4c 24 14          	mov    ecx,DWORD PTR [esp+0x14]
+ 1002569:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+ 100256d:	b8 00 00 00 00       	mov    eax,0x0
+ 1002572:	e8 03 fe ff ff       	call   100237a <print>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:196
 }
- 1002573:	83 c4 0c             	add    esp,0xc
- 1002576:	c3                   	ret    
+ 1002577:	83 c4 0c             	add    esp,0xc
+ 100257a:	c3                   	ret    
 
-01002577 <printk>:
+0100257b <printk>:
 printk():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:199
 
 int printk(const char *format, ...)
 {
- 1002577:	83 ec 0c             	sub    esp,0xc
+ 100257b:	83 ec 0c             	sub    esp,0xc
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:201
         va_list args;
         va_start( args, format );
- 100257a:	8d 44 24 14          	lea    eax,[esp+0x14]
+ 100257e:	8d 44 24 14          	lea    eax,[esp+0x14]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:202
         return printk_valist(format, args);
- 100257e:	83 ec 08             	sub    esp,0x8
- 1002581:	50                   	push   eax
- 1002582:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
- 1002586:	e8 d3 ff ff ff       	call   100255e <printk_valist>
+ 1002582:	83 ec 08             	sub    esp,0x8
+ 1002585:	50                   	push   eax
+ 1002586:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 100258a:	e8 d3 ff ff ff       	call   1002562 <printk_valist>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:203
 }
- 100258b:	83 c4 1c             	add    esp,0x1c
- 100258e:	c3                   	ret    
+ 100258f:	83 c4 1c             	add    esp,0x1c
+ 1002592:	c3                   	ret    
 
-0100258f <printd>:
+01002593 <printd>:
 printd():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:209
 
@@ -6599,12 +6598,12 @@ int printd() {}
 #else
 int printd(uint32_t DebugLevel, const char *format, ...)
 {
- 100258f:	83 ec 0c             	sub    esp,0xc
- 1002592:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+ 1002593:	83 ec 0c             	sub    esp,0xc
+ 1002596:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:210
     if ((kDebugLevel & DebugLevel) == DebugLevel)    
- 1002596:	89 d1                	mov    ecx,edx
- 1002598:	23 0d 38 03 12 00    	and    ecx,DWORD PTR ds:0x120338
+ 100259a:	89 d1                	mov    ecx,edx
+ 100259c:	23 0d 38 03 12 00    	and    ecx,DWORD PTR ds:0x120338
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:222
 //            pauseDisplay(false);
 //            printDLineCount=0;
@@ -6612,7 +6611,7 @@ int printd(uint32_t DebugLevel, const char *format, ...)
         return printk_valist(format, args);
     }
     return 0;
- 100259e:	b8 00 00 00 00       	mov    eax,0x0
+ 10025a2:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:210
 #ifdef DEBUG_NONE
 int printd() {}
@@ -6620,14 +6619,14 @@ int printd() {}
 int printd(uint32_t DebugLevel, const char *format, ...)
 {
     if ((kDebugLevel & DebugLevel) == DebugLevel)    
- 10025a3:	39 ca                	cmp    edx,ecx
- 10025a5:	75 14                	jne    10025bb <printd+0x2c>
+ 10025a7:	39 ca                	cmp    edx,ecx
+ 10025a9:	75 14                	jne    10025bf <printd+0x2c>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:214
     {
         va_list args;
 
         va_start( args, format );
- 10025a7:	8d 44 24 18          	lea    eax,[esp+0x18]
+ 10025ab:	8d 44 24 18          	lea    eax,[esp+0x18]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:220
 //        if (++printDLineCount==SYS_VGA_HEIGHT-1)
 //        {
@@ -6635,42 +6634,42 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 //            printDLineCount=0;
 //        }
         return printk_valist(format, args);
- 10025ab:	83 ec 08             	sub    esp,0x8
- 10025ae:	50                   	push   eax
- 10025af:	ff 74 24 20          	push   DWORD PTR [esp+0x20]
- 10025b3:	e8 a6 ff ff ff       	call   100255e <printk_valist>
- 10025b8:	83 c4 10             	add    esp,0x10
+ 10025af:	83 ec 08             	sub    esp,0x8
+ 10025b2:	50                   	push   eax
+ 10025b3:	ff 74 24 20          	push   DWORD PTR [esp+0x20]
+ 10025b7:	e8 a6 ff ff ff       	call   1002562 <printk_valist>
+ 10025bc:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:223 (discriminator 1)
     }
     return 0;
 }
- 10025bb:	83 c4 0c             	add    esp,0xc
- 10025be:	c3                   	ret    
+ 10025bf:	83 c4 0c             	add    esp,0xc
+ 10025c2:	c3                   	ret    
 
-010025bf <sprintf>:
+010025c3 <sprintf>:
 sprintf():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:227
 #endif
 
 int sprintf(char *out, const char *format, ...)
 {
- 10025bf:	83 ec 0c             	sub    esp,0xc
+ 10025c3:	83 ec 0c             	sub    esp,0xc
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:231
         va_list args;
         
         va_start( args, format );
         return print( &out, format, args );
- 10025c2:	8d 4c 24 18          	lea    ecx,[esp+0x18]
- 10025c6:	8b 54 24 14          	mov    edx,DWORD PTR [esp+0x14]
- 10025ca:	8d 44 24 10          	lea    eax,[esp+0x10]
- 10025ce:	e8 a3 fd ff ff       	call   1002376 <print>
+ 10025c6:	8d 4c 24 18          	lea    ecx,[esp+0x18]
+ 10025ca:	8b 54 24 14          	mov    edx,DWORD PTR [esp+0x14]
+ 10025ce:	8d 44 24 10          	lea    eax,[esp+0x10]
+ 10025d2:	e8 a3 fd ff ff       	call   100237a <print>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/printf.c:232
 }
- 10025d3:	83 c4 0c             	add    esp,0xc
- 10025d6:	c3                   	ret    
- 10025d7:	90                   	nop
+ 10025d7:	83 c4 0c             	add    esp,0xc
+ 10025da:	c3                   	ret    
+ 10025db:	90                   	nop
 
-010025d8 <strcpy>:
+010025dc <strcpy>:
 strcpy():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:5
 #include "strings.h"
@@ -6678,103 +6677,103 @@ strcpy():
 char *
 strcpy(char *s1, const char *s2)
 {
- 10025d8:	53                   	push   ebx
- 10025d9:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
- 10025dd:	8b 4c 24 0c          	mov    ecx,DWORD PTR [esp+0xc]
+ 10025dc:	53                   	push   ebx
+ 10025dd:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+ 10025e1:	8b 4c 24 0c          	mov    ecx,DWORD PTR [esp+0xc]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:6
     char *s = s1;
- 10025e1:	89 c2                	mov    edx,eax
+ 10025e5:	89 c2                	mov    edx,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:7 (discriminator 1)
     while ((*s++ = *s2++) != 0)
- 10025e3:	83 c2 01             	add    edx,0x1
- 10025e6:	83 c1 01             	add    ecx,0x1
- 10025e9:	0f b6 59 ff          	movzx  ebx,BYTE PTR [ecx-0x1]
- 10025ed:	88 5a ff             	mov    BYTE PTR [edx-0x1],bl
- 10025f0:	84 db                	test   bl,bl
- 10025f2:	75 ef                	jne    10025e3 <strcpy+0xb>
+ 10025e7:	83 c2 01             	add    edx,0x1
+ 10025ea:	83 c1 01             	add    ecx,0x1
+ 10025ed:	0f b6 59 ff          	movzx  ebx,BYTE PTR [ecx-0x1]
+ 10025f1:	88 5a ff             	mov    BYTE PTR [edx-0x1],bl
+ 10025f4:	84 db                	test   bl,bl
+ 10025f6:	75 ef                	jne    10025e7 <strcpy+0xb>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:10
 	;
     return (s1);
 }
- 10025f4:	5b                   	pop    ebx
- 10025f5:	c3                   	ret    
+ 10025f8:	5b                   	pop    ebx
+ 10025f9:	c3                   	ret    
 
-010025f6 <strcpyc>:
+010025fa <strcpyc>:
 strcpyc():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:14
 
 char *
 strcpyc(char *s1, const char *s2, unsigned count)
 {
- 10025f6:	56                   	push   esi
- 10025f7:	53                   	push   ebx
- 10025f8:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
- 10025fc:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+ 10025fa:	56                   	push   esi
+ 10025fb:	53                   	push   ebx
+ 10025fc:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+ 1002600:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:16
     char *s = s1;
     while ((*s++ = *s2++) != 0 && count-->0)
- 1002600:	ba 00 00 00 00       	mov    edx,0x0
- 1002605:	8b 5c 24 14          	mov    ebx,DWORD PTR [esp+0x14]
- 1002609:	83 c3 01             	add    ebx,0x1
+ 1002604:	ba 00 00 00 00       	mov    edx,0x0
+ 1002609:	8b 5c 24 14          	mov    ebx,DWORD PTR [esp+0x14]
+ 100260d:	83 c3 01             	add    ebx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:16 (discriminator 2)
- 100260c:	0f b6 0c 16          	movzx  ecx,BYTE PTR [esi+edx*1]
- 1002610:	88 0c 10             	mov    BYTE PTR [eax+edx*1],cl
- 1002613:	84 c9                	test   cl,cl
- 1002615:	74 07                	je     100261e <strcpyc+0x28>
- 1002617:	83 c2 01             	add    edx,0x1
+ 1002610:	0f b6 0c 16          	movzx  ecx,BYTE PTR [esi+edx*1]
+ 1002614:	88 0c 10             	mov    BYTE PTR [eax+edx*1],cl
+ 1002617:	84 c9                	test   cl,cl
+ 1002619:	74 07                	je     1002622 <strcpyc+0x28>
+ 100261b:	83 c2 01             	add    edx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:16 (discriminator 1)
- 100261a:	39 d3                	cmp    ebx,edx
- 100261c:	75 ee                	jne    100260c <strcpyc+0x16>
+ 100261e:	39 d3                	cmp    ebx,edx
+ 1002620:	75 ee                	jne    1002610 <strcpyc+0x16>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strcpy.c:19
 	;
     return (s1);
 }
- 100261e:	5b                   	pop    ebx
- 100261f:	5e                   	pop    esi
- 1002620:	c3                   	ret    
- 1002621:	66 90                	xchg   ax,ax
- 1002623:	90                   	nop
+ 1002622:	5b                   	pop    ebx
+ 1002623:	5e                   	pop    esi
+ 1002624:	c3                   	ret    
+ 1002625:	66 90                	xchg   ax,ax
+ 1002627:	90                   	nop
 
-01002624 <strlen>:
+01002628 <strlen>:
 strlen():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strlen.c:3
 #include <stddef.h>
 
 size_t strlen(const char* str) {
- 1002624:	8b 54 24 04          	mov    edx,DWORD PTR [esp+0x4]
+ 1002628:	8b 54 24 04          	mov    edx,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strlen.c:5
           size_t ret = 0;
         while ( str[ret] != 0 )
- 1002628:	80 3a 00             	cmp    BYTE PTR [edx],0x0
- 100262b:	74 10                	je     100263d <strlen+0x19>
- 100262d:	b8 00 00 00 00       	mov    eax,0x0
+ 100262c:	80 3a 00             	cmp    BYTE PTR [edx],0x0
+ 100262f:	74 10                	je     1002641 <strlen+0x19>
+ 1002631:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strlen.c:6
                 ret++;
- 1002632:	83 c0 01             	add    eax,0x1
+ 1002636:	83 c0 01             	add    eax,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strlen.c:5
 #include <stddef.h>
 
 size_t strlen(const char* str) {
           size_t ret = 0;
         while ( str[ret] != 0 )
- 1002635:	80 3c 02 00          	cmp    BYTE PTR [edx+eax*1],0x0
- 1002639:	75 f7                	jne    1002632 <strlen+0xe>
- 100263b:	f3 c3                	repz ret 
+ 1002639:	80 3c 02 00          	cmp    BYTE PTR [edx+eax*1],0x0
+ 100263d:	75 f7                	jne    1002636 <strlen+0xe>
+ 100263f:	f3 c3                	repz ret 
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strlen.c:4
 #include <stddef.h>
 
 size_t strlen(const char* str) {
           size_t ret = 0;
- 100263d:	b8 00 00 00 00       	mov    eax,0x0
+ 1002641:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strlen.c:8
         while ( str[ret] != 0 )
                 ret++;
         return ret;
 }
- 1002642:	c3                   	ret    
- 1002643:	90                   	nop
+ 1002646:	c3                   	ret    
+ 1002647:	90                   	nop
 
-01002644 <strncmp>:
+01002648 <strncmp>:
 strncmp():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:13
  *   array pointed to by `s2'.  [4.11.4.4]
@@ -6783,30 +6782,30 @@ strncmp():
 
 int strncmp(const char *s1, const char *s2, size_t n)
 {
- 1002644:	57                   	push   edi
- 1002645:	56                   	push   esi
- 1002646:	53                   	push   ebx
- 1002647:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
- 100264b:	8b 7c 24 14          	mov    edi,DWORD PTR [esp+0x14]
- 100264f:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
+ 1002648:	57                   	push   edi
+ 1002649:	56                   	push   esi
+ 100264a:	53                   	push   ebx
+ 100264b:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+ 100264f:	8b 7c 24 14          	mov    edi,DWORD PTR [esp+0x14]
+ 1002653:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:14
     for ( ; n > 0; s1++, s2++, --n)
- 1002653:	85 db                	test   ebx,ebx
- 1002655:	74 41                	je     1002698 <strncmp+0x54>
+ 1002657:	85 db                	test   ebx,ebx
+ 1002659:	74 41                	je     100269c <strncmp+0x54>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:15
 	if (*s1 != *s2)
- 1002657:	0f b6 16             	movzx  edx,BYTE PTR [esi]
- 100265a:	0f b6 0f             	movzx  ecx,BYTE PTR [edi]
- 100265d:	38 ca                	cmp    dl,cl
- 100265f:	75 1c                	jne    100267d <strncmp+0x39>
+ 100265b:	0f b6 16             	movzx  edx,BYTE PTR [esi]
+ 100265e:	0f b6 0f             	movzx  ecx,BYTE PTR [edi]
+ 1002661:	38 ca                	cmp    dl,cl
+ 1002663:	75 1c                	jne    1002681 <strncmp+0x39>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:17
 	    return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
 	else if (*s1 == '\0')
- 1002661:	84 d2                	test   dl,dl
- 1002663:	74 3a                	je     100269f <strncmp+0x5b>
- 1002665:	83 eb 01             	sub    ebx,0x1
- 1002668:	b8 00 00 00 00       	mov    eax,0x0
- 100266d:	eb 1e                	jmp    100268d <strncmp+0x49>
+ 1002665:	84 d2                	test   dl,dl
+ 1002667:	74 3a                	je     10026a3 <strncmp+0x5b>
+ 1002669:	83 eb 01             	sub    ebx,0x1
+ 100266c:	b8 00 00 00 00       	mov    eax,0x0
+ 1002671:	eb 1e                	jmp    1002691 <strncmp+0x49>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:15
 #include <stddef.h>
 
@@ -6814,21 +6813,21 @@ int strncmp(const char *s1, const char *s2, size_t n)
 {
     for ( ; n > 0; s1++, s2++, --n)
 	if (*s1 != *s2)
- 100266f:	0f b6 54 06 01       	movzx  edx,BYTE PTR [esi+eax*1+0x1]
- 1002674:	0f b6 4c 07 01       	movzx  ecx,BYTE PTR [edi+eax*1+0x1]
- 1002679:	38 ca                	cmp    dl,cl
- 100267b:	74 09                	je     1002686 <strncmp+0x42>
+ 1002673:	0f b6 54 06 01       	movzx  edx,BYTE PTR [esi+eax*1+0x1]
+ 1002678:	0f b6 4c 07 01       	movzx  ecx,BYTE PTR [edi+eax*1+0x1]
+ 100267d:	38 ca                	cmp    dl,cl
+ 100267f:	74 09                	je     100268a <strncmp+0x42>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:16
 	    return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
- 100267d:	38 ca                	cmp    dl,cl
- 100267f:	19 c0                	sbb    eax,eax
- 1002681:	83 c8 01             	or     eax,0x1
- 1002684:	eb 25                	jmp    10026ab <strncmp+0x67>
- 1002686:	83 c0 01             	add    eax,0x1
+ 1002681:	38 ca                	cmp    dl,cl
+ 1002683:	19 c0                	sbb    eax,eax
+ 1002685:	83 c8 01             	or     eax,0x1
+ 1002688:	eb 25                	jmp    10026af <strncmp+0x67>
+ 100268a:	83 c0 01             	add    eax,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:17
 	else if (*s1 == '\0')
- 1002689:	84 d2                	test   dl,dl
- 100268b:	74 19                	je     10026a6 <strncmp+0x62>
+ 100268d:	84 d2                	test   dl,dl
+ 100268f:	74 19                	je     10026aa <strncmp+0x62>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:14
  */
 #include <stddef.h>
@@ -6836,18 +6835,18 @@ int strncmp(const char *s1, const char *s2, size_t n)
 int strncmp(const char *s1, const char *s2, size_t n)
 {
     for ( ; n > 0; s1++, s2++, --n)
- 100268d:	39 d8                	cmp    eax,ebx
- 100268f:	75 de                	jne    100266f <strncmp+0x2b>
+ 1002691:	39 d8                	cmp    eax,ebx
+ 1002693:	75 de                	jne    1002673 <strncmp+0x2b>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:19
 	if (*s1 != *s2)
 	    return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
 	else if (*s1 == '\0')
 	    return 0;
     return 0;
- 1002691:	b8 00 00 00 00       	mov    eax,0x0
- 1002696:	eb 13                	jmp    10026ab <strncmp+0x67>
- 1002698:	b8 00 00 00 00       	mov    eax,0x0
- 100269d:	eb 0c                	jmp    10026ab <strncmp+0x67>
+ 1002695:	b8 00 00 00 00       	mov    eax,0x0
+ 100269a:	eb 13                	jmp    10026af <strncmp+0x67>
+ 100269c:	b8 00 00 00 00       	mov    eax,0x0
+ 10026a1:	eb 0c                	jmp    10026af <strncmp+0x67>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:18
 {
     for ( ; n > 0; s1++, s2++, --n)
@@ -6855,19 +6854,19 @@ int strncmp(const char *s1, const char *s2, size_t n)
 	    return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
 	else if (*s1 == '\0')
 	    return 0;
- 100269f:	b8 00 00 00 00       	mov    eax,0x0
- 10026a4:	eb 05                	jmp    10026ab <strncmp+0x67>
- 10026a6:	b8 00 00 00 00       	mov    eax,0x0
+ 10026a3:	b8 00 00 00 00       	mov    eax,0x0
+ 10026a8:	eb 05                	jmp    10026af <strncmp+0x67>
+ 10026aa:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncmp.c:20
     return 0;
 }
- 10026ab:	5b                   	pop    ebx
- 10026ac:	5e                   	pop    esi
- 10026ad:	5f                   	pop    edi
- 10026ae:	c3                   	ret    
- 10026af:	90                   	nop
+ 10026af:	5b                   	pop    ebx
+ 10026b0:	5e                   	pop    esi
+ 10026b1:	5f                   	pop    edi
+ 10026b2:	c3                   	ret    
+ 10026b3:	90                   	nop
 
-010026b0 <strncpy>:
+010026b4 <strncpy>:
 strncpy():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:14
  *   The `strncpy' function returns the value of `s1'.  [4.11.2.4]
@@ -6876,25 +6875,25 @@ strncpy():
 
 char * strncpy(char *s1, const char *s2, size_t n)
 {
- 10026b0:	56                   	push   esi
- 10026b1:	53                   	push   ebx
- 10026b2:	8b 74 24 0c          	mov    esi,DWORD PTR [esp+0xc]
- 10026b6:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
- 10026ba:	8b 4c 24 14          	mov    ecx,DWORD PTR [esp+0x14]
+ 10026b4:	56                   	push   esi
+ 10026b5:	53                   	push   ebx
+ 10026b6:	8b 74 24 0c          	mov    esi,DWORD PTR [esp+0xc]
+ 10026ba:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
+ 10026be:	8b 4c 24 14          	mov    ecx,DWORD PTR [esp+0x14]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:16
     char *s = s1;
     while (n > 0 && *s2 != '\0') {
- 10026be:	85 c9                	test   ecx,ecx
- 10026c0:	74 33                	je     10026f5 <strncpy+0x45>
- 10026c2:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
- 10026c5:	84 c0                	test   al,al
- 10026c7:	74 26                	je     10026ef <strncpy+0x3f>
- 10026c9:	89 f2                	mov    edx,esi
+ 10026c2:	85 c9                	test   ecx,ecx
+ 10026c4:	74 33                	je     10026f9 <strncpy+0x45>
+ 10026c6:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
+ 10026c9:	84 c0                	test   al,al
+ 10026cb:	74 26                	je     10026f3 <strncpy+0x3f>
+ 10026cd:	89 f2                	mov    edx,esi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:17
 	*s++ = *s2++;
- 10026cb:	83 c2 01             	add    edx,0x1
- 10026ce:	83 c3 01             	add    ebx,0x1
- 10026d1:	88 42 ff             	mov    BYTE PTR [edx-0x1],al
+ 10026cf:	83 c2 01             	add    edx,0x1
+ 10026d2:	83 c3 01             	add    ebx,0x1
+ 10026d5:	88 42 ff             	mov    BYTE PTR [edx-0x1],al
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:16
 #include <stddef.h>
 
@@ -6902,21 +6901,21 @@ char * strncpy(char *s1, const char *s2, size_t n)
 {
     char *s = s1;
     while (n > 0 && *s2 != '\0') {
- 10026d4:	83 e9 01             	sub    ecx,0x1
- 10026d7:	74 1c                	je     10026f5 <strncpy+0x45>
+ 10026d8:	83 e9 01             	sub    ecx,0x1
+ 10026db:	74 1c                	je     10026f9 <strncpy+0x45>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:16 (discriminator 1)
- 10026d9:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
- 10026dc:	84 c0                	test   al,al
- 10026de:	75 eb                	jne    10026cb <strncpy+0x1b>
- 10026e0:	eb 0f                	jmp    10026f1 <strncpy+0x41>
+ 10026dd:	0f b6 03             	movzx  eax,BYTE PTR [ebx]
+ 10026e0:	84 c0                	test   al,al
+ 10026e2:	75 eb                	jne    10026cf <strncpy+0x1b>
+ 10026e4:	eb 0f                	jmp    10026f5 <strncpy+0x41>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:21
 	*s++ = *s2++;
 	--n;
     }
     while (n > 0) {
 	*s++ = '\0';
- 10026e2:	83 c2 01             	add    edx,0x1
- 10026e5:	c6 42 ff 00          	mov    BYTE PTR [edx-0x1],0x0
+ 10026e6:	83 c2 01             	add    edx,0x1
+ 10026e9:	c6 42 ff 00          	mov    BYTE PTR [edx-0x1],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:20
     char *s = s1;
     while (n > 0 && *s2 != '\0') {
@@ -6924,9 +6923,9 @@ char * strncpy(char *s1, const char *s2, size_t n)
 	--n;
     }
     while (n > 0) {
- 10026e9:	39 d1                	cmp    ecx,edx
- 10026eb:	75 f5                	jne    10026e2 <strncpy+0x32>
- 10026ed:	eb 06                	jmp    10026f5 <strncpy+0x45>
+ 10026ed:	39 d1                	cmp    ecx,edx
+ 10026ef:	75 f5                	jne    10026e6 <strncpy+0x32>
+ 10026f1:	eb 06                	jmp    10026f9 <strncpy+0x45>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:15
  */
 #include <stddef.h>
@@ -6934,9 +6933,9 @@ char * strncpy(char *s1, const char *s2, size_t n)
 char * strncpy(char *s1, const char *s2, size_t n)
 {
     char *s = s1;
- 10026ef:	89 f2                	mov    edx,esi
- 10026f1:	01 d1                	add    ecx,edx
- 10026f3:	eb ed                	jmp    10026e2 <strncpy+0x32>
+ 10026f3:	89 f2                	mov    edx,esi
+ 10026f5:	01 d1                	add    ecx,edx
+ 10026f7:	eb ed                	jmp    10026e6 <strncpy+0x32>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strncpy.c:25
     while (n > 0) {
 	*s++ = '\0';
@@ -6944,30 +6943,30 @@ char * strncpy(char *s1, const char *s2, size_t n)
     }
     return s1;
 }
- 10026f5:	89 f0                	mov    eax,esi
- 10026f7:	5b                   	pop    ebx
- 10026f8:	5e                   	pop    esi
- 10026f9:	c3                   	ret    
- 10026fa:	66 90                	xchg   ax,ax
+ 10026f9:	89 f0                	mov    eax,esi
+ 10026fb:	5b                   	pop    ebx
+ 10026fc:	5e                   	pop    esi
+ 10026fd:	c3                   	ret    
+ 10026fe:	66 90                	xchg   ax,ax
 
-010026fc <strleft>:
+01002700 <strleft>:
 strleft():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strparts.c:2
 char* strleft(char* val, int cnt)
 {
- 10026fc:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
+ 1002700:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strparts.c:3
     val[cnt]='\0';
- 1002700:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
- 1002704:	c6 04 10 00          	mov    BYTE PTR [eax+edx*1],0x0
+ 1002704:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+ 1002708:	c6 04 10 00          	mov    BYTE PTR [eax+edx*1],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/strings/strparts.c:5
     return val;
 }
- 1002708:	c3                   	ret    
- 1002709:	66 90                	xchg   ax,ax
- 100270b:	90                   	nop
+ 100270c:	c3                   	ret    
+ 100270d:	66 90                	xchg   ax,ax
+ 100270f:	90                   	nop
 
-0100270c <time>:
+01002710 <time>:
 time():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:84
 };
@@ -6976,89 +6975,89 @@ extern time_t kSystemCurrentTime;
 time_t time(time_t* arg)
 {
     *arg = kSystemCurrentTime;
- 100270c:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
- 1002710:	8b 15 8c 02 12 00    	mov    edx,DWORD PTR ds:0x12028c
- 1002716:	89 10                	mov    DWORD PTR [eax],edx
+ 1002710:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
+ 1002714:	8b 15 8c 02 12 00    	mov    edx,DWORD PTR ds:0x12028c
+ 100271a:	89 10                	mov    DWORD PTR [eax],edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:86
     return kSystemCurrentTime;
 }
- 1002718:	a1 8c 02 12 00       	mov    eax,ds:0x12028c
- 100271d:	c3                   	ret    
+ 100271c:	a1 8c 02 12 00       	mov    eax,ds:0x12028c
+ 1002721:	c3                   	ret    
 
-0100271e <gmtime_r>:
+01002722 <gmtime_r>:
 gmtime_r():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:88
 
 struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
- 100271e:	55                   	push   ebp
- 100271f:	57                   	push   edi
- 1002720:	56                   	push   esi
- 1002721:	53                   	push   ebx
- 1002722:	83 ec 08             	sub    esp,0x8
- 1002725:	8b 74 24 20          	mov    esi,DWORD PTR [esp+0x20]
+ 1002722:	55                   	push   ebp
+ 1002723:	57                   	push   edi
+ 1002724:	56                   	push   esi
+ 1002725:	53                   	push   ebx
+ 1002726:	83 ec 08             	sub    esp,0x8
+ 1002729:	8b 74 24 20          	mov    esi,DWORD PTR [esp+0x20]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:93
   time_t time = *timer;
   unsigned long dayclock, dayno;
   int year = EPOCH_YR;
 
   dayclock = (unsigned long) time % SECS_DAY;
- 1002729:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
- 100272d:	8b 18                	mov    ebx,DWORD PTR [eax]
- 100272f:	ba 07 45 2e c2       	mov    edx,0xc22e4507
- 1002734:	89 d8                	mov    eax,ebx
- 1002736:	f7 e2                	mul    edx
- 1002738:	89 d1                	mov    ecx,edx
- 100273a:	c1 e9 10             	shr    ecx,0x10
- 100273d:	69 c9 80 51 01 00    	imul   ecx,ecx,0x15180
- 1002743:	29 cb                	sub    ebx,ecx
- 1002745:	89 d9                	mov    ecx,ebx
+ 100272d:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
+ 1002731:	8b 18                	mov    ebx,DWORD PTR [eax]
+ 1002733:	ba 07 45 2e c2       	mov    edx,0xc22e4507
+ 1002738:	89 d8                	mov    eax,ebx
+ 100273a:	f7 e2                	mul    edx
+ 100273c:	89 d1                	mov    ecx,edx
+ 100273e:	c1 e9 10             	shr    ecx,0x10
+ 1002741:	69 c9 80 51 01 00    	imul   ecx,ecx,0x15180
+ 1002747:	29 cb                	sub    ebx,ecx
+ 1002749:	89 d9                	mov    ecx,ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:94
   dayno = (unsigned long) time / SECS_DAY;
- 1002747:	89 d3                	mov    ebx,edx
- 1002749:	c1 eb 10             	shr    ebx,0x10
+ 100274b:	89 d3                	mov    ebx,edx
+ 100274d:	c1 eb 10             	shr    ebx,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:96
 
   tmbuf->tm_sec = dayclock % 60;
- 100274c:	bd 89 88 88 88       	mov    ebp,0x88888889
- 1002751:	89 c8                	mov    eax,ecx
- 1002753:	f7 e5                	mul    ebp
- 1002755:	c1 ea 05             	shr    edx,0x5
- 1002758:	6b d2 3c             	imul   edx,edx,0x3c
- 100275b:	89 c8                	mov    eax,ecx
- 100275d:	29 d0                	sub    eax,edx
- 100275f:	89 06                	mov    DWORD PTR [esi],eax
+ 1002750:	bd 89 88 88 88       	mov    ebp,0x88888889
+ 1002755:	89 c8                	mov    eax,ecx
+ 1002757:	f7 e5                	mul    ebp
+ 1002759:	c1 ea 05             	shr    edx,0x5
+ 100275c:	6b d2 3c             	imul   edx,edx,0x3c
+ 100275f:	89 c8                	mov    eax,ecx
+ 1002761:	29 d0                	sub    eax,edx
+ 1002763:	89 06                	mov    DWORD PTR [esi],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:97
   tmbuf->tm_min = (dayclock % 3600) / 60;
- 1002761:	ba c5 b3 a2 91       	mov    edx,0x91a2b3c5
- 1002766:	89 c8                	mov    eax,ecx
- 1002768:	f7 e2                	mul    edx
- 100276a:	89 d7                	mov    edi,edx
- 100276c:	c1 ef 0b             	shr    edi,0xb
- 100276f:	69 c7 10 0e 00 00    	imul   eax,edi,0xe10
- 1002775:	29 c1                	sub    ecx,eax
- 1002777:	89 c8                	mov    eax,ecx
- 1002779:	f7 e5                	mul    ebp
- 100277b:	89 d1                	mov    ecx,edx
- 100277d:	c1 e9 05             	shr    ecx,0x5
- 1002780:	89 4e 04             	mov    DWORD PTR [esi+0x4],ecx
+ 1002765:	ba c5 b3 a2 91       	mov    edx,0x91a2b3c5
+ 100276a:	89 c8                	mov    eax,ecx
+ 100276c:	f7 e2                	mul    edx
+ 100276e:	89 d7                	mov    edi,edx
+ 1002770:	c1 ef 0b             	shr    edi,0xb
+ 1002773:	69 c7 10 0e 00 00    	imul   eax,edi,0xe10
+ 1002779:	29 c1                	sub    ecx,eax
+ 100277b:	89 c8                	mov    eax,ecx
+ 100277d:	f7 e5                	mul    ebp
+ 100277f:	89 d1                	mov    ecx,edx
+ 1002781:	c1 e9 05             	shr    ecx,0x5
+ 1002784:	89 4e 04             	mov    DWORD PTR [esi+0x4],ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:98
   tmbuf->tm_hour = dayclock / 3600;
- 1002783:	89 7e 08             	mov    DWORD PTR [esi+0x8],edi
+ 1002787:	89 7e 08             	mov    DWORD PTR [esi+0x8],edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:99
   tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
- 1002786:	8d 4b 04             	lea    ecx,[ebx+0x4]
- 1002789:	ba 25 49 92 24       	mov    edx,0x24924925
- 100278e:	89 c8                	mov    eax,ecx
- 1002790:	f7 e2                	mul    edx
+ 100278a:	8d 4b 04             	lea    ecx,[ebx+0x4]
+ 100278d:	ba 25 49 92 24       	mov    edx,0x24924925
  1002792:	89 c8                	mov    eax,ecx
- 1002794:	29 d0                	sub    eax,edx
- 1002796:	d1 e8                	shr    eax,1
- 1002798:	01 c2                	add    edx,eax
- 100279a:	c1 ea 02             	shr    edx,0x2
- 100279d:	8d 04 d5 00 00 00 00 	lea    eax,[edx*8+0x0]
- 10027a4:	29 d0                	sub    eax,edx
- 10027a6:	29 c1                	sub    ecx,eax
- 10027a8:	89 4e 18             	mov    DWORD PTR [esi+0x18],ecx
+ 1002794:	f7 e2                	mul    edx
+ 1002796:	89 c8                	mov    eax,ecx
+ 1002798:	29 d0                	sub    eax,edx
+ 100279a:	d1 e8                	shr    eax,1
+ 100279c:	01 c2                	add    edx,eax
+ 100279e:	c1 ea 02             	shr    edx,0x2
+ 10027a1:	8d 04 d5 00 00 00 00 	lea    eax,[edx*8+0x0]
+ 10027a8:	29 d0                	sub    eax,edx
+ 10027aa:	29 c1                	sub    ecx,eax
+ 10027ac:	89 4e 18             	mov    DWORD PTR [esi+0x18],ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:91
 }
 
@@ -7066,7 +7065,7 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   time_t time = *timer;
   unsigned long dayclock, dayno;
   int year = EPOCH_YR;
- 10027ab:	b9 b2 07 00 00       	mov    ecx,0x7b2
+ 10027af:	b9 b2 07 00 00       	mov    ecx,0x7b2
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:100
 
   tmbuf->tm_sec = dayclock % 60;
@@ -7074,45 +7073,45 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_hour = dayclock / 3600;
   tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
   while (dayno >= (unsigned long) YEARSIZE(year)) {
- 10027b0:	bd 1f 85 eb 51       	mov    ebp,0x51eb851f
- 10027b5:	eb 53                	jmp    100280a <gmtime_r+0xec>
+ 10027b4:	bd 1f 85 eb 51       	mov    ebp,0x51eb851f
+ 10027b9:	eb 53                	jmp    100280e <gmtime_r+0xec>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:101 (discriminator 1)
     dayno -= YEARSIZE(year);
- 10027b7:	89 c8                	mov    eax,ecx
- 10027b9:	f7 ed                	imul   ebp
- 10027bb:	c1 fa 05             	sar    edx,0x5
- 10027be:	89 c8                	mov    eax,ecx
- 10027c0:	c1 f8 1f             	sar    eax,0x1f
- 10027c3:	29 c2                	sub    edx,eax
- 10027c5:	6b d2 64             	imul   edx,edx,0x64
- 10027c8:	39 d1                	cmp    ecx,edx
- 10027ca:	75 26                	jne    10027f2 <gmtime_r+0xd4>
+ 10027bb:	89 c8                	mov    eax,ecx
+ 10027bd:	f7 ed                	imul   ebp
+ 10027bf:	c1 fa 05             	sar    edx,0x5
+ 10027c2:	89 c8                	mov    eax,ecx
+ 10027c4:	c1 f8 1f             	sar    eax,0x1f
+ 10027c7:	29 c2                	sub    edx,eax
+ 10027c9:	6b d2 64             	imul   edx,edx,0x64
+ 10027cc:	39 d1                	cmp    ecx,edx
+ 10027ce:	75 26                	jne    10027f6 <gmtime_r+0xd4>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:101 (discriminator 4)
- 10027cc:	89 c8                	mov    eax,ecx
- 10027ce:	f7 ed                	imul   ebp
- 10027d0:	c1 fa 07             	sar    edx,0x7
- 10027d3:	89 c8                	mov    eax,ecx
- 10027d5:	c1 f8 1f             	sar    eax,0x1f
- 10027d8:	29 c2                	sub    edx,eax
- 10027da:	69 c2 90 01 00 00    	imul   eax,edx,0x190
- 10027e0:	89 cf                	mov    edi,ecx
- 10027e2:	29 c7                	sub    edi,eax
- 10027e4:	83 ff 01             	cmp    edi,0x1
- 10027e7:	19 c0                	sbb    eax,eax
- 10027e9:	f7 d0                	not    eax
- 10027eb:	05 6e 01 00 00       	add    eax,0x16e
- 10027f0:	eb 13                	jmp    1002805 <gmtime_r+0xe7>
+ 10027d0:	89 c8                	mov    eax,ecx
+ 10027d2:	f7 ed                	imul   ebp
+ 10027d4:	c1 fa 07             	sar    edx,0x7
+ 10027d7:	89 c8                	mov    eax,ecx
+ 10027d9:	c1 f8 1f             	sar    eax,0x1f
+ 10027dc:	29 c2                	sub    edx,eax
+ 10027de:	69 c2 90 01 00 00    	imul   eax,edx,0x190
+ 10027e4:	89 cf                	mov    edi,ecx
+ 10027e6:	29 c7                	sub    edi,eax
+ 10027e8:	83 ff 01             	cmp    edi,0x1
+ 10027eb:	19 c0                	sbb    eax,eax
+ 10027ed:	f7 d0                	not    eax
+ 10027ef:	05 6e 01 00 00       	add    eax,0x16e
+ 10027f4:	eb 13                	jmp    1002809 <gmtime_r+0xe7>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:101
- 10027f2:	b8 6e 01 00 00       	mov    eax,0x16e
- 10027f7:	eb 0c                	jmp    1002805 <gmtime_r+0xe7>
- 10027f9:	b8 6d 01 00 00       	mov    eax,0x16d
- 10027fe:	eb 05                	jmp    1002805 <gmtime_r+0xe7>
- 1002800:	b8 6e 01 00 00       	mov    eax,0x16e
+ 10027f6:	b8 6e 01 00 00       	mov    eax,0x16e
+ 10027fb:	eb 0c                	jmp    1002809 <gmtime_r+0xe7>
+ 10027fd:	b8 6d 01 00 00       	mov    eax,0x16d
+ 1002802:	eb 05                	jmp    1002809 <gmtime_r+0xe7>
+ 1002804:	b8 6e 01 00 00       	mov    eax,0x16e
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:101 (discriminator 8)
- 1002805:	29 c3                	sub    ebx,eax
+ 1002809:	29 c3                	sub    ebx,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:102 (discriminator 8)
     year++;
- 1002807:	83 c1 01             	add    ecx,0x1
+ 100280b:	83 c1 01             	add    ecx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:100
 
   tmbuf->tm_sec = dayclock % 60;
@@ -7120,64 +7119,64 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_hour = dayclock / 3600;
   tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
   while (dayno >= (unsigned long) YEARSIZE(year)) {
- 100280a:	89 cf                	mov    edi,ecx
- 100280c:	83 e7 03             	and    edi,0x3
- 100280f:	0f 85 d5 00 00 00    	jne    10028ea <gmtime_r+0x1cc>
+ 100280e:	89 cf                	mov    edi,ecx
+ 1002810:	83 e7 03             	and    edi,0x3
+ 1002813:	0f 85 d5 00 00 00    	jne    10028ee <gmtime_r+0x1cc>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:100 (discriminator 1)
- 1002815:	89 c8                	mov    eax,ecx
- 1002817:	f7 ed                	imul   ebp
- 1002819:	c1 fa 05             	sar    edx,0x5
- 100281c:	89 c8                	mov    eax,ecx
- 100281e:	c1 f8 1f             	sar    eax,0x1f
- 1002821:	29 c2                	sub    edx,eax
- 1002823:	6b d2 64             	imul   edx,edx,0x64
- 1002826:	39 d1                	cmp    ecx,edx
- 1002828:	0f 85 0a 01 00 00    	jne    1002938 <gmtime_r+0x21a>
+ 1002819:	89 c8                	mov    eax,ecx
+ 100281b:	f7 ed                	imul   ebp
+ 100281d:	c1 fa 05             	sar    edx,0x5
+ 1002820:	89 c8                	mov    eax,ecx
+ 1002822:	c1 f8 1f             	sar    eax,0x1f
+ 1002825:	29 c2                	sub    edx,eax
+ 1002827:	6b d2 64             	imul   edx,edx,0x64
+ 100282a:	39 d1                	cmp    ecx,edx
+ 100282c:	0f 85 0a 01 00 00    	jne    100293c <gmtime_r+0x21a>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:100 (discriminator 4)
- 100282e:	89 c8                	mov    eax,ecx
- 1002830:	f7 ed                	imul   ebp
- 1002832:	c1 fa 07             	sar    edx,0x7
- 1002835:	89 c8                	mov    eax,ecx
- 1002837:	c1 f8 1f             	sar    eax,0x1f
- 100283a:	29 c2                	sub    edx,eax
- 100283c:	69 d2 90 01 00 00    	imul   edx,edx,0x190
- 1002842:	39 d1                	cmp    ecx,edx
- 1002844:	0f 84 03 01 00 00    	je     100294d <gmtime_r+0x22f>
- 100284a:	e9 b0 00 00 00       	jmp    10028ff <gmtime_r+0x1e1>
+ 1002832:	89 c8                	mov    eax,ecx
+ 1002834:	f7 ed                	imul   ebp
+ 1002836:	c1 fa 07             	sar    edx,0x7
+ 1002839:	89 c8                	mov    eax,ecx
+ 100283b:	c1 f8 1f             	sar    eax,0x1f
+ 100283e:	29 c2                	sub    edx,eax
+ 1002840:	69 d2 90 01 00 00    	imul   edx,edx,0x190
+ 1002846:	39 d1                	cmp    ecx,edx
+ 1002848:	0f 84 03 01 00 00    	je     1002951 <gmtime_r+0x22f>
+ 100284e:	e9 b0 00 00 00       	jmp    1002903 <gmtime_r+0x1e1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:104
     dayno -= YEARSIZE(year);
     year++;
   }
   tmbuf->tm_year = year - YEAR0;
- 100284f:	8d 81 94 f8 ff ff    	lea    eax,[ecx-0x76c]
- 1002855:	89 46 14             	mov    DWORD PTR [esi+0x14],eax
+ 1002853:	8d 81 94 f8 ff ff    	lea    eax,[ecx-0x76c]
+ 1002859:	89 46 14             	mov    DWORD PTR [esi+0x14],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:105
   tmbuf->tm_yday = dayno;
- 1002858:	89 5e 1c             	mov    DWORD PTR [esi+0x1c],ebx
+ 100285c:	89 5e 1c             	mov    DWORD PTR [esi+0x1c],ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:106
   tmbuf->tm_mon = 0;
- 100285b:	c7 46 10 00 00 00 00 	mov    DWORD PTR [esi+0x10],0x0
+ 100285f:	c7 46 10 00 00 00 00 	mov    DWORD PTR [esi+0x10],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:108
   while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) {
     dayno -= _ytab[LEAPYEAR(year)][tmbuf->tm_mon];
- 1002862:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
- 1002867:	89 c8                	mov    eax,ecx
- 1002869:	f7 ea                	imul   edx
- 100286b:	89 d5                	mov    ebp,edx
- 100286d:	c1 fd 05             	sar    ebp,0x5
- 1002870:	89 c8                	mov    eax,ecx
- 1002872:	c1 f8 1f             	sar    eax,0x1f
- 1002875:	29 c5                	sub    ebp,eax
- 1002877:	6b ed 64             	imul   ebp,ebp,0x64
- 100287a:	89 cf                	mov    edi,ecx
- 100287c:	29 ef                	sub    edi,ebp
- 100287e:	89 fd                	mov    ebp,edi
- 1002880:	c1 fa 07             	sar    edx,0x7
- 1002883:	29 c2                	sub    edx,eax
- 1002885:	69 d2 90 01 00 00    	imul   edx,edx,0x190
- 100288b:	29 d1                	sub    ecx,edx
- 100288d:	89 0c 24             	mov    DWORD PTR [esp],ecx
- 1002890:	8b 7c 24 04          	mov    edi,DWORD PTR [esp+0x4]
+ 1002866:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+ 100286b:	89 c8                	mov    eax,ecx
+ 100286d:	f7 ea                	imul   edx
+ 100286f:	89 d5                	mov    ebp,edx
+ 1002871:	c1 fd 05             	sar    ebp,0x5
+ 1002874:	89 c8                	mov    eax,ecx
+ 1002876:	c1 f8 1f             	sar    eax,0x1f
+ 1002879:	29 c5                	sub    ebp,eax
+ 100287b:	6b ed 64             	imul   ebp,ebp,0x64
+ 100287e:	89 cf                	mov    edi,ecx
+ 1002880:	29 ef                	sub    edi,ebp
+ 1002882:	89 fd                	mov    ebp,edi
+ 1002884:	c1 fa 07             	sar    edx,0x7
+ 1002887:	29 c2                	sub    edx,eax
+ 1002889:	69 d2 90 01 00 00    	imul   edx,edx,0x190
+ 100288f:	29 d1                	sub    ecx,edx
+ 1002891:	89 0c 24             	mov    DWORD PTR [esp],ecx
+ 1002894:	8b 7c 24 04          	mov    edi,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:107
     year++;
   }
@@ -7185,34 +7184,34 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_yday = dayno;
   tmbuf->tm_mon = 0;
   while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) {
- 1002894:	eb 40                	jmp    10028d6 <gmtime_r+0x1b8>
+ 1002898:	eb 40                	jmp    10028da <gmtime_r+0x1b8>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:108 (discriminator 1)
     dayno -= _ytab[LEAPYEAR(year)][tmbuf->tm_mon];
- 1002896:	85 ed                	test   ebp,ebp
- 1002898:	75 0d                	jne    10028a7 <gmtime_r+0x189>
+ 100289a:	85 ed                	test   ebp,ebp
+ 100289c:	75 0d                	jne    10028ab <gmtime_r+0x189>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:108 (discriminator 4)
- 100289a:	83 3c 24 00          	cmp    DWORD PTR [esp],0x0
- 100289e:	74 0e                	je     10028ae <gmtime_r+0x190>
+ 100289e:	83 3c 24 00          	cmp    DWORD PTR [esp],0x0
+ 10028a2:	74 0e                	je     10028b2 <gmtime_r+0x190>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:108 (discriminator 6)
- 10028a0:	ba 00 00 00 00       	mov    edx,0x0
- 10028a5:	eb 1a                	jmp    10028c1 <gmtime_r+0x1a3>
+ 10028a4:	ba 00 00 00 00       	mov    edx,0x0
+ 10028a9:	eb 1a                	jmp    10028c5 <gmtime_r+0x1a3>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:108
- 10028a7:	ba 01 00 00 00       	mov    edx,0x1
- 10028ac:	eb 13                	jmp    10028c1 <gmtime_r+0x1a3>
- 10028ae:	ba 01 00 00 00       	mov    edx,0x1
- 10028b3:	eb 0c                	jmp    10028c1 <gmtime_r+0x1a3>
- 10028b5:	ba 01 00 00 00       	mov    edx,0x1
- 10028ba:	eb 05                	jmp    10028c1 <gmtime_r+0x1a3>
- 10028bc:	ba 01 00 00 00       	mov    edx,0x1
+ 10028ab:	ba 01 00 00 00       	mov    edx,0x1
+ 10028b0:	eb 13                	jmp    10028c5 <gmtime_r+0x1a3>
+ 10028b2:	ba 01 00 00 00       	mov    edx,0x1
+ 10028b7:	eb 0c                	jmp    10028c5 <gmtime_r+0x1a3>
+ 10028b9:	ba 01 00 00 00       	mov    edx,0x1
+ 10028be:	eb 05                	jmp    10028c5 <gmtime_r+0x1a3>
+ 10028c0:	ba 01 00 00 00       	mov    edx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:108 (discriminator 8)
- 10028c1:	8d 0c 12             	lea    ecx,[edx+edx*1]
- 10028c4:	01 ca                	add    edx,ecx
- 10028c6:	8d 14 90             	lea    edx,[eax+edx*4]
- 10028c9:	2b 1c 95 00 50 00 01 	sub    ebx,DWORD PTR [edx*4+0x1005000]
+ 10028c5:	8d 0c 12             	lea    ecx,[edx+edx*1]
+ 10028c8:	01 ca                	add    edx,ecx
+ 10028ca:	8d 14 90             	lea    edx,[eax+edx*4]
+ 10028cd:	2b 1c 95 00 50 00 01 	sub    ebx,DWORD PTR [edx*4+0x1005000]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:109 (discriminator 8)
     tmbuf->tm_mon++;
- 10028d0:	83 c0 01             	add    eax,0x1
- 10028d3:	89 46 10             	mov    DWORD PTR [esi+0x10],eax
+ 10028d4:	83 c0 01             	add    eax,0x1
+ 10028d7:	89 46 10             	mov    DWORD PTR [esi+0x10],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:107
     year++;
   }
@@ -7220,15 +7219,15 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_yday = dayno;
   tmbuf->tm_mon = 0;
   while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) {
- 10028d6:	85 ff                	test   edi,edi
- 10028d8:	75 4c                	jne    1002926 <gmtime_r+0x208>
+ 10028da:	85 ff                	test   edi,edi
+ 10028dc:	75 4c                	jne    100292a <gmtime_r+0x208>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:107 (discriminator 1)
- 10028da:	85 ed                	test   ebp,ebp
- 10028dc:	0f 85 92 00 00 00    	jne    1002974 <gmtime_r+0x256>
+ 10028de:	85 ed                	test   ebp,ebp
+ 10028e0:	0f 85 92 00 00 00    	jne    1002978 <gmtime_r+0x256>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:107 (discriminator 4)
- 10028e2:	83 3c 24 00          	cmp    DWORD PTR [esp],0x0
- 10028e6:	74 7a                	je     1002962 <gmtime_r+0x244>
- 10028e8:	eb 2a                	jmp    1002914 <gmtime_r+0x1f6>
+ 10028e6:	83 3c 24 00          	cmp    DWORD PTR [esp],0x0
+ 10028ea:	74 7a                	je     1002966 <gmtime_r+0x244>
+ 10028ec:	eb 2a                	jmp    1002918 <gmtime_r+0x1f6>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:100
 
   tmbuf->tm_sec = dayclock % 60;
@@ -7236,14 +7235,14 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_hour = dayclock / 3600;
   tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
   while (dayno >= (unsigned long) YEARSIZE(year)) {
- 10028ea:	81 fb 6c 01 00 00    	cmp    ebx,0x16c
- 10028f0:	0f 87 03 ff ff ff    	ja     10027f9 <gmtime_r+0xdb>
- 10028f6:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
- 10028fa:	e9 50 ff ff ff       	jmp    100284f <gmtime_r+0x131>
- 10028ff:	81 fb 6c 01 00 00    	cmp    ebx,0x16c
- 1002905:	0f 87 ac fe ff ff    	ja     10027b7 <gmtime_r+0x99>
- 100290b:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
- 100290f:	e9 3b ff ff ff       	jmp    100284f <gmtime_r+0x131>
+ 10028ee:	81 fb 6c 01 00 00    	cmp    ebx,0x16c
+ 10028f4:	0f 87 03 ff ff ff    	ja     10027fd <gmtime_r+0xdb>
+ 10028fa:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
+ 10028fe:	e9 50 ff ff ff       	jmp    1002853 <gmtime_r+0x131>
+ 1002903:	81 fb 6c 01 00 00    	cmp    ebx,0x16c
+ 1002909:	0f 87 ac fe ff ff    	ja     10027bb <gmtime_r+0x99>
+ 100290f:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
+ 1002913:	e9 3b ff ff ff       	jmp    1002853 <gmtime_r+0x131>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:107
     year++;
   }
@@ -7251,14 +7250,14 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_yday = dayno;
   tmbuf->tm_mon = 0;
   while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) {
- 1002914:	8b 46 10             	mov    eax,DWORD PTR [esi+0x10]
- 1002917:	3b 1c 85 00 50 00 01 	cmp    ebx,DWORD PTR [eax*4+0x1005000]
- 100291e:	0f 83 72 ff ff ff    	jae    1002896 <gmtime_r+0x178>
- 1002924:	eb 5e                	jmp    1002984 <gmtime_r+0x266>
- 1002926:	8b 46 10             	mov    eax,DWORD PTR [esi+0x10]
- 1002929:	3b 1c 85 00 50 00 01 	cmp    ebx,DWORD PTR [eax*4+0x1005000]
- 1002930:	0f 83 6a ff ff ff    	jae    10028a0 <gmtime_r+0x182>
- 1002936:	eb 4c                	jmp    1002984 <gmtime_r+0x266>
+ 1002918:	8b 46 10             	mov    eax,DWORD PTR [esi+0x10]
+ 100291b:	3b 1c 85 00 50 00 01 	cmp    ebx,DWORD PTR [eax*4+0x1005000]
+ 1002922:	0f 83 72 ff ff ff    	jae    100289a <gmtime_r+0x178>
+ 1002928:	eb 5e                	jmp    1002988 <gmtime_r+0x266>
+ 100292a:	8b 46 10             	mov    eax,DWORD PTR [esi+0x10]
+ 100292d:	3b 1c 85 00 50 00 01 	cmp    ebx,DWORD PTR [eax*4+0x1005000]
+ 1002934:	0f 83 6a ff ff ff    	jae    10028a4 <gmtime_r+0x182>
+ 100293a:	eb 4c                	jmp    1002988 <gmtime_r+0x266>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:100
 
   tmbuf->tm_sec = dayclock % 60;
@@ -7266,14 +7265,14 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_hour = dayclock / 3600;
   tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
   while (dayno >= (unsigned long) YEARSIZE(year)) {
- 1002938:	81 fb 6d 01 00 00    	cmp    ebx,0x16d
- 100293e:	0f 87 bc fe ff ff    	ja     1002800 <gmtime_r+0xe2>
- 1002944:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
- 1002948:	e9 02 ff ff ff       	jmp    100284f <gmtime_r+0x131>
- 100294d:	81 fb 6d 01 00 00    	cmp    ebx,0x16d
- 1002953:	0f 87 73 fe ff ff    	ja     10027cc <gmtime_r+0xae>
- 1002959:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
- 100295d:	e9 ed fe ff ff       	jmp    100284f <gmtime_r+0x131>
+ 100293c:	81 fb 6d 01 00 00    	cmp    ebx,0x16d
+ 1002942:	0f 87 bc fe ff ff    	ja     1002804 <gmtime_r+0xe2>
+ 1002948:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
+ 100294c:	e9 02 ff ff ff       	jmp    1002853 <gmtime_r+0x131>
+ 1002951:	81 fb 6d 01 00 00    	cmp    ebx,0x16d
+ 1002957:	0f 87 73 fe ff ff    	ja     10027d0 <gmtime_r+0xae>
+ 100295d:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
+ 1002961:	e9 ed fe ff ff       	jmp    1002853 <gmtime_r+0x131>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:107
     year++;
   }
@@ -7281,96 +7280,96 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_yday = dayno;
   tmbuf->tm_mon = 0;
   while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) {
- 1002962:	8b 46 10             	mov    eax,DWORD PTR [esi+0x10]
- 1002965:	3b 1c 85 30 50 00 01 	cmp    ebx,DWORD PTR [eax*4+0x1005030]
- 100296c:	0f 83 43 ff ff ff    	jae    10028b5 <gmtime_r+0x197>
- 1002972:	eb 10                	jmp    1002984 <gmtime_r+0x266>
- 1002974:	8b 46 10             	mov    eax,DWORD PTR [esi+0x10]
- 1002977:	3b 1c 85 30 50 00 01 	cmp    ebx,DWORD PTR [eax*4+0x1005030]
- 100297e:	0f 83 38 ff ff ff    	jae    10028bc <gmtime_r+0x19e>
+ 1002966:	8b 46 10             	mov    eax,DWORD PTR [esi+0x10]
+ 1002969:	3b 1c 85 30 50 00 01 	cmp    ebx,DWORD PTR [eax*4+0x1005030]
+ 1002970:	0f 83 43 ff ff ff    	jae    10028b9 <gmtime_r+0x197>
+ 1002976:	eb 10                	jmp    1002988 <gmtime_r+0x266>
+ 1002978:	8b 46 10             	mov    eax,DWORD PTR [esi+0x10]
+ 100297b:	3b 1c 85 30 50 00 01 	cmp    ebx,DWORD PTR [eax*4+0x1005030]
+ 1002982:	0f 83 38 ff ff ff    	jae    10028c0 <gmtime_r+0x19e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:111
     dayno -= _ytab[LEAPYEAR(year)][tmbuf->tm_mon];
     tmbuf->tm_mon++;
   }
   tmbuf->tm_mday = dayno + 1;
- 1002984:	83 c3 01             	add    ebx,0x1
- 1002987:	89 5e 0c             	mov    DWORD PTR [esi+0xc],ebx
+ 1002988:	83 c3 01             	add    ebx,0x1
+ 100298b:	89 5e 0c             	mov    DWORD PTR [esi+0xc],ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:112
   tmbuf->tm_isdst = 0;
- 100298a:	c7 46 20 00 00 00 00 	mov    DWORD PTR [esi+0x20],0x0
+ 100298e:	c7 46 20 00 00 00 00 	mov    DWORD PTR [esi+0x20],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:114
   return tmbuf;
 }
- 1002991:	89 f0                	mov    eax,esi
- 1002993:	83 c4 08             	add    esp,0x8
- 1002996:	5b                   	pop    ebx
- 1002997:	5e                   	pop    esi
- 1002998:	5f                   	pop    edi
- 1002999:	5d                   	pop    ebp
- 100299a:	c3                   	ret    
+ 1002995:	89 f0                	mov    eax,esi
+ 1002997:	83 c4 08             	add    esp,0x8
+ 100299a:	5b                   	pop    ebx
+ 100299b:	5e                   	pop    esi
+ 100299c:	5f                   	pop    edi
+ 100299d:	5d                   	pop    ebp
+ 100299e:	c3                   	ret    
 
-0100299b <localtime>:
+0100299f <localtime>:
 localtime():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:116
 
 struct tm *localtime(const time_t *timer) {
- 100299b:	83 ec 30             	sub    esp,0x30
+ 100299f:	83 ec 30             	sub    esp,0x30
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:120
   time_t t;
   struct tm tmbuf;
   
   t = *timer - kTimeZone;
- 100299e:	8b 44 24 34          	mov    eax,DWORD PTR [esp+0x34]
- 10029a2:	8b 00                	mov    eax,DWORD PTR [eax]
- 10029a4:	2b 05 90 02 12 00    	sub    eax,DWORD PTR ds:0x120290
- 10029aa:	89 44 24 2c          	mov    DWORD PTR [esp+0x2c],eax
+ 10029a2:	8b 44 24 34          	mov    eax,DWORD PTR [esp+0x34]
+ 10029a6:	8b 00                	mov    eax,DWORD PTR [eax]
+ 10029a8:	2b 05 90 02 12 00    	sub    eax,DWORD PTR ds:0x120290
+ 10029ae:	89 44 24 2c          	mov    DWORD PTR [esp+0x2c],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:121
   return gmtime_r(&t, &tmbuf);
- 10029ae:	54                   	push   esp
- 10029af:	8d 44 24 30          	lea    eax,[esp+0x30]
- 10029b3:	50                   	push   eax
- 10029b4:	e8 65 fd ff ff       	call   100271e <gmtime_r>
+ 10029b2:	54                   	push   esp
+ 10029b3:	8d 44 24 30          	lea    eax,[esp+0x30]
+ 10029b7:	50                   	push   eax
+ 10029b8:	e8 65 fd ff ff       	call   1002722 <gmtime_r>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:122
 }
- 10029b9:	83 c4 38             	add    esp,0x38
- 10029bc:	c3                   	ret    
+ 10029bd:	83 c4 38             	add    esp,0x38
+ 10029c0:	c3                   	ret    
 
-010029bd <localtime_r>:
+010029c1 <localtime_r>:
 localtime_r():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:124
 
 struct tm *localtime_r(const time_t *timer, struct tm *tmbuf) {
- 10029bd:	83 ec 10             	sub    esp,0x10
+ 10029c1:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:127
   time_t t;
 
   t = *timer - kTimeZone;
- 10029c0:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
- 10029c4:	8b 00                	mov    eax,DWORD PTR [eax]
- 10029c6:	2b 05 90 02 12 00    	sub    eax,DWORD PTR ds:0x120290
- 10029cc:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
+ 10029c4:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
+ 10029c8:	8b 00                	mov    eax,DWORD PTR [eax]
+ 10029ca:	2b 05 90 02 12 00    	sub    eax,DWORD PTR ds:0x120290
+ 10029d0:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:128
   return gmtime_r(&t, tmbuf);
- 10029d0:	ff 74 24 18          	push   DWORD PTR [esp+0x18]
- 10029d4:	8d 44 24 10          	lea    eax,[esp+0x10]
- 10029d8:	50                   	push   eax
- 10029d9:	e8 40 fd ff ff       	call   100271e <gmtime_r>
+ 10029d4:	ff 74 24 18          	push   DWORD PTR [esp+0x18]
+ 10029d8:	8d 44 24 10          	lea    eax,[esp+0x10]
+ 10029dc:	50                   	push   eax
+ 10029dd:	e8 40 fd ff ff       	call   1002722 <gmtime_r>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:129
 }
- 10029de:	83 c4 18             	add    esp,0x18
- 10029e1:	c3                   	ret    
+ 10029e2:	83 c4 18             	add    esp,0x18
+ 10029e5:	c3                   	ret    
 
-010029e2 <mktime>:
+010029e6 <mktime>:
 mktime():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:131
 
 time_t mktime(struct tm *tmbuf) {
- 10029e2:	55                   	push   ebp
- 10029e3:	57                   	push   edi
- 10029e4:	56                   	push   esi
- 10029e5:	53                   	push   ebx
- 10029e6:	83 ec 20             	sub    esp,0x20
- 10029e9:	8b 5c 24 34          	mov    ebx,DWORD PTR [esp+0x34]
+ 10029e6:	55                   	push   ebp
+ 10029e7:	57                   	push   edi
+ 10029e8:	56                   	push   esi
+ 10029e9:	53                   	push   ebx
+ 10029ea:	83 ec 20             	sub    esp,0x20
+ 10029ed:	8b 5c 24 34          	mov    ebx,DWORD PTR [esp+0x34]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:139
   int yday, month;
   /*unsigned*/ long seconds;
@@ -7378,25 +7377,25 @@ time_t mktime(struct tm *tmbuf) {
   long dst;
 
   tmbuf->tm_min += tmbuf->tm_sec / 60;
- 10029ed:	8b 0b                	mov    ecx,DWORD PTR [ebx]
- 10029ef:	ba 89 88 88 88       	mov    edx,0x88888889
- 10029f4:	89 c8                	mov    eax,ecx
- 10029f6:	f7 ea                	imul   edx
- 10029f8:	8d 04 0a             	lea    eax,[edx+ecx*1]
- 10029fb:	c1 f8 05             	sar    eax,0x5
- 10029fe:	89 ca                	mov    edx,ecx
- 1002a00:	c1 fa 1f             	sar    edx,0x1f
- 1002a03:	29 d0                	sub    eax,edx
- 1002a05:	89 c2                	mov    edx,eax
- 1002a07:	03 53 04             	add    edx,DWORD PTR [ebx+0x4]
- 1002a0a:	89 53 04             	mov    DWORD PTR [ebx+0x4],edx
+ 10029f1:	8b 0b                	mov    ecx,DWORD PTR [ebx]
+ 10029f3:	ba 89 88 88 88       	mov    edx,0x88888889
+ 10029f8:	89 c8                	mov    eax,ecx
+ 10029fa:	f7 ea                	imul   edx
+ 10029fc:	8d 04 0a             	lea    eax,[edx+ecx*1]
+ 10029ff:	c1 f8 05             	sar    eax,0x5
+ 1002a02:	89 ca                	mov    edx,ecx
+ 1002a04:	c1 fa 1f             	sar    edx,0x1f
+ 1002a07:	29 d0                	sub    eax,edx
+ 1002a09:	89 c2                	mov    edx,eax
+ 1002a0b:	03 53 04             	add    edx,DWORD PTR [ebx+0x4]
+ 1002a0e:	89 53 04             	mov    DWORD PTR [ebx+0x4],edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:140
   tmbuf->tm_sec %= 60;
- 1002a0d:	6b c0 3c             	imul   eax,eax,0x3c
+ 1002a11:	6b c0 3c             	imul   eax,eax,0x3c
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:141
   if (tmbuf->tm_sec < 0) {
- 1002a10:	29 c1                	sub    ecx,eax
- 1002a12:	78 04                	js     1002a18 <mktime+0x36>
+ 1002a14:	29 c1                	sub    ecx,eax
+ 1002a16:	78 04                	js     1002a1c <mktime+0x36>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:140
   /*unsigned*/ long seconds;
   int overflow;
@@ -7404,39 +7403,39 @@ time_t mktime(struct tm *tmbuf) {
 
   tmbuf->tm_min += tmbuf->tm_sec / 60;
   tmbuf->tm_sec %= 60;
- 1002a14:	89 0b                	mov    DWORD PTR [ebx],ecx
- 1002a16:	eb 0b                	jmp    1002a23 <mktime+0x41>
+ 1002a18:	89 0b                	mov    DWORD PTR [ebx],ecx
+ 1002a1a:	eb 0b                	jmp    1002a27 <mktime+0x41>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:142
   if (tmbuf->tm_sec < 0) {
     tmbuf->tm_sec += 60;
- 1002a18:	83 c1 3c             	add    ecx,0x3c
- 1002a1b:	89 0b                	mov    DWORD PTR [ebx],ecx
+ 1002a1c:	83 c1 3c             	add    ecx,0x3c
+ 1002a1f:	89 0b                	mov    DWORD PTR [ebx],ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:143
     tmbuf->tm_min--;
- 1002a1d:	83 ea 01             	sub    edx,0x1
- 1002a20:	89 53 04             	mov    DWORD PTR [ebx+0x4],edx
+ 1002a21:	83 ea 01             	sub    edx,0x1
+ 1002a24:	89 53 04             	mov    DWORD PTR [ebx+0x4],edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:145
   }
   tmbuf->tm_hour += tmbuf->tm_min / 60;
- 1002a23:	8b 4b 04             	mov    ecx,DWORD PTR [ebx+0x4]
- 1002a26:	ba 89 88 88 88       	mov    edx,0x88888889
- 1002a2b:	89 c8                	mov    eax,ecx
- 1002a2d:	f7 ea                	imul   edx
- 1002a2f:	8d 04 0a             	lea    eax,[edx+ecx*1]
- 1002a32:	c1 f8 05             	sar    eax,0x5
- 1002a35:	89 ca                	mov    edx,ecx
- 1002a37:	c1 fa 1f             	sar    edx,0x1f
- 1002a3a:	29 d0                	sub    eax,edx
- 1002a3c:	89 c2                	mov    edx,eax
- 1002a3e:	03 53 08             	add    edx,DWORD PTR [ebx+0x8]
- 1002a41:	89 53 08             	mov    DWORD PTR [ebx+0x8],edx
+ 1002a27:	8b 4b 04             	mov    ecx,DWORD PTR [ebx+0x4]
+ 1002a2a:	ba 89 88 88 88       	mov    edx,0x88888889
+ 1002a2f:	89 c8                	mov    eax,ecx
+ 1002a31:	f7 ea                	imul   edx
+ 1002a33:	8d 04 0a             	lea    eax,[edx+ecx*1]
+ 1002a36:	c1 f8 05             	sar    eax,0x5
+ 1002a39:	89 ca                	mov    edx,ecx
+ 1002a3b:	c1 fa 1f             	sar    edx,0x1f
+ 1002a3e:	29 d0                	sub    eax,edx
+ 1002a40:	89 c2                	mov    edx,eax
+ 1002a42:	03 53 08             	add    edx,DWORD PTR [ebx+0x8]
+ 1002a45:	89 53 08             	mov    DWORD PTR [ebx+0x8],edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:146
   tmbuf->tm_min = tmbuf->tm_min % 60;
- 1002a44:	6b c0 3c             	imul   eax,eax,0x3c
+ 1002a48:	6b c0 3c             	imul   eax,eax,0x3c
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:147
   if (tmbuf->tm_min < 0) {
- 1002a47:	29 c1                	sub    ecx,eax
- 1002a49:	78 05                	js     1002a50 <mktime+0x6e>
+ 1002a4b:	29 c1                	sub    ecx,eax
+ 1002a4d:	78 05                	js     1002a54 <mktime+0x6e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:146
   if (tmbuf->tm_sec < 0) {
     tmbuf->tm_sec += 60;
@@ -7444,37 +7443,37 @@ time_t mktime(struct tm *tmbuf) {
   }
   tmbuf->tm_hour += tmbuf->tm_min / 60;
   tmbuf->tm_min = tmbuf->tm_min % 60;
- 1002a4b:	89 4b 04             	mov    DWORD PTR [ebx+0x4],ecx
- 1002a4e:	eb 0c                	jmp    1002a5c <mktime+0x7a>
+ 1002a4f:	89 4b 04             	mov    DWORD PTR [ebx+0x4],ecx
+ 1002a52:	eb 0c                	jmp    1002a60 <mktime+0x7a>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:148
   if (tmbuf->tm_min < 0) {
     tmbuf->tm_min += 60;
- 1002a50:	83 c1 3c             	add    ecx,0x3c
- 1002a53:	89 4b 04             	mov    DWORD PTR [ebx+0x4],ecx
+ 1002a54:	83 c1 3c             	add    ecx,0x3c
+ 1002a57:	89 4b 04             	mov    DWORD PTR [ebx+0x4],ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:149
     tmbuf->tm_hour--;
- 1002a56:	83 ea 01             	sub    edx,0x1
- 1002a59:	89 53 08             	mov    DWORD PTR [ebx+0x8],edx
+ 1002a5a:	83 ea 01             	sub    edx,0x1
+ 1002a5d:	89 53 08             	mov    DWORD PTR [ebx+0x8],edx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:151
   }
   day = tmbuf->tm_hour / 24;
- 1002a5c:	8b 73 08             	mov    esi,DWORD PTR [ebx+0x8]
- 1002a5f:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
- 1002a64:	89 f0                	mov    eax,esi
- 1002a66:	f7 ea                	imul   edx
- 1002a68:	c1 fa 02             	sar    edx,0x2
- 1002a6b:	89 f0                	mov    eax,esi
- 1002a6d:	c1 f8 1f             	sar    eax,0x1f
- 1002a70:	89 d1                	mov    ecx,edx
- 1002a72:	29 c1                	sub    ecx,eax
+ 1002a60:	8b 73 08             	mov    esi,DWORD PTR [ebx+0x8]
+ 1002a63:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
+ 1002a68:	89 f0                	mov    eax,esi
+ 1002a6a:	f7 ea                	imul   edx
+ 1002a6c:	c1 fa 02             	sar    edx,0x2
+ 1002a6f:	89 f0                	mov    eax,esi
+ 1002a71:	c1 f8 1f             	sar    eax,0x1f
+ 1002a74:	89 d1                	mov    ecx,edx
+ 1002a76:	29 c1                	sub    ecx,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:152
   tmbuf->tm_hour= tmbuf->tm_hour % 24;
- 1002a74:	8d 04 49             	lea    eax,[ecx+ecx*2]
- 1002a77:	c1 e0 03             	shl    eax,0x3
+ 1002a78:	8d 04 49             	lea    eax,[ecx+ecx*2]
+ 1002a7b:	c1 e0 03             	shl    eax,0x3
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:153
   if (tmbuf->tm_hour < 0) {
- 1002a7a:	29 c6                	sub    esi,eax
- 1002a7c:	78 05                	js     1002a83 <mktime+0xa1>
+ 1002a7e:	29 c6                	sub    esi,eax
+ 1002a80:	78 05                	js     1002a87 <mktime+0xa1>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:152
   if (tmbuf->tm_min < 0) {
     tmbuf->tm_min += 60;
@@ -7482,38 +7481,38 @@ time_t mktime(struct tm *tmbuf) {
   }
   day = tmbuf->tm_hour / 24;
   tmbuf->tm_hour= tmbuf->tm_hour % 24;
- 1002a7e:	89 73 08             	mov    DWORD PTR [ebx+0x8],esi
- 1002a81:	eb 09                	jmp    1002a8c <mktime+0xaa>
+ 1002a82:	89 73 08             	mov    DWORD PTR [ebx+0x8],esi
+ 1002a85:	eb 09                	jmp    1002a90 <mktime+0xaa>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:154
   if (tmbuf->tm_hour < 0) {
     tmbuf->tm_hour += 24;
- 1002a83:	83 c6 18             	add    esi,0x18
- 1002a86:	89 73 08             	mov    DWORD PTR [ebx+0x8],esi
+ 1002a87:	83 c6 18             	add    esi,0x18
+ 1002a8a:	89 73 08             	mov    DWORD PTR [ebx+0x8],esi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:155
     day--;
- 1002a89:	83 e9 01             	sub    ecx,0x1
+ 1002a8d:	83 e9 01             	sub    ecx,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:157
   }
   tmbuf->tm_year += tmbuf->tm_mon / 12;
- 1002a8c:	8b 73 10             	mov    esi,DWORD PTR [ebx+0x10]
- 1002a8f:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
- 1002a94:	89 f0                	mov    eax,esi
- 1002a96:	f7 ea                	imul   edx
- 1002a98:	d1 fa                	sar    edx,1
- 1002a9a:	89 f0                	mov    eax,esi
- 1002a9c:	c1 f8 1f             	sar    eax,0x1f
- 1002a9f:	29 c2                	sub    edx,eax
- 1002aa1:	89 d0                	mov    eax,edx
- 1002aa3:	03 43 14             	add    eax,DWORD PTR [ebx+0x14]
- 1002aa6:	89 43 14             	mov    DWORD PTR [ebx+0x14],eax
+ 1002a90:	8b 73 10             	mov    esi,DWORD PTR [ebx+0x10]
+ 1002a93:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
+ 1002a98:	89 f0                	mov    eax,esi
+ 1002a9a:	f7 ea                	imul   edx
+ 1002a9c:	d1 fa                	sar    edx,1
+ 1002a9e:	89 f0                	mov    eax,esi
+ 1002aa0:	c1 f8 1f             	sar    eax,0x1f
+ 1002aa3:	29 c2                	sub    edx,eax
+ 1002aa5:	89 d0                	mov    eax,edx
+ 1002aa7:	03 43 14             	add    eax,DWORD PTR [ebx+0x14]
+ 1002aaa:	89 43 14             	mov    DWORD PTR [ebx+0x14],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:158
   tmbuf->tm_mon %= 12;
- 1002aa9:	8d 14 52             	lea    edx,[edx+edx*2]
- 1002aac:	c1 e2 02             	shl    edx,0x2
+ 1002aad:	8d 14 52             	lea    edx,[edx+edx*2]
+ 1002ab0:	c1 e2 02             	shl    edx,0x2
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:159
   if (tmbuf->tm_mon < 0) {
- 1002aaf:	29 d6                	sub    esi,edx
- 1002ab1:	78 05                	js     1002ab8 <mktime+0xd6>
+ 1002ab3:	29 d6                	sub    esi,edx
+ 1002ab5:	78 05                	js     1002abc <mktime+0xd6>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:158
   if (tmbuf->tm_hour < 0) {
     tmbuf->tm_hour += 24;
@@ -7521,34 +7520,34 @@ time_t mktime(struct tm *tmbuf) {
   }
   tmbuf->tm_year += tmbuf->tm_mon / 12;
   tmbuf->tm_mon %= 12;
- 1002ab3:	89 73 10             	mov    DWORD PTR [ebx+0x10],esi
- 1002ab6:	eb 0c                	jmp    1002ac4 <mktime+0xe2>
+ 1002ab7:	89 73 10             	mov    DWORD PTR [ebx+0x10],esi
+ 1002aba:	eb 0c                	jmp    1002ac8 <mktime+0xe2>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:160
   if (tmbuf->tm_mon < 0) {
     tmbuf->tm_mon += 12;
- 1002ab8:	83 c6 0c             	add    esi,0xc
- 1002abb:	89 73 10             	mov    DWORD PTR [ebx+0x10],esi
+ 1002abc:	83 c6 0c             	add    esi,0xc
+ 1002abf:	89 73 10             	mov    DWORD PTR [ebx+0x10],esi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:161
     tmbuf->tm_year--;
- 1002abe:	83 e8 01             	sub    eax,0x1
- 1002ac1:	89 43 14             	mov    DWORD PTR [ebx+0x14],eax
+ 1002ac2:	83 e8 01             	sub    eax,0x1
+ 1002ac5:	89 43 14             	mov    DWORD PTR [ebx+0x14],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:163
   }
   day += (tmbuf->tm_mday - 1);
- 1002ac4:	8b 43 0c             	mov    eax,DWORD PTR [ebx+0xc]
- 1002ac7:	8d 6c 01 ff          	lea    ebp,[ecx+eax*1-0x1]
+ 1002ac8:	8b 43 0c             	mov    eax,DWORD PTR [ebx+0xc]
+ 1002acb:	8d 6c 01 ff          	lea    ebp,[ecx+eax*1-0x1]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:164
   while (day < 0) {
- 1002acb:	85 ed                	test   ebp,ebp
- 1002acd:	0f 89 f1 00 00 00    	jns    1002bc4 <mktime+0x1e2>
- 1002ad3:	8b 73 10             	mov    esi,DWORD PTR [ebx+0x10]
+ 1002acf:	85 ed                	test   ebp,ebp
+ 1002ad1:	0f 89 f1 00 00 00    	jns    1002bc8 <mktime+0x1e2>
+ 1002ad7:	8b 73 10             	mov    esi,DWORD PTR [ebx+0x10]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:169
     if(--tmbuf->tm_mon < 0) {
       tmbuf->tm_year--;
       tmbuf->tm_mon = 11;
     }
     day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
- 1002ad6:	bf 1f 85 eb 51       	mov    edi,0x51eb851f
+ 1002ada:	bf 1f 85 eb 51       	mov    edi,0x51eb851f
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:165
     tmbuf->tm_mon += 12;
     tmbuf->tm_year--;
@@ -7556,49 +7555,49 @@ time_t mktime(struct tm *tmbuf) {
   day += (tmbuf->tm_mday - 1);
   while (day < 0) {
     if(--tmbuf->tm_mon < 0) {
- 1002adb:	83 ee 01             	sub    esi,0x1
- 1002ade:	79 09                	jns    1002ae9 <mktime+0x107>
+ 1002adf:	83 ee 01             	sub    esi,0x1
+ 1002ae2:	79 09                	jns    1002aed <mktime+0x107>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:166
       tmbuf->tm_year--;
- 1002ae0:	83 6b 14 01          	sub    DWORD PTR [ebx+0x14],0x1
+ 1002ae4:	83 6b 14 01          	sub    DWORD PTR [ebx+0x14],0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:167
       tmbuf->tm_mon = 11;
- 1002ae4:	be 0b 00 00 00       	mov    esi,0xb
+ 1002ae8:	be 0b 00 00 00       	mov    esi,0xb
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:169
     }
     day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
- 1002ae9:	8b 4b 14             	mov    ecx,DWORD PTR [ebx+0x14]
- 1002aec:	b8 00 00 00 00       	mov    eax,0x0
- 1002af1:	f6 c1 03             	test   cl,0x3
- 1002af4:	75 3c                	jne    1002b32 <mktime+0x150>
+ 1002aed:	8b 4b 14             	mov    ecx,DWORD PTR [ebx+0x14]
+ 1002af0:	b8 00 00 00 00       	mov    eax,0x0
+ 1002af5:	f6 c1 03             	test   cl,0x3
+ 1002af8:	75 3c                	jne    1002b36 <mktime+0x150>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:169 (discriminator 1)
- 1002af6:	81 c1 6c 07 00 00    	add    ecx,0x76c
- 1002afc:	89 c8                	mov    eax,ecx
- 1002afe:	f7 ef                	imul   edi
- 1002b00:	c1 fa 05             	sar    edx,0x5
- 1002b03:	89 c8                	mov    eax,ecx
- 1002b05:	c1 f8 1f             	sar    eax,0x1f
- 1002b08:	29 c2                	sub    edx,eax
- 1002b0a:	6b d2 64             	imul   edx,edx,0x64
- 1002b0d:	b8 01 00 00 00       	mov    eax,0x1
- 1002b12:	39 d1                	cmp    ecx,edx
- 1002b14:	75 1c                	jne    1002b32 <mktime+0x150>
+ 1002afa:	81 c1 6c 07 00 00    	add    ecx,0x76c
+ 1002b00:	89 c8                	mov    eax,ecx
+ 1002b02:	f7 ef                	imul   edi
+ 1002b04:	c1 fa 05             	sar    edx,0x5
+ 1002b07:	89 c8                	mov    eax,ecx
+ 1002b09:	c1 f8 1f             	sar    eax,0x1f
+ 1002b0c:	29 c2                	sub    edx,eax
+ 1002b0e:	6b d2 64             	imul   edx,edx,0x64
+ 1002b11:	b8 01 00 00 00       	mov    eax,0x1
+ 1002b16:	39 d1                	cmp    ecx,edx
+ 1002b18:	75 1c                	jne    1002b36 <mktime+0x150>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:169 (discriminator 4)
- 1002b16:	89 c8                	mov    eax,ecx
- 1002b18:	f7 ef                	imul   edi
- 1002b1a:	c1 fa 07             	sar    edx,0x7
- 1002b1d:	89 c8                	mov    eax,ecx
- 1002b1f:	c1 f8 1f             	sar    eax,0x1f
- 1002b22:	29 c2                	sub    edx,eax
- 1002b24:	69 d2 90 01 00 00    	imul   edx,edx,0x190
- 1002b2a:	39 d1                	cmp    ecx,edx
- 1002b2c:	0f 94 c0             	sete   al
- 1002b2f:	0f b6 c0             	movzx  eax,al
+ 1002b1a:	89 c8                	mov    eax,ecx
+ 1002b1c:	f7 ef                	imul   edi
+ 1002b1e:	c1 fa 07             	sar    edx,0x7
+ 1002b21:	89 c8                	mov    eax,ecx
+ 1002b23:	c1 f8 1f             	sar    eax,0x1f
+ 1002b26:	29 c2                	sub    edx,eax
+ 1002b28:	69 d2 90 01 00 00    	imul   edx,edx,0x190
+ 1002b2e:	39 d1                	cmp    ecx,edx
+ 1002b30:	0f 94 c0             	sete   al
+ 1002b33:	0f b6 c0             	movzx  eax,al
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:169 (discriminator 8)
- 1002b32:	8d 14 00             	lea    edx,[eax+eax*1]
- 1002b35:	01 d0                	add    eax,edx
- 1002b37:	8d 04 86             	lea    eax,[esi+eax*4]
- 1002b3a:	03 2c 85 00 50 00 01 	add    ebp,DWORD PTR [eax*4+0x1005000]
+ 1002b36:	8d 14 00             	lea    edx,[eax+eax*1]
+ 1002b39:	01 d0                	add    eax,edx
+ 1002b3b:	8d 04 86             	lea    eax,[esi+eax*4]
+ 1002b3e:	03 2c 85 00 50 00 01 	add    ebp,DWORD PTR [eax*4+0x1005000]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:164 (discriminator 8)
   if (tmbuf->tm_mon < 0) {
     tmbuf->tm_mon += 12;
@@ -7606,10 +7605,10 @@ time_t mktime(struct tm *tmbuf) {
   }
   day += (tmbuf->tm_mday - 1);
   while (day < 0) {
- 1002b41:	85 ed                	test   ebp,ebp
- 1002b43:	78 96                	js     1002adb <mktime+0xf9>
- 1002b45:	89 73 10             	mov    DWORD PTR [ebx+0x10],esi
- 1002b48:	eb 7a                	jmp    1002bc4 <mktime+0x1e2>
+ 1002b45:	85 ed                	test   ebp,ebp
+ 1002b47:	78 96                	js     1002adf <mktime+0xf9>
+ 1002b49:	89 73 10             	mov    DWORD PTR [ebx+0x10],esi
+ 1002b4c:	eb 7a                	jmp    1002bc8 <mktime+0x1e2>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:172 (discriminator 1)
       tmbuf->tm_mon = 11;
     }
@@ -7617,54 +7616,54 @@ time_t mktime(struct tm *tmbuf) {
   }
   while (day >= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon]) {
     day -= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
- 1002b4a:	8d be 6c 07 00 00    	lea    edi,[esi+0x76c]
- 1002b50:	b8 1f 85 eb 51       	mov    eax,0x51eb851f
- 1002b55:	f7 ef                	imul   edi
- 1002b57:	c1 fa 05             	sar    edx,0x5
- 1002b5a:	89 f8                	mov    eax,edi
- 1002b5c:	c1 f8 1f             	sar    eax,0x1f
- 1002b5f:	29 c2                	sub    edx,eax
- 1002b61:	6b d2 64             	imul   edx,edx,0x64
- 1002b64:	39 d7                	cmp    edi,edx
- 1002b66:	75 27                	jne    1002b8f <mktime+0x1ad>
+ 1002b4e:	8d be 6c 07 00 00    	lea    edi,[esi+0x76c]
+ 1002b54:	b8 1f 85 eb 51       	mov    eax,0x51eb851f
+ 1002b59:	f7 ef                	imul   edi
+ 1002b5b:	c1 fa 05             	sar    edx,0x5
+ 1002b5e:	89 f8                	mov    eax,edi
+ 1002b60:	c1 f8 1f             	sar    eax,0x1f
+ 1002b63:	29 c2                	sub    edx,eax
+ 1002b65:	6b d2 64             	imul   edx,edx,0x64
+ 1002b68:	39 d7                	cmp    edi,edx
+ 1002b6a:	75 27                	jne    1002b93 <mktime+0x1ad>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:172 (discriminator 4)
- 1002b68:	b8 1f 85 eb 51       	mov    eax,0x51eb851f
- 1002b6d:	f7 ef                	imul   edi
- 1002b6f:	c1 fa 07             	sar    edx,0x7
- 1002b72:	89 f8                	mov    eax,edi
- 1002b74:	c1 f8 1f             	sar    eax,0x1f
- 1002b77:	29 c2                	sub    edx,eax
- 1002b79:	69 d2 90 01 00 00    	imul   edx,edx,0x190
- 1002b7f:	b8 01 00 00 00       	mov    eax,0x1
- 1002b84:	39 d7                	cmp    edi,edx
- 1002b86:	74 13                	je     1002b9b <mktime+0x1b9>
+ 1002b6c:	b8 1f 85 eb 51       	mov    eax,0x51eb851f
+ 1002b71:	f7 ef                	imul   edi
+ 1002b73:	c1 fa 07             	sar    edx,0x7
+ 1002b76:	89 f8                	mov    eax,edi
+ 1002b78:	c1 f8 1f             	sar    eax,0x1f
+ 1002b7b:	29 c2                	sub    edx,eax
+ 1002b7d:	69 d2 90 01 00 00    	imul   edx,edx,0x190
+ 1002b83:	b8 01 00 00 00       	mov    eax,0x1
+ 1002b88:	39 d7                	cmp    edi,edx
+ 1002b8a:	74 13                	je     1002b9f <mktime+0x1b9>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:172 (discriminator 6)
- 1002b88:	b8 00 00 00 00       	mov    eax,0x0
- 1002b8d:	eb 0c                	jmp    1002b9b <mktime+0x1b9>
+ 1002b8c:	b8 00 00 00 00       	mov    eax,0x0
+ 1002b91:	eb 0c                	jmp    1002b9f <mktime+0x1b9>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:172
- 1002b8f:	b8 01 00 00 00       	mov    eax,0x1
- 1002b94:	eb 05                	jmp    1002b9b <mktime+0x1b9>
- 1002b96:	b8 01 00 00 00       	mov    eax,0x1
+ 1002b93:	b8 01 00 00 00       	mov    eax,0x1
+ 1002b98:	eb 05                	jmp    1002b9f <mktime+0x1b9>
+ 1002b9a:	b8 01 00 00 00       	mov    eax,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:172 (discriminator 8)
- 1002b9b:	8d 14 00             	lea    edx,[eax+eax*1]
- 1002b9e:	01 d0                	add    eax,edx
- 1002ba0:	8d 04 81             	lea    eax,[ecx+eax*4]
- 1002ba3:	2b 2c 85 00 50 00 01 	sub    ebp,DWORD PTR [eax*4+0x1005000]
+ 1002b9f:	8d 14 00             	lea    edx,[eax+eax*1]
+ 1002ba2:	01 d0                	add    eax,edx
+ 1002ba4:	8d 04 81             	lea    eax,[ecx+eax*4]
+ 1002ba7:	2b 2c 85 00 50 00 01 	sub    ebp,DWORD PTR [eax*4+0x1005000]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:173 (discriminator 8)
     if (++(tmbuf->tm_mon) == 12) {
- 1002baa:	83 c1 01             	add    ecx,0x1
- 1002bad:	83 f9 0c             	cmp    ecx,0xc
- 1002bb0:	74 05                	je     1002bb7 <mktime+0x1d5>
+ 1002bae:	83 c1 01             	add    ecx,0x1
+ 1002bb1:	83 f9 0c             	cmp    ecx,0xc
+ 1002bb4:	74 05                	je     1002bbb <mktime+0x1d5>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:173
- 1002bb2:	89 4b 10             	mov    DWORD PTR [ebx+0x10],ecx
- 1002bb5:	eb 0d                	jmp    1002bc4 <mktime+0x1e2>
+ 1002bb6:	89 4b 10             	mov    DWORD PTR [ebx+0x10],ecx
+ 1002bb9:	eb 0d                	jmp    1002bc8 <mktime+0x1e2>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:174
       tmbuf->tm_mon = 0;
- 1002bb7:	c7 43 10 00 00 00 00 	mov    DWORD PTR [ebx+0x10],0x0
+ 1002bbb:	c7 43 10 00 00 00 00 	mov    DWORD PTR [ebx+0x10],0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:175
       tmbuf->tm_year++;
- 1002bbe:	83 c6 01             	add    esi,0x1
- 1002bc1:	89 73 14             	mov    DWORD PTR [ebx+0x14],esi
+ 1002bc2:	83 c6 01             	add    esi,0x1
+ 1002bc5:	89 73 14             	mov    DWORD PTR [ebx+0x14],esi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:171
       tmbuf->tm_year--;
       tmbuf->tm_mon = 11;
@@ -7672,31 +7671,31 @@ time_t mktime(struct tm *tmbuf) {
     day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
   }
   while (day >= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon]) {
- 1002bc4:	8b 73 14             	mov    esi,DWORD PTR [ebx+0x14]
- 1002bc7:	f7 c6 03 00 00 00    	test   esi,0x3
- 1002bcd:	0f 85 ad 02 00 00    	jne    1002e80 <mktime+0x49e>
+ 1002bc8:	8b 73 14             	mov    esi,DWORD PTR [ebx+0x14]
+ 1002bcb:	f7 c6 03 00 00 00    	test   esi,0x3
+ 1002bd1:	0f 85 ad 02 00 00    	jne    1002e84 <mktime+0x49e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:171 (discriminator 1)
- 1002bd3:	8d 8e 6c 07 00 00    	lea    ecx,[esi+0x76c]
- 1002bd9:	b8 1f 85 eb 51       	mov    eax,0x51eb851f
- 1002bde:	f7 e9                	imul   ecx
- 1002be0:	c1 fa 05             	sar    edx,0x5
- 1002be3:	89 c8                	mov    eax,ecx
- 1002be5:	c1 f8 1f             	sar    eax,0x1f
- 1002be8:	29 c2                	sub    edx,eax
- 1002bea:	6b d2 64             	imul   edx,edx,0x64
- 1002bed:	39 d1                	cmp    ecx,edx
- 1002bef:	0f 85 b5 02 00 00    	jne    1002eaa <mktime+0x4c8>
+ 1002bd7:	8d 8e 6c 07 00 00    	lea    ecx,[esi+0x76c]
+ 1002bdd:	b8 1f 85 eb 51       	mov    eax,0x51eb851f
+ 1002be2:	f7 e9                	imul   ecx
+ 1002be4:	c1 fa 05             	sar    edx,0x5
+ 1002be7:	89 c8                	mov    eax,ecx
+ 1002be9:	c1 f8 1f             	sar    eax,0x1f
+ 1002bec:	29 c2                	sub    edx,eax
+ 1002bee:	6b d2 64             	imul   edx,edx,0x64
+ 1002bf1:	39 d1                	cmp    ecx,edx
+ 1002bf3:	0f 85 b5 02 00 00    	jne    1002eae <mktime+0x4c8>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:171 (discriminator 4)
- 1002bf5:	b8 1f 85 eb 51       	mov    eax,0x51eb851f
- 1002bfa:	f7 e9                	imul   ecx
- 1002bfc:	c1 fa 07             	sar    edx,0x7
- 1002bff:	89 c8                	mov    eax,ecx
- 1002c01:	c1 f8 1f             	sar    eax,0x1f
- 1002c04:	29 c2                	sub    edx,eax
- 1002c06:	69 d2 90 01 00 00    	imul   edx,edx,0x190
- 1002c0c:	39 d1                	cmp    ecx,edx
- 1002c0e:	0f 84 b6 02 00 00    	je     1002eca <mktime+0x4e8>
- 1002c14:	e9 7c 02 00 00       	jmp    1002e95 <mktime+0x4b3>
+ 1002bf9:	b8 1f 85 eb 51       	mov    eax,0x51eb851f
+ 1002bfe:	f7 e9                	imul   ecx
+ 1002c00:	c1 fa 07             	sar    edx,0x7
+ 1002c03:	89 c8                	mov    eax,ecx
+ 1002c05:	c1 f8 1f             	sar    eax,0x1f
+ 1002c08:	29 c2                	sub    edx,eax
+ 1002c0a:	69 d2 90 01 00 00    	imul   edx,edx,0x190
+ 1002c10:	39 d1                	cmp    ecx,edx
+ 1002c12:	0f 84 b6 02 00 00    	je     1002ece <mktime+0x4e8>
+ 1002c18:	e9 7c 02 00 00       	jmp    1002e99 <mktime+0x4b3>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:178
     if (++(tmbuf->tm_mon) == 12) {
       tmbuf->tm_mon = 0;
@@ -7704,13 +7703,13 @@ time_t mktime(struct tm *tmbuf) {
     }
   }
   tmbuf->tm_mday = day + 1;
- 1002c19:	8d 45 01             	lea    eax,[ebp+0x1]
- 1002c1c:	89 43 0c             	mov    DWORD PTR [ebx+0xc],eax
+ 1002c1d:	8d 45 01             	lea    eax,[ebp+0x1]
+ 1002c20:	89 43 0c             	mov    DWORD PTR [ebx+0xc],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:180
   year = EPOCH_YR;
   if (tmbuf->tm_year < year - YEAR0) return (time_t) -999;
- 1002c1f:	83 fe 45             	cmp    esi,0x45
- 1002c22:	0f 8e 51 02 00 00    	jle    1002e79 <mktime+0x497>
+ 1002c23:	83 fe 45             	cmp    esi,0x45
+ 1002c26:	0f 8e 51 02 00 00    	jle    1002e7d <mktime+0x497>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:190
   // Assume that when day becomes negative, there will certainly
   // be overflow on seconds.
@@ -7718,14 +7717,14 @@ time_t mktime(struct tm *tmbuf) {
   // divisible by 400.
   // The code only works when year (1970) is not a leapyear.
   tm_year = tmbuf->tm_year + YEAR0;
- 1002c28:	8d 86 6c 07 00 00    	lea    eax,[esi+0x76c]
- 1002c2e:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
+ 1002c2c:	8d 86 6c 07 00 00    	lea    eax,[esi+0x76c]
+ 1002c32:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:192
 
   if (TIME_MAX / 365 < tm_year - year) overflow=1;
- 1002c32:	8d 46 ba             	lea    eax,[esi-0x46]
- 1002c35:	89 c7                	mov    edi,eax
- 1002c37:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
+ 1002c36:	8d 46 ba             	lea    eax,[esi-0x46]
+ 1002c39:	89 c7                	mov    edi,eax
+ 1002c3b:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:183
   tmbuf->tm_mday = day + 1;
   year = EPOCH_YR;
@@ -7733,10 +7732,10 @@ time_t mktime(struct tm *tmbuf) {
   seconds = 0;
   day = 0;                      // Means days since day 0 now
   overflow = 0;
- 1002c3b:	3d 7c c6 59 00       	cmp    eax,0x59c67c
- 1002c40:	0f 9f c0             	setg   al
- 1002c43:	0f b6 c0             	movzx  eax,al
- 1002c46:	89 c2                	mov    edx,eax
+ 1002c3f:	3d 7c c6 59 00       	cmp    eax,0x59c67c
+ 1002c44:	0f 9f c0             	setg   al
+ 1002c47:	0f b6 c0             	movzx  eax,al
+ 1002c4a:	89 c2                	mov    edx,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:193
   // divisible by 400.
   // The code only works when year (1970) is not a leapyear.
@@ -7744,132 +7743,132 @@ time_t mktime(struct tm *tmbuf) {
 
   if (TIME_MAX / 365 < tm_year - year) overflow=1;
   day = (tm_year - year) * 365;
- 1002c48:	89 f8                	mov    eax,edi
- 1002c4a:	69 ff 6d 01 00 00    	imul   edi,edi,0x16d
- 1002c50:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
+ 1002c4c:	89 f8                	mov    eax,edi
+ 1002c4e:	69 ff 6d 01 00 00    	imul   edi,edi,0x16d
+ 1002c54:	89 7c 24 04          	mov    DWORD PTR [esp+0x4],edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:194
   if (TIME_MAX - day < (tm_year - year) / 4 + 1) overflow|=2;
- 1002c54:	8d 7e bd             	lea    edi,[esi-0x43]
- 1002c57:	85 c0                	test   eax,eax
- 1002c59:	0f 49 f8             	cmovns edi,eax
- 1002c5c:	c1 ff 02             	sar    edi,0x2
- 1002c5f:	b8 ff ff ff 7f       	mov    eax,0x7fffffff
- 1002c64:	2b 44 24 04          	sub    eax,DWORD PTR [esp+0x4]
- 1002c68:	8d 77 01             	lea    esi,[edi+0x1]
- 1002c6b:	89 14 24             	mov    DWORD PTR [esp],edx
- 1002c6e:	83 ca 02             	or     edx,0x2
- 1002c71:	39 f0                	cmp    eax,esi
- 1002c73:	89 d6                	mov    esi,edx
- 1002c75:	0f 4d 34 24          	cmovge esi,DWORD PTR [esp]
- 1002c79:	89 34 24             	mov    DWORD PTR [esp],esi
+ 1002c58:	8d 7e bd             	lea    edi,[esi-0x43]
+ 1002c5b:	85 c0                	test   eax,eax
+ 1002c5d:	0f 49 f8             	cmovns edi,eax
+ 1002c60:	c1 ff 02             	sar    edi,0x2
+ 1002c63:	b8 ff ff ff 7f       	mov    eax,0x7fffffff
+ 1002c68:	2b 44 24 04          	sub    eax,DWORD PTR [esp+0x4]
+ 1002c6c:	8d 77 01             	lea    esi,[edi+0x1]
+ 1002c6f:	89 14 24             	mov    DWORD PTR [esp],edx
+ 1002c72:	83 ca 02             	or     edx,0x2
+ 1002c75:	39 f0                	cmp    eax,esi
+ 1002c77:	89 d6                	mov    esi,edx
+ 1002c79:	0f 4d 34 24          	cmovge esi,DWORD PTR [esp]
+ 1002c7d:	89 34 24             	mov    DWORD PTR [esp],esi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:195
   day += (tm_year - year) / 4 + ((tm_year % 4) && tm_year % 4 < year % 4);
- 1002c7c:	b8 00 00 00 00       	mov    eax,0x0
- 1002c81:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
- 1002c85:	89 d6                	mov    esi,edx
- 1002c87:	83 e6 03             	and    esi,0x3
- 1002c8a:	89 74 24 1c          	mov    DWORD PTR [esp+0x1c],esi
- 1002c8e:	74 19                	je     1002ca9 <mktime+0x2c7>
+ 1002c80:	b8 00 00 00 00       	mov    eax,0x0
+ 1002c85:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+ 1002c89:	89 d6                	mov    esi,edx
+ 1002c8b:	83 e6 03             	and    esi,0x3
+ 1002c8e:	89 74 24 1c          	mov    DWORD PTR [esp+0x1c],esi
+ 1002c92:	74 19                	je     1002cad <mktime+0x2c7>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:195 (discriminator 1)
- 1002c90:	89 d6                	mov    esi,edx
- 1002c92:	c1 fa 1f             	sar    edx,0x1f
- 1002c95:	c1 ea 1e             	shr    edx,0x1e
- 1002c98:	8d 04 16             	lea    eax,[esi+edx*1]
- 1002c9b:	83 e0 03             	and    eax,0x3
- 1002c9e:	29 d0                	sub    eax,edx
- 1002ca0:	83 f8 01             	cmp    eax,0x1
- 1002ca3:	0f 9e c0             	setle  al
- 1002ca6:	0f b6 c0             	movzx  eax,al
+ 1002c94:	89 d6                	mov    esi,edx
+ 1002c96:	c1 fa 1f             	sar    edx,0x1f
+ 1002c99:	c1 ea 1e             	shr    edx,0x1e
+ 1002c9c:	8d 04 16             	lea    eax,[esi+edx*1]
+ 1002c9f:	83 e0 03             	and    eax,0x3
+ 1002ca2:	29 d0                	sub    eax,edx
+ 1002ca4:	83 f8 01             	cmp    eax,0x1
+ 1002ca7:	0f 9e c0             	setle  al
+ 1002caa:	0f b6 c0             	movzx  eax,al
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:195 (discriminator 6)
- 1002ca9:	01 c7                	add    edi,eax
- 1002cab:	03 7c 24 04          	add    edi,DWORD PTR [esp+0x4]
- 1002caf:	89 7c 24 10          	mov    DWORD PTR [esp+0x10],edi
+ 1002cad:	01 c7                	add    edi,eax
+ 1002caf:	03 7c 24 04          	add    edi,DWORD PTR [esp+0x4]
+ 1002cb3:	89 7c 24 10          	mov    DWORD PTR [esp+0x10],edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:196 (discriminator 6)
   day -= (tm_year - year) / 100 + ((tm_year % 100) && tm_year % 100 < year % 100);
- 1002cb3:	bf 1f 85 eb 51       	mov    edi,0x51eb851f
- 1002cb8:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
- 1002cbc:	f7 ef                	imul   edi
- 1002cbe:	89 54 24 14          	mov    DWORD PTR [esp+0x14],edx
- 1002cc2:	89 d0                	mov    eax,edx
- 1002cc4:	c1 f8 05             	sar    eax,0x5
- 1002cc7:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
- 1002ccb:	89 d6                	mov    esi,edx
- 1002ccd:	c1 fe 1f             	sar    esi,0x1f
- 1002cd0:	89 74 24 18          	mov    DWORD PTR [esp+0x18],esi
- 1002cd4:	29 f0                	sub    eax,esi
- 1002cd6:	6b c0 64             	imul   eax,eax,0x64
- 1002cd9:	29 c2                	sub    edx,eax
- 1002cdb:	89 d0                	mov    eax,edx
- 1002cdd:	0f 95 44 24 04       	setne  BYTE PTR [esp+0x4]
- 1002ce2:	0f b6 54 24 04       	movzx  edx,BYTE PTR [esp+0x4]
- 1002ce7:	83 f8 45             	cmp    eax,0x45
- 1002cea:	0f 9e c0             	setle  al
- 1002ced:	0f b6 c0             	movzx  eax,al
- 1002cf0:	89 c6                	mov    esi,eax
- 1002cf2:	21 d6                	and    esi,edx
- 1002cf4:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
- 1002cf8:	f7 ef                	imul   edi
- 1002cfa:	89 d7                	mov    edi,edx
- 1002cfc:	c1 ff 05             	sar    edi,0x5
- 1002cff:	89 f8                	mov    eax,edi
- 1002d01:	8b 7c 24 0c          	mov    edi,DWORD PTR [esp+0xc]
- 1002d05:	c1 ff 1f             	sar    edi,0x1f
- 1002d08:	89 7c 24 0c          	mov    DWORD PTR [esp+0xc],edi
- 1002d0c:	29 f8                	sub    eax,edi
- 1002d0e:	01 c6                	add    esi,eax
- 1002d10:	8b 7c 24 10          	mov    edi,DWORD PTR [esp+0x10]
- 1002d14:	29 f7                	sub    edi,esi
- 1002d16:	89 fe                	mov    esi,edi
+ 1002cb7:	bf 1f 85 eb 51       	mov    edi,0x51eb851f
+ 1002cbc:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+ 1002cc0:	f7 ef                	imul   edi
+ 1002cc2:	89 54 24 14          	mov    DWORD PTR [esp+0x14],edx
+ 1002cc6:	89 d0                	mov    eax,edx
+ 1002cc8:	c1 f8 05             	sar    eax,0x5
+ 1002ccb:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+ 1002ccf:	89 d6                	mov    esi,edx
+ 1002cd1:	c1 fe 1f             	sar    esi,0x1f
+ 1002cd4:	89 74 24 18          	mov    DWORD PTR [esp+0x18],esi
+ 1002cd8:	29 f0                	sub    eax,esi
+ 1002cda:	6b c0 64             	imul   eax,eax,0x64
+ 1002cdd:	29 c2                	sub    edx,eax
+ 1002cdf:	89 d0                	mov    eax,edx
+ 1002ce1:	0f 95 44 24 04       	setne  BYTE PTR [esp+0x4]
+ 1002ce6:	0f b6 54 24 04       	movzx  edx,BYTE PTR [esp+0x4]
+ 1002ceb:	83 f8 45             	cmp    eax,0x45
+ 1002cee:	0f 9e c0             	setle  al
+ 1002cf1:	0f b6 c0             	movzx  eax,al
+ 1002cf4:	89 c6                	mov    esi,eax
+ 1002cf6:	21 d6                	and    esi,edx
+ 1002cf8:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+ 1002cfc:	f7 ef                	imul   edi
+ 1002cfe:	89 d7                	mov    edi,edx
+ 1002d00:	c1 ff 05             	sar    edi,0x5
+ 1002d03:	89 f8                	mov    eax,edi
+ 1002d05:	8b 7c 24 0c          	mov    edi,DWORD PTR [esp+0xc]
+ 1002d09:	c1 ff 1f             	sar    edi,0x1f
+ 1002d0c:	89 7c 24 0c          	mov    DWORD PTR [esp+0xc],edi
+ 1002d10:	29 f8                	sub    eax,edi
+ 1002d12:	01 c6                	add    esi,eax
+ 1002d14:	8b 7c 24 10          	mov    edi,DWORD PTR [esp+0x10]
+ 1002d18:	29 f7                	sub    edi,esi
+ 1002d1a:	89 fe                	mov    esi,edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:197 (discriminator 6)
   day += (tm_year - year) / 400 + ((tm_year % 400) && tm_year % 400 < year % 400);
- 1002d18:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
- 1002d1c:	c1 f8 07             	sar    eax,0x7
- 1002d1f:	89 c7                	mov    edi,eax
- 1002d21:	2b 7c 24 18          	sub    edi,DWORD PTR [esp+0x18]
- 1002d25:	69 c7 90 01 00 00    	imul   eax,edi,0x190
- 1002d2b:	8b 7c 24 08          	mov    edi,DWORD PTR [esp+0x8]
- 1002d2f:	29 c7                	sub    edi,eax
- 1002d31:	89 7c 24 08          	mov    DWORD PTR [esp+0x8],edi
- 1002d35:	81 ff 71 01 00 00    	cmp    edi,0x171
- 1002d3b:	0f 9e 44 24 10       	setle  BYTE PTR [esp+0x10]
- 1002d40:	85 ff                	test   edi,edi
- 1002d42:	0f 95 c0             	setne  al
- 1002d45:	0f b6 c0             	movzx  eax,al
- 1002d48:	23 44 24 10          	and    eax,DWORD PTR [esp+0x10]
- 1002d4c:	c1 fa 07             	sar    edx,0x7
- 1002d4f:	2b 54 24 0c          	sub    edx,DWORD PTR [esp+0xc]
- 1002d53:	01 c2                	add    edx,eax
- 1002d55:	8d 04 32             	lea    eax,[edx+esi*1]
- 1002d58:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
+ 1002d1c:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
+ 1002d20:	c1 f8 07             	sar    eax,0x7
+ 1002d23:	89 c7                	mov    edi,eax
+ 1002d25:	2b 7c 24 18          	sub    edi,DWORD PTR [esp+0x18]
+ 1002d29:	69 c7 90 01 00 00    	imul   eax,edi,0x190
+ 1002d2f:	8b 7c 24 08          	mov    edi,DWORD PTR [esp+0x8]
+ 1002d33:	29 c7                	sub    edi,eax
+ 1002d35:	89 7c 24 08          	mov    DWORD PTR [esp+0x8],edi
+ 1002d39:	81 ff 71 01 00 00    	cmp    edi,0x171
+ 1002d3f:	0f 9e 44 24 10       	setle  BYTE PTR [esp+0x10]
+ 1002d44:	85 ff                	test   edi,edi
+ 1002d46:	0f 95 c0             	setne  al
+ 1002d49:	0f b6 c0             	movzx  eax,al
+ 1002d4c:	23 44 24 10          	and    eax,DWORD PTR [esp+0x10]
+ 1002d50:	c1 fa 07             	sar    edx,0x7
+ 1002d53:	2b 54 24 0c          	sub    edx,DWORD PTR [esp+0xc]
+ 1002d57:	01 c2                	add    edx,eax
+ 1002d59:	8d 04 32             	lea    eax,[edx+esi*1]
+ 1002d5c:	89 44 24 0c          	mov    DWORD PTR [esp+0xc],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:200 (discriminator 6)
 
   yday = month = 0;
   while (month < tmbuf->tm_mon) {
- 1002d5c:	85 c9                	test   ecx,ecx
- 1002d5e:	7e 46                	jle    1002da6 <mktime+0x3c4>
+ 1002d60:	85 c9                	test   ecx,ecx
+ 1002d62:	7e 46                	jle    1002daa <mktime+0x3c4>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:200
- 1002d60:	be 00 00 00 00       	mov    esi,0x0
- 1002d65:	bf 00 00 00 00       	mov    edi,0x0
- 1002d6a:	89 6c 24 10          	mov    DWORD PTR [esp+0x10],ebp
- 1002d6e:	8b 6c 24 1c          	mov    ebp,DWORD PTR [esp+0x1c]
+ 1002d64:	be 00 00 00 00       	mov    esi,0x0
+ 1002d69:	bf 00 00 00 00       	mov    edi,0x0
+ 1002d6e:	89 6c 24 10          	mov    DWORD PTR [esp+0x10],ebp
+ 1002d72:	8b 6c 24 1c          	mov    ebp,DWORD PTR [esp+0x1c]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:201
     yday += _ytab[LEAPYEAR(tm_year)][month];
- 1002d72:	b8 00 00 00 00       	mov    eax,0x0
- 1002d77:	85 ed                	test   ebp,ebp
- 1002d79:	75 0f                	jne    1002d8a <mktime+0x3a8>
+ 1002d76:	b8 00 00 00 00       	mov    eax,0x0
+ 1002d7b:	85 ed                	test   ebp,ebp
+ 1002d7d:	75 0f                	jne    1002d8e <mktime+0x3a8>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:201 (discriminator 4)
- 1002d7b:	83 7c 24 08 00       	cmp    DWORD PTR [esp+0x8],0x0
- 1002d80:	0f 94 c0             	sete   al
- 1002d83:	0a 44 24 04          	or     al,BYTE PTR [esp+0x4]
- 1002d87:	0f b6 c0             	movzx  eax,al
+ 1002d7f:	83 7c 24 08 00       	cmp    DWORD PTR [esp+0x8],0x0
+ 1002d84:	0f 94 c0             	sete   al
+ 1002d87:	0a 44 24 04          	or     al,BYTE PTR [esp+0x4]
+ 1002d8b:	0f b6 c0             	movzx  eax,al
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:201 (discriminator 8)
- 1002d8a:	8d 14 00             	lea    edx,[eax+eax*1]
- 1002d8d:	01 d0                	add    eax,edx
- 1002d8f:	8d 04 86             	lea    eax,[esi+eax*4]
- 1002d92:	03 3c 85 00 50 00 01 	add    edi,DWORD PTR [eax*4+0x1005000]
+ 1002d8e:	8d 14 00             	lea    edx,[eax+eax*1]
+ 1002d91:	01 d0                	add    eax,edx
+ 1002d93:	8d 04 86             	lea    eax,[esi+eax*4]
+ 1002d96:	03 3c 85 00 50 00 01 	add    edi,DWORD PTR [eax*4+0x1005000]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:202 (discriminator 8)
     month++;
- 1002d99:	83 c6 01             	add    esi,0x1
+ 1002d9d:	83 c6 01             	add    esi,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:200 (discriminator 8)
   day += (tm_year - year) / 4 + ((tm_year % 4) && tm_year % 4 < year % 4);
   day -= (tm_year - year) / 100 + ((tm_year % 100) && tm_year % 100 < year % 100);
@@ -7877,10 +7876,10 @@ time_t mktime(struct tm *tmbuf) {
 
   yday = month = 0;
   while (month < tmbuf->tm_mon) {
- 1002d9c:	39 ce                	cmp    esi,ecx
- 1002d9e:	75 d2                	jne    1002d72 <mktime+0x390>
- 1002da0:	8b 6c 24 10          	mov    ebp,DWORD PTR [esp+0x10]
- 1002da4:	eb 05                	jmp    1002dab <mktime+0x3c9>
+ 1002da0:	39 ce                	cmp    esi,ecx
+ 1002da2:	75 d2                	jne    1002d76 <mktime+0x390>
+ 1002da4:	8b 6c 24 10          	mov    ebp,DWORD PTR [esp+0x10]
+ 1002da8:	eb 05                	jmp    1002daf <mktime+0x3c9>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:199
   if (TIME_MAX - day < (tm_year - year) / 4 + 1) overflow|=2;
   day += (tm_year - year) / 4 + ((tm_year % 4) && tm_year % 4 < year % 4);
@@ -7888,133 +7887,133 @@ time_t mktime(struct tm *tmbuf) {
   day += (tm_year - year) / 400 + ((tm_year % 400) && tm_year % 400 < year % 400);
 
   yday = month = 0;
- 1002da6:	bf 00 00 00 00       	mov    edi,0x0
+ 1002daa:	bf 00 00 00 00       	mov    edi,0x0
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:204
   while (month < tmbuf->tm_mon) {
     yday += _ytab[LEAPYEAR(tm_year)][month];
     month++;
   }
   yday += (tmbuf->tm_mday - 1);
- 1002dab:	01 ef                	add    edi,ebp
+ 1002daf:	01 ef                	add    edi,ebp
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:205
   if (day + yday < 0) overflow|=4;
- 1002dad:	8b 74 24 0c          	mov    esi,DWORD PTR [esp+0xc]
- 1002db1:	01 fe                	add    esi,edi
- 1002db3:	8b 0c 24             	mov    ecx,DWORD PTR [esp]
- 1002db6:	89 c8                	mov    eax,ecx
- 1002db8:	83 c8 04             	or     eax,0x4
- 1002dbb:	85 f6                	test   esi,esi
- 1002dbd:	0f 49 c1             	cmovns eax,ecx
- 1002dc0:	89 c5                	mov    ebp,eax
+ 1002db1:	8b 74 24 0c          	mov    esi,DWORD PTR [esp+0xc]
+ 1002db5:	01 fe                	add    esi,edi
+ 1002db7:	8b 0c 24             	mov    ecx,DWORD PTR [esp]
+ 1002dba:	89 c8                	mov    eax,ecx
+ 1002dbc:	83 c8 04             	or     eax,0x4
+ 1002dbf:	85 f6                	test   esi,esi
+ 1002dc1:	0f 49 c1             	cmovns eax,ecx
+ 1002dc4:	89 c5                	mov    ebp,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:208
   day += yday;
 
   tmbuf->tm_yday = yday;
- 1002dc2:	89 7b 1c             	mov    DWORD PTR [ebx+0x1c],edi
+ 1002dc6:	89 7b 1c             	mov    DWORD PTR [ebx+0x1c],edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:209
   tmbuf->tm_wday = (day + 4) % 7;               // Day 0 was thursday (4)
- 1002dc5:	8d 4e 04             	lea    ecx,[esi+0x4]
- 1002dc8:	ba 93 24 49 92       	mov    edx,0x92492493
- 1002dcd:	89 c8                	mov    eax,ecx
- 1002dcf:	f7 ea                	imul   edx
- 1002dd1:	01 ca                	add    edx,ecx
- 1002dd3:	c1 fa 02             	sar    edx,0x2
- 1002dd6:	89 c8                	mov    eax,ecx
- 1002dd8:	c1 f8 1f             	sar    eax,0x1f
- 1002ddb:	29 c2                	sub    edx,eax
- 1002ddd:	8d 04 d5 00 00 00 00 	lea    eax,[edx*8+0x0]
- 1002de4:	29 d0                	sub    eax,edx
- 1002de6:	29 c1                	sub    ecx,eax
- 1002de8:	89 4b 18             	mov    DWORD PTR [ebx+0x18],ecx
+ 1002dc9:	8d 4e 04             	lea    ecx,[esi+0x4]
+ 1002dcc:	ba 93 24 49 92       	mov    edx,0x92492493
+ 1002dd1:	89 c8                	mov    eax,ecx
+ 1002dd3:	f7 ea                	imul   edx
+ 1002dd5:	01 ca                	add    edx,ecx
+ 1002dd7:	c1 fa 02             	sar    edx,0x2
+ 1002dda:	89 c8                	mov    eax,ecx
+ 1002ddc:	c1 f8 1f             	sar    eax,0x1f
+ 1002ddf:	29 c2                	sub    edx,eax
+ 1002de1:	8d 04 d5 00 00 00 00 	lea    eax,[edx*8+0x0]
+ 1002de8:	29 d0                	sub    eax,edx
+ 1002dea:	29 c1                	sub    ecx,eax
+ 1002dec:	89 4b 18             	mov    DWORD PTR [ebx+0x18],ecx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:211
 
   seconds = ((tmbuf->tm_hour * 60L) + tmbuf->tm_min) * 60L + tmbuf->tm_sec;
- 1002deb:	6b 4b 08 3c          	imul   ecx,DWORD PTR [ebx+0x8],0x3c
- 1002def:	03 4b 04             	add    ecx,DWORD PTR [ebx+0x4]
- 1002df2:	6b c9 3c             	imul   ecx,ecx,0x3c
- 1002df5:	03 0b                	add    ecx,DWORD PTR [ebx]
+ 1002def:	6b 4b 08 3c          	imul   ecx,DWORD PTR [ebx+0x8],0x3c
+ 1002df3:	03 4b 04             	add    ecx,DWORD PTR [ebx+0x4]
+ 1002df6:	6b c9 3c             	imul   ecx,ecx,0x3c
+ 1002df9:	03 0b                	add    ecx,DWORD PTR [ebx]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:213
 
   if ((TIME_MAX - seconds) / SECS_DAY < day) overflow|=8;
- 1002df7:	bf ff ff ff 7f       	mov    edi,0x7fffffff
- 1002dfc:	29 cf                	sub    edi,ecx
- 1002dfe:	ba 07 45 2e c2       	mov    edx,0xc22e4507
- 1002e03:	89 f8                	mov    eax,edi
- 1002e05:	f7 ea                	imul   edx
- 1002e07:	01 fa                	add    edx,edi
- 1002e09:	c1 fa 10             	sar    edx,0x10
- 1002e0c:	c1 ff 1f             	sar    edi,0x1f
- 1002e0f:	29 fa                	sub    edx,edi
- 1002e11:	89 e8                	mov    eax,ebp
- 1002e13:	83 c8 08             	or     eax,0x8
- 1002e16:	39 d6                	cmp    esi,edx
- 1002e18:	0f 4e c5             	cmovle eax,ebp
- 1002e1b:	89 04 24             	mov    DWORD PTR [esp],eax
+ 1002dfb:	bf ff ff ff 7f       	mov    edi,0x7fffffff
+ 1002e00:	29 cf                	sub    edi,ecx
+ 1002e02:	ba 07 45 2e c2       	mov    edx,0xc22e4507
+ 1002e07:	89 f8                	mov    eax,edi
+ 1002e09:	f7 ea                	imul   edx
+ 1002e0b:	01 fa                	add    edx,edi
+ 1002e0d:	c1 fa 10             	sar    edx,0x10
+ 1002e10:	c1 ff 1f             	sar    edi,0x1f
+ 1002e13:	29 fa                	sub    edx,edi
+ 1002e15:	89 e8                	mov    eax,ebp
+ 1002e17:	83 c8 08             	or     eax,0x8
+ 1002e1a:	39 d6                	cmp    esi,edx
+ 1002e1c:	0f 4e c5             	cmovle eax,ebp
+ 1002e1f:	89 04 24             	mov    DWORD PTR [esp],eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:214
   seconds += day * SECS_DAY;
- 1002e1e:	69 f6 80 51 01 00    	imul   esi,esi,0x15180
- 1002e24:	01 f1                	add    ecx,esi
+ 1002e22:	69 f6 80 51 01 00    	imul   esi,esi,0x15180
+ 1002e28:	01 f1                	add    ecx,esi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:217
 
   // Now adjust according to timezone and daylight saving time
   if (((kTimeZone > 0) && (TIME_MAX - kTimeZone < seconds)) || 
- 1002e26:	a1 90 02 12 00       	mov    eax,ds:0x120290
- 1002e2b:	85 c0                	test   eax,eax
- 1002e2d:	7e 0b                	jle    1002e3a <mktime+0x458>
+ 1002e2a:	a1 90 02 12 00       	mov    eax,ds:0x120290
+ 1002e2f:	85 c0                	test   eax,eax
+ 1002e31:	7e 0b                	jle    1002e3e <mktime+0x458>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:217 (discriminator 1)
- 1002e2f:	ba ff ff ff 7f       	mov    edx,0x7fffffff
- 1002e34:	29 c2                	sub    edx,eax
- 1002e36:	39 d1                	cmp    ecx,edx
- 1002e38:	7f 0c                	jg     1002e46 <mktime+0x464>
+ 1002e33:	ba ff ff ff 7f       	mov    edx,0x7fffffff
+ 1002e38:	29 c2                	sub    edx,eax
+ 1002e3a:	39 d1                	cmp    ecx,edx
+ 1002e3c:	7f 0c                	jg     1002e4a <mktime+0x464>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:217 (discriminator 3)
- 1002e3a:	85 c0                	test   eax,eax
- 1002e3c:	79 0c                	jns    1002e4a <mktime+0x468>
+ 1002e3e:	85 c0                	test   eax,eax
+ 1002e40:	79 0c                	jns    1002e4e <mktime+0x468>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:218
       ((kTimeZone < 0) && (seconds < -kTimeZone))) {
- 1002e3e:	89 c2                	mov    edx,eax
- 1002e40:	f7 da                	neg    edx
- 1002e42:	39 d1                	cmp    ecx,edx
- 1002e44:	7d 04                	jge    1002e4a <mktime+0x468>
+ 1002e42:	89 c2                	mov    edx,eax
+ 1002e44:	f7 da                	neg    edx
+ 1002e46:	39 d1                	cmp    ecx,edx
+ 1002e48:	7d 04                	jge    1002e4e <mktime+0x468>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:219
           overflow|=16;
- 1002e46:	83 0c 24 10          	or     DWORD PTR [esp],0x10
+ 1002e4a:	83 0c 24 10          	or     DWORD PTR [esp],0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:221
   }
   seconds += kTimeZone;
- 1002e4a:	01 c1                	add    ecx,eax
+ 1002e4e:	01 c1                	add    ecx,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:224
 
   if (tmbuf->tm_isdst) {
     dst = _dstbias;
- 1002e4c:	83 7b 20 00          	cmp    DWORD PTR [ebx+0x20],0x0
- 1002e50:	ba 00 00 00 00       	mov    edx,0x0
- 1002e55:	0f 45 15 2c 04 12 00 	cmovne edx,DWORD PTR ds:0x12042c
+ 1002e50:	83 7b 20 00          	cmp    DWORD PTR [ebx+0x20],0x0
+ 1002e54:	ba 00 00 00 00       	mov    edx,0x0
+ 1002e59:	0f 45 15 2c 04 12 00 	cmovne edx,DWORD PTR ds:0x12042c
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:229
   } else {
     dst = 0;
   }
 
   if (dst > seconds) overflow|=32;        // dst is always non-negative
- 1002e5c:	8b 1c 24             	mov    ebx,DWORD PTR [esp]
- 1002e5f:	89 d8                	mov    eax,ebx
- 1002e61:	83 c8 20             	or     eax,0x20
- 1002e64:	39 ca                	cmp    edx,ecx
- 1002e66:	0f 4e c3             	cmovle eax,ebx
- 1002e69:	89 c7                	mov    edi,eax
+ 1002e60:	8b 1c 24             	mov    ebx,DWORD PTR [esp]
+ 1002e63:	89 d8                	mov    eax,ebx
+ 1002e65:	83 c8 20             	or     eax,0x20
+ 1002e68:	39 ca                	cmp    edx,ecx
+ 1002e6a:	0f 4e c3             	cmovle eax,ebx
+ 1002e6d:	89 c7                	mov    edi,eax
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:232
   seconds -= dst;
 
   if (overflow) return (time_t) overflow-2;
- 1002e6b:	89 f8                	mov    eax,edi
+ 1002e6f:	89 f8                	mov    eax,edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:235
 
   if ((time_t) seconds != seconds) return (time_t) -1;
   return (time_t) seconds;
- 1002e6d:	29 d1                	sub    ecx,edx
- 1002e6f:	83 e8 02             	sub    eax,0x2
- 1002e72:	85 ff                	test   edi,edi
- 1002e74:	0f 44 c1             	cmove  eax,ecx
- 1002e77:	eb 62                	jmp    1002edb <mktime+0x4f9>
+ 1002e71:	29 d1                	sub    ecx,edx
+ 1002e73:	83 e8 02             	sub    eax,0x2
+ 1002e76:	85 ff                	test   edi,edi
+ 1002e78:	0f 44 c1             	cmove  eax,ecx
+ 1002e7b:	eb 62                	jmp    1002edf <mktime+0x4f9>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:180
       tmbuf->tm_year++;
     }
@@ -8022,8 +8021,8 @@ time_t mktime(struct tm *tmbuf) {
   tmbuf->tm_mday = day + 1;
   year = EPOCH_YR;
   if (tmbuf->tm_year < year - YEAR0) return (time_t) -999;
- 1002e79:	b8 19 fc ff ff       	mov    eax,0xfffffc19
- 1002e7e:	eb 5b                	jmp    1002edb <mktime+0x4f9>
+ 1002e7d:	b8 19 fc ff ff       	mov    eax,0xfffffc19
+ 1002e82:	eb 5b                	jmp    1002edf <mktime+0x4f9>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:171
       tmbuf->tm_year--;
       tmbuf->tm_mon = 11;
@@ -8031,22 +8030,22 @@ time_t mktime(struct tm *tmbuf) {
     day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
   }
   while (day >= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon]) {
- 1002e80:	8b 4b 10             	mov    ecx,DWORD PTR [ebx+0x10]
- 1002e83:	3b 2c 8d 00 50 00 01 	cmp    ebp,DWORD PTR [ecx*4+0x1005000]
- 1002e8a:	0f 8d f8 fc ff ff    	jge    1002b88 <mktime+0x1a6>
- 1002e90:	e9 84 fd ff ff       	jmp    1002c19 <mktime+0x237>
- 1002e95:	8b 4b 10             	mov    ecx,DWORD PTR [ebx+0x10]
- 1002e98:	3b 2c 8d 00 50 00 01 	cmp    ebp,DWORD PTR [ecx*4+0x1005000]
- 1002e9f:	0f 8d a5 fc ff ff    	jge    1002b4a <mktime+0x168>
- 1002ea5:	e9 6f fd ff ff       	jmp    1002c19 <mktime+0x237>
- 1002eaa:	8b 4b 10             	mov    ecx,DWORD PTR [ebx+0x10]
- 1002ead:	3b 2c 8d 30 50 00 01 	cmp    ebp,DWORD PTR [ecx*4+0x1005030]
- 1002eb4:	0f 8d dc fc ff ff    	jge    1002b96 <mktime+0x1b4>
- 1002eba:	e9 5a fd ff ff       	jmp    1002c19 <mktime+0x237>
+ 1002e84:	8b 4b 10             	mov    ecx,DWORD PTR [ebx+0x10]
+ 1002e87:	3b 2c 8d 00 50 00 01 	cmp    ebp,DWORD PTR [ecx*4+0x1005000]
+ 1002e8e:	0f 8d f8 fc ff ff    	jge    1002b8c <mktime+0x1a6>
+ 1002e94:	e9 84 fd ff ff       	jmp    1002c1d <mktime+0x237>
+ 1002e99:	8b 4b 10             	mov    ecx,DWORD PTR [ebx+0x10]
+ 1002e9c:	3b 2c 8d 00 50 00 01 	cmp    ebp,DWORD PTR [ecx*4+0x1005000]
+ 1002ea3:	0f 8d a5 fc ff ff    	jge    1002b4e <mktime+0x168>
+ 1002ea9:	e9 6f fd ff ff       	jmp    1002c1d <mktime+0x237>
+ 1002eae:	8b 4b 10             	mov    ecx,DWORD PTR [ebx+0x10]
+ 1002eb1:	3b 2c 8d 30 50 00 01 	cmp    ebp,DWORD PTR [ecx*4+0x1005030]
+ 1002eb8:	0f 8d dc fc ff ff    	jge    1002b9a <mktime+0x1b4>
+ 1002ebe:	e9 5a fd ff ff       	jmp    1002c1d <mktime+0x237>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:172
     day -= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
- 1002ebf:	8d be 6c 07 00 00    	lea    edi,[esi+0x76c]
- 1002ec5:	e9 9e fc ff ff       	jmp    1002b68 <mktime+0x186>
+ 1002ec3:	8d be 6c 07 00 00    	lea    edi,[esi+0x76c]
+ 1002ec9:	e9 9e fc ff ff       	jmp    1002b6c <mktime+0x186>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:171
       tmbuf->tm_year--;
       tmbuf->tm_mon = 11;
@@ -8054,10 +8053,10 @@ time_t mktime(struct tm *tmbuf) {
     day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
   }
   while (day >= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon]) {
- 1002eca:	8b 4b 10             	mov    ecx,DWORD PTR [ebx+0x10]
- 1002ecd:	3b 2c 8d 30 50 00 01 	cmp    ebp,DWORD PTR [ecx*4+0x1005030]
- 1002ed4:	7d e9                	jge    1002ebf <mktime+0x4dd>
- 1002ed6:	e9 3e fd ff ff       	jmp    1002c19 <mktime+0x237>
+ 1002ece:	8b 4b 10             	mov    ecx,DWORD PTR [ebx+0x10]
+ 1002ed1:	3b 2c 8d 30 50 00 01 	cmp    ebp,DWORD PTR [ecx*4+0x1005030]
+ 1002ed8:	7d e9                	jge    1002ec3 <mktime+0x4dd>
+ 1002eda:	e9 3e fd ff ff       	jmp    1002c1d <mktime+0x237>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:236
 
   if (overflow) return (time_t) overflow-2;
@@ -8065,14 +8064,14 @@ time_t mktime(struct tm *tmbuf) {
   if ((time_t) seconds != seconds) return (time_t) -1;
   return (time_t) seconds;
 }
- 1002edb:	83 c4 20             	add    esp,0x20
- 1002ede:	5b                   	pop    ebx
- 1002edf:	5e                   	pop    esi
- 1002ee0:	5f                   	pop    edi
- 1002ee1:	5d                   	pop    ebp
- 1002ee2:	c3                   	ret    
+ 1002edf:	83 c4 20             	add    esp,0x20
+ 1002ee2:	5b                   	pop    ebx
+ 1002ee3:	5e                   	pop    esi
+ 1002ee4:	5f                   	pop    edi
+ 1002ee5:	5d                   	pop    ebp
+ 1002ee6:	c3                   	ret    
 
-01002ee3 <_strdate>:
+01002ee7 <_strdate>:
 _strdate():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:241
 
@@ -8080,75 +8079,75 @@ _strdate():
 
 
 char *_strdate(char *s) {
- 1002ee3:	83 ec 10             	sub    esp,0x10
+ 1002ee7:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:244
   time_t now;
 
   time(&now);
- 1002ee6:	8d 44 24 0c          	lea    eax,[esp+0xc]
- 1002eea:	50                   	push   eax
- 1002eeb:	e8 1c f8 ff ff       	call   100270c <time>
+ 1002eea:	8d 44 24 0c          	lea    eax,[esp+0xc]
+ 1002eee:	50                   	push   eax
+ 1002eef:	e8 1c f8 ff ff       	call   1002710 <time>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:248
   //fix me!
   //  strftime(s, 9, "%D", localtime(&now));
   return s;
 }
- 1002ef0:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
- 1002ef4:	83 c4 14             	add    esp,0x14
- 1002ef7:	c3                   	ret    
+ 1002ef4:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
+ 1002ef8:	83 c4 14             	add    esp,0x14
+ 1002efb:	c3                   	ret    
 
-01002ef8 <_strtime>:
+01002efc <_strtime>:
 _strtime():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:250
 
 char *_strtime(char *s) {
- 1002ef8:	83 ec 10             	sub    esp,0x10
+ 1002efc:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:253
   time_t now;
 
   time(&now);
- 1002efb:	8d 44 24 0c          	lea    eax,[esp+0xc]
- 1002eff:	50                   	push   eax
- 1002f00:	e8 07 f8 ff ff       	call   100270c <time>
+ 1002eff:	8d 44 24 0c          	lea    eax,[esp+0xc]
+ 1002f03:	50                   	push   eax
+ 1002f04:	e8 07 f8 ff ff       	call   1002710 <time>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:257
   //fix me
   //  strftime(s, 9, "%T", localtime(&now));
   return s;
 }
- 1002f05:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
- 1002f09:	83 c4 14             	add    esp,0x14
- 1002f0c:	c3                   	ret    
+ 1002f09:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
+ 1002f0d:	83 c4 14             	add    esp,0x14
+ 1002f10:	c3                   	ret    
 
-01002f0d <waitTicks>:
+01002f11 <waitTicks>:
 waitTicks():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:260
 
 void __attribute__((noinline))waitTicks(int TicksToWait)
 {
- 1002f0d:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
+ 1002f11:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:262
     //printf("ttw=%u",ttw);
     if (TicksToWait==0)
- 1002f11:	85 c0                	test   eax,eax
- 1002f13:	74 09                	je     1002f1e <waitTicks+0x11>
+ 1002f15:	85 c0                	test   eax,eax
+ 1002f17:	74 09                	je     1002f22 <waitTicks+0x11>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:267 (discriminator 1)
         return;
     //printd(DEBUG_TIMER,"ttw=%08X", TicksToWait);
     do
     {
         __asm("sti\nhlt\n");
- 1002f15:	fb                   	sti    
- 1002f16:	f4                   	hlt    
+ 1002f19:	fb                   	sti    
+ 1002f1a:	f4                   	hlt    
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:268 (discriminator 1)
         TicksToWait--;
- 1002f17:	83 e8 01             	sub    eax,0x1
+ 1002f1b:	83 e8 01             	sub    eax,0x1
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:269 (discriminator 1)
     } while (TicksToWait>0);
- 1002f1a:	85 c0                	test   eax,eax
- 1002f1c:	7f f7                	jg     1002f15 <waitTicks+0x8>
- 1002f1e:	f3 c3                	repz ret 
+ 1002f1e:	85 c0                	test   eax,eax
+ 1002f20:	7f f7                	jg     1002f19 <waitTicks+0x8>
+ 1002f22:	f3 c3                	repz ret 
 
-01002f20 <wait>:
+01002f24 <wait>:
 wait():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:274
     return;
@@ -8156,70 +8155,70 @@ wait():
 
 void /*__attribute__((noinline))*/wait(int msToWait)
 {
- 1002f20:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
+ 1002f24:	8b 44 24 04          	mov    eax,DWORD PTR [esp+0x4]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:277
     //printk("msToWait=%u, ticksperms=%u, ticksToWait=%u",msToWait, kTicksPerMS, msToWait*kTicksPerMS);
     //STOPHERE2
     waitTicks(msToWait/kTicksPerMS);
- 1002f24:	99                   	cdq    
- 1002f25:	f7 3d 84 02 12 00    	idiv   DWORD PTR ds:0x120284
- 1002f2b:	50                   	push   eax
- 1002f2c:	e8 dc ff ff ff       	call   1002f0d <waitTicks>
+ 1002f28:	99                   	cdq    
+ 1002f29:	f7 3d 84 02 12 00    	idiv   DWORD PTR ds:0x120284
+ 1002f2f:	50                   	push   eax
+ 1002f30:	e8 dc ff ff ff       	call   1002f11 <waitTicks>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:278
 }
- 1002f31:	83 c4 04             	add    esp,0x4
- 1002f34:	c3                   	ret    
+ 1002f35:	83 c4 04             	add    esp,0x4
+ 1002f38:	c3                   	ret    
 
-01002f35 <wait3>:
+01002f39 <wait3>:
 wait3():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:281
 
 void wait3(double msToWait)
 {
- 1002f35:	56                   	push   esi
- 1002f36:	53                   	push   ebx
- 1002f37:	83 ec 24             	sub    esp,0x24
+ 1002f39:	56                   	push   esi
+ 1002f3a:	53                   	push   ebx
+ 1002f3b:	83 ec 24             	sub    esp,0x24
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:282
 volatile double endTicks = (double)*kTicksSinceStart + msToWait/ (1000/kTicksPerSecond);
- 1002f3a:	8b 0d 60 02 12 00    	mov    ecx,DWORD PTR ds:0x120260
- 1002f40:	8b 19                	mov    ebx,DWORD PTR [ecx]
- 1002f42:	8b 35 80 02 12 00    	mov    esi,DWORD PTR ds:0x120280
- 1002f48:	dd 44 24 30          	fld    QWORD PTR [esp+0x30]
- 1002f4c:	b8 e8 03 00 00       	mov    eax,0x3e8
- 1002f51:	ba 00 00 00 00       	mov    edx,0x0
- 1002f56:	f7 f6                	div    esi
- 1002f58:	89 04 24             	mov    DWORD PTR [esp],eax
- 1002f5b:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
- 1002f62:	00 
- 1002f63:	df 2c 24             	fild   QWORD PTR [esp]
- 1002f66:	de f9                	fdivp  st(1),st
- 1002f68:	89 1c 24             	mov    DWORD PTR [esp],ebx
- 1002f6b:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
- 1002f72:	00 
- 1002f73:	df 2c 24             	fild   QWORD PTR [esp]
- 1002f76:	de c1                	faddp  st(1),st
- 1002f78:	dd 5c 24 08          	fstp   QWORD PTR [esp+0x8]
- 1002f7c:	dd 44 24 08          	fld    QWORD PTR [esp+0x8]
- 1002f80:	dd 5c 24 18          	fstp   QWORD PTR [esp+0x18]
+ 1002f3e:	8b 0d 60 02 12 00    	mov    ecx,DWORD PTR ds:0x120260
+ 1002f44:	8b 19                	mov    ebx,DWORD PTR [ecx]
+ 1002f46:	8b 35 80 02 12 00    	mov    esi,DWORD PTR ds:0x120280
+ 1002f4c:	dd 44 24 30          	fld    QWORD PTR [esp+0x30]
+ 1002f50:	b8 e8 03 00 00       	mov    eax,0x3e8
+ 1002f55:	ba 00 00 00 00       	mov    edx,0x0
+ 1002f5a:	f7 f6                	div    esi
+ 1002f5c:	89 04 24             	mov    DWORD PTR [esp],eax
+ 1002f5f:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
+ 1002f66:	00 
+ 1002f67:	df 2c 24             	fild   QWORD PTR [esp]
+ 1002f6a:	de f9                	fdivp  st(1),st
+ 1002f6c:	89 1c 24             	mov    DWORD PTR [esp],ebx
+ 1002f6f:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
+ 1002f76:	00 
+ 1002f77:	df 2c 24             	fild   QWORD PTR [esp]
+ 1002f7a:	de c1                	faddp  st(1),st
+ 1002f7c:	dd 5c 24 08          	fstp   QWORD PTR [esp+0x8]
+ 1002f80:	dd 44 24 08          	fld    QWORD PTR [esp+0x8]
+ 1002f84:	dd 5c 24 18          	fstp   QWORD PTR [esp+0x18]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:284
 
 while (endTicks > (double)*kTicksSinceStart)
- 1002f84:	8b 01                	mov    eax,DWORD PTR [ecx]
- 1002f86:	dd 44 24 18          	fld    QWORD PTR [esp+0x18]
- 1002f8a:	89 04 24             	mov    DWORD PTR [esp],eax
- 1002f8d:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
- 1002f94:	00 
- 1002f95:	df 2c 24             	fild   QWORD PTR [esp]
- 1002f98:	dd 5c 24 08          	fstp   QWORD PTR [esp+0x8]
- 1002f9c:	dd 44 24 08          	fld    QWORD PTR [esp+0x8]
- 1002fa0:	d9 c9                	fxch   st(1)
- 1002fa2:	df e9                	fucomip st,st(1)
- 1002fa4:	dd d8                	fstp   st(0)
- 1002fa6:	76 26                	jbe    1002fce <wait3+0x99>
+ 1002f88:	8b 01                	mov    eax,DWORD PTR [ecx]
+ 1002f8a:	dd 44 24 18          	fld    QWORD PTR [esp+0x18]
+ 1002f8e:	89 04 24             	mov    DWORD PTR [esp],eax
+ 1002f91:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
+ 1002f98:	00 
+ 1002f99:	df 2c 24             	fild   QWORD PTR [esp]
+ 1002f9c:	dd 5c 24 08          	fstp   QWORD PTR [esp+0x8]
+ 1002fa0:	dd 44 24 08          	fld    QWORD PTR [esp+0x8]
+ 1002fa4:	d9 c9                	fxch   st(1)
+ 1002fa6:	df e9                	fucomip st,st(1)
+ 1002fa8:	dd d8                	fstp   st(0)
+ 1002faa:	76 26                	jbe    1002fd2 <wait3+0x99>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:285
     {__asm__("sti\n hlt\n");}
- 1002fa8:	fb                   	sti    
- 1002fa9:	f4                   	hlt    
+ 1002fac:	fb                   	sti    
+ 1002fad:	f4                   	hlt    
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:284
 
 void wait3(double msToWait)
@@ -8227,67 +8226,67 @@ void wait3(double msToWait)
 volatile double endTicks = (double)*kTicksSinceStart + msToWait/ (1000/kTicksPerSecond);
 
 while (endTicks > (double)*kTicksSinceStart)
- 1002faa:	8b 01                	mov    eax,DWORD PTR [ecx]
- 1002fac:	dd 44 24 18          	fld    QWORD PTR [esp+0x18]
- 1002fb0:	89 04 24             	mov    DWORD PTR [esp],eax
- 1002fb3:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
- 1002fba:	00 
- 1002fbb:	df 2c 24             	fild   QWORD PTR [esp]
- 1002fbe:	dd 5c 24 08          	fstp   QWORD PTR [esp+0x8]
- 1002fc2:	dd 44 24 08          	fld    QWORD PTR [esp+0x8]
- 1002fc6:	d9 c9                	fxch   st(1)
- 1002fc8:	df e9                	fucomip st,st(1)
- 1002fca:	dd d8                	fstp   st(0)
- 1002fcc:	77 da                	ja     1002fa8 <wait3+0x73>
+ 1002fae:	8b 01                	mov    eax,DWORD PTR [ecx]
+ 1002fb0:	dd 44 24 18          	fld    QWORD PTR [esp+0x18]
+ 1002fb4:	89 04 24             	mov    DWORD PTR [esp],eax
+ 1002fb7:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
+ 1002fbe:	00 
+ 1002fbf:	df 2c 24             	fild   QWORD PTR [esp]
+ 1002fc2:	dd 5c 24 08          	fstp   QWORD PTR [esp+0x8]
+ 1002fc6:	dd 44 24 08          	fld    QWORD PTR [esp+0x8]
+ 1002fca:	d9 c9                	fxch   st(1)
+ 1002fcc:	df e9                	fucomip st,st(1)
+ 1002fce:	dd d8                	fstp   st(0)
+ 1002fd0:	77 da                	ja     1002fac <wait3+0x73>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:287
     {__asm__("sti\n hlt\n");}
     
 }
- 1002fce:	83 c4 24             	add    esp,0x24
- 1002fd1:	5b                   	pop    ebx
- 1002fd2:	5e                   	pop    esi
- 1002fd3:	c3                   	ret    
+ 1002fd2:	83 c4 24             	add    esp,0x24
+ 1002fd5:	5b                   	pop    ebx
+ 1002fd6:	5e                   	pop    esi
+ 1002fd7:	c3                   	ret    
 
-01002fd4 <wait2>:
+01002fd8 <wait2>:
 wait2():
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:290
 
 void wait2(unsigned msToWait)
 {
- 1002fd4:	57                   	push   edi
- 1002fd5:	56                   	push   esi
- 1002fd6:	53                   	push   ebx
+ 1002fd8:	57                   	push   edi
+ 1002fd9:	56                   	push   esi
+ 1002fda:	53                   	push   ebx
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:291
     uint64_t startTicks = *kTicksSinceStart;             //25
- 1002fd7:	8b 1d 60 02 12 00    	mov    ebx,DWORD PTR ds:0x120260
- 1002fdd:	8b 0b                	mov    ecx,DWORD PTR [ebx]
+ 1002fdb:	8b 1d 60 02 12 00    	mov    ebx,DWORD PTR ds:0x120260
+ 1002fe1:	8b 0b                	mov    ecx,DWORD PTR [ebx]
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:292
     unsigned msPerTick = 1000 / kTicksPerSecond;         //18
- 1002fdf:	8b 3d 80 02 12 00    	mov    edi,DWORD PTR ds:0x120280
+ 1002fe3:	8b 3d 80 02 12 00    	mov    edi,DWORD PTR ds:0x120280
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:294
     uint64_t totalTicksToWait = msToWait/msPerTick;     //4321/18
     uint64_t endTicks = startTicks + totalTicksToWait;
- 1002fe5:	b8 e8 03 00 00       	mov    eax,0x3e8
- 1002fea:	ba 00 00 00 00       	mov    edx,0x0
- 1002fef:	f7 f7                	div    edi
- 1002ff1:	89 c6                	mov    esi,eax
- 1002ff3:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
- 1002ff7:	ba 00 00 00 00       	mov    edx,0x0
- 1002ffc:	f7 f6                	div    esi
- 1002ffe:	89 c6                	mov    esi,eax
- 1003000:	bf 00 00 00 00       	mov    edi,0x0
- 1003005:	89 c8                	mov    eax,ecx
- 1003007:	ba 00 00 00 00       	mov    edx,0x0
- 100300c:	01 f0                	add    eax,esi
- 100300e:	11 fa                	adc    edx,edi
+ 1002fe9:	b8 e8 03 00 00       	mov    eax,0x3e8
+ 1002fee:	ba 00 00 00 00       	mov    edx,0x0
+ 1002ff3:	f7 f7                	div    edi
+ 1002ff5:	89 c6                	mov    esi,eax
+ 1002ff7:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
+ 1002ffb:	ba 00 00 00 00       	mov    edx,0x0
+ 1003000:	f7 f6                	div    esi
+ 1003002:	89 c6                	mov    esi,eax
+ 1003004:	bf 00 00 00 00       	mov    edi,0x0
+ 1003009:	89 c8                	mov    eax,ecx
+ 100300b:	ba 00 00 00 00       	mov    edx,0x0
+ 1003010:	01 f0                	add    eax,esi
+ 1003012:	11 fa                	adc    edx,edi
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:296
 
     if (endTicks < *kTicksSinceStart)
- 1003010:	8b 0b                	mov    ecx,DWORD PTR [ebx]
- 1003012:	83 fa 00             	cmp    edx,0x0
- 1003015:	77 04                	ja     100301b <wait2+0x47>
- 1003017:	39 c8                	cmp    eax,ecx
- 1003019:	72 17                	jb     1003032 <wait2+0x5e>
+ 1003014:	8b 0b                	mov    ecx,DWORD PTR [ebx]
+ 1003016:	83 fa 00             	cmp    edx,0x0
+ 1003019:	77 04                	ja     100301f <wait2+0x47>
+ 100301b:	39 c8                	cmp    eax,ecx
+ 100301d:	72 17                	jb     1003036 <wait2+0x5e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:304
     //waitTicks(totalTicksToWait);
     //return;
@@ -8295,14 +8294,14 @@ void wait2(unsigned msToWait)
     //printf ("startTicks=%u, msPerTick=%u, totalTicksToWait=%u, endTicks=%u, kTicksSinceStart=%u", startTicks, msPerTick, totalTicksToWait, endTicks, kTicksSinceStart);
     //printf("\nStart waiting ... endTicks=%u, kTicksSinceStart=%u\n",endTicks, kTicksSinceStart);
     while (endTicks > *kTicksSinceStart)
- 100301b:	8b 0b                	mov    ecx,DWORD PTR [ebx]
- 100301d:	83 fa 00             	cmp    edx,0x0
- 1003020:	77 04                	ja     1003026 <wait2+0x52>
- 1003022:	39 c8                	cmp    eax,ecx
- 1003024:	76 0c                	jbe    1003032 <wait2+0x5e>
+ 100301f:	8b 0b                	mov    ecx,DWORD PTR [ebx]
+ 1003021:	83 fa 00             	cmp    edx,0x0
+ 1003024:	77 04                	ja     100302a <wait2+0x52>
+ 1003026:	39 c8                	cmp    eax,ecx
+ 1003028:	76 0c                	jbe    1003036 <wait2+0x5e>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:305
     {__asm__("hlt\n");}
- 1003026:	f4                   	hlt    
+ 100302a:	f4                   	hlt    
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:304
     //waitTicks(totalTicksToWait);
     //return;
@@ -8310,22 +8309,22 @@ void wait2(unsigned msToWait)
     //printf ("startTicks=%u, msPerTick=%u, totalTicksToWait=%u, endTicks=%u, kTicksSinceStart=%u", startTicks, msPerTick, totalTicksToWait, endTicks, kTicksSinceStart);
     //printf("\nStart waiting ... endTicks=%u, kTicksSinceStart=%u\n",endTicks, kTicksSinceStart);
     while (endTicks > *kTicksSinceStart)
- 1003027:	8b 0b                	mov    ecx,DWORD PTR [ebx]
- 1003029:	83 fa 00             	cmp    edx,0x0
- 100302c:	77 f8                	ja     1003026 <wait2+0x52>
- 100302e:	39 c8                	cmp    eax,ecx
- 1003030:	77 f4                	ja     1003026 <wait2+0x52>
+ 100302b:	8b 0b                	mov    ecx,DWORD PTR [ebx]
+ 100302d:	83 fa 00             	cmp    edx,0x0
+ 1003030:	77 f8                	ja     100302a <wait2+0x52>
+ 1003032:	39 c8                	cmp    eax,ecx
+ 1003034:	77 f4                	ja     100302a <wait2+0x52>
 /home/yogi/src/os/chrisOSKernel/../chrisOS/src/time.c:307
     {__asm__("hlt\n");}
     //printf("done waiting!\n");
 }
- 1003032:	5b                   	pop    ebx
- 1003033:	5e                   	pop    esi
- 1003034:	5f                   	pop    edi
- 1003035:	c3                   	ret    
- 1003036:	66 90                	xchg   ax,ax
+ 1003036:	5b                   	pop    ebx
+ 1003037:	5e                   	pop    esi
+ 1003038:	5f                   	pop    edi
+ 1003039:	c3                   	ret    
+ 100303a:	66 90                	xchg   ax,ax
 
-01003038 <kbd_handler_generic>:
+0100303c <kbd_handler_generic>:
 kbd_handler_generic():
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:38
     kbd_handler_generic();
@@ -8334,8 +8333,8 @@ kbd_handler_generic():
 
 void kbd_handler_generic()
 {
- 1003038:	53                   	push   ebx
- 1003039:	83 ec 08             	sub    esp,0x8
+ 100303c:	53                   	push   ebx
+ 100303d:	83 ec 08             	sub    esp,0x8
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
 }
@@ -8344,7 +8343,7 @@ static __inline unsigned char inb(unsigned short __port)
 {
 	unsigned char __val;
 	__asm__ volatile ("inb %0, %1" : "=a" (__val) : "dN" (__port));
- 100303c:	e4 60                	in     al,0x60
+ 1003040:	e4 60                	in     al,0x60
 kbd_handler_generic():
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:44
     unsigned char lKeyControlVal=0;
@@ -8353,64 +8352,64 @@ kbd_handler_generic():
    
     rawKey = inb(KEYB_DATA_PORT);
     kKeyChar = rawKey;//& 0x80;
- 100303e:	a2 70 3a 01 01       	mov    ds:0x1013a70,al
+ 1003042:	a2 7c 4a 01 01       	mov    ds:0x1014a7c,al
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:46
 
     __asm__("cli\n");
- 1003043:	fa                   	cli    
+ 1003047:	fa                   	cli    
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:48
     
     switch(rawKey)  
- 1003044:	3c 9d                	cmp    al,0x9d
- 1003046:	74 44                	je     100308c <kbd_handler_generic+0x54>
  1003048:	3c 9d                	cmp    al,0x9d
- 100304a:	77 0e                	ja     100305a <kbd_handler_generic+0x22>
- 100304c:	3c 2a                	cmp    al,0x2a
- 100304e:	74 18                	je     1003068 <kbd_handler_generic+0x30>
- 1003050:	3c 38                	cmp    al,0x38
- 1003052:	74 44                	je     1003098 <kbd_handler_generic+0x60>
- 1003054:	3c 1d                	cmp    al,0x1d
- 1003056:	75 6e                	jne    10030c6 <kbd_handler_generic+0x8e>
- 1003058:	eb 26                	jmp    1003080 <kbd_handler_generic+0x48>
- 100305a:	3c b8                	cmp    al,0xb8
- 100305c:	74 46                	je     10030a4 <kbd_handler_generic+0x6c>
- 100305e:	3c ba                	cmp    al,0xba
- 1003060:	74 4e                	je     10030b0 <kbd_handler_generic+0x78>
- 1003062:	3c aa                	cmp    al,0xaa
- 1003064:	75 60                	jne    10030c6 <kbd_handler_generic+0x8e>
- 1003066:	eb 0c                	jmp    1003074 <kbd_handler_generic+0x3c>
+ 100304a:	74 44                	je     1003090 <kbd_handler_generic+0x54>
+ 100304c:	3c 9d                	cmp    al,0x9d
+ 100304e:	77 0e                	ja     100305e <kbd_handler_generic+0x22>
+ 1003050:	3c 2a                	cmp    al,0x2a
+ 1003052:	74 18                	je     100306c <kbd_handler_generic+0x30>
+ 1003054:	3c 38                	cmp    al,0x38
+ 1003056:	74 44                	je     100309c <kbd_handler_generic+0x60>
+ 1003058:	3c 1d                	cmp    al,0x1d
+ 100305a:	75 6e                	jne    10030ca <kbd_handler_generic+0x8e>
+ 100305c:	eb 26                	jmp    1003084 <kbd_handler_generic+0x48>
+ 100305e:	3c b8                	cmp    al,0xb8
+ 1003060:	74 46                	je     10030a8 <kbd_handler_generic+0x6c>
+ 1003062:	3c ba                	cmp    al,0xba
+ 1003064:	74 4e                	je     10030b4 <kbd_handler_generic+0x78>
+ 1003066:	3c aa                	cmp    al,0xaa
+ 1003068:	75 60                	jne    10030ca <kbd_handler_generic+0x8e>
+ 100306a:	eb 0c                	jmp    1003078 <kbd_handler_generic+0x3c>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:50
     {
         case KEY_SHIFT_DN: kKeyStatus[INDEX_SHIFT]=1;break;
- 1003068:	c6 05 48 3a 01 01 01 	mov    BYTE PTR ds:0x1013a48,0x1
- 100306f:	e9 94 01 00 00       	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 100306c:	c6 05 48 4a 01 01 01 	mov    BYTE PTR ds:0x1014a48,0x1
+ 1003073:	e9 94 01 00 00       	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:51
         case KEY_SHIFT_UP: kKeyStatus[INDEX_SHIFT]=0;break;
- 1003074:	c6 05 48 3a 01 01 00 	mov    BYTE PTR ds:0x1013a48,0x0
- 100307b:	e9 88 01 00 00       	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 1003078:	c6 05 48 4a 01 01 00 	mov    BYTE PTR ds:0x1014a48,0x0
+ 100307f:	e9 88 01 00 00       	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:52
         case KEY_CTRL_DN: kKeyStatus[INDEX_CTRL]=1;break;
- 1003080:	c6 05 49 3a 01 01 01 	mov    BYTE PTR ds:0x1013a49,0x1
- 1003087:	e9 7c 01 00 00       	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 1003084:	c6 05 49 4a 01 01 01 	mov    BYTE PTR ds:0x1014a49,0x1
+ 100308b:	e9 7c 01 00 00       	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:53
         case KEY_CTRL_UP: kKeyStatus[INDEX_CTRL]=0;break;
- 100308c:	c6 05 49 3a 01 01 00 	mov    BYTE PTR ds:0x1013a49,0x0
- 1003093:	e9 70 01 00 00       	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 1003090:	c6 05 49 4a 01 01 00 	mov    BYTE PTR ds:0x1014a49,0x0
+ 1003097:	e9 70 01 00 00       	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:54
         case KEY_ALT_DN: kKeyStatus[INDEX_ALT]=1;break;
- 1003098:	c6 05 4a 3a 01 01 01 	mov    BYTE PTR ds:0x1013a4a,0x1
- 100309f:	e9 64 01 00 00       	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 100309c:	c6 05 4a 4a 01 01 01 	mov    BYTE PTR ds:0x1014a4a,0x1
+ 10030a3:	e9 64 01 00 00       	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:55
         case KEY_ALT_UP: kKeyStatus[INDEX_ALT]=0;break;
- 10030a4:	c6 05 4a 3a 01 01 00 	mov    BYTE PTR ds:0x1013a4a,0x0
- 10030ab:	e9 58 01 00 00       	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 10030a8:	c6 05 4a 4a 01 01 00 	mov    BYTE PTR ds:0x1014a4a,0x0
+ 10030af:	e9 58 01 00 00       	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:56
         case KEY_CAPSLOCK_UP: kKeyStatus[INDEX_CAPSLOCK]=!kKeyStatus[INDEX_CAPSLOCK];break;
- 10030b0:	0f b6 05 4b 3a 01 01 	movzx  eax,BYTE PTR ds:0x1013a4b
- 10030b7:	84 c0                	test   al,al
- 10030b9:	0f 94 c0             	sete   al
- 10030bc:	a2 4b 3a 01 01       	mov    ds:0x1013a4b,al
- 10030c1:	e9 42 01 00 00       	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 10030b4:	0f b6 05 4b 4a 01 01 	movzx  eax,BYTE PTR ds:0x1014a4b
+ 10030bb:	84 c0                	test   al,al
+ 10030bd:	0f 94 c0             	sete   al
+ 10030c0:	a2 4b 4a 01 01       	mov    ds:0x1014a4b,al
+ 10030c5:	e9 42 01 00 00       	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:64
 //        case MAKE_UP: kKeyStatus[INDEX_UP]=0;break;
 //        case MAKE_DOWN: kKeyStatus[INDEX_DOWN]=0;break;
@@ -8418,55 +8417,55 @@ kbd_handler_generic():
 //printk("%02X",rawKey);
            //changed from if rawkey & 0x80, so that keydown triggers the key being input
            if (rawKey==BREAK_RIGHT || rawKey==BREAK_LEFT || rawKey==BREAK_UP || rawKey==BREAK_DOWN)
- 10030c6:	8d 50 35             	lea    edx,[eax+0x35]
- 10030c9:	f6 c2 fd             	test   dl,0xfd
- 10030cc:	74 08                	je     10030d6 <kbd_handler_generic+0x9e>
+ 10030ca:	8d 50 35             	lea    edx,[eax+0x35]
+ 10030cd:	f6 c2 fd             	test   dl,0xfd
+ 10030d0:	74 08                	je     10030da <kbd_handler_generic+0x9e>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:64 (discriminator 1)
- 10030ce:	8d 50 38             	lea    edx,[eax+0x38]
- 10030d1:	f6 c2 f7             	test   dl,0xf7
- 10030d4:	75 24                	jne    10030fa <kbd_handler_generic+0xc2>
+ 10030d2:	8d 50 38             	lea    edx,[eax+0x38]
+ 10030d5:	f6 c2 f7             	test   dl,0xf7
+ 10030d8:	75 24                	jne    10030fe <kbd_handler_generic+0xc2>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:65
                if (kKeyboardBuffer<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
- 10030d6:	8b 15 e0 03 12 00    	mov    edx,DWORD PTR ds:0x1203e0
- 10030dc:	81 fa 2f 25 15 00    	cmp    edx,0x15252f
- 10030e2:	77 16                	ja     10030fa <kbd_handler_generic+0xc2>
+ 10030da:	8b 15 e0 03 12 00    	mov    edx,DWORD PTR ds:0x1203e0
+ 10030e0:	81 fa 2f 25 15 00    	cmp    edx,0x15252f
+ 10030e6:	77 16                	ja     10030fe <kbd_handler_generic+0xc2>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:65 (discriminator 1)
- 10030e4:	0f b6 0d 4a 3a 01 01 	movzx  ecx,BYTE PTR ds:0x1013a4a
- 10030eb:	84 c9                	test   cl,cl
- 10030ed:	75 0b                	jne    10030fa <kbd_handler_generic+0xc2>
+ 10030e8:	0f b6 0d 4a 4a 01 01 	movzx  ecx,BYTE PTR ds:0x1014a4a
+ 10030ef:	84 c9                	test   cl,cl
+ 10030f1:	75 0b                	jne    10030fe <kbd_handler_generic+0xc2>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:66
                    *kKeyboardBuffer++=rawKey;
- 10030ef:	8d 4a 01             	lea    ecx,[edx+0x1]
- 10030f2:	89 0d e0 03 12 00    	mov    DWORD PTR ds:0x1203e0,ecx
- 10030f8:	88 02                	mov    BYTE PTR [edx],al
+ 10030f3:	8d 4a 01             	lea    ecx,[edx+0x1]
+ 10030f6:	89 0d e0 03 12 00    	mov    DWORD PTR ds:0x1203e0,ecx
+ 10030fc:	88 02                	mov    BYTE PTR [edx],al
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:67
            if (!(rawKey & 0x80))
- 10030fa:	84 c0                	test   al,al
- 10030fc:	0f 88 06 01 00 00    	js     1003208 <kbd_handler_generic+0x1d0>
+ 10030fe:	84 c0                	test   al,al
+ 1003100:	0f 88 06 01 00 00    	js     100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:71
            {
                 //rawKey &= 0x7f;
                //printk("%02X",rawKey); 48=up, 50=down
                  if (kKeyStatus[INDEX_SHIFT] || kKeyStatus[INDEX_CAPSLOCK])
- 1003102:	0f b6 15 48 3a 01 01 	movzx  edx,BYTE PTR ds:0x1013a48
- 1003109:	84 d2                	test   dl,dl
- 100310b:	75 0b                	jne    1003118 <kbd_handler_generic+0xe0>
+ 1003106:	0f b6 15 48 4a 01 01 	movzx  edx,BYTE PTR ds:0x1014a48
+ 100310d:	84 d2                	test   dl,dl
+ 100310f:	75 0b                	jne    100311c <kbd_handler_generic+0xe0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:71 (discriminator 1)
- 100310d:	0f b6 15 4b 3a 01 01 	movzx  edx,BYTE PTR ds:0x1013a4b
- 1003114:	84 d2                	test   dl,dl
- 1003116:	74 0c                	je     1003124 <kbd_handler_generic+0xec>
+ 1003111:	0f b6 15 4b 4a 01 01 	movzx  edx,BYTE PTR ds:0x1014a4b
+ 1003118:	84 d2                	test   dl,dl
+ 100311a:	74 0c                	je     1003128 <kbd_handler_generic+0xec>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:73
                  {
                      translatedKeypress=keyboard_map_up[rawKey];
- 1003118:	0f b6 c0             	movzx  eax,al
- 100311b:	0f b6 98 60 50 00 01 	movzx  ebx,BYTE PTR [eax+0x1005060]
- 1003122:	eb 0a                	jmp    100312e <kbd_handler_generic+0xf6>
+ 100311c:	0f b6 c0             	movzx  eax,al
+ 100311f:	0f b6 98 60 50 00 01 	movzx  ebx,BYTE PTR [eax+0x1005060]
+ 1003126:	eb 0a                	jmp    1003132 <kbd_handler_generic+0xf6>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:76
                  }
                  else
                      translatedKeypress=keyboard_map[rawKey];
- 1003124:	0f b6 c0             	movzx  eax,al
- 1003127:	0f b6 98 e0 50 00 01 	movzx  ebx,BYTE PTR [eax+0x10050e0]
+ 1003128:	0f b6 c0             	movzx  eax,al
+ 100312b:	0f b6 98 e0 50 00 01 	movzx  ebx,BYTE PTR [eax+0x10050e0]
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:83
 //                 if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
 //                 {
@@ -8474,56 +8473,56 @@ kbd_handler_generic():
 //                 }
 #endif
                 if (kKeyStatus[INDEX_CTRL])
- 100312e:	0f b6 05 49 3a 01 01 	movzx  eax,BYTE PTR ds:0x1013a49
- 1003135:	84 c0                	test   al,al
- 1003137:	74 13                	je     100314c <kbd_handler_generic+0x114>
+ 1003132:	0f b6 05 49 4a 01 01 	movzx  eax,BYTE PTR ds:0x1014a49
+ 1003139:	84 c0                	test   al,al
+ 100313b:	74 13                	je     1003150 <kbd_handler_generic+0x114>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:85
                 {
                     printk("^");
- 1003139:	83 ec 0c             	sub    esp,0xc
- 100313c:	68 d3 75 00 01       	push   0x10075d3
- 1003141:	e8 31 f4 ff ff       	call   1002577 <printk>
+ 100313d:	83 ec 0c             	sub    esp,0xc
+ 1003140:	68 cf 78 00 01       	push   0x10078cf
+ 1003145:	e8 31 f4 ff ff       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:86
                     translatedKeypress-=32;
- 1003146:	83 eb 20             	sub    ebx,0x20
- 1003149:	83 c4 10             	add    esp,0x10
+ 100314a:	83 eb 20             	sub    ebx,0x20
+ 100314d:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:89
                 }
                 //Debug
                 if (kKeyStatus[INDEX_ALT] && translatedKeypress==0x6A)
- 100314c:	0f b6 05 4a 3a 01 01 	movzx  eax,BYTE PTR ds:0x1013a4a
- 1003153:	80 fb 6a             	cmp    bl,0x6a
- 1003156:	75 05                	jne    100315d <kbd_handler_generic+0x125>
- 1003158:	84 c0                	test   al,al
- 100315a:	74 01                	je     100315d <kbd_handler_generic+0x125>
+ 1003150:	0f b6 05 4a 4a 01 01 	movzx  eax,BYTE PTR ds:0x1014a4a
+ 1003157:	80 fb 6a             	cmp    bl,0x6a
+ 100315a:	75 05                	jne    1003161 <kbd_handler_generic+0x125>
+ 100315c:	84 c0                	test   al,al
+ 100315e:	74 01                	je     1003161 <kbd_handler_generic+0x125>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:91
                 {
                     __asm("int 0x3");
- 100315c:	cc                   	int3   
+ 1003160:	cc                   	int3   
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:93
                 }
             if (kKeyStatus[INDEX_ALT] && kKeyStatus[INDEX_CTRL] && translatedKeypress==0xE0)
- 100315d:	0f b6 05 4a 3a 01 01 	movzx  eax,BYTE PTR ds:0x1013a4a
- 1003164:	84 c0                	test   al,al
- 1003166:	74 2f                	je     1003197 <kbd_handler_generic+0x15f>
+ 1003161:	0f b6 05 4a 4a 01 01 	movzx  eax,BYTE PTR ds:0x1014a4a
+ 1003168:	84 c0                	test   al,al
+ 100316a:	74 2f                	je     100319b <kbd_handler_generic+0x15f>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:93 (discriminator 1)
- 1003168:	0f b6 05 49 3a 01 01 	movzx  eax,BYTE PTR ds:0x1013a49
- 100316f:	80 fb e0             	cmp    bl,0xe0
- 1003172:	75 23                	jne    1003197 <kbd_handler_generic+0x15f>
- 1003174:	84 c0                	test   al,al
- 1003176:	74 1f                	je     1003197 <kbd_handler_generic+0x15f>
+ 100316c:	0f b6 05 49 4a 01 01 	movzx  eax,BYTE PTR ds:0x1014a49
+ 1003173:	80 fb e0             	cmp    bl,0xe0
+ 1003176:	75 23                	jne    100319b <kbd_handler_generic+0x15f>
+ 1003178:	84 c0                	test   al,al
+ 100317a:	74 1f                	je     100319b <kbd_handler_generic+0x15f>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:96
             {
                 translatedKeypress=0;
                 reboot(false);
- 1003178:	83 ec 0c             	sub    esp,0xc
- 100317b:	6a 00                	push   0x0
- 100317d:	e8 9d eb ff ff       	call   1001d1f <reboot>
+ 100317c:	83 ec 0c             	sub    esp,0xc
+ 100317f:	6a 00                	push   0x0
+ 1003181:	e8 9d eb ff ff       	call   1001d23 <reboot>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:98
             }
             if (kKeyStatus[INDEX_ALT])
- 1003182:	0f b6 05 4a 3a 01 01 	movzx  eax,BYTE PTR ds:0x1013a4a
- 1003189:	83 c4 10             	add    esp,0x10
+ 1003186:	0f b6 05 4a 4a 01 01 	movzx  eax,BYTE PTR ds:0x1014a4a
+ 100318d:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:95
                 {
                     __asm("int 0x3");
@@ -8531,49 +8530,49 @@ kbd_handler_generic():
             if (kKeyStatus[INDEX_ALT] && kKeyStatus[INDEX_CTRL] && translatedKeypress==0xE0)
             {
                 translatedKeypress=0;
- 100318c:	bb 00 00 00 00       	mov    ebx,0x0
+ 1003190:	bb 00 00 00 00       	mov    ebx,0x0
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:98
                 reboot(false);
             }
             if (kKeyStatus[INDEX_ALT])
- 1003191:	84 c0                	test   al,al
- 1003193:	75 69                	jne    10031fe <kbd_handler_generic+0x1c6>
- 1003195:	eb 71                	jmp    1003208 <kbd_handler_generic+0x1d0>
- 1003197:	0f b6 05 4a 3a 01 01 	movzx  eax,BYTE PTR ds:0x1013a4a
- 100319e:	84 c0                	test   al,al
- 10031a0:	74 66                	je     1003208 <kbd_handler_generic+0x1d0>
+ 1003195:	84 c0                	test   al,al
+ 1003197:	75 69                	jne    1003202 <kbd_handler_generic+0x1c6>
+ 1003199:	eb 71                	jmp    100320c <kbd_handler_generic+0x1d0>
+ 100319b:	0f b6 05 4a 4a 01 01 	movzx  eax,BYTE PTR ds:0x1014a4a
+ 10031a2:	84 c0                	test   al,al
+ 10031a4:	74 66                	je     100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:100
             {
                 if (translatedKeypress=='c')
- 10031a2:	80 fb 63             	cmp    bl,0x63
- 10031a5:	75 4b                	jne    10031f2 <kbd_handler_generic+0x1ba>
+ 10031a6:	80 fb 63             	cmp    bl,0x63
+ 10031a9:	75 4b                	jne    10031f6 <kbd_handler_generic+0x1ba>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:102
                 {
                     printk("%u",*kTicksSinceStart);
- 10031a7:	a1 60 02 12 00       	mov    eax,ds:0x120260
- 10031ac:	8b 00                	mov    eax,DWORD PTR [eax]
- 10031ae:	83 ec 08             	sub    esp,0x8
- 10031b1:	50                   	push   eax
- 10031b2:	68 d5 75 00 01       	push   0x10075d5
- 10031b7:	e8 bb f3 ff ff       	call   1002577 <printk>
+ 10031ab:	a1 60 02 12 00       	mov    eax,ds:0x120260
+ 10031b0:	8b 00                	mov    eax,DWORD PTR [eax]
+ 10031b2:	83 ec 08             	sub    esp,0x8
+ 10031b5:	50                   	push   eax
+ 10031b6:	68 d1 78 00 01       	push   0x10078d1
+ 10031bb:	e8 bb f3 ff ff       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:103
                     printk("-%c-%04X:%08X",(exceptionFlags & 0x200)==0x200?'I':'i',exceptionCS, exceptionEIP);
- 10031bc:	8b 0d f8 01 12 00    	mov    ecx,DWORD PTR ds:0x1201f8
- 10031c2:	8b 15 fc 01 12 00    	mov    edx,DWORD PTR ds:0x1201fc
- 10031c8:	a1 f0 01 12 00       	mov    eax,ds:0x1201f0
- 10031cd:	83 c4 10             	add    esp,0x10
- 10031d0:	25 00 02 00 00       	and    eax,0x200
- 10031d5:	83 f8 01             	cmp    eax,0x1
- 10031d8:	19 c0                	sbb    eax,eax
- 10031da:	83 e0 20             	and    eax,0x20
- 10031dd:	83 c0 49             	add    eax,0x49
- 10031e0:	51                   	push   ecx
- 10031e1:	52                   	push   edx
- 10031e2:	50                   	push   eax
- 10031e3:	68 d8 75 00 01       	push   0x10075d8
- 10031e8:	e8 8a f3 ff ff       	call   1002577 <printk>
- 10031ed:	83 c4 10             	add    esp,0x10
- 10031f0:	eb 16                	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 10031c0:	8b 0d f8 01 12 00    	mov    ecx,DWORD PTR ds:0x1201f8
+ 10031c6:	8b 15 fc 01 12 00    	mov    edx,DWORD PTR ds:0x1201fc
+ 10031cc:	a1 f0 01 12 00       	mov    eax,ds:0x1201f0
+ 10031d1:	83 c4 10             	add    esp,0x10
+ 10031d4:	25 00 02 00 00       	and    eax,0x200
+ 10031d9:	83 f8 01             	cmp    eax,0x1
+ 10031dc:	19 c0                	sbb    eax,eax
+ 10031de:	83 e0 20             	and    eax,0x20
+ 10031e1:	83 c0 49             	add    eax,0x49
+ 10031e4:	51                   	push   ecx
+ 10031e5:	52                   	push   edx
+ 10031e6:	50                   	push   eax
+ 10031e7:	68 d4 78 00 01       	push   0x10078d4
+ 10031ec:	e8 8a f3 ff ff       	call   100257b <printk>
+ 10031f1:	83 c4 10             	add    esp,0x10
+ 10031f4:	eb 16                	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:116
                     printk("The time is currently %s", &currTime);
                     cursorMoveTo(65,SYS_VGA_HEIGHT-1);
@@ -8581,26 +8580,26 @@ kbd_handler_generic():
                     cursorRestorePosition();
                 }
 */                if (translatedKeypress=='d')
- 10031f2:	80 fb 64             	cmp    bl,0x64
- 10031f5:	75 07                	jne    10031fe <kbd_handler_generic+0x1c6>
+ 10031f6:	80 fb 64             	cmp    bl,0x64
+ 10031f9:	75 07                	jne    1003202 <kbd_handler_generic+0x1c6>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:118
                 {
                     printDumpedRegs();
- 10031f7:	e8 8a e8 ff ff       	call   1001a86 <printDumpedRegs>
- 10031fc:	eb 0a                	jmp    1003208 <kbd_handler_generic+0x1d0>
+ 10031fb:	e8 8a e8 ff ff       	call   1001a8a <printDumpedRegs>
+ 1003200:	eb 0a                	jmp    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:120
                 }
                 if (translatedKeypress=='e')
- 10031fe:	80 fb 65             	cmp    bl,0x65
- 1003201:	75 05                	jne    1003208 <kbd_handler_generic+0x1d0>
+ 1003202:	80 fb 65             	cmp    bl,0x65
+ 1003205:	75 05                	jne    100320c <kbd_handler_generic+0x1d0>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:122
                 {
                     dumpKernelAddresses();
- 1003203:	e8 58 eb ff ff       	call   1001d60 <dumpKernelAddresses>
+ 1003207:	e8 58 eb ff ff       	call   1001d64 <dumpKernelAddresses>
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
- 1003208:	e4 61                	in     al,0x61
- 100320a:	89 c2                	mov    edx,eax
+ 100320c:	e4 61                	in     al,0x61
+ 100320e:	89 c2                	mov    edx,eax
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -8609,12 +8608,12 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 100320c:	83 c8 82             	or     eax,0xffffff82
- 100320f:	e6 61                	out    0x61,al
- 1003211:	89 d0                	mov    eax,edx
- 1003213:	83 e0 7f             	and    eax,0x7f
- 1003216:	83 c8 02             	or     eax,0x2
- 1003219:	e6 61                	out    0x61,al
+ 1003210:	83 c8 82             	or     eax,0xffffff82
+ 1003213:	e6 61                	out    0x61,al
+ 1003215:	89 d0                	mov    eax,edx
+ 1003217:	83 e0 7f             	and    eax,0x7f
+ 100321a:	83 c8 02             	or     eax,0x2
+ 100321d:	e6 61                	out    0x61,al
 kbd_handler_generic():
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:135
     lKeyControlVal |= 0x82;
@@ -8623,11 +8622,11 @@ kbd_handler_generic():
     outb(KEYB_CTRL_PORT, lKeyControlVal);
     return;
 }
- 100321b:	83 c4 08             	add    esp,0x8
- 100321e:	5b                   	pop    ebx
- 100321f:	c3                   	ret    
+ 100321f:	83 c4 08             	add    esp,0x8
+ 1003222:	5b                   	pop    ebx
+ 1003223:	c3                   	ret    
 
-01003220 <ih_keyboard_generic>:
+01003224 <ih_keyboard_generic>:
 ih_keyboard_generic():
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:32
 extern volatile uint32_t exceptionSavedESP;
@@ -8636,1743 +8635,2666 @@ extern volatile uint32_t* kTicksSinceStart;
 __attribute__ ((interrupt))
 void ih_keyboard_generic(struct interrupt_frame *frame)
 {
- 1003220:	83 ec 0c             	sub    esp,0xc
+ 1003224:	83 ec 0c             	sub    esp,0xc
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:33
     kbd_handler_generic();
- 1003223:	e8 10 fe ff ff       	call   1003038 <kbd_handler_generic>
+ 1003227:	e8 10 fe ff ff       	call   100303c <kbd_handler_generic>
 /home/yogi/src/os/chrisOSKernel/src/drivers/drv_genKeyboard.c:35
     return;
 }
- 1003228:	83 c4 0c             	add    esp,0xc
- 100322b:	c3                   	ret    
+ 100322c:	83 c4 0c             	add    esp,0xc
+ 100322f:	c3                   	ret    
 
-0100322c <main>:
+01003230 <main>:
 main():
-/home/yogi/src/os/chrisOSKernel/src/kernel.c:24
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:26
 extern char kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
 /*
  * 
  */
 int main(int argc, char** argv) {
- 100322c:	8d 4c 24 04          	lea    ecx,[esp+0x4]
- 1003230:	83 e4 f0             	and    esp,0xfffffff0
- 1003233:	ff 71 fc             	push   DWORD PTR [ecx-0x4]
- 1003236:	55                   	push   ebp
- 1003237:	89 e5                	mov    ebp,esp
- 1003239:	51                   	push   ecx
- 100323a:	83 ec 10             	sub    esp,0x10
-/home/yogi/src/os/chrisOSKernel/src/kernel.c:26
+ 1003230:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+ 1003234:	83 e4 f0             	and    esp,0xfffffff0
+ 1003237:	ff 71 fc             	push   DWORD PTR [ecx-0x4]
+ 100323a:	55                   	push   ebp
+ 100323b:	89 e5                	mov    ebp,esp
+ 100323d:	53                   	push   ebx
+ 100323e:	51                   	push   ecx
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:28
     //terminal_clear();
     printk("\nkernel loaded ... \n");
- 100323d:	68 e6 75 00 01       	push   0x10075e6
- 1003242:	e8 30 f3 ff ff       	call   1002577 <printk>
-/home/yogi/src/os/chrisOSKernel/src/kernel.c:36
+ 100323f:	83 ec 0c             	sub    esp,0xc
+ 1003242:	68 e2 78 00 01       	push   0x10078e2
+ 1003247:	e8 2f f3 ff ff       	call   100257b <printk>
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:37
+        printk("Param %u=%s\n",cnt,argv[cnt]);
         //if (cnt>5)
         //    break;
     }
 */
-    
-    printk("kernelDataLoadAddress = 0x%08X \n\n",&kernelDataLoadAddress);
- 1003247:	83 c4 08             	add    esp,0x8
- 100324a:	68 00 00 12 00       	push   0x120000
- 100324f:	68 24 83 00 01       	push   0x1008324
- 1003254:	e8 1e f3 ff ff       	call   1002577 <printk>
-/home/yogi/src/os/chrisOSKernel/src/kernel.c:37
-    mmInit();
- 1003259:	e8 9c 03 00 00       	call   10035fa <mmInit>
+    printk("Initializing memory management ...\n");
+ 100324c:	c7 04 24 1c 86 00 01 	mov    DWORD PTR [esp],0x100861c
+ 1003253:	e8 23 f3 ff ff       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/src/kernel.c:38
-    taskInit();
- 100325e:	e8 0d 0b 00 00       	call   1003d70 <taskInit>
-/home/yogi/src/os/chrisOSKernel/src/kernel.c:40
-    
-    task_t* task=createTask(true);
- 1003263:	c7 04 24 01 00 00 00 	mov    DWORD PTR [esp],0x1
- 100326a:	e8 1e 0c 00 00       	call   1003e8d <createTask>
+    kDebugLevel |= DEBUG_KERNEL_PAGING;
+ 1003258:	81 0d 38 03 12 00 00 	or     DWORD PTR ds:0x120338,0x8000
+ 100325f:	80 00 00 
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:39
+    mmInit();
+ 1003262:	e8 63 06 00 00       	call   10038ca <mmInit>
 /home/yogi/src/os/chrisOSKernel/src/kernel.c:42
-    
-    printk("kernelGDT=0x%08X, base=0x%08X, limit=%u\n",&kernelGDT, kernelGDT.base,kernelGDT.limit);
- 100326f:	0f b7 05 4c 04 12 00 	movzx  eax,WORD PTR ds:0x12044c
- 1003276:	50                   	push   eax
- 1003277:	ff 35 4e 04 12 00    	push   DWORD PTR ds:0x12044e
- 100327d:	68 4c 04 12 00       	push   0x12044c
- 1003282:	68 48 83 00 01       	push   0x1008348
- 1003287:	e8 eb f2 ff ff       	call   1002577 <printk>
+//    kDebugLevel |= DEBUG_MEMORY_MANAGEMENT;
+//    kDebugLevel |= DEBUG_PAGING;
+    kDebugLevel |= DEBUG_MALLOC;
+ 1003267:	81 0d 38 03 12 00 00 	or     DWORD PTR ds:0x120338,0x80000
+ 100326e:	00 08 00 
 /home/yogi/src/os/chrisOSKernel/src/kernel.c:43
-    return (0xbad);
- 100328c:	83 c4 20             	add    esp,0x20
+    printk("Done initializing memory management.\n\nInitializing malloc ...\n");
+ 1003271:	c7 04 24 40 86 00 01 	mov    DWORD PTR [esp],0x1008640
+ 1003278:	e8 fe f2 ff ff       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/src/kernel.c:44
-}
- 100328f:	b8 ad 0b 00 00       	mov    eax,0xbad
- 1003294:	8b 4d fc             	mov    ecx,DWORD PTR [ebp-0x4]
- 1003297:	c9                   	leave  
- 1003298:	8d 61 fc             	lea    esp,[ecx-0x4]
- 100329b:	c3                   	ret    
+    initMalloc();
+ 100327d:	e8 19 03 00 00       	call   100359b <initMalloc>
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:45
+    printk("Done initializing malloc\n\nInitializing task management ...\n");
+ 1003282:	c7 04 24 80 86 00 01 	mov    DWORD PTR [esp],0x1008680
+ 1003289:	e8 ed f2 ff ff       	call   100257b <printk>
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:46
+    taskInit();
+ 100328e:	e8 dd 0f 00 00       	call   1004270 <taskInit>
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:47
+    printk("Done initializing task management\n\n");
+ 1003293:	c7 04 24 bc 86 00 01 	mov    DWORD PTR [esp],0x10086bc
+ 100329a:	e8 dc f2 ff ff       	call   100257b <printk>
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:51
+    
+    //process_t* process = createProcess(false,'/myhelloworld');
 
-0100329c <findEmptyBlock>:
+    int* a = malloc(50);
+ 100329f:	c7 04 24 32 00 00 00 	mov    DWORD PTR [esp],0x32
+ 10032a6:	e8 d2 04 00 00       	call   100377d <malloc>
+ 10032ab:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:52
+    a[0]=0xDEADBEEF;
+ 10032ad:	c7 00 ef be ad de    	mov    DWORD PTR [eax],0xdeadbeef
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:53
+    printk("a[0](0x%08X)=0x%08X\n",&a[0],a[0]);
+ 10032b3:	83 c4 0c             	add    esp,0xc
+ 10032b6:	68 ef be ad de       	push   0xdeadbeef
+ 10032bb:	50                   	push   eax
+ 10032bc:	68 f7 78 00 01       	push   0x10078f7
+ 10032c1:	e8 b5 f2 ff ff       	call   100257b <printk>
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:54
+    a[1]=0xBEADFEED;
+ 10032c6:	c7 43 04 ed fe ad be 	mov    DWORD PTR [ebx+0x4],0xbeadfeed
+ 10032cd:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/kernel.c:59
+    return 0;
+    char* b = malloc(512);
+    
+    return (0xbad);
+}
+ 10032d0:	b8 00 00 00 00       	mov    eax,0x0
+ 10032d5:	8d 65 f8             	lea    esp,[ebp-0x8]
+ 10032d8:	59                   	pop    ecx
+ 10032d9:	5b                   	pop    ebx
+ 10032da:	5d                   	pop    ebp
+ 10032db:	8d 61 fc             	lea    esp,[ecx-0x4]
+ 10032de:	c3                   	ret    
+ 10032df:	90                   	nop
+
+010032e0 <findEmptyBlock>:
 findEmptyBlock():
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:21
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:18
                       __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
                       cr3Val;})
 
 //Returns pointer to first empty block found
 sMemInfo* findEmptyBlock()
 {
- 100329c:	53                   	push   ebx
- 100329d:	83 ec 08             	sub    esp,0x8
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:22
+ 10032e0:	53                   	push   ebx
+ 10032e1:	83 ec 08             	sub    esp,0x8
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:19
     sMemInfo* mInfo=heapMemoryInfo;
- 10032a0:	a1 54 3a 01 01       	mov    eax,ds:0x1013a54
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:25
+ 10032e4:	a1 60 4a 01 01       	mov    eax,ds:0x1014a60
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:22
     sMemInfo* lRetVal;
     
     while (mInfo<heapMemoryInfo+(sizeof(sMemInfo)*1000))
- 10032a5:	8d 90 80 f6 0b 00    	lea    edx,[eax+0xbf680]
- 10032ab:	39 d0                	cmp    eax,edx
- 10032ad:	73 32                	jae    10032e1 <findEmptyBlock+0x45>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:27
+ 10032e9:	8d 90 80 f6 0b 00    	lea    edx,[eax+0xbf680]
+ 10032ef:	39 d0                	cmp    eax,edx
+ 10032f1:	73 32                	jae    1003325 <findEmptyBlock+0x45>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:24
     {
         if (mInfo->next==NULL)
- 10032af:	83 78 18 00          	cmp    DWORD PTR [eax+0x18],0x0
- 10032b3:	75 25                	jne    10032da <findEmptyBlock+0x3e>
- 10032b5:	eb 06                	jmp    10032bd <findEmptyBlock+0x21>
- 10032b7:	83 78 18 00          	cmp    DWORD PTR [eax+0x18],0x0
- 10032bb:	75 1d                	jne    10032da <findEmptyBlock+0x3e>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:29
+ 10032f3:	83 78 18 00          	cmp    DWORD PTR [eax+0x18],0x0
+ 10032f7:	75 25                	jne    100331e <findEmptyBlock+0x3e>
+ 10032f9:	eb 06                	jmp    1003301 <findEmptyBlock+0x21>
+ 10032fb:	83 78 18 00          	cmp    DWORD PTR [eax+0x18],0x0
+ 10032ff:	75 1d                	jne    100331e <findEmptyBlock+0x3e>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:26
         {
             lRetVal=mInfo+1;
- 10032bd:	8d 58 1c             	lea    ebx,[eax+0x1c]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:30
+ 1003301:	8d 58 1c             	lea    ebx,[eax+0x1c]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:27
             printd(DEBUG_MEMORY_MANAGEMENT,"findEmptyBlock: Returning block # 0x%08X\n",lRetVal);
- 10032c0:	83 ec 04             	sub    esp,0x4
- 10032c3:	53                   	push   ebx
- 10032c4:	68 74 83 00 01       	push   0x1008374
- 10032c9:	68 00 00 01 00       	push   0x10000
- 10032ce:	e8 bc f2 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:31
+ 1003304:	83 ec 04             	sub    esp,0x4
+ 1003307:	53                   	push   ebx
+ 1003308:	68 e0 86 00 01       	push   0x10086e0
+ 100330d:	68 00 00 01 00       	push   0x10000
+ 1003312:	e8 7c f2 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:28
             return lRetVal;
- 10032d3:	83 c4 10             	add    esp,0x10
- 10032d6:	89 d8                	mov    eax,ebx
- 10032d8:	eb 21                	jmp    10032fb <findEmptyBlock+0x5f>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:33
+ 1003317:	83 c4 10             	add    esp,0x10
+ 100331a:	89 d8                	mov    eax,ebx
+ 100331c:	eb 21                	jmp    100333f <findEmptyBlock+0x5f>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:30
         }
          mInfo++;
- 10032da:	83 c0 1c             	add    eax,0x1c
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:25
+ 100331e:	83 c0 1c             	add    eax,0x1c
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:22
 sMemInfo* findEmptyBlock()
 {
     sMemInfo* mInfo=heapMemoryInfo;
     sMemInfo* lRetVal;
     
     while (mInfo<heapMemoryInfo+(sizeof(sMemInfo)*1000))
- 10032dd:	39 d0                	cmp    eax,edx
- 10032df:	75 d6                	jne    10032b7 <findEmptyBlock+0x1b>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:35
+ 1003321:	39 d0                	cmp    eax,edx
+ 1003323:	75 d6                	jne    10032fb <findEmptyBlock+0x1b>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:32
             printd(DEBUG_MEMORY_MANAGEMENT,"findEmptyBlock: Returning block # 0x%08X\n",lRetVal);
             return lRetVal;
         }
          mInfo++;
     }
     printd(DEBUG_MEMORY_MANAGEMENT,"findEmptyBlock: No empty block found, returning NULL\n");
- 10032e1:	83 ec 08             	sub    esp,0x8
- 10032e4:	68 a0 83 00 01       	push   0x10083a0
- 10032e9:	68 00 00 01 00       	push   0x10000
- 10032ee:	e8 9c f2 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:36
+ 1003325:	83 ec 08             	sub    esp,0x8
+ 1003328:	68 0c 87 00 01       	push   0x100870c
+ 100332d:	68 00 00 01 00       	push   0x10000
+ 1003332:	e8 5c f2 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:33
     return NULL;
- 10032f3:	83 c4 10             	add    esp,0x10
- 10032f6:	b8 00 00 00 00       	mov    eax,0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:37
+ 1003337:	83 c4 10             	add    esp,0x10
+ 100333a:	b8 00 00 00 00       	mov    eax,0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:34
 }
- 10032fb:	83 c4 08             	add    esp,0x8
- 10032fe:	5b                   	pop    ebx
- 10032ff:	c3                   	ret    
+ 100333f:	83 c4 08             	add    esp,0x8
+ 1003342:	5b                   	pop    ebx
+ 1003343:	c3                   	ret    
 
-01003300 <findBlockByMemoryAddress>:
+01003344 <findBlockByMemoryAddress>:
 findBlockByMemoryAddress():
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:40
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:37
 
 sMemInfo* findBlockByMemoryAddress(uintptr_t* address)
 {
- 1003300:	53                   	push   ebx
- 1003301:	83 ec 08             	sub    esp,0x8
- 1003304:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:41
+ 1003344:	53                   	push   ebx
+ 1003345:	83 ec 08             	sub    esp,0x8
+ 1003348:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:38
     sMemInfo* mInfo=heapMemoryInfo;
- 1003308:	8b 1d 54 3a 01 01    	mov    ebx,DWORD PTR ds:0x1013a54
- 100330e:	8d 93 80 f6 0b 00    	lea    edx,[ebx+0xbf680]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:44
+ 100334c:	8b 1d 60 4a 01 01    	mov    ebx,DWORD PTR ds:0x1014a60
+ 1003352:	8d 93 80 f6 0b 00    	lea    edx,[ebx+0xbf680]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:41
     do
     {
         if (mInfo->address==address)
- 1003314:	3b 43 04             	cmp    eax,DWORD PTR [ebx+0x4]
- 1003317:	75 18                	jne    1003331 <findBlockByMemoryAddress+0x31>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:46
+ 1003358:	3b 43 04             	cmp    eax,DWORD PTR [ebx+0x4]
+ 100335b:	75 18                	jne    1003375 <findBlockByMemoryAddress+0x31>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:43
         {
             printd(DEBUG_MEMORY_MANAGEMENT,"findBlockByMemoryAddress: Found block 0x%08X for memory address 0x%08X\n",mInfo,address);
- 1003319:	50                   	push   eax
- 100331a:	53                   	push   ebx
- 100331b:	68 d8 83 00 01       	push   0x10083d8
- 1003320:	68 00 00 01 00       	push   0x10000
- 1003325:	e8 65 f2 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:47
+ 100335d:	50                   	push   eax
+ 100335e:	53                   	push   ebx
+ 100335f:	68 44 87 00 01       	push   0x1008744
+ 1003364:	68 00 00 01 00       	push   0x10000
+ 1003369:	e8 25 f2 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:44
             return (sMemInfo*)mInfo;
- 100332a:	83 c4 10             	add    esp,0x10
- 100332d:	89 d8                	mov    eax,ebx
- 100332f:	eb 0c                	jmp    100333d <findBlockByMemoryAddress+0x3d>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:49
+ 100336e:	83 c4 10             	add    esp,0x10
+ 1003371:	89 d8                	mov    eax,ebx
+ 1003373:	eb 0c                	jmp    1003381 <findBlockByMemoryAddress+0x3d>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:46
         }
         mInfo++;
- 1003331:	83 c3 1c             	add    ebx,0x1c
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:50
+ 1003375:	83 c3 1c             	add    ebx,0x1c
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:47
     } while (mInfo<heapMemoryInfo+(sizeof(sMemInfo)*1000));
- 1003334:	39 d3                	cmp    ebx,edx
- 1003336:	75 dc                	jne    1003314 <findBlockByMemoryAddress+0x14>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:51
+ 1003378:	39 d3                	cmp    ebx,edx
+ 100337a:	75 dc                	jne    1003358 <findBlockByMemoryAddress+0x14>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:48
     return NULL;
- 1003338:	b8 00 00 00 00       	mov    eax,0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:52
+ 100337c:	b8 00 00 00 00       	mov    eax,0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:49
 }
- 100333d:	83 c4 08             	add    esp,0x8
- 1003340:	5b                   	pop    ebx
- 1003341:	c3                   	ret    
+ 1003381:	83 c4 08             	add    esp,0x8
+ 1003384:	5b                   	pop    ebx
+ 1003385:	c3                   	ret    
 
-01003342 <findAvailableBlockBySize>:
+01003386 <findAvailableBlockBySize>:
 findAvailableBlockBySize():
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:56
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:53
 
 //Returns a block with enough memory to fulfill the request
 uintptr_t* findAvailableBlockBySize(uint32_t pSize)
 {
- 1003342:	53                   	push   ebx
- 1003343:	83 ec 08             	sub    esp,0x8
- 1003346:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:57
+ 1003386:	53                   	push   ebx
+ 1003387:	83 ec 08             	sub    esp,0x8
+ 100338a:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:54
     sMemInfo* mInfo=heapMemoryInfo;
- 100334a:	a1 54 3a 01 01       	mov    eax,ds:0x1013a54
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:61
+ 100338e:	a1 60 4a 01 01       	mov    eax,ds:0x1014a60
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:58
     
     //First try finding a block starting at the last block instead of the first
     //Get to the last block
     while (mInfo->next)
- 100334f:	83 78 18 00          	cmp    DWORD PTR [eax+0x18],0x0
- 1003353:	74 11                	je     1003366 <findAvailableBlockBySize+0x24>
- 1003355:	89 c3                	mov    ebx,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:62
+ 1003393:	83 78 18 00          	cmp    DWORD PTR [eax+0x18],0x0
+ 1003397:	74 11                	je     10033aa <findAvailableBlockBySize+0x24>
+ 1003399:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:59
         mInfo++;
- 1003357:	83 c3 1c             	add    ebx,0x1c
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:61
+ 100339b:	83 c3 1c             	add    ebx,0x1c
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:58
 {
     sMemInfo* mInfo=heapMemoryInfo;
     
     //First try finding a block starting at the last block instead of the first
     //Get to the last block
     while (mInfo->next)
- 100335a:	83 7b 18 00          	cmp    DWORD PTR [ebx+0x18],0x0
- 100335e:	75 f7                	jne    1003357 <findAvailableBlockBySize+0x15>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:63
+ 100339e:	83 7b 18 00          	cmp    DWORD PTR [ebx+0x18],0x0
+ 10033a2:	75 f7                	jne    100339b <findAvailableBlockBySize+0x15>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:60
         mInfo++;
     while (mInfo>=heapMemoryInfo)
- 1003360:	39 d8                	cmp    eax,ebx
- 1003362:	76 04                	jbe    1003368 <findAvailableBlockBySize+0x26>
- 1003364:	eb 2e                	jmp    1003394 <findAvailableBlockBySize+0x52>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:57
+ 10033a4:	39 d8                	cmp    eax,ebx
+ 10033a6:	76 04                	jbe    10033ac <findAvailableBlockBySize+0x26>
+ 10033a8:	eb 2e                	jmp    10033d8 <findAvailableBlockBySize+0x52>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:54
 }
 
 //Returns a block with enough memory to fulfill the request
 uintptr_t* findAvailableBlockBySize(uint32_t pSize)
 {
     sMemInfo* mInfo=heapMemoryInfo;
- 1003366:	89 c3                	mov    ebx,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:65
+ 10033aa:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:62
     //Get to the last block
     while (mInfo->next)
         mInfo++;
     while (mInfo>=heapMemoryInfo)
     {
         if (mInfo->size>=pSize && (!mInfo->inUse))
- 1003368:	39 53 08             	cmp    DWORD PTR [ebx+0x8],edx
- 100336b:	72 20                	jb     100338d <findAvailableBlockBySize+0x4b>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:65 (discriminator 1)
- 100336d:	80 7b 0c 00          	cmp    BYTE PTR [ebx+0xc],0x0
- 1003371:	75 1a                	jne    100338d <findAvailableBlockBySize+0x4b>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:67
+ 10033ac:	39 53 08             	cmp    DWORD PTR [ebx+0x8],edx
+ 10033af:	72 20                	jb     10033d1 <findAvailableBlockBySize+0x4b>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:62 (discriminator 1)
+ 10033b1:	80 7b 0c 00          	cmp    BYTE PTR [ebx+0xc],0x0
+ 10033b5:	75 1a                	jne    10033d1 <findAvailableBlockBySize+0x4b>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:64
         {
             printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
- 1003373:	83 ec 04             	sub    esp,0x4
- 1003376:	53                   	push   ebx
- 1003377:	68 20 84 00 01       	push   0x1008420
- 100337c:	68 00 00 01 00       	push   0x10000
- 1003381:	e8 09 f2 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:68
+ 10033b7:	83 ec 04             	sub    esp,0x4
+ 10033ba:	53                   	push   ebx
+ 10033bb:	68 8c 87 00 01       	push   0x100878c
+ 10033c0:	68 00 00 01 00       	push   0x10000
+ 10033c5:	e8 c9 f1 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:65
             return (uintptr_t*)mInfo;
- 1003386:	89 d8                	mov    eax,ebx
- 1003388:	83 c4 10             	add    esp,0x10
- 100338b:	eb 07                	jmp    1003394 <findAvailableBlockBySize+0x52>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:70
+ 10033ca:	89 d8                	mov    eax,ebx
+ 10033cc:	83 c4 10             	add    esp,0x10
+ 10033cf:	eb 07                	jmp    10033d8 <findAvailableBlockBySize+0x52>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:67
         }
         mInfo--;
- 100338d:	83 eb 1c             	sub    ebx,0x1c
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:63
+ 10033d1:	83 eb 1c             	sub    ebx,0x1c
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:60
     
     //First try finding a block starting at the last block instead of the first
     //Get to the last block
     while (mInfo->next)
         mInfo++;
     while (mInfo>=heapMemoryInfo)
- 1003390:	39 d8                	cmp    eax,ebx
- 1003392:	76 d4                	jbe    1003368 <findAvailableBlockBySize+0x26>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:72
+ 10033d4:	39 d8                	cmp    eax,ebx
+ 10033d6:	76 d4                	jbe    10033ac <findAvailableBlockBySize+0x26>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:69
             printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
             return (uintptr_t*)mInfo;
         }
         mInfo--;
     }
 }
- 1003394:	83 c4 08             	add    esp,0x8
- 1003397:	5b                   	pop    ebx
- 1003398:	c3                   	ret    
+ 10033d8:	83 c4 08             	add    esp,0x8
+ 10033db:	5b                   	pop    ebx
+ 10033dc:	c3                   	ret    
 
-01003399 <allocateBlockFrom>:
+010033dd <allocateBlockFrom>:
 allocateBlockFrom():
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:76
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:73
 
 //Create a new block with the requested amount of memory, and adjust the old block's size and pointer appropriately
 uintptr_t* allocateBlockFrom(sMemInfo* mInfoToAllocateFrom, uint32_t size)
 {
- 1003399:	57                   	push   edi
- 100339a:	56                   	push   esi
- 100339b:	53                   	push   ebx
- 100339c:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
- 10033a0:	8b 7c 24 14          	mov    edi,DWORD PTR [esp+0x14]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:77
+ 10033dd:	57                   	push   edi
+ 10033de:	56                   	push   esi
+ 10033df:	53                   	push   ebx
+ 10033e0:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+ 10033e4:	8b 7c 24 14          	mov    edi,DWORD PTR [esp+0x14]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:74
     sMemInfo* mNewInfo=findEmptyBlock();
- 10033a4:	e8 f3 fe ff ff       	call   100329c <findEmptyBlock>
- 10033a9:	89 c3                	mov    ebx,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:80
+ 10033e8:	e8 f3 fe ff ff       	call   10032e0 <findEmptyBlock>
+ 10033ed:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:77
     sMemInfo* mPriorInfo=mNewInfo-1;
     
     printd(DEBUG_MEMORY_MANAGEMENT,"allocateBlockFrom: findEmptyBlock returned 0x%08X\n",mNewInfo);
- 10033ab:	83 ec 04             	sub    esp,0x4
- 10033ae:	50                   	push   eax
- 10033af:	68 5c 84 00 01       	push   0x100845c
- 10033b4:	68 00 00 01 00       	push   0x10000
- 10033b9:	e8 d1 f1 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:82
+ 10033ef:	83 ec 04             	sub    esp,0x4
+ 10033f2:	50                   	push   eax
+ 10033f3:	68 c8 87 00 01       	push   0x10087c8
+ 10033f8:	68 00 00 01 00       	push   0x10000
+ 10033fd:	e8 91 f1 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:79
     
     mPriorInfo->next=(uintptr_t*)mNewInfo;
- 10033be:	89 5b fc             	mov    DWORD PTR [ebx-0x4],ebx
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:85
+ 1003402:	89 5b fc             	mov    DWORD PTR [ebx-0x4],ebx
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:82
     
     //Set up the new sMemInfo
     mNewInfo->prev=(uintptr_t*)mPriorInfo;
- 10033c1:	8d 43 e4             	lea    eax,[ebx-0x1c]
- 10033c4:	89 03                	mov    DWORD PTR [ebx],eax
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:86
+ 1003405:	8d 43 e4             	lea    eax,[ebx-0x1c]
+ 1003408:	89 03                	mov    DWORD PTR [ebx],eax
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:83
     mNewInfo->address=mInfoToAllocateFrom->address;
- 10033c6:	8b 46 04             	mov    eax,DWORD PTR [esi+0x4]
- 10033c9:	89 43 04             	mov    DWORD PTR [ebx+0x4],eax
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:87
+ 100340a:	8b 46 04             	mov    eax,DWORD PTR [esi+0x4]
+ 100340d:	89 43 04             	mov    DWORD PTR [ebx+0x4],eax
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:84
     mNewInfo->size=size;
- 10033cc:	89 7b 08             	mov    DWORD PTR [ebx+0x8],edi
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:88
+ 1003410:	89 7b 08             	mov    DWORD PTR [ebx+0x8],edi
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:85
     mNewInfo->inUse=true;
- 10033cf:	c6 43 0c 01          	mov    BYTE PTR [ebx+0xc],0x1
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:89
+ 1003413:	c6 43 0c 01          	mov    BYTE PTR [ebx+0xc],0x1
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:86
     mNewInfo->cr3=CURRENT_CR3;
- 10033d3:	0f 20 d8             	mov    eax,cr3
- 10033d6:	89 c0                	mov    eax,eax
- 10033d8:	89 43 14             	mov    DWORD PTR [ebx+0x14],eax
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:92
+ 1003417:	0f 20 d8             	mov    eax,cr3
+ 100341a:	89 c0                	mov    eax,eax
+ 100341c:	89 43 14             	mov    DWORD PTR [ebx+0x14],eax
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:89
     //mNewInfo pid and next don't get set
     
     mInfoToAllocateFrom->address+=size;
- 10033db:	01 7e 04             	add    DWORD PTR [esi+0x4],edi
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:93
+ 100341f:	01 7e 04             	add    DWORD PTR [esi+0x4],edi
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:90
     mInfoToAllocateFrom->size-=size;
- 10033de:	29 7e 08             	sub    DWORD PTR [esi+0x8],edi
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:94
+ 1003422:	29 7e 08             	sub    DWORD PTR [esi+0x8],edi
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:91
     return (uintptr_t*)mNewInfo->address;
- 10033e1:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
- 10033e4:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:95
+ 1003425:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
+ 1003428:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:92
 }
- 10033e7:	5b                   	pop    ebx
- 10033e8:	5e                   	pop    esi
- 10033e9:	5f                   	pop    edi
- 10033ea:	c3                   	ret    
+ 100342b:	5b                   	pop    ebx
+ 100342c:	5e                   	pop    esi
+ 100342d:	5f                   	pop    edi
+ 100342e:	c3                   	ret    
 
-010033eb <malloc>:
-malloc():
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:98
+0100342f <allocPages>:
+allocPages():
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:95
 
-uintptr_t* malloc(uint32_t size)
+void* allocPages(uint32_t size)
 {
- 10033eb:	56                   	push   esi
- 10033ec:	53                   	push   ebx
- 10033ed:	83 ec 04             	sub    esp,0x4
- 10033f0:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
+ 100342f:	56                   	push   esi
+ 1003430:	53                   	push   ebx
+ 1003431:	83 ec 04             	sub    esp,0x4
+ 1003434:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:97
+    uint32_t newSize=size;
+    if (newSize%PAGE_SIZE)
+ 1003438:	89 d8                	mov    eax,ebx
+ 100343a:	25 ff 0f 00 00       	and    eax,0xfff
+ 100343f:	74 1e                	je     100345f <allocPages+0x30>
+ 1003441:	8d b3 00 10 00 00    	lea    esi,[ebx+0x1000]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:99
+    {
+        newSize+=(PAGE_SIZE-(size % PAGE_SIZE));
+ 1003447:	29 c6                	sub    esi,eax
 /home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:100
-    uint32_t newSize=size;
-    if (newSize%MEMORY_BLOCK_SIZE)
- 10033f4:	89 d8                	mov    eax,ebx
- 10033f6:	25 ff 0f 00 00       	and    eax,0xfff
- 10033fb:	74 1e                	je     100341b <malloc+0x30>
- 10033fd:	8d b3 00 10 00 00    	lea    esi,[ebx+0x1000]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:102
-    {
-        newSize+=(MEMORY_BLOCK_SIZE-(size % MEMORY_BLOCK_SIZE));
- 1003403:	29 c6                	sub    esi,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:103
-        printd(DEBUG_MEMORY_MANAGEMENT,"malloc: Size adjusted from %u to %u\n",size,newSize);
- 1003405:	56                   	push   esi
- 1003406:	53                   	push   ebx
- 1003407:	68 90 84 00 01       	push   0x1008490
- 100340c:	68 00 00 01 00       	push   0x10000
- 1003411:	e8 79 f1 ff ff       	call   100258f <printd>
- 1003416:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:102
-uintptr_t* malloc(uint32_t size)
+        printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Size adjusted from %u to %u\n",size,newSize);
+ 1003449:	56                   	push   esi
+ 100344a:	53                   	push   ebx
+ 100344b:	68 fc 87 00 01       	push   0x10087fc
+ 1003450:	68 00 00 01 00       	push   0x10000
+ 1003455:	e8 39 f1 ff ff       	call   1002593 <printd>
+ 100345a:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:99
+void* allocPages(uint32_t size)
 {
     uint32_t newSize=size;
-    if (newSize%MEMORY_BLOCK_SIZE)
+    if (newSize%PAGE_SIZE)
     {
-        newSize+=(MEMORY_BLOCK_SIZE-(size % MEMORY_BLOCK_SIZE));
- 1003419:	89 f3                	mov    ebx,esi
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:106
-        printd(DEBUG_MEMORY_MANAGEMENT,"malloc: Size adjusted from %u to %u\n",size,newSize);
+        newSize+=(PAGE_SIZE-(size % PAGE_SIZE));
+ 100345d:	89 f3                	mov    ebx,esi
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:103
+        printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Size adjusted from %u to %u\n",size,newSize);
     }
     uintptr_t* lRetVal;
     uintptr_t* block=findAvailableBlockBySize(newSize);
- 100341b:	83 ec 0c             	sub    esp,0xc
- 100341e:	53                   	push   ebx
- 100341f:	e8 1e ff ff ff       	call   1003342 <findAvailableBlockBySize>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:107
+ 100345f:	83 ec 0c             	sub    esp,0xc
+ 1003462:	53                   	push   ebx
+ 1003463:	e8 1e ff ff ff       	call   1003386 <findAvailableBlockBySize>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:104
     if ( ((sMemInfo*)(block))->size > newSize)
- 1003424:	83 c4 10             	add    esp,0x10
- 1003427:	3b 58 08             	cmp    ebx,DWORD PTR [eax+0x8]
- 100342a:	73 11                	jae    100343d <malloc+0x52>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:108
+ 1003468:	83 c4 10             	add    esp,0x10
+ 100346b:	3b 58 08             	cmp    ebx,DWORD PTR [eax+0x8]
+ 100346e:	73 11                	jae    1003481 <allocPages+0x52>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:105
        lRetVal=allocateBlockFrom((sMemInfo*)block,newSize);
- 100342c:	83 ec 08             	sub    esp,0x8
- 100342f:	53                   	push   ebx
- 1003430:	50                   	push   eax
- 1003431:	e8 63 ff ff ff       	call   1003399 <allocateBlockFrom>
- 1003436:	89 c6                	mov    esi,eax
- 1003438:	83 c4 10             	add    esp,0x10
- 100343b:	eb 03                	jmp    1003440 <malloc+0x55>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:110
+ 1003470:	83 ec 08             	sub    esp,0x8
+ 1003473:	53                   	push   ebx
+ 1003474:	50                   	push   eax
+ 1003475:	e8 63 ff ff ff       	call   10033dd <allocateBlockFrom>
+ 100347a:	89 c6                	mov    esi,eax
+ 100347c:	83 c4 10             	add    esp,0x10
+ 100347f:	eb 03                	jmp    1003484 <allocPages+0x55>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:107
     else
         lRetVal=((sMemInfo*)(block))->address;
- 100343d:	8b 70 04             	mov    esi,DWORD PTR [eax+0x4]
+ 1003481:	8b 70 04             	mov    esi,DWORD PTR [eax+0x4]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:109
+    //Map page into our address space
+    pagingMapPage(CURRENT_CR3,lRetVal,lRetVal,0x7);
+ 1003484:	0f 20 d8             	mov    eax,cr3
+ 1003487:	89 c0                	mov    eax,eax
+ 1003489:	6a 07                	push   0x7
+ 100348b:	56                   	push   esi
+ 100348c:	56                   	push   esi
+ 100348d:	50                   	push   eax
+ 100348e:	e8 21 0b 00 00       	call   1003fb4 <pagingMapPage>
 /home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:111
-    printd(DEBUG_MEMORY_MANAGEMENT,"malloc: Returning address 0x%08X\n",lRetVal);
- 1003440:	83 ec 04             	sub    esp,0x4
- 1003443:	56                   	push   esi
- 1003444:	68 b8 84 00 01       	push   0x10084b8
- 1003449:	68 00 00 01 00       	push   0x10000
- 100344e:	e8 3c f1 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:113
     //Zero out the memory
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Zeroing out page(s) at 0x%08X for 0x%08X\n",lRetVal,newSize);
+ 1003493:	53                   	push   ebx
+ 1003494:	56                   	push   esi
+ 1003495:	68 28 88 00 01       	push   0x1008828
+ 100349a:	68 00 00 01 00       	push   0x10000
+ 100349f:	e8 ef f0 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:112
     memset(lRetVal,0,newSize);
- 1003453:	83 c4 0c             	add    esp,0xc
- 1003456:	53                   	push   ebx
- 1003457:	6a 00                	push   0x0
- 1003459:	56                   	push   esi
- 100345a:	e8 84 e4 ff ff       	call   10018e3 <memset>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:116
-    //pagingMapPage();
+ 10034a4:	83 c4 1c             	add    esp,0x1c
+ 10034a7:	53                   	push   ebx
+ 10034a8:	6a 00                	push   0x0
+ 10034aa:	56                   	push   esi
+ 10034ab:	e8 37 e4 ff ff       	call   10018e7 <memset>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:113
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Returning address 0x%08X\n",lRetVal);
+ 10034b0:	83 c4 0c             	add    esp,0xc
+ 10034b3:	56                   	push   esi
+ 10034b4:	68 60 88 00 01       	push   0x1008860
+ 10034b9:	68 00 00 01 00       	push   0x10000
+ 10034be:	e8 d0 f0 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:115
     return lRetVal;
 }
- 100345f:	89 f0                	mov    eax,esi
- 1003461:	83 c4 14             	add    esp,0x14
- 1003464:	5b                   	pop    ebx
- 1003465:	5e                   	pop    esi
- 1003466:	c3                   	ret    
+ 10034c3:	89 f0                	mov    eax,esi
+ 10034c5:	83 c4 14             	add    esp,0x14
+ 10034c8:	5b                   	pop    ebx
+ 10034c9:	5e                   	pop    esi
+ 10034ca:	c3                   	ret    
 
-01003467 <free>:
-free():
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:119
+010034cb <freePage>:
+freePage():
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:118
 
-void free(uintptr_t* address)
+void freePage(void* address)
 {
- 1003467:	53                   	push   ebx
- 1003468:	83 ec 14             	sub    esp,0x14
- 100346b:	8b 5c 24 1c          	mov    ebx,DWORD PTR [esp+0x1c]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:120
+ 10034cb:	53                   	push   ebx
+ 10034cc:	83 ec 14             	sub    esp,0x14
+ 10034cf:	8b 5c 24 1c          	mov    ebx,DWORD PTR [esp+0x1c]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:119
     sMemInfo* mInfo = findBlockByMemoryAddress(address);
- 100346f:	53                   	push   ebx
- 1003470:	e8 8b fe ff ff       	call   1003300 <findBlockByMemoryAddress>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:121
+ 10034d3:	53                   	push   ebx
+ 10034d4:	e8 6b fe ff ff       	call   1003344 <findBlockByMemoryAddress>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:120
     if (mInfo!=NULL)
- 1003475:	83 c4 10             	add    esp,0x10
- 1003478:	85 c0                	test   eax,eax
- 100347a:	74 1a                	je     1003496 <free+0x2f>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:123
+ 10034d9:	83 c4 10             	add    esp,0x10
+ 10034dc:	85 c0                	test   eax,eax
+ 10034de:	74 1a                	je     10034fa <freePage+0x2f>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:122
     {
         mInfo->inUse=false;
- 100347c:	c6 40 0c 00          	mov    BYTE PTR [eax+0xc],0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:124
+ 10034e0:	c6 40 0c 00          	mov    BYTE PTR [eax+0xc],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:123
         printd(DEBUG_MEMORY_MANAGEMENT,"Freed block 0x%08x for memory address 0x%08x\n",mInfo,address);
- 1003480:	53                   	push   ebx
- 1003481:	50                   	push   eax
- 1003482:	68 dc 84 00 01       	push   0x10084dc
- 1003487:	68 00 00 01 00       	push   0x10000
- 100348c:	e8 fe f0 ff ff       	call   100258f <printd>
- 1003491:	83 c4 10             	add    esp,0x10
- 1003494:	eb 16                	jmp    10034ac <free+0x45>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:127
+ 10034e4:	53                   	push   ebx
+ 10034e5:	50                   	push   eax
+ 10034e6:	68 88 88 00 01       	push   0x1008888
+ 10034eb:	68 00 00 01 00       	push   0x10000
+ 10034f0:	e8 9e f0 ff ff       	call   1002593 <printd>
+ 10034f5:	83 c4 10             	add    esp,0x10
+ 10034f8:	eb 16                	jmp    1003510 <freePage+0x45>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:126
     }
     else
         printd(DEBUG_MEMORY_MANAGEMENT,"free: Could not find memory block for 0x%08X to free, doing nothing\n",address);
- 1003496:	83 ec 04             	sub    esp,0x4
- 1003499:	53                   	push   ebx
- 100349a:	68 0c 85 00 01       	push   0x100850c
- 100349f:	68 00 00 01 00       	push   0x10000
- 10034a4:	e8 e6 f0 ff ff       	call   100258f <printd>
- 10034a9:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:128
+ 10034fa:	83 ec 04             	sub    esp,0x4
+ 10034fd:	53                   	push   ebx
+ 10034fe:	68 b8 88 00 01       	push   0x10088b8
+ 1003503:	68 00 00 01 00       	push   0x10000
+ 1003508:	e8 86 f0 ff ff       	call   1002593 <printd>
+ 100350d:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:127
 }
- 10034ac:	83 c4 08             	add    esp,0x8
- 10034af:	5b                   	pop    ebx
- 10034b0:	c3                   	ret    
+ 1003510:	83 c4 08             	add    esp,0x8
+ 1003513:	5b                   	pop    ebx
+ 1003514:	c3                   	ret    
 
-010034b1 <mallocA1k>:
+01003515 <mallocA1k>:
 mallocA1k():
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:135
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:134
 uintptr_t* mallocA1k(uint32_t size)
 {
     uintptr_t* lRetVal=0;
     
     return lRetVal;
 }
- 10034b1:	b8 00 00 00 00       	mov    eax,0x0
- 10034b6:	c3                   	ret    
+ 1003515:	b8 00 00 00 00       	mov    eax,0x0
+ 100351a:	c3                   	ret    
 
-010034b7 <memAvailable>:
+0100351b <memAvailable>:
 memAvailable():
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:140
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:139
 
 uint32_t memAvailable()
 {
     uint32_t lRetVal;
     sMemInfo* mInfo=heapMemoryInfo;
- 10034b7:	8b 15 54 3a 01 01    	mov    edx,DWORD PTR ds:0x1013a54
- 10034bd:	8d 8a 80 f6 0b 00    	lea    ecx,[edx+0xbf680]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:144
+ 100351b:	8b 15 60 4a 01 01    	mov    edx,DWORD PTR ds:0x1014a60
+ 1003521:	8d 8a 80 f6 0b 00    	lea    ecx,[edx+0xbf680]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:143
 
     do
     {
         if (!mInfo->inUse)
- 10034c3:	80 7a 0c 00          	cmp    BYTE PTR [edx+0xc],0x0
- 10034c7:	75 03                	jne    10034cc <memAvailable+0x15>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:145
+ 1003527:	80 7a 0c 00          	cmp    BYTE PTR [edx+0xc],0x0
+ 100352b:	75 03                	jne    1003530 <memAvailable+0x15>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:144
             lRetVal+=mInfo->size;
- 10034c9:	03 42 08             	add    eax,DWORD PTR [edx+0x8]
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:146
+ 100352d:	03 42 08             	add    eax,DWORD PTR [edx+0x8]
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:145
         mInfo++;
- 10034cc:	83 c2 1c             	add    edx,0x1c
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:147
+ 1003530:	83 c2 1c             	add    edx,0x1c
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:146
     } while (mInfo<heapMemoryInfo+(sizeof(sMemInfo)*1000));
- 10034cf:	39 ca                	cmp    edx,ecx
- 10034d1:	75 f0                	jne    10034c3 <memAvailable+0xc>
-/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:149
+ 1003533:	39 ca                	cmp    edx,ecx
+ 1003535:	75 f0                	jne    1003527 <memAvailable+0xc>
+/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c:148
     return lRetVal;
 }
- 10034d3:	f3 c3                	repz ret 
- 10034d5:	66 90                	xchg   ax,ax
- 10034d7:	90                   	nop
+ 1003537:	f3 c3                	repz ret 
+ 1003539:	66 90                	xchg   ax,ax
+ 100353b:	90                   	nop
 
-010034d8 <mmInitHeapTracking>:
+0100353c <initHeapPagePtr>:
+initHeapPagePtr():
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:37
+    kHeapPagePtr->prev=NO_PREV_HEAP_PTR;
+    initHeapPagePtr(kHeapPagePtr);
+}
+
+void initHeapPagePtr(heapPtrPage* pagePtr)
+{
+ 100353c:	53                   	push   ebx
+ 100353d:	83 ec 08             	sub    esp,0x8
+ 1003540:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:38
+    printd(DEBUG_MALLOC,"initHeapPagePtr Initializing pointer page @ 0x%08X, 0x%08X pointers\n",pagePtr,POINTERS_PER_HEAP_PTR_PAGE);
+ 1003544:	68 ff 01 00 00       	push   0x1ff
+ 1003549:	53                   	push   ebx
+ 100354a:	68 00 89 00 01       	push   0x1008900
+ 100354f:	68 00 00 08 00       	push   0x80000
+ 1003554:	e8 3a f0 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:39
+    pagePtr->next=NO_NEXT_HEAP_PTR;
+ 1003559:	c7 83 fc 0f 00 00 ff 	mov    DWORD PTR [ebx+0xffc],0xffffffff
+ 1003560:	ff ff ff 
+ 1003563:	8d 43 04             	lea    eax,[ebx+0x4]
+ 1003566:	8d 93 fc 0f 00 00    	lea    edx,[ebx+0xffc]
+ 100356c:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:42 (discriminator 3)
+    for (int cnt=0;cnt<(int)(POINTERS_PER_HEAP_PTR_PAGE);cnt++)
+    {
+        pagePtr->ptrs[cnt].address=NULL;
+ 100356f:	c7 00 00 00 00 00    	mov    DWORD PTR [eax],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:43 (discriminator 3)
+        pagePtr->ptrs[cnt].size=0;
+ 1003575:	c7 40 04 00 00 00 00 	mov    DWORD PTR [eax+0x4],0x0
+ 100357c:	83 c0 08             	add    eax,0x8
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:40 (discriminator 3)
+
+void initHeapPagePtr(heapPtrPage* pagePtr)
+{
+    printd(DEBUG_MALLOC,"initHeapPagePtr Initializing pointer page @ 0x%08X, 0x%08X pointers\n",pagePtr,POINTERS_PER_HEAP_PTR_PAGE);
+    pagePtr->next=NO_NEXT_HEAP_PTR;
+    for (int cnt=0;cnt<(int)(POINTERS_PER_HEAP_PTR_PAGE);cnt++)
+ 100357f:	39 d0                	cmp    eax,edx
+ 1003581:	75 ec                	jne    100356f <initHeapPagePtr+0x33>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:45
+    {
+        pagePtr->ptrs[cnt].address=NULL;
+        pagePtr->ptrs[cnt].size=0;
+    }
+    printd(DEBUG_MALLOC,"initHeapPagePtr Done\n",pagePtr);
+ 1003583:	83 ec 04             	sub    esp,0x4
+ 1003586:	53                   	push   ebx
+ 1003587:	68 e7 79 00 01       	push   0x10079e7
+ 100358c:	68 00 00 08 00       	push   0x80000
+ 1003591:	e8 fd ef ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:46
+}
+ 1003596:	83 c4 18             	add    esp,0x18
+ 1003599:	5b                   	pop    ebx
+ 100359a:	c3                   	ret    
+
+0100359b <initMalloc>:
+initMalloc():
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:30
+                      cr3Val;})
+
+void initHeapPagePtr(heapPtrPage* pagePtr);
+
+void initMalloc()
+{
+ 100359b:	83 ec 18             	sub    esp,0x18
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:31
+    kHeapPagePtr = allocPages(sizeof(heapPtrPage));
+ 100359e:	68 00 10 00 00       	push   0x1000
+ 10035a3:	e8 87 fe ff ff       	call   100342f <allocPages>
+ 10035a8:	a3 50 4a 01 01       	mov    ds:0x1014a50,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:32
+    kHeapPagePtr->prev=NO_PREV_HEAP_PTR;
+ 10035ad:	c7 00 fe ff ff ff    	mov    DWORD PTR [eax],0xfffffffe
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:33
+    initHeapPagePtr(kHeapPagePtr);
+ 10035b3:	83 c4 04             	add    esp,0x4
+ 10035b6:	ff 35 50 4a 01 01    	push   DWORD PTR ds:0x1014a50
+ 10035bc:	e8 7b ff ff ff       	call   100353c <initHeapPagePtr>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:34
+}
+ 10035c1:	83 c4 1c             	add    esp,0x1c
+ 10035c4:	c3                   	ret    
+
+010035c5 <findFreeMallocPointer>:
+findFreeMallocPointer():
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:49
+    }
+    printd(DEBUG_MALLOC,"initHeapPagePtr Done\n",pagePtr);
+}
+
+void* findFreeMallocPointer()
+{
+ 10035c5:	56                   	push   esi
+ 10035c6:	53                   	push   ebx
+ 10035c7:	83 ec 04             	sub    esp,0x4
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:50
+    heapPtrPage* ptrPg=kHeapPagePtr;
+ 10035ca:	8b 35 50 4a 01 01    	mov    esi,DWORD PTR ds:0x1014a50
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:55
+    heapPtrPage* newPtrPage;
+
+    while (1==1)
+    {
+        printd(DEBUG_MALLOC,"findFreeMallocPointer: Scanning for a free memory pointer\n");
+ 10035d0:	83 ec 08             	sub    esp,0x8
+ 10035d3:	68 48 89 00 01       	push   0x1008948
+ 10035d8:	68 00 00 08 00       	push   0x80000
+ 10035dd:	e8 b1 ef ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:57
+        for (int cnt=0;cnt<(int)(POINTERS_PER_HEAP_PTR_PAGE);cnt++)
+        if (ptrPg->ptrs[cnt].address==NULL)
+ 10035e2:	83 c4 10             	add    esp,0x10
+ 10035e5:	83 7e 04 00          	cmp    DWORD PTR [esi+0x4],0x0
+ 10035e9:	74 11                	je     10035fc <findFreeMallocPointer+0x37>
+ 10035eb:	bb 01 00 00 00       	mov    ebx,0x1
+ 10035f0:	83 7c de 04 00       	cmp    DWORD PTR [esi+ebx*8+0x4],0x0
+ 10035f5:	75 0f                	jne    1003606 <findFreeMallocPointer+0x41>
+ 10035f7:	e9 8c 00 00 00       	jmp    1003688 <findFreeMallocPointer+0xc3>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:56
+    heapPtrPage* newPtrPage;
+
+    while (1==1)
+    {
+        printd(DEBUG_MALLOC,"findFreeMallocPointer: Scanning for a free memory pointer\n");
+        for (int cnt=0;cnt<(int)(POINTERS_PER_HEAP_PTR_PAGE);cnt++)
+ 10035fc:	bb 00 00 00 00       	mov    ebx,0x0
+ 1003601:	e9 82 00 00 00       	jmp    1003688 <findFreeMallocPointer+0xc3>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:56 (discriminator 2)
+ 1003606:	83 c3 01             	add    ebx,0x1
+ 1003609:	81 fb ff 01 00 00    	cmp    ebx,0x1ff
+ 100360f:	75 df                	jne    10035f0 <findFreeMallocPointer+0x2b>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:64
+            printd(DEBUG_MALLOC,"findFreeMallocPointer: Found memory pointer on page 0 (0x%08X)\n",ptrPg);
+            return &ptrPg->ptrs[cnt];
+        }
+        
+        //If we've reached the last memory pointer on the page
+        if (ptrPg->next==NO_NEXT_HEAP_PTR)
+ 1003611:	83 be fc 0f 00 00 ff 	cmp    DWORD PTR [esi+0xffc],0xffffffff
+ 1003618:	75 48                	jne    1003662 <findFreeMallocPointer+0x9d>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:66
+        {
+            printd(DEBUG_MALLOC,"No next heapPtrPage, creating one\n",ptrPg->next);
+ 100361a:	83 ec 04             	sub    esp,0x4
+ 100361d:	6a ff                	push   0xffffffff
+ 100361f:	68 c4 89 00 01       	push   0x10089c4
+ 1003624:	68 00 00 08 00       	push   0x80000
+ 1003629:	e8 65 ef ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:68
+            //Create a new page and link it to the existing one
+            newPtrPage=allocPages(sizeof(heapPtrPage));
+ 100362e:	c7 04 24 00 10 00 00 	mov    DWORD PTR [esp],0x1000
+ 1003635:	e8 f5 fd ff ff       	call   100342f <allocPages>
+ 100363a:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:69
+            initHeapPagePtr(newPtrPage);
+ 100363c:	89 04 24             	mov    DWORD PTR [esp],eax
+ 100363f:	e8 f8 fe ff ff       	call   100353c <initHeapPagePtr>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:70
+            ptrPg->next=newPtrPage;
+ 1003644:	89 9e fc 0f 00 00    	mov    DWORD PTR [esi+0xffc],ebx
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:71
+            newPtrPage->prev=ptrPg;
+ 100364a:	89 33                	mov    DWORD PTR [ebx],esi
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:72
+            printd(DEBUG_MALLOC,"Initialized new heapPtrPage @ 0x%08X\n\n",newPtrPage);
+ 100364c:	83 c4 0c             	add    esp,0xc
+ 100364f:	53                   	push   ebx
+ 1003650:	68 e8 89 00 01       	push   0x10089e8
+ 1003655:	68 00 00 08 00       	push   0x80000
+ 100365a:	e8 34 ef ff ff       	call   1002593 <printd>
+ 100365f:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:74
+        }
+        printd(DEBUG_MALLOC,"Moving to next heapPtrPage @ 0x%08X\n",ptrPg->next);
+ 1003662:	83 ec 04             	sub    esp,0x4
+ 1003665:	ff b6 fc 0f 00 00    	push   DWORD PTR [esi+0xffc]
+ 100366b:	68 10 8a 00 01       	push   0x1008a10
+ 1003670:	68 00 00 08 00       	push   0x80000
+ 1003675:	e8 19 ef ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:75
+        ptrPg=(heapPtrPage*)ptrPg->next;
+ 100367a:	8b b6 fc 0f 00 00    	mov    esi,DWORD PTR [esi+0xffc]
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:76
+    }
+ 1003680:	83 c4 10             	add    esp,0x10
+ 1003683:	e9 48 ff ff ff       	jmp    10035d0 <findFreeMallocPointer+0xb>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:59
+    {
+        printd(DEBUG_MALLOC,"findFreeMallocPointer: Scanning for a free memory pointer\n");
+        for (int cnt=0;cnt<(int)(POINTERS_PER_HEAP_PTR_PAGE);cnt++)
+        if (ptrPg->ptrs[cnt].address==NULL)
+        {
+            printd(DEBUG_MALLOC,"findFreeMallocPointer: Found memory pointer on page 0 (0x%08X)\n",ptrPg);
+ 1003688:	83 ec 04             	sub    esp,0x4
+ 100368b:	56                   	push   esi
+ 100368c:	68 84 89 00 01       	push   0x1008984
+ 1003691:	68 00 00 08 00       	push   0x80000
+ 1003696:	e8 f8 ee ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:60
+            return &ptrPg->ptrs[cnt];
+ 100369b:	8d 44 de 04          	lea    eax,[esi+ebx*8+0x4]
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:78
+        }
+        printd(DEBUG_MALLOC,"Moving to next heapPtrPage @ 0x%08X\n",ptrPg->next);
+        ptrPg=(heapPtrPage*)ptrPg->next;
+    }
+    panic("findFreeMallocPointer: Should not have gotten to this point");
+}
+ 100369f:	83 c4 14             	add    esp,0x14
+ 10036a2:	5b                   	pop    ebx
+ 10036a3:	5e                   	pop    esi
+ 10036a4:	c3                   	ret    
+
+010036a5 <allocateMemoryToProcess>:
+allocateMemoryToProcess():
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:81
+
+void allocateMemoryToProcess(heapPtr* ptr, size_t size)
+{
+ 10036a5:	55                   	push   ebp
+ 10036a6:	57                   	push   edi
+ 10036a7:	56                   	push   esi
+ 10036a8:	53                   	push   ebx
+ 10036a9:	83 ec 1c             	sub    esp,0x1c
+ 10036ac:	8b 7c 24 30          	mov    edi,DWORD PTR [esp+0x30]
+ 10036b0:	8b 6c 24 34          	mov    ebp,DWORD PTR [esp+0x34]
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:85
+    uint32_t newSize=size;
+    uint32_t* allocdPage;
+    
+    if (newSize%PAGE_SIZE)
+ 10036b4:	89 e8                	mov    eax,ebp
+ 10036b6:	25 ff 0f 00 00       	and    eax,0xfff
+ 10036bb:	74 1e                	je     10036db <allocateMemoryToProcess+0x36>
+ 10036bd:	8d 9d 00 10 00 00    	lea    ebx,[ebp+0x1000]
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:87
+    {
+        newSize+=(PAGE_SIZE-(size % PAGE_SIZE));
+ 10036c3:	29 c3                	sub    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:88
+        printd(DEBUG_MALLOC,"allocateMemoryToProcess: Size adjusted from %u to %u\n",size,newSize);
+ 10036c5:	53                   	push   ebx
+ 10036c6:	55                   	push   ebp
+ 10036c7:	68 38 8a 00 01       	push   0x1008a38
+ 10036cc:	68 00 00 08 00       	push   0x80000
+ 10036d1:	e8 bd ee ff ff       	call   1002593 <printd>
+ 10036d6:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:87
+    uint32_t newSize=size;
+    uint32_t* allocdPage;
+    
+    if (newSize%PAGE_SIZE)
+    {
+        newSize+=(PAGE_SIZE-(size % PAGE_SIZE));
+ 10036d9:	89 dd                	mov    ebp,ebx
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:91
+        printd(DEBUG_MALLOC,"allocateMemoryToProcess: Size adjusted from %u to %u\n",size,newSize);
+    }
+
+    allocdPage=allocPages(newSize);
+ 10036db:	83 ec 0c             	sub    esp,0xc
+ 10036de:	55                   	push   ebp
+ 10036df:	e8 4b fd ff ff       	call   100342f <allocPages>
+ 10036e4:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:92
+    printd(DEBUG_MALLOC,"Used allocPages to allocate 0x%08X bytes at 0x%08X\n",ptr->size,allocdPage);
+ 10036e6:	50                   	push   eax
+ 10036e7:	ff 77 04             	push   DWORD PTR [edi+0x4]
+ 10036ea:	68 70 8a 00 01       	push   0x1008a70
+ 10036ef:	68 00 00 08 00       	push   0x80000
+ 10036f4:	e8 9a ee ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:93
+    uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
+ 10036f9:	0f 20 d8             	mov    eax,cr3
+ 10036fc:	89 c0                	mov    eax,eax
+ 10036fe:	83 c4 18             	add    esp,0x18
+ 1003701:	89 ea                	mov    edx,ebp
+ 1003703:	c1 ea 0c             	shr    edx,0xc
+ 1003706:	52                   	push   edx
+ 1003707:	50                   	push   eax
+ 1003708:	e8 db 03 00 00       	call   1003ae8 <pagingFindAvailableAddressToMapTo>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:94
+    ptr->address=virtualAddress;
+ 100370d:	89 44 24 1c          	mov    DWORD PTR [esp+0x1c],eax
+ 1003711:	89 07                	mov    DWORD PTR [edi],eax
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:95
+    printd(DEBUG_MALLOC,"before for loop: newSize=0x%08X, physialAddress=0x%08X, stop=0x%08X\n",newSize, allocdPage,(uint32_t)(allocdPage)+newSize);
+ 1003713:	8d 34 2b             	lea    esi,[ebx+ebp*1]
+ 1003716:	89 34 24             	mov    DWORD PTR [esp],esi
+ 1003719:	53                   	push   ebx
+ 100371a:	55                   	push   ebp
+ 100371b:	68 a4 8a 00 01       	push   0x1008aa4
+ 1003720:	68 00 00 08 00       	push   0x80000
+ 1003725:	e8 69 ee ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:96
+    for (void* physicalAddress=allocdPage;physicalAddress<(uint32_t)(allocdPage)+newSize;physicalAddress+=PAGE_SIZE)
+ 100372a:	89 74 24 28          	mov    DWORD PTR [esp+0x28],esi
+ 100372e:	83 c4 20             	add    esp,0x20
+ 1003731:	39 f3                	cmp    ebx,esi
+ 1003733:	73 40                	jae    1003775 <allocateMemoryToProcess+0xd0>
+ 1003735:	8b 74 24 0c          	mov    esi,DWORD PTR [esp+0xc]
+ 1003739:	81 c6 00 10 00 00    	add    esi,0x1000
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:98
+    {
+        pagingMapPage(CURRENT_CR3,virtualAddress+=PAGE_SIZE,physicalAddress,0x03);
+ 100373f:	0f 20 d8             	mov    eax,cr3
+ 1003742:	89 c5                	mov    ebp,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:98 (discriminator 3)
+ 1003744:	6a 03                	push   0x3
+ 1003746:	53                   	push   ebx
+ 1003747:	56                   	push   esi
+ 1003748:	55                   	push   ebp
+ 1003749:	e8 66 08 00 00       	call   1003fb4 <pagingMapPage>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:99 (discriminator 3)
+        printd(DEBUG_MALLOC,"allocateMemoryToProcess: Mapped 0x%08X to 0x%08X\n",physicalAddress,ptr->address);
+ 100374e:	ff 37                	push   DWORD PTR [edi]
+ 1003750:	53                   	push   ebx
+ 1003751:	68 ec 8a 00 01       	push   0x1008aec
+ 1003756:	68 00 00 08 00       	push   0x80000
+ 100375b:	e8 33 ee ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:96 (discriminator 3)
+    allocdPage=allocPages(newSize);
+    printd(DEBUG_MALLOC,"Used allocPages to allocate 0x%08X bytes at 0x%08X\n",ptr->size,allocdPage);
+    uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
+    ptr->address=virtualAddress;
+    printd(DEBUG_MALLOC,"before for loop: newSize=0x%08X, physialAddress=0x%08X, stop=0x%08X\n",newSize, allocdPage,(uint32_t)(allocdPage)+newSize);
+    for (void* physicalAddress=allocdPage;physicalAddress<(uint32_t)(allocdPage)+newSize;physicalAddress+=PAGE_SIZE)
+ 1003760:	81 c3 00 10 00 00    	add    ebx,0x1000
+ 1003766:	81 c6 00 20 00 00    	add    esi,0x2000
+ 100376c:	83 c4 20             	add    esp,0x20
+ 100376f:	3b 5c 24 08          	cmp    ebx,DWORD PTR [esp+0x8]
+ 1003773:	72 cf                	jb     1003744 <allocateMemoryToProcess+0x9f>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:102
+    {
+        pagingMapPage(CURRENT_CR3,virtualAddress+=PAGE_SIZE,physicalAddress,0x03);
+        printd(DEBUG_MALLOC,"allocateMemoryToProcess: Mapped 0x%08X to 0x%08X\n",physicalAddress,ptr->address);
+        virtualAddress+=PAGE_SIZE;
+    }
+}
+ 1003775:	83 c4 1c             	add    esp,0x1c
+ 1003778:	5b                   	pop    ebx
+ 1003779:	5e                   	pop    esi
+ 100377a:	5f                   	pop    edi
+ 100377b:	5d                   	pop    ebp
+ 100377c:	c3                   	ret    
+
+0100377d <malloc>:
+malloc():
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:106
+
+
+void* malloc(size_t size)
+{
+ 100377d:	56                   	push   esi
+ 100377e:	53                   	push   ebx
+ 100377f:	83 ec 04             	sub    esp,0x4
+ 1003782:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:110
+    heapPtr* ptr;
+    
+    //First find a page to place the memory pointer on
+    ptr=findFreeMallocPointer();
+ 1003786:	e8 3a fe ff ff       	call   10035c5 <findFreeMallocPointer>
+ 100378b:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:113
+    //Next get a memory address to point to and map the memory into the process
+    
+    ptr->address=0;
+ 100378d:	c7 00 00 00 00 00    	mov    DWORD PTR [eax],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:114
+    ptr->size=size;
+ 1003793:	89 70 04             	mov    DWORD PTR [eax+0x4],esi
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:115
+    allocateMemoryToProcess(ptr,size);
+ 1003796:	83 ec 08             	sub    esp,0x8
+ 1003799:	56                   	push   esi
+ 100379a:	50                   	push   eax
+ 100379b:	e8 05 ff ff ff       	call   10036a5 <allocateMemoryToProcess>
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:116
+    return ptr->address;
+ 10037a0:	8b 03                	mov    eax,DWORD PTR [ebx]
+/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c:117
+ 10037a2:	83 c4 14             	add    esp,0x14
+ 10037a5:	5b                   	pop    ebx
+ 10037a6:	5e                   	pop    esi
+ 10037a7:	c3                   	ret    
+
+010037a8 <mmInitHeapTracking>:
 mmInitHeapTracking():
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:32
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:36
 uint32_t kernelPoolMemorySize=1400000;   //20 MB kernel memory
 
 sMemInfo* heapMemoryInfo;
 
 void mmInitHeapTracking()
 {
- 10034d8:	83 ec 10             	sub    esp,0x10
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:33
+ 10037a8:	83 ec 10             	sub    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:37
     heapMemoryInfo=kmmHeapMemoryBaseAddress;
- 10034db:	a1 04 05 12 00       	mov    eax,ds:0x120504
- 10034e0:	a3 54 3a 01 01       	mov    ds:0x1013a54,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:34
-    printd(DEBUG_MEMORY_MANAGEMENT,"Assigning heapMemoryInfo address of 0x%08X\n",heapMemoryInfo);
- 10034e5:	50                   	push   eax
- 10034e6:	68 54 85 00 01       	push   0x1008554
- 10034eb:	68 00 00 01 00       	push   0x10000
- 10034f0:	e8 9a f0 ff ff       	call   100258f <printd>
+ 10037ab:	a1 04 05 12 00       	mov    eax,ds:0x120504
+ 10037b0:	a3 60 4a 01 01       	mov    ds:0x1014a60,eax
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:38
+    printd(DEBUG_MEMORY_MANAGEMENT,"Assigning heapMemoryInfo address of 0x%08X\n",heapMemoryInfo);
+ 10037b5:	50                   	push   eax
+ 10037b6:	68 20 8b 00 01       	push   0x1008b20
+ 10037bb:	68 00 00 01 00       	push   0x10000
+ 10037c0:	e8 ce ed ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:42
     
     kmmHeapMemoryBaseAddress += sizeof(sMemInfo)*1000;
     kmmHeapMemoryBaseAddress += 0x1000;
     kmmHeapMemoryBaseAddress &= 0xFFFFF000;
- 10034f5:	a1 04 05 12 00       	mov    eax,ds:0x120504
- 10034fa:	05 60 7d 00 00       	add    eax,0x7d60
- 10034ff:	25 00 f0 ff ff       	and    eax,0xfffff000
- 1003504:	a3 04 05 12 00       	mov    ds:0x120504,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:39
-    kmmHeapMemoryTotal-= sizeof(sMemInfo)*1000; 
- 1003509:	81 2d 08 05 12 00 60 	sub    DWORD PTR ds:0x120508,0x6d60
- 1003510:	6d 00 00 
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:40
-    printd(DEBUG_MEMORY_MANAGEMENT,"heapMemoryInfo = 0x%08X\n",heapMemoryInfo);
- 1003513:	83 c4 0c             	add    esp,0xc
- 1003516:	ff 35 54 3a 01 01    	push   DWORD PTR ds:0x1013a54
- 100351c:	68 d6 76 00 01       	push   0x10076d6
- 1003521:	68 00 00 01 00       	push   0x10000
- 1003526:	e8 64 f0 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:41
-    printd(DEBUG_MEMORY_MANAGEMENT,"Allocating 0x%08X bytes to memory block tracking\n",sizeof(sMemInfo)*1000);
- 100352b:	83 c4 0c             	add    esp,0xc
- 100352e:	68 60 6d 00 00       	push   0x6d60
- 1003533:	68 80 85 00 01       	push   0x1008580
- 1003538:	68 00 00 01 00       	push   0x10000
- 100353d:	e8 4d f0 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:42
-    printd(DEBUG_MEMORY_MANAGEMENT,"User memory base adjusted to 0x%08X\n",kmmHeapMemoryBaseAddress);
- 1003542:	83 c4 0c             	add    esp,0xc
- 1003545:	ff 35 04 05 12 00    	push   DWORD PTR ds:0x120504
- 100354b:	68 b4 85 00 01       	push   0x10085b4
- 1003550:	68 00 00 01 00       	push   0x10000
- 1003555:	e8 35 f0 ff ff       	call   100258f <printd>
+ 10037c5:	a1 04 05 12 00       	mov    eax,ds:0x120504
+ 10037ca:	05 60 7d 00 00       	add    eax,0x7d60
+ 10037cf:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 10037d4:	a3 04 05 12 00       	mov    ds:0x120504,eax
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:43
-    printd(DEBUG_MEMORY_MANAGEMENT,"User memory size adjusted to 0x%08X\n",kmmHeapMemoryTotal);
- 100355a:	83 c4 0c             	add    esp,0xc
- 100355d:	ff 35 08 05 12 00    	push   DWORD PTR ds:0x120508
- 1003563:	68 dc 85 00 01       	push   0x10085dc
- 1003568:	68 00 00 01 00       	push   0x10000
- 100356d:	e8 1d f0 ff ff       	call   100258f <printd>
+    kmmHeapMemoryTotal-= sizeof(sMemInfo)*1000; 
+ 10037d9:	81 2d 08 05 12 00 60 	sub    DWORD PTR ds:0x120508,0x6d60
+ 10037e0:	6d 00 00 
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:44
+    printd(DEBUG_MEMORY_MANAGEMENT,"heapMemoryInfo = 0x%08X\n",heapMemoryInfo);
+ 10037e3:	83 c4 0c             	add    esp,0xc
+ 10037e6:	ff 35 60 4a 01 01    	push   DWORD PTR ds:0x1014a60
+ 10037ec:	68 fd 79 00 01       	push   0x10079fd
+ 10037f1:	68 00 00 01 00       	push   0x10000
+ 10037f6:	e8 98 ed ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:45
+    printd(DEBUG_MEMORY_MANAGEMENT,"Allocating 0x%08X bytes to memory block tracking\n",sizeof(sMemInfo)*1000);
+ 10037fb:	83 c4 0c             	add    esp,0xc
+ 10037fe:	68 60 6d 00 00       	push   0x6d60
+ 1003803:	68 4c 8b 00 01       	push   0x1008b4c
+ 1003808:	68 00 00 01 00       	push   0x10000
+ 100380d:	e8 81 ed ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:46
+    printd(DEBUG_MEMORY_MANAGEMENT,"User memory base adjusted to 0x%08X\n",kmmHeapMemoryBaseAddress);
+ 1003812:	83 c4 0c             	add    esp,0xc
+ 1003815:	ff 35 04 05 12 00    	push   DWORD PTR ds:0x120504
+ 100381b:	68 80 8b 00 01       	push   0x1008b80
+ 1003820:	68 00 00 01 00       	push   0x10000
+ 1003825:	e8 69 ed ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:47
+    printd(DEBUG_MEMORY_MANAGEMENT,"User memory size adjusted to 0x%08X\n",kmmHeapMemoryTotal);
+ 100382a:	83 c4 0c             	add    esp,0xc
+ 100382d:	ff 35 08 05 12 00    	push   DWORD PTR ds:0x120508
+ 1003833:	68 a8 8b 00 01       	push   0x1008ba8
+ 1003838:	68 00 00 01 00       	push   0x10000
+ 100383d:	e8 51 ed ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:49
 
     heapMemoryInfo->address=kmmHeapMemoryBaseAddress;
- 1003572:	a1 54 3a 01 01       	mov    eax,ds:0x1013a54
- 1003577:	8b 15 04 05 12 00    	mov    edx,DWORD PTR ds:0x120504
- 100357d:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:46
-    heapMemoryInfo->size=kmmHeapMemoryTotal;
- 1003580:	8b 15 08 05 12 00    	mov    edx,DWORD PTR ds:0x120508
- 1003586:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:47
-    heapMemoryInfo->next=NULL;
- 1003589:	c7 40 18 00 00 00 00 	mov    DWORD PTR [eax+0x18],0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:48
-    heapMemoryInfo->prev=NULL;
- 1003590:	c7 00 00 00 00 00    	mov    DWORD PTR [eax],0x0
- 1003596:	83 c4 10             	add    esp,0x10
- 1003599:	b8 1c 00 00 00       	mov    eax,0x1c
+ 1003842:	a1 60 4a 01 01       	mov    eax,ds:0x1014a60
+ 1003847:	8b 15 04 05 12 00    	mov    edx,DWORD PTR ds:0x120504
+ 100384d:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:50
+    heapMemoryInfo->size=kmmHeapMemoryTotal;
+ 1003850:	8b 15 08 05 12 00    	mov    edx,DWORD PTR ds:0x120508
+ 1003856:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:51
+    heapMemoryInfo->next=NULL;
+ 1003859:	c7 40 18 00 00 00 00 	mov    DWORD PTR [eax+0x18],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:52
+    heapMemoryInfo->prev=NULL;
+ 1003860:	c7 00 00 00 00 00    	mov    DWORD PTR [eax],0x0
+ 1003866:	83 c4 10             	add    esp,0x10
+ 1003869:	b8 1c 00 00 00       	mov    eax,0x1c
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:54
     
     for (int cnt=1;cnt<1000;cnt++)
- 100359e:	ba 01 00 00 00       	mov    edx,0x1
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:52
+ 100386e:	ba 01 00 00 00       	mov    edx,0x1
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:56
     {
         heapMemoryInfo[cnt].address=0;
- 10035a3:	89 c1                	mov    ecx,eax
- 10035a5:	03 0d 54 3a 01 01    	add    ecx,DWORD PTR ds:0x1013a54
- 10035ab:	c7 41 04 00 00 00 00 	mov    DWORD PTR [ecx+0x4],0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:53
+ 1003873:	89 c1                	mov    ecx,eax
+ 1003875:	03 0d 60 4a 01 01    	add    ecx,DWORD PTR ds:0x1014a60
+ 100387b:	c7 41 04 00 00 00 00 	mov    DWORD PTR [ecx+0x4],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:57
         heapMemoryInfo[cnt].prev=NULL;
- 10035b2:	c7 01 00 00 00 00    	mov    DWORD PTR [ecx],0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:54
+ 1003882:	c7 01 00 00 00 00    	mov    DWORD PTR [ecx],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:58
         if (cnt<999)
- 10035b8:	81 fa e6 03 00 00    	cmp    edx,0x3e6
- 10035be:	7f 0e                	jg     10035ce <mmInitHeapTracking+0xf6>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:55
+ 1003888:	81 fa e6 03 00 00    	cmp    edx,0x3e6
+ 100388e:	7f 0e                	jg     100389e <mmInitHeapTracking+0xf6>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:59
             heapMemoryInfo[cnt].next=NULL;
- 10035c0:	8b 0d 54 3a 01 01    	mov    ecx,DWORD PTR ds:0x1013a54
- 10035c6:	c7 44 01 18 00 00 00 	mov    DWORD PTR [ecx+eax*1+0x18],0x0
- 10035cd:	00 
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:56 (discriminator 2)
+ 1003890:	8b 0d 60 4a 01 01    	mov    ecx,DWORD PTR ds:0x1014a60
+ 1003896:	c7 44 01 18 00 00 00 	mov    DWORD PTR [ecx+eax*1+0x18],0x0
+ 100389d:	00 
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:60 (discriminator 2)
         heapMemoryInfo[cnt].inUse=false;
- 10035ce:	89 c1                	mov    ecx,eax
- 10035d0:	03 0d 54 3a 01 01    	add    ecx,DWORD PTR ds:0x1013a54
- 10035d6:	c6 41 0c 00          	mov    BYTE PTR [ecx+0xc],0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:57 (discriminator 2)
+ 100389e:	89 c1                	mov    ecx,eax
+ 10038a0:	03 0d 60 4a 01 01    	add    ecx,DWORD PTR ds:0x1014a60
+ 10038a6:	c6 41 0c 00          	mov    BYTE PTR [ecx+0xc],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:61 (discriminator 2)
         heapMemoryInfo[cnt].pid=0;
- 10035da:	c7 41 10 00 00 00 00 	mov    DWORD PTR [ecx+0x10],0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:58 (discriminator 2)
+ 10038aa:	c7 41 10 00 00 00 00 	mov    DWORD PTR [ecx+0x10],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:62 (discriminator 2)
         heapMemoryInfo[cnt].size=0;
- 10035e1:	c7 41 08 00 00 00 00 	mov    DWORD PTR [ecx+0x8],0x0
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:50 (discriminator 2)
+ 10038b1:	c7 41 08 00 00 00 00 	mov    DWORD PTR [ecx+0x8],0x0
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:54 (discriminator 2)
     heapMemoryInfo->address=kmmHeapMemoryBaseAddress;
     heapMemoryInfo->size=kmmHeapMemoryTotal;
     heapMemoryInfo->next=NULL;
     heapMemoryInfo->prev=NULL;
     
     for (int cnt=1;cnt<1000;cnt++)
- 10035e8:	83 c2 01             	add    edx,0x1
- 10035eb:	83 c0 1c             	add    eax,0x1c
- 10035ee:	81 fa e8 03 00 00    	cmp    edx,0x3e8
- 10035f4:	75 ad                	jne    10035a3 <mmInitHeapTracking+0xcb>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:60
+ 10038b8:	83 c2 01             	add    edx,0x1
+ 10038bb:	83 c0 1c             	add    eax,0x1c
+ 10038be:	81 fa e8 03 00 00    	cmp    edx,0x3e8
+ 10038c4:	75 ad                	jne    1003873 <mmInitHeapTracking+0xcb>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:64
             heapMemoryInfo[cnt].next=NULL;
         heapMemoryInfo[cnt].inUse=false;
         heapMemoryInfo[cnt].pid=0;
         heapMemoryInfo[cnt].size=0;
     }
 }
- 10035f6:	83 c4 0c             	add    esp,0xc
- 10035f9:	c3                   	ret    
+ 10038c6:	83 c4 0c             	add    esp,0xc
+ 10038c9:	c3                   	ret    
 
-010035fa <mmInit>:
+010038ca <mmInit>:
 mmInit():
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:64
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:68
 
 
 void mmInit()
 {
- 10035fa:	56                   	push   esi
- 10035fb:	53                   	push   ebx
- 10035fc:	83 ec 04             	sub    esp,0x4
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:66
+ 10038ca:	56                   	push   esi
+ 10038cb:	53                   	push   ebx
+ 10038cc:	83 ec 04             	sub    esp,0x4
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:70
     //0x10000000 represents segment 0xC0000000-0xCFFFFFFF ... don't want to map anything there for now
     kernelMemoryUsed=kernelStart + kernelSize;
- 10035ff:	a1 0c 40 00 01       	mov    eax,ds:0x100400c
- 1003604:	03 05 08 40 00 01    	add    eax,DWORD PTR ds:0x1004008
- 100360a:	a3 50 3a 01 01       	mov    ds:0x1013a50,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:67
-    kmmGrossUserMemoryAvailable=kE820MemoryBytes - kernelMemoryUsed;
- 100360f:	8b 0d 48 00 12 00    	mov    ecx,DWORD PTR ds:0x120048
- 1003615:	8b 1d 4c 00 12 00    	mov    ebx,DWORD PTR ds:0x12004c
- 100361b:	89 ca                	mov    edx,ecx
- 100361d:	29 c2                	sub    edx,eax
- 100361f:	89 15 00 05 12 00    	mov    DWORD PTR ds:0x120500,edx
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:68
-    kmmHeapMemoryTotal=kmmGrossUserMemoryAvailable - kernelPoolMemorySize - kernelMemoryUsed;
- 1003625:	8b 35 04 40 00 01    	mov    esi,DWORD PTR ds:0x1004004
- 100362b:	29 f2                	sub    edx,esi
- 100362d:	29 c2                	sub    edx,eax
- 100362f:	89 15 08 05 12 00    	mov    DWORD PTR ds:0x120508,edx
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:69
-    kmmHeapMemoryBaseAddress=(kernelMemoryUsed + 0x100000) & 0xFFFFF000 ;
- 1003635:	05 00 00 10 00       	add    eax,0x100000
- 100363a:	25 00 f0 ff ff       	and    eax,0xfffff000
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:70
-    kKernelPoolMemoryAddress=kmmHeapMemoryBaseAddress;
- 100363f:	a3 58 3a 01 01       	mov    ds:0x1013a58,eax
+ 10038cf:	a1 0c 48 00 01       	mov    eax,ds:0x100480c
+ 10038d4:	03 05 08 48 00 01    	add    eax,DWORD PTR ds:0x1004808
+ 10038da:	a3 5c 4a 01 01       	mov    ds:0x1014a5c,eax
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:71
-    kmmHeapMemoryBaseAddress+=kernelPoolMemorySize; //Need some page table memory but we don't want to use Malloc while creating page tables to get it
- 1003644:	01 f0                	add    eax,esi
- 1003646:	a3 04 05 12 00       	mov    ds:0x120504,eax
+    kmmGrossUserMemoryAvailable=kE820MemoryBytes - kernelMemoryUsed;
+ 10038df:	8b 0d 48 00 12 00    	mov    ecx,DWORD PTR ds:0x120048
+ 10038e5:	8b 1d 4c 00 12 00    	mov    ebx,DWORD PTR ds:0x12004c
+ 10038eb:	89 ca                	mov    edx,ecx
+ 10038ed:	29 c2                	sub    edx,eax
+ 10038ef:	89 15 00 05 12 00    	mov    DWORD PTR ds:0x120500,edx
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:72
+    kmmHeapMemoryTotal=kmmGrossUserMemoryAvailable - kernelPoolMemorySize - kernelMemoryUsed;
+ 10038f5:	8b 35 04 48 00 01    	mov    esi,DWORD PTR ds:0x1004804
+ 10038fb:	29 f2                	sub    edx,esi
+ 10038fd:	29 c2                	sub    edx,eax
+ 10038ff:	89 15 08 05 12 00    	mov    DWORD PTR ds:0x120508,edx
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:73
+    kmmHeapMemoryBaseAddress=(kernelMemoryUsed + 0x100000) & 0xFFFFF000 ;
+ 1003905:	05 00 00 10 00       	add    eax,0x100000
+ 100390a:	25 00 f0 ff ff       	and    eax,0xfffff000
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:74
+    kKernelPoolMemoryAddress=kmmHeapMemoryBaseAddress;
+ 100390f:	a3 64 4a 01 01       	mov    ds:0x1014a64,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:75
+    kmmHeapMemoryBaseAddress+=kernelPoolMemorySize; //Need some page table memory but we don't want to use Malloc while creating page tables to get it
+ 1003914:	01 f0                	add    eax,esi
+ 1003916:	a3 04 05 12 00       	mov    ds:0x120504,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:77
     //Setup the base of the heap
     kMallocBaseAddress=kmmHeapMemoryBaseAddress;
- 100364b:	a3 fc 04 12 00       	mov    ds:0x1204fc,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:74
+ 100391b:	a3 fc 04 12 00       	mov    ds:0x1204fc,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:78
     kMallocCurrAddress=kMallocBaseAddress;
- 1003650:	a3 f8 04 12 00       	mov    ds:0x1204f8,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:76
+ 1003920:	a3 f8 04 12 00       	mov    ds:0x1204f8,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:80
     
     printd(DEBUG_MEMORY_MANAGEMENT,"E820 memory total: %u kb\n", kE820MemoryBytes/1024);
- 1003655:	0f ac d9 0a          	shrd   ecx,ebx,0xa
- 1003659:	c1 eb 0a             	shr    ebx,0xa
- 100365c:	53                   	push   ebx
- 100365d:	51                   	push   ecx
- 100365e:	68 ef 76 00 01       	push   0x10076ef
- 1003663:	68 00 00 01 00       	push   0x10000
- 1003668:	e8 22 ef ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:77
-    printd(DEBUG_MEMORY_MANAGEMENT,"Memory used by the kernel: %u\n",kernelMemoryUsed);
- 100366d:	83 c4 0c             	add    esp,0xc
- 1003670:	ff 35 50 3a 01 01    	push   DWORD PTR ds:0x1013a50
- 1003676:	68 04 86 00 01       	push   0x1008604
- 100367b:	68 00 00 01 00       	push   0x10000
- 1003680:	e8 0a ef ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:78
-    printd(DEBUG_MEMORY_MANAGEMENT,"Memory available to mm: %u kb\n",kmmGrossUserMemoryAvailable/1024);
- 1003685:	83 c4 0c             	add    esp,0xc
- 1003688:	a1 00 05 12 00       	mov    eax,ds:0x120500
- 100368d:	c1 e8 0a             	shr    eax,0xa
- 1003690:	50                   	push   eax
- 1003691:	68 24 86 00 01       	push   0x1008624
- 1003696:	68 00 00 01 00       	push   0x10000
- 100369b:	e8 ef ee ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:79
-    printd(DEBUG_MEMORY_MANAGEMENT,"Total memory availabe to user applications: %u kb\n",(kmmGrossUserMemoryAvailable - kernelPoolMemorySize)/1024);
- 10036a0:	83 c4 0c             	add    esp,0xc
- 10036a3:	a1 00 05 12 00       	mov    eax,ds:0x120500
- 10036a8:	2b 05 04 40 00 01    	sub    eax,DWORD PTR ds:0x1004004
- 10036ae:	c1 e8 0a             	shr    eax,0xa
- 10036b1:	50                   	push   eax
- 10036b2:	68 44 86 00 01       	push   0x1008644
- 10036b7:	68 00 00 01 00       	push   0x10000
- 10036bc:	e8 ce ee ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:80
-    printd(DEBUG_MEMORY_MANAGEMENT,"Initializing memory manager\n\n");
- 10036c1:	83 c4 08             	add    esp,0x8
- 10036c4:	68 09 77 00 01       	push   0x1007709
- 10036c9:	68 00 00 01 00       	push   0x10000
- 10036ce:	e8 bc ee ff ff       	call   100258f <printd>
+ 1003925:	0f ac d9 0a          	shrd   ecx,ebx,0xa
+ 1003929:	c1 eb 0a             	shr    ebx,0xa
+ 100392c:	53                   	push   ebx
+ 100392d:	51                   	push   ecx
+ 100392e:	68 16 7a 00 01       	push   0x1007a16
+ 1003933:	68 00 00 01 00       	push   0x10000
+ 1003938:	e8 56 ec ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:81
-    printd(DEBUG_MEMORY_MANAGEMENT,"Pool\t\tAddress\t\t\tLength\t\t\n");
- 10036d3:	83 c4 08             	add    esp,0x8
- 10036d6:	68 27 77 00 01       	push   0x1007727
- 10036db:	68 00 00 01 00       	push   0x10000
- 10036e0:	e8 aa ee ff ff       	call   100258f <printd>
+    printd(DEBUG_MEMORY_MANAGEMENT,"Memory used by the kernel: %u\n",kernelMemoryUsed);
+ 100393d:	83 c4 0c             	add    esp,0xc
+ 1003940:	ff 35 5c 4a 01 01    	push   DWORD PTR ds:0x1014a5c
+ 1003946:	68 d0 8b 00 01       	push   0x1008bd0
+ 100394b:	68 00 00 01 00       	push   0x10000
+ 1003950:	e8 3e ec ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:82
-    printd(DEBUG_MEMORY_MANAGEMENT,"Kernel\t0x%08X\t\t0x%08X\n",kKernelPoolMemoryAddress,kernelPoolMemorySize);
- 10036e5:	ff 35 04 40 00 01    	push   DWORD PTR ds:0x1004004
- 10036eb:	ff 35 58 3a 01 01    	push   DWORD PTR ds:0x1013a58
- 10036f1:	68 41 77 00 01       	push   0x1007741
- 10036f6:	68 00 00 01 00       	push   0x10000
- 10036fb:	e8 8f ee ff ff       	call   100258f <printd>
+    printd(DEBUG_MEMORY_MANAGEMENT,"Memory available to mm: %u kb\n",kmmGrossUserMemoryAvailable/1024);
+ 1003955:	83 c4 0c             	add    esp,0xc
+ 1003958:	a1 00 05 12 00       	mov    eax,ds:0x120500
+ 100395d:	c1 e8 0a             	shr    eax,0xa
+ 1003960:	50                   	push   eax
+ 1003961:	68 f0 8b 00 01       	push   0x1008bf0
+ 1003966:	68 00 00 01 00       	push   0x10000
+ 100396b:	e8 23 ec ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:83
-    printd(DEBUG_MEMORY_MANAGEMENT,"User\t\t0x%08X\t\t0x%08X\n",kmmHeapMemoryBaseAddress,kmmHeapMemoryTotal);
- 1003700:	83 c4 20             	add    esp,0x20
- 1003703:	ff 35 08 05 12 00    	push   DWORD PTR ds:0x120508
- 1003709:	ff 35 04 05 12 00    	push   DWORD PTR ds:0x120504
- 100370f:	68 58 77 00 01       	push   0x1007758
- 1003714:	68 00 00 01 00       	push   0x10000
- 1003719:	e8 71 ee ff ff       	call   100258f <printd>
+    printd(DEBUG_MEMORY_MANAGEMENT,"Total memory availabe to user applications: %u kb\n",(kmmGrossUserMemoryAvailable - kernelPoolMemorySize)/1024);
+ 1003970:	83 c4 0c             	add    esp,0xc
+ 1003973:	a1 00 05 12 00       	mov    eax,ds:0x120500
+ 1003978:	2b 05 04 48 00 01    	sub    eax,DWORD PTR ds:0x1004804
+ 100397e:	c1 e8 0a             	shr    eax,0xa
+ 1003981:	50                   	push   eax
+ 1003982:	68 10 8c 00 01       	push   0x1008c10
+ 1003987:	68 00 00 01 00       	push   0x10000
+ 100398c:	e8 02 ec ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:84
+    printd(DEBUG_MEMORY_MANAGEMENT,"Initializing memory manager\n\n");
+ 1003991:	83 c4 08             	add    esp,0x8
+ 1003994:	68 30 7a 00 01       	push   0x1007a30
+ 1003999:	68 00 00 01 00       	push   0x10000
+ 100399e:	e8 f0 eb ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/mm/mm.c:85
+    printd(DEBUG_MEMORY_MANAGEMENT,"Pool\t\tAddress\t\t\tLength\t\t\n");
+ 10039a3:	83 c4 08             	add    esp,0x8
+ 10039a6:	68 4e 7a 00 01       	push   0x1007a4e
+ 10039ab:	68 00 00 01 00       	push   0x10000
+ 10039b0:	e8 de eb ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:86
+    printd(DEBUG_MEMORY_MANAGEMENT,"Kernel\t0x%08X\t\t0x%08X\n",kKernelPoolMemoryAddress,kernelPoolMemorySize);
+ 10039b5:	ff 35 04 48 00 01    	push   DWORD PTR ds:0x1004804
+ 10039bb:	ff 35 64 4a 01 01    	push   DWORD PTR ds:0x1014a64
+ 10039c1:	68 68 7a 00 01       	push   0x1007a68
+ 10039c6:	68 00 00 01 00       	push   0x10000
+ 10039cb:	e8 c3 eb ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:87
+    printd(DEBUG_MEMORY_MANAGEMENT,"User\t\t0x%08X\t\t0x%08X\n",kmmHeapMemoryBaseAddress,kmmHeapMemoryTotal);
+ 10039d0:	83 c4 20             	add    esp,0x20
+ 10039d3:	ff 35 08 05 12 00    	push   DWORD PTR ds:0x120508
+ 10039d9:	ff 35 04 05 12 00    	push   DWORD PTR ds:0x120504
+ 10039df:	68 7f 7a 00 01       	push   0x1007a7f
+ 10039e4:	68 00 00 01 00       	push   0x10000
+ 10039e9:	e8 a5 eb ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:89
 
     mmInitHeapTracking();    
- 100371e:	e8 b5 fd ff ff       	call   10034d8 <mmInitHeapTracking>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:88
+ 10039ee:	e8 b5 fd ff ff       	call   10037a8 <mmInitHeapTracking>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:92
     //We need to
     uintptr_t startAddr=0x0;
     uintptr_t endAddr= (kernelMemoryUsed + 0x1000) & 0xFFFFF000;
- 1003723:	a1 50 3a 01 01       	mov    eax,ds:0x1013a50
- 1003728:	8d 98 00 10 00 00    	lea    ebx,[eax+0x1000]
- 100372e:	81 e3 00 f0 ff ff    	and    ebx,0xfffff000
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:90
+ 10039f3:	a1 5c 4a 01 01       	mov    eax,ds:0x1014a5c
+ 10039f8:	8d 98 00 10 00 00    	lea    ebx,[eax+0x1000]
+ 10039fe:	81 e3 00 f0 ff ff    	and    ebx,0xfffff000
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:94
     //Mark everything from the beginning of memory (0xC0000000) to the end of the kernel objects as in-use
     printd(DEBUG_KERNEL_PAGING,"Setting kernel memory range from 0x%08X-0x%08X as in-use\n",startAddr,endAddr);
- 1003734:	53                   	push   ebx
- 1003735:	6a 00                	push   0x0
- 1003737:	68 78 86 00 01       	push   0x1008678
- 100373c:	68 00 80 00 00       	push   0x8000
- 1003741:	e8 49 ee ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:91
+ 1003a04:	53                   	push   ebx
+ 1003a05:	6a 00                	push   0x0
+ 1003a07:	68 44 8c 00 01       	push   0x1008c44
+ 1003a0c:	68 00 80 00 00       	push   0x8000
+ 1003a11:	e8 7d eb ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:95
     mmKernelSetPageRangeInUseFlag(startAddr,
- 1003746:	83 c4 20             	add    esp,0x20
- 1003749:	6a 01                	push   0x1
- 100374b:	68 00 10 00 00       	push   0x1000
- 1003750:	8d 43 01             	lea    eax,[ebx+0x1]
- 1003753:	50                   	push   eax
- 1003754:	6a 00                	push   0x0
- 1003756:	e8 9c df ff ff       	call   10016f7 <mmKernelSetPageRangeInUseFlag>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:97
+ 1003a16:	83 c4 20             	add    esp,0x20
+ 1003a19:	6a 01                	push   0x1
+ 1003a1b:	68 00 10 00 00       	push   0x1000
+ 1003a20:	8d 43 01             	lea    eax,[ebx+0x1]
+ 1003a23:	50                   	push   eax
+ 1003a24:	6a 00                	push   0x0
+ 1003a26:	e8 ce dc ff ff       	call   10016f9 <mmKernelSetPageRangeInUseFlag>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:101
             endAddr+1,
             0x1000, /*page size*/
             true);
     startAddr+=0xc0000000;
     endAddr+=0xc0000000;
     printd(DEBUG_KERNEL_PAGING,"Setting kernel memory range from 0x%08X-0x%08X as in-use\n",startAddr,endAddr);
- 100375b:	8d 83 00 00 00 c0    	lea    eax,[ebx-0x40000000]
- 1003761:	50                   	push   eax
- 1003762:	68 00 00 00 c0       	push   0xc0000000
- 1003767:	68 78 86 00 01       	push   0x1008678
- 100376c:	68 00 80 00 00       	push   0x8000
- 1003771:	e8 19 ee ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:98
+ 1003a2b:	8d 83 00 00 00 c0    	lea    eax,[ebx-0x40000000]
+ 1003a31:	50                   	push   eax
+ 1003a32:	68 00 00 00 c0       	push   0xc0000000
+ 1003a37:	68 44 8c 00 01       	push   0x1008c44
+ 1003a3c:	68 00 80 00 00       	push   0x8000
+ 1003a41:	e8 4d eb ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:102
     mmKernelSetPageRangeInUseFlag(startAddr,
- 1003776:	83 c4 20             	add    esp,0x20
- 1003779:	6a 01                	push   0x1
- 100377b:	68 00 10 00 00       	push   0x1000
- 1003780:	81 eb ff ff ff 3f    	sub    ebx,0x3fffffff
- 1003786:	53                   	push   ebx
- 1003787:	68 00 00 00 c0       	push   0xc0000000
- 100378c:	e8 66 df ff ff       	call   10016f7 <mmKernelSetPageRangeInUseFlag>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:119
+ 1003a46:	83 c4 20             	add    esp,0x20
+ 1003a49:	6a 01                	push   0x1
+ 1003a4b:	68 00 10 00 00       	push   0x1000
+ 1003a50:	81 eb ff ff ff 3f    	sub    ebx,0x3fffffff
+ 1003a56:	53                   	push   ebx
+ 1003a57:	68 00 00 00 c0       	push   0xc0000000
+ 1003a5c:	e8 98 dc ff ff       	call   10016f9 <mmKernelSetPageRangeInUseFlag>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:107
+            endAddr+1,
+            0x1000, /*page size*/
+            true);
+
+    startAddr=kmmHeapMemoryBaseAddress; 
+ 1003a61:	8b 1d 04 05 12 00    	mov    ebx,DWORD PTR ds:0x120504
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:108
+    printd(DEBUG_KERNEL_PAGING,"Zeroing page entries for memory range 0x%08X-0x%08X",startAddr,0x9FFFFFFF);
+ 1003a67:	68 ff ff ff 9f       	push   0x9fffffff
+ 1003a6c:	53                   	push   ebx
+ 1003a6d:	68 80 8c 00 01       	push   0x1008c80
+ 1003a72:	68 00 80 00 00       	push   0x8000
+ 1003a77:	e8 17 eb ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:109
+    for (uintptr_t cnt=startAddr;cnt<=0x9FFFFFFF;cnt+=0x1000)
+ 1003a7c:	83 c4 20             	add    esp,0x20
+ 1003a7f:	81 fb ff ff ff 9f    	cmp    ebx,0x9fffffff
+ 1003a85:	77 4c                	ja     1003ad3 <mmInit+0x209>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:113
+    {
+        if (cnt<0xC0000000 || cnt>0xCFFFFFFF)
+        {
+            unMapPage(CURRENT_CR3,cnt,0x0);
+ 1003a87:	0f 20 d8             	mov    eax,cr3
+ 1003a8a:	89 c6                	mov    esi,eax
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:111
+
+    startAddr=kmmHeapMemoryBaseAddress; 
+    printd(DEBUG_KERNEL_PAGING,"Zeroing page entries for memory range 0x%08X-0x%08X",startAddr,0x9FFFFFFF);
+    for (uintptr_t cnt=startAddr;cnt<=0x9FFFFFFF;cnt+=0x1000)
+    {
+        if (cnt<0xC0000000 || cnt>0xCFFFFFFF)
+ 1003a8c:	8d 83 00 00 00 40    	lea    eax,[ebx+0x40000000]
+ 1003a92:	3d ff ff ff 0f       	cmp    eax,0xfffffff
+ 1003a97:	76 2c                	jbe    1003ac5 <mmInit+0x1fb>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:113
+        {
+            unMapPage(CURRENT_CR3,cnt,0x0);
+ 1003a99:	83 ec 04             	sub    esp,0x4
+ 1003a9c:	6a 00                	push   0x0
+ 1003a9e:	53                   	push   ebx
+ 1003a9f:	56                   	push   esi
+ 1003aa0:	e8 ca 05 00 00       	call   100406f <unMapPage>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:114
+            if (cnt%0x10000000==0)
+ 1003aa5:	83 c4 10             	add    esp,0x10
+ 1003aa8:	f7 c3 ff ff ff 0f    	test   ebx,0xfffffff
+ 1003aae:	75 15                	jne    1003ac5 <mmInit+0x1fb>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:117
+            {
+//                printk("0x%08X-0x%08X\n",cnt,kPagingGet4kPTEntryValue(cnt));
+                printd(DEBUG_KERNEL_PAGING,".");
+ 1003ab0:	83 ec 08             	sub    esp,0x8
+ 1003ab3:	68 95 7a 00 01       	push   0x1007a95
+ 1003ab8:	68 00 80 00 00       	push   0x8000
+ 1003abd:	e8 d1 ea ff ff       	call   1002593 <printd>
+ 1003ac2:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:109 (discriminator 2)
+            0x1000, /*page size*/
+            true);
+
+    startAddr=kmmHeapMemoryBaseAddress; 
+    printd(DEBUG_KERNEL_PAGING,"Zeroing page entries for memory range 0x%08X-0x%08X",startAddr,0x9FFFFFFF);
+    for (uintptr_t cnt=startAddr;cnt<=0x9FFFFFFF;cnt+=0x1000)
+ 1003ac5:	81 c3 00 10 00 00    	add    ebx,0x1000
+ 1003acb:	81 fb ff ff ff 9f    	cmp    ebx,0x9fffffff
+ 1003ad1:	76 b9                	jbe    1003a8c <mmInit+0x1c2>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:123
 //                cursorMoveTo(0,cursorGetPosY()-1);
             }
         }
     }
- */  
+ 
     printk("\n");
- 1003791:	c7 04 24 3f 77 00 01 	mov    DWORD PTR [esp],0x100773f
- 1003798:	e8 da ed ff ff       	call   1002577 <printk>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:121
-    
-    printd(DEBUG_KERNEL_PAGING,"Test mallocs:\n");
- 100379d:	83 c4 08             	add    esp,0x8
- 10037a0:	68 6e 77 00 01       	push   0x100776e
- 10037a5:	68 00 80 00 00       	push   0x8000
- 10037aa:	e8 e0 ed ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:122
-    uintptr_t* b1 = malloc(50);
- 10037af:	c7 04 24 32 00 00 00 	mov    DWORD PTR [esp],0x32
- 10037b6:	e8 30 fc ff ff       	call   10033eb <malloc>
- 10037bb:	89 c3                	mov    ebx,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:123
-    sprintf(b1,"The value of b1 = 0x%08X",b1);
- 10037bd:	83 c4 0c             	add    esp,0xc
- 10037c0:	50                   	push   eax
- 10037c1:	68 7d 77 00 01       	push   0x100777d
- 10037c6:	50                   	push   eax
- 10037c7:	e8 f3 ed ff ff       	call   10025bf <sprintf>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:124
-    printd(DEBUG_KERNEL_PAGING,"b1=malloc(1) returned 0x%08X\n\n",b1);
- 10037cc:	83 c4 0c             	add    esp,0xc
- 10037cf:	53                   	push   ebx
- 10037d0:	68 b4 86 00 01       	push   0x10086b4
- 10037d5:	68 00 80 00 00       	push   0x8000
- 10037da:	e8 b0 ed ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:125
-    uintptr_t* b2 = malloc(4095);
- 10037df:	c7 04 24 ff 0f 00 00 	mov    DWORD PTR [esp],0xfff
- 10037e6:	e8 00 fc ff ff       	call   10033eb <malloc>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:126
-    *b2=0xBEEFDEAD;
- 10037eb:	c7 00 ad de ef be    	mov    DWORD PTR [eax],0xbeefdead
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:127
-    printd(DEBUG_KERNEL_PAGING,"b2=malloc(4095) returned 0x%08X\n\n",b2);
- 10037f1:	83 c4 0c             	add    esp,0xc
- 10037f4:	50                   	push   eax
- 10037f5:	68 d4 86 00 01       	push   0x10086d4
- 10037fa:	68 00 80 00 00       	push   0x8000
- 10037ff:	e8 8b ed ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:128
-    uintptr_t* b5 = malloc(1024*1024*100);
- 1003804:	c7 04 24 00 00 40 06 	mov    DWORD PTR [esp],0x6400000
- 100380b:	e8 db fb ff ff       	call   10033eb <malloc>
- 1003810:	89 c3                	mov    ebx,eax
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:129
-    printd(DEBUG_KERNEL_PAGING,"b4=malloc(100MB) returned 0x%08X\n\n",b5);
- 1003812:	83 c4 0c             	add    esp,0xc
- 1003815:	50                   	push   eax
- 1003816:	68 f8 86 00 01       	push   0x10086f8
- 100381b:	68 00 80 00 00       	push   0x8000
- 1003820:	e8 6a ed ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:130
-    uintptr_t* b6 = malloc(1024*1024*200);
- 1003825:	c7 04 24 00 00 80 0c 	mov    DWORD PTR [esp],0xc800000
- 100382c:	e8 ba fb ff ff       	call   10033eb <malloc>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:131
-    printd(DEBUG_KERNEL_PAGING,"b4=malloc(200MB) returned 0x%08X\n\n",b6);
- 1003831:	83 c4 0c             	add    esp,0xc
- 1003834:	50                   	push   eax
- 1003835:	68 1c 87 00 01       	push   0x100871c
- 100383a:	68 00 80 00 00       	push   0x8000
- 100383f:	e8 4b ed ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:132
-    printd(DEBUG_KERNEL_PAGING,"freeing b2\n");
- 1003844:	83 c4 08             	add    esp,0x8
- 1003847:	68 96 77 00 01       	push   0x1007796
- 100384c:	68 00 80 00 00       	push   0x8000
- 1003851:	e8 39 ed ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:133
-    free(b5);
- 1003856:	89 1c 24             	mov    DWORD PTR [esp],ebx
- 1003859:	e8 09 fc ff ff       	call   1003467 <free>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:134
-    b5=malloc(100);
- 100385e:	c7 04 24 64 00 00 00 	mov    DWORD PTR [esp],0x64
- 1003865:	e8 81 fb ff ff       	call   10033eb <malloc>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:135
-    printd(DEBUG_KERNEL_PAGING,"b5=malloc(100) returned 0x%08X\n\n",b5);
- 100386a:	83 c4 0c             	add    esp,0xc
- 100386d:	50                   	push   eax
- 100386e:	68 40 87 00 01       	push   0x1008740
- 1003873:	68 00 80 00 00       	push   0x8000
- 1003878:	e8 12 ed ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:136
+ 1003ad3:	83 ec 0c             	sub    esp,0xc
+ 1003ad6:	68 66 7a 00 01       	push   0x1007a66
+ 1003adb:	e8 9b ea ff ff       	call   100257b <printk>
+/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:145
     printd(DEBUG_KERNEL_PAGING,"Available memory: %u\n",memAvailable());
- 100387d:	e8 35 fc ff ff       	call   10034b7 <memAvailable>
- 1003882:	83 c4 0c             	add    esp,0xc
- 1003885:	50                   	push   eax
- 1003886:	68 a2 77 00 01       	push   0x10077a2
- 100388b:	68 00 80 00 00       	push   0x8000
- 1003890:	e8 fa ec ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/mm/mm.c:141
     return;
-    
+  */  
 //    for (int cnt=KERNEL_VIRTUAL_EXEC_ADDRESS;cnt<KERNEL_VIRTUAL_EXEC_ADDRESS+0x10000000;cnt+=4096)
 //        pagingMapPage
 }
- 1003895:	83 c4 14             	add    esp,0x14
- 1003898:	5b                   	pop    ebx
- 1003899:	5e                   	pop    esi
- 100389a:	c3                   	ret    
- 100389b:	90                   	nop
+ 1003ae0:	83 c4 14             	add    esp,0x14
+ 1003ae3:	5b                   	pop    ebx
+ 1003ae4:	5e                   	pop    esi
+ 1003ae5:	c3                   	ret    
+ 1003ae6:	66 90                	xchg   ax,ax
 
-0100389c <pagingAllocatePagingTablePage>:
+01003ae8 <pagingFindAvailableAddressToMapTo>:
+pagingFindAvailableAddressToMapTo():
+/home/yogi/src/os/chrisOSKernel/src/paging.c:24
+uint32_t kKernelPoolMemoryAddress;
+
+
+
+uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToFind)
+{
+ 1003ae8:	55                   	push   ebp
+ 1003ae9:	57                   	push   edi
+ 1003aea:	56                   	push   esi
+ 1003aeb:	53                   	push   ebx
+ 1003aec:	83 ec 30             	sub    esp,0x30
+/home/yogi/src/os/chrisOSKernel/src/paging.c:26
+    uint32_t* dir;
+    dir=(uint32_t*)pageDirAddress;
+ 1003aef:	8b 44 24 44          	mov    eax,DWORD PTR [esp+0x44]
+ 1003af3:	89 44 24 20          	mov    DWORD PTR [esp+0x20],eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:36
+    uint32_t foundPageTableEntry;
+    uint32_t foundPageTableEntryNum;
+    int dirEntryNumber=0;
+    uint32_t lRetVal;
+    currentPDE=dir;
+    lastPDE=dir+(PAGE_SIZE/4);
+ 1003af7:	05 00 10 00 00       	add    eax,0x1000
+ 1003afc:	89 44 24 14          	mov    DWORD PTR [esp+0x14],eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:38
+    
+    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding page entries to accomodate 0x%08X pages\n",pagesToFind);
+ 1003b00:	ff 74 24 48          	push   DWORD PTR [esp+0x48]
+ 1003b04:	68 b4 8c 00 01       	push   0x1008cb4
+ 1003b09:	6a 40                	push   0x40
+ 1003b0b:	e8 83 ea ff ff       	call   1002593 <printd>
+ 1003b10:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/paging.c:35
+    bool found=false;
+    uint32_t foundPageTableEntry;
+    uint32_t foundPageTableEntryNum;
+    int dirEntryNumber=0;
+    uint32_t lRetVal;
+    currentPDE=dir;
+ 1003b13:	8b 44 24 40          	mov    eax,DWORD PTR [esp+0x40]
+ 1003b17:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:26
+
+
+uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToFind)
+{
+    uint32_t* dir;
+    dir=(uint32_t*)pageDirAddress;
+ 1003b1b:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:33
+    uint32_t* currentPDE,*lastPDE;
+    int foundEntryCount;
+    bool found=false;
+    uint32_t foundPageTableEntry;
+    uint32_t foundPageTableEntryNum;
+    int dirEntryNumber=0;
+ 1003b1d:	bd 00 00 00 00       	mov    ebp,0x0
+/home/yogi/src/os/chrisOSKernel/src/paging.c:30
+    uint32_t* dir;
+    dir=(uint32_t*)pageDirAddress;
+    uint32_t* tablePtr;
+    uint32_t* currentPDE,*lastPDE;
+    int foundEntryCount;
+    bool found=false;
+ 1003b22:	c6 44 24 17 00       	mov    BYTE PTR [esp+0x17],0x0
+ 1003b27:	05 04 10 00 00       	add    eax,0x1004
+ 1003b2c:	89 44 24 18          	mov    DWORD PTR [esp+0x18],eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:42
+    
+    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding page entries to accomodate 0x%08X pages\n",pagesToFind);
+    //Scan the page directory for an entry that is in use
+    do
+    {
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding existing page directory entry\n");
+ 1003b30:	83 ec 08             	sub    esp,0x8
+ 1003b33:	68 04 8d 00 01       	push   0x1008d04
+ 1003b38:	6a 40                	push   0x40
+ 1003b3a:	e8 54 ea ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:43
+        for (uint32_t* cnt=currentPDE;cnt<=lastPDE;cnt++)
+ 1003b3f:	83 c4 10             	add    esp,0x10
+ 1003b42:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+ 1003b46:	8b 4c 24 10          	mov    ecx,DWORD PTR [esp+0x10]
+ 1003b4a:	39 c8                	cmp    eax,ecx
+ 1003b4c:	77 32                	ja     1003b80 <pagingFindAvailableAddressToMapTo+0x98>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:45
+        {
+            if (*dir==0)
+ 1003b4e:	83 3b 00             	cmp    DWORD PTR [ebx],0x0
+ 1003b51:	0f 85 a1 01 00 00    	jne    1003cf8 <pagingFindAvailableAddressToMapTo+0x210>
+ 1003b57:	83 c0 04             	add    eax,0x4
+ 1003b5a:	8b 54 24 18          	mov    edx,DWORD PTR [esp+0x18]
+ 1003b5e:	29 c2                	sub    edx,eax
+ 1003b60:	89 d0                	mov    eax,edx
+ 1003b62:	c1 e8 02             	shr    eax,0x2
+ 1003b65:	8d 44 05 01          	lea    eax,[ebp+eax*1+0x1]
+ 1003b69:	eb 09                	jmp    1003b74 <pagingFindAvailableAddressToMapTo+0x8c>
+ 1003b6b:	83 3b 00             	cmp    DWORD PTR [ebx],0x0
+ 1003b6e:	0f 85 84 01 00 00    	jne    1003cf8 <pagingFindAvailableAddressToMapTo+0x210>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:47 (discriminator 2)
+            {
+                dir++;
+ 1003b74:	83 c3 04             	add    ebx,0x4
+/home/yogi/src/os/chrisOSKernel/src/paging.c:48 (discriminator 2)
+                dirEntryNumber++;
+ 1003b77:	83 c5 01             	add    ebp,0x1
+/home/yogi/src/os/chrisOSKernel/src/paging.c:43 (discriminator 2)
+    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding page entries to accomodate 0x%08X pages\n",pagesToFind);
+    //Scan the page directory for an entry that is in use
+    do
+    {
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding existing page directory entry\n");
+        for (uint32_t* cnt=currentPDE;cnt<=lastPDE;cnt++)
+ 1003b7a:	39 c5                	cmp    ebp,eax
+ 1003b7c:	75 ed                	jne    1003b6b <pagingFindAvailableAddressToMapTo+0x83>
+ 1003b7e:	eb 02                	jmp    1003b82 <pagingFindAvailableAddressToMapTo+0x9a>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:43
+ 1003b80:	89 e8                	mov    eax,ebp
+/home/yogi/src/os/chrisOSKernel/src/paging.c:55
+            else
+                break;
+        }
+
+        //If we didn't find a page directory in use, put the first entry into use
+        if (*dir==0)
+ 1003b82:	83 3b 00             	cmp    DWORD PTR [ebx],0x0
+ 1003b85:	75 37                	jne    1003bbe <pagingFindAvailableAddressToMapTo+0xd6>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:58
+        {
+            dir=(uint32_t*)pageDirAddress;
+            *dir=(uint32_t)allocPages(PAGE_SIZE);
+ 1003b87:	83 ec 0c             	sub    esp,0xc
+ 1003b8a:	68 00 10 00 00       	push   0x1000
+ 1003b8f:	e8 9b f8 ff ff       	call   100342f <allocPages>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:60
+            *dir &= 0xFFFFF000;
+            *dir |= 0x7;
+ 1003b94:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 1003b99:	83 c8 07             	or     eax,0x7
+ 1003b9c:	8b 7c 24 2c          	mov    edi,DWORD PTR [esp+0x2c]
+ 1003ba0:	89 07                	mov    DWORD PTR [edi],eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:62
+            dirEntryNumber=0;
+            printd(DEBUG_PAGING,"pagingFindAvailablePageTable: No available directory entry, allocated one at 0x%08X, placed at PDE entry 0 (0x%08X)\n",*dir,dir);
+ 1003ba2:	57                   	push   edi
+ 1003ba3:	50                   	push   eax
+ 1003ba4:	68 4c 8d 00 01       	push   0x1008d4c
+ 1003ba9:	6a 40                	push   0x40
+ 1003bab:	e8 e3 e9 ff ff       	call   1002593 <printd>
+ 1003bb0:	83 c4 20             	add    esp,0x20
+/home/yogi/src/os/chrisOSKernel/src/paging.c:57
+        }
+
+        //If we didn't find a page directory in use, put the first entry into use
+        if (*dir==0)
+        {
+            dir=(uint32_t*)pageDirAddress;
+ 1003bb3:	89 7c 24 08          	mov    DWORD PTR [esp+0x8],edi
+/home/yogi/src/os/chrisOSKernel/src/paging.c:61
+            *dir=(uint32_t)allocPages(PAGE_SIZE);
+            *dir &= 0xFFFFF000;
+            *dir |= 0x7;
+            dirEntryNumber=0;
+ 1003bb7:	bd 00 00 00 00       	mov    ebp,0x0
+ 1003bbc:	eb 06                	jmp    1003bc4 <pagingFindAvailableAddressToMapTo+0xdc>
+ 1003bbe:	89 c5                	mov    ebp,eax
+ 1003bc0:	89 5c 24 08          	mov    DWORD PTR [esp+0x8],ebx
+/home/yogi/src/os/chrisOSKernel/src/paging.c:70
+        currentPDE=dir;
+        foundEntryCount=0;
+        foundPageTableEntry=0;
+        foundPageTableEntryNum=0;
+        
+        tablePtr=(uint32_t*)*dir;
+ 1003bc4:	8b 4c 24 08          	mov    ecx,DWORD PTR [esp+0x8]
+ 1003bc8:	8b 01                	mov    eax,DWORD PTR [ecx]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:71
+        tablePtr=(uint32_t*)((uint32_t)tablePtr & 0xFFFFF000);
+ 1003bca:	89 c6                	mov    esi,eax
+ 1003bcc:	81 e6 00 f0 ff ff    	and    esi,0xfffff000
+/home/yogi/src/os/chrisOSKernel/src/paging.c:73
+        
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found PDE=0x%08X (0x%08X)\n",currentPDE,*currentPDE);
+ 1003bd2:	50                   	push   eax
+ 1003bd3:	51                   	push   ecx
+ 1003bd4:	68 c4 8d 00 01       	push   0x1008dc4
+ 1003bd9:	6a 40                	push   0x40
+ 1003bdb:	e8 b3 e9 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:76
+        
+        //Find sequential table entries large enough to hold the requested amount of memory
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding free page table entries\n");
+ 1003be0:	83 c4 08             	add    esp,0x8
+ 1003be3:	68 00 8e 00 01       	push   0x1008e00
+ 1003be8:	6a 40                	push   0x40
+ 1003bea:	e8 a4 e9 ff ff       	call   1002593 <printd>
+ 1003bef:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/paging.c:77
+        for (int cnt=0;cnt<(PAGE_SIZE/4)-1;cnt++)
+ 1003bf2:	bb 00 00 00 00       	mov    ebx,0x0
+/home/yogi/src/os/chrisOSKernel/src/paging.c:68
+        }
+
+        currentPDE=dir;
+        foundEntryCount=0;
+        foundPageTableEntry=0;
+        foundPageTableEntryNum=0;
+ 1003bf7:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
+ 1003bfe:	00 
+/home/yogi/src/os/chrisOSKernel/src/paging.c:67
+            printd(DEBUG_PAGING,"pagingFindAvailablePageTable: No available directory entry, allocated one at 0x%08X, placed at PDE entry 0 (0x%08X)\n",*dir,dir);
+        }
+
+        currentPDE=dir;
+        foundEntryCount=0;
+        foundPageTableEntry=0;
+ 1003bff:	c7 04 24 00 00 00 00 	mov    DWORD PTR [esp],0x0
+/home/yogi/src/os/chrisOSKernel/src/paging.c:66
+            dirEntryNumber=0;
+            printd(DEBUG_PAGING,"pagingFindAvailablePageTable: No available directory entry, allocated one at 0x%08X, placed at PDE entry 0 (0x%08X)\n",*dir,dir);
+        }
+
+        currentPDE=dir;
+        foundEntryCount=0;
+ 1003c06:	bf 00 00 00 00       	mov    edi,0x0
+ 1003c0b:	89 6c 24 0c          	mov    DWORD PTR [esp+0xc],ebp
+ 1003c0f:	8b 6c 24 44          	mov    ebp,DWORD PTR [esp+0x44]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:80
+        //Find sequential table entries large enough to hold the requested amount of memory
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding free page table entries\n");
+        for (int cnt=0;cnt<(PAGE_SIZE/4)-1;cnt++)
+        {
+            //If entry is in use
+            if (*tablePtr!=0)
+ 1003c13:	83 3e 00             	cmp    DWORD PTR [esi],0x0
+ 1003c16:	74 19                	je     1003c31 <pagingFindAvailableAddressToMapTo+0x149>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:85
+            {
+                //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u is in use (0x%08X=0x%08X), starting again\n",foundEntryCount+1,pagesToFind,tablePtr,*tablePtr);
+                //reset the found entry count and move to the next entry
+                foundEntryCount=0;
+                tablePtr++;
+ 1003c18:	83 c6 04             	add    esi,0x4
+/home/yogi/src/os/chrisOSKernel/src/paging.c:87
+                foundPageTableEntry=0;
+                foundPageTableEntryNum=0;
+ 1003c1b:	c7 44 24 04 00 00 00 	mov    DWORD PTR [esp+0x4],0x0
+ 1003c22:	00 
+/home/yogi/src/os/chrisOSKernel/src/paging.c:86
+            {
+                //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u is in use (0x%08X=0x%08X), starting again\n",foundEntryCount+1,pagesToFind,tablePtr,*tablePtr);
+                //reset the found entry count and move to the next entry
+                foundEntryCount=0;
+                tablePtr++;
+                foundPageTableEntry=0;
+ 1003c23:	c7 04 24 00 00 00 00 	mov    DWORD PTR [esp],0x0
+/home/yogi/src/os/chrisOSKernel/src/paging.c:84
+            //If entry is in use
+            if (*tablePtr!=0)
+            {
+                //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u is in use (0x%08X=0x%08X), starting again\n",foundEntryCount+1,pagesToFind,tablePtr,*tablePtr);
+                //reset the found entry count and move to the next entry
+                foundEntryCount=0;
+ 1003c2a:	bf 00 00 00 00       	mov    edi,0x0
+ 1003c2f:	eb 64                	jmp    1003c95 <pagingFindAvailableAddressToMapTo+0x1ad>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:92
+                foundPageTableEntryNum=0;
+            }
+            else
+            {
+                //Entry not in use, increment the found entry count
+                foundEntryCount++;
+ 1003c31:	83 c7 01             	add    edi,0x1
+/home/yogi/src/os/chrisOSKernel/src/paging.c:93
+                printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u available ... continuing\n",foundEntryCount,pagesToFind);
+ 1003c34:	55                   	push   ebp
+ 1003c35:	57                   	push   edi
+ 1003c36:	68 40 8e 00 01       	push   0x1008e40
+ 1003c3b:	6a 40                	push   0x40
+ 1003c3d:	e8 51 e9 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:94
+                if (foundPageTableEntry==0)
+ 1003c42:	83 c4 10             	add    esp,0x10
+ 1003c45:	83 3c 24 00          	cmp    DWORD PTR [esp],0x0
+ 1003c49:	75 07                	jne    1003c52 <pagingFindAvailableAddressToMapTo+0x16a>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:96
+                {
+                    foundPageTableEntry=(uint32_t)tablePtr;
+ 1003c4b:	89 34 24             	mov    DWORD PTR [esp],esi
+/home/yogi/src/os/chrisOSKernel/src/paging.c:97
+                    foundPageTableEntryNum=cnt;
+ 1003c4e:	89 5c 24 04          	mov    DWORD PTR [esp+0x4],ebx
+/home/yogi/src/os/chrisOSKernel/src/paging.c:100
+                }
+                //If we found enough entries which aren't in use, bail out of the FOR
+                if (foundEntryCount==pagesToFind)
+ 1003c52:	39 fd                	cmp    ebp,edi
+ 1003c54:	75 3f                	jne    1003c95 <pagingFindAvailableAddressToMapTo+0x1ad>
+ 1003c56:	8b 6c 24 0c          	mov    ebp,DWORD PTR [esp+0xc]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:102
+                {
+                    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found available page entries at entry 0x%08X\n",foundPageTableEntry);
+ 1003c5a:	83 ec 04             	sub    esp,0x4
+ 1003c5d:	ff 74 24 04          	push   DWORD PTR [esp+0x4]
+ 1003c61:	68 88 8e 00 01       	push   0x1008e88
+ 1003c66:	6a 40                	push   0x40
+ 1003c68:	e8 26 e9 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:108
+                    found=true;
+                    break;
+                }
+            }
+        }
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Not enough pages at dir entry 0x%08X (%u-%u)\n",currentPDE,foundEntryCount,pagesToFind);
+ 1003c6d:	83 c4 04             	add    esp,0x4
+ 1003c70:	ff 74 24 50          	push   DWORD PTR [esp+0x50]
+ 1003c74:	ff 74 24 54          	push   DWORD PTR [esp+0x54]
+ 1003c78:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1003c7c:	68 d4 8e 00 01       	push   0x1008ed4
+ 1003c81:	6a 40                	push   0x40
+ 1003c83:	e8 0b e9 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:110
+        dir++;
+        dirEntryNumber++;
+ 1003c88:	83 c5 01             	add    ebp,0x1
+ 1003c8b:	83 c4 20             	add    esp,0x20
+/home/yogi/src/os/chrisOSKernel/src/paging.c:103
+                }
+                //If we found enough entries which aren't in use, bail out of the FOR
+                if (foundEntryCount==pagesToFind)
+                {
+                    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found available page entries at entry 0x%08X\n",foundPageTableEntry);
+                    found=true;
+ 1003c8e:	c6 44 24 17 01       	mov    BYTE PTR [esp+0x17],0x1
+ 1003c93:	eb 46                	jmp    1003cdb <pagingFindAvailableAddressToMapTo+0x1f3>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:77 (discriminator 2)
+        
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found PDE=0x%08X (0x%08X)\n",currentPDE,*currentPDE);
+        
+        //Find sequential table entries large enough to hold the requested amount of memory
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding free page table entries\n");
+        for (int cnt=0;cnt<(PAGE_SIZE/4)-1;cnt++)
+ 1003c95:	83 c3 01             	add    ebx,0x1
+ 1003c98:	81 fb ff 03 00 00    	cmp    ebx,0x3ff
+ 1003c9e:	0f 85 6f ff ff ff    	jne    1003c13 <pagingFindAvailableAddressToMapTo+0x12b>
+ 1003ca4:	8b 6c 24 0c          	mov    ebp,DWORD PTR [esp+0xc]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:108
+                    found=true;
+                    break;
+                }
+            }
+        }
+        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Not enough pages at dir entry 0x%08X (%u-%u)\n",currentPDE,foundEntryCount,pagesToFind);
+ 1003ca8:	83 ec 0c             	sub    esp,0xc
+ 1003cab:	ff 74 24 50          	push   DWORD PTR [esp+0x50]
+ 1003caf:	57                   	push   edi
+ 1003cb0:	8b 7c 24 1c          	mov    edi,DWORD PTR [esp+0x1c]
+ 1003cb4:	57                   	push   edi
+ 1003cb5:	68 d4 8e 00 01       	push   0x1008ed4
+ 1003cba:	6a 40                	push   0x40
+ 1003cbc:	e8 d2 e8 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:109
+        dir++;
+ 1003cc1:	8d 5f 04             	lea    ebx,[edi+0x4]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:110
+        dirEntryNumber++;
+ 1003cc4:	83 c5 01             	add    ebp,0x1
+/home/yogi/src/os/chrisOSKernel/src/paging.c:111
+    } while ( !found && currentPDE<lastPDE);
+ 1003cc7:	83 c4 20             	add    esp,0x20
+ 1003cca:	3b 7c 24 10          	cmp    edi,DWORD PTR [esp+0x10]
+ 1003cce:	0f 92 c0             	setb   al
+ 1003cd1:	38 44 24 17          	cmp    BYTE PTR [esp+0x17],al
+ 1003cd5:	0f 82 55 fe ff ff    	jb     1003b30 <pagingFindAvailableAddressToMapTo+0x48>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:113
+    
+    if (!found)
+ 1003cdb:	80 7c 24 17 00       	cmp    BYTE PTR [esp+0x17],0x0
+ 1003ce0:	75 1f                	jne    1003d01 <pagingFindAvailableAddressToMapTo+0x219>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:114
+        panic("pagingFindAvailablePageTable: Could not find a free PTE, PDE=0x%08X\n",pageDirAddress);
+ 1003ce2:	83 ec 08             	sub    esp,0x8
+ 1003ce5:	ff 74 24 48          	push   DWORD PTR [esp+0x48]
+ 1003ce9:	68 20 8f 00 01       	push   0x1008f20
+ 1003cee:	e8 01 e4 ff ff       	call   10020f4 <panic>
+ 1003cf3:	83 c4 10             	add    esp,0x10
+ 1003cf6:	eb 09                	jmp    1003d01 <pagingFindAvailableAddressToMapTo+0x219>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:61
+        {
+            dir=(uint32_t*)pageDirAddress;
+            *dir=(uint32_t)allocPages(PAGE_SIZE);
+            *dir &= 0xFFFFF000;
+            *dir |= 0x7;
+            dirEntryNumber=0;
+ 1003cf8:	89 5c 24 08          	mov    DWORD PTR [esp+0x8],ebx
+ 1003cfc:	e9 c3 fe ff ff       	jmp    1003bc4 <pagingFindAvailableAddressToMapTo+0xdc>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:116
+    } while ( !found && currentPDE<lastPDE);
+    
+    if (!found)
+        panic("pagingFindAvailablePageTable: Could not find a free PTE, PDE=0x%08X\n",pageDirAddress);
+
+    printd(DEBUG_PAGING,"dirEntryNumber=0x%08X, foundPageTableEntry=0x%08X\n",dirEntryNumber,foundPageTableEntryNum);
+ 1003d01:	8b 7c 24 04          	mov    edi,DWORD PTR [esp+0x4]
+ 1003d05:	57                   	push   edi
+ 1003d06:	55                   	push   ebp
+ 1003d07:	68 68 8f 00 01       	push   0x1008f68
+ 1003d0c:	6a 40                	push   0x40
+ 1003d0e:	e8 80 e8 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:117
+    lRetVal=(uint32_t)((dirEntryNumber*0x400000) + (foundPageTableEntryNum*4096));
+ 1003d13:	89 eb                	mov    ebx,ebp
+ 1003d15:	c1 e3 16             	shl    ebx,0x16
+ 1003d18:	89 f8                	mov    eax,edi
+ 1003d1a:	c1 e0 0c             	shl    eax,0xc
+ 1003d1d:	01 c3                	add    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:118
+    printd(DEBUG_PAGING,"Found page directory entry 0x%08X, starting page entry 0x%08X\n",currentPDE,foundPageTableEntry);
+ 1003d1f:	ff 74 24 10          	push   DWORD PTR [esp+0x10]
+ 1003d23:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1003d27:	68 9c 8f 00 01       	push   0x1008f9c
+ 1003d2c:	6a 40                	push   0x40
+ 1003d2e:	e8 60 e8 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:119
+    printd(DEBUG_PAGING,"\tfor 0x%08X bytes of memory starting at address 0x%08X\n",pagesToFind*PAGE_SIZE,lRetVal);
+ 1003d33:	83 c4 20             	add    esp,0x20
+ 1003d36:	53                   	push   ebx
+ 1003d37:	8b 44 24 48          	mov    eax,DWORD PTR [esp+0x48]
+ 1003d3b:	c1 e0 0c             	shl    eax,0xc
+ 1003d3e:	50                   	push   eax
+ 1003d3f:	68 dc 8f 00 01       	push   0x1008fdc
+ 1003d44:	6a 40                	push   0x40
+ 1003d46:	e8 48 e8 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:121
+    return lRetVal;
+}
+ 1003d4b:	89 d8                	mov    eax,ebx
+ 1003d4d:	83 c4 3c             	add    esp,0x3c
+ 1003d50:	5b                   	pop    ebx
+ 1003d51:	5e                   	pop    esi
+ 1003d52:	5f                   	pop    edi
+ 1003d53:	5d                   	pop    ebp
+ 1003d54:	c3                   	ret    
+
+01003d55 <pagingAllocatePagingTablePage>:
 pagingAllocatePagingTablePage():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:23
-
-#define PAGE_SIZE 0x1000
+/home/yogi/src/os/chrisOSKernel/src/paging.c:125
 
 uint32_t pagingAllocatePagingTablePage()
 {
     uint32_t lRetVal = kKernelPoolMemoryAddress;
- 100389c:	a1 58 3a 01 01       	mov    eax,ds:0x1013a58
-/home/yogi/src/os/chrisOSKernel/src/paging.c:24
+ 1003d55:	a1 64 4a 01 01       	mov    eax,ds:0x1014a64
+/home/yogi/src/os/chrisOSKernel/src/paging.c:126
     kKernelPoolMemoryAddress+=0x1000;
- 10038a1:	8d 90 00 10 00 00    	lea    edx,[eax+0x1000]
- 10038a7:	89 15 58 3a 01 01    	mov    DWORD PTR ds:0x1013a58,edx
-/home/yogi/src/os/chrisOSKernel/src/paging.c:26
+ 1003d5a:	8d 90 00 10 00 00    	lea    edx,[eax+0x1000]
+ 1003d60:	89 15 64 4a 01 01    	mov    DWORD PTR ds:0x1014a64,edx
+/home/yogi/src/os/chrisOSKernel/src/paging.c:128
     return lRetVal;
 }
- 10038ad:	c3                   	ret    
+ 1003d66:	c3                   	ret    
 
-010038ae <pagingGet4kPDEntryValue>:
+01003d67 <pagingGet4kPDEntryValue>:
 pagingGet4kPDEntryValue():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:29
+/home/yogi/src/os/chrisOSKernel/src/paging.c:131
 
 uint32_t pagingGet4kPDEntryValue(uintptr_t pageDirAddress, uint32_t address)
 {
- 10038ae:	53                   	push   ebx
- 10038af:	83 ec 0c             	sub    esp,0xc
-/home/yogi/src/os/chrisOSKernel/src/paging.c:31
+ 1003d67:	53                   	push   ebx
+ 1003d68:	83 ec 0c             	sub    esp,0xc
+/home/yogi/src/os/chrisOSKernel/src/paging.c:133
     address&=0xFFFFF000;
     uintptr_t* lTemp=(uint32_t*)((pageDirAddress + (((address & 0xFFC00000) >> 22) << 2)));
- 10038b2:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
- 10038b6:	c1 eb 16             	shr    ebx,0x16
- 10038b9:	c1 e3 02             	shl    ebx,0x2
- 10038bc:	03 5c 24 14          	add    ebx,DWORD PTR [esp+0x14]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:32
+ 1003d6b:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
+ 1003d6f:	c1 eb 16             	shr    ebx,0x16
+ 1003d72:	c1 e3 02             	shl    ebx,0x2
+ 1003d75:	03 5c 24 14          	add    ebx,DWORD PTR [esp+0x14]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:134
     printd(DEBUG_PAGING,"pagingGet4kPDEntryValue: dirAddressPtr=0x%08x\n", *lTemp);
- 10038c0:	ff 33                	push   DWORD PTR [ebx]
- 10038c2:	68 14 7b 00 01       	push   0x1007b14
- 10038c7:	6a 40                	push   0x40
- 10038c9:	e8 c1 ec ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:33
+ 1003d79:	ff 33                	push   DWORD PTR [ebx]
+ 1003d7b:	68 0c 7e 00 01       	push   0x1007e0c
+ 1003d80:	6a 40                	push   0x40
+ 1003d82:	e8 0c e8 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:135
     return (uint32_t)*lTemp;
- 10038ce:	8b 03                	mov    eax,DWORD PTR [ebx]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:34
+ 1003d87:	8b 03                	mov    eax,DWORD PTR [ebx]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:136
 }
- 10038d0:	83 c4 18             	add    esp,0x18
- 10038d3:	5b                   	pop    ebx
- 10038d4:	c3                   	ret    
+ 1003d89:	83 c4 18             	add    esp,0x18
+ 1003d8c:	5b                   	pop    ebx
+ 1003d8d:	c3                   	ret    
 
-010038d5 <pagingGet4kPDEntryAddress>:
+01003d8e <pagingGet4kPDEntryAddress>:
 pagingGet4kPDEntryAddress():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:37
+/home/yogi/src/os/chrisOSKernel/src/paging.c:139
 
 uint32_t pagingGet4kPDEntryAddress(uintptr_t pageDirAddress, uint32_t address)
 {
- 10038d5:	53                   	push   ebx
- 10038d6:	83 ec 0c             	sub    esp,0xc
-/home/yogi/src/os/chrisOSKernel/src/paging.c:39
+ 1003d8e:	53                   	push   ebx
+ 1003d8f:	83 ec 0c             	sub    esp,0xc
+/home/yogi/src/os/chrisOSKernel/src/paging.c:141
     address&=0xFFFFF000;
     uintptr_t lTemp=((pageDirAddress  | (((address & 0xFFC00000) >> 22) << 2)));
- 10038d9:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
- 10038dd:	c1 eb 16             	shr    ebx,0x16
- 10038e0:	c1 e3 02             	shl    ebx,0x2
- 10038e3:	0b 5c 24 14          	or     ebx,DWORD PTR [esp+0x14]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:40
-    printd(DEBUG_PAGING,"dirEntryAddress=0x%08x\n", lTemp);
- 10038e7:	53                   	push   ebx
- 10038e8:	68 1e 74 00 01       	push   0x100741e
- 10038ed:	6a 40                	push   0x40
- 10038ef:	e8 9b ec ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:42
+ 1003d92:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
+ 1003d96:	c1 eb 16             	shr    ebx,0x16
+ 1003d99:	c1 e3 02             	shl    ebx,0x2
+ 1003d9c:	0b 5c 24 14          	or     ebx,DWORD PTR [esp+0x14]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:142
+    printd(DEBUG_PAGING,"pagingGet4kPDEntryAddress: dirEntryAddress=0x%08x\n", lTemp);
+ 1003da0:	53                   	push   ebx
+ 1003da1:	68 14 90 00 01       	push   0x1009014
+ 1003da6:	6a 40                	push   0x40
+ 1003da8:	e8 e6 e7 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:144
     return (uint32_t)lTemp & 0xFFFFFFFF;
 }
- 10038f4:	89 d8                	mov    eax,ebx
- 10038f6:	83 c4 18             	add    esp,0x18
- 10038f9:	5b                   	pop    ebx
- 10038fa:	c3                   	ret    
+ 1003dad:	89 d8                	mov    eax,ebx
+ 1003daf:	83 c4 18             	add    esp,0x18
+ 1003db2:	5b                   	pop    ebx
+ 1003db3:	c3                   	ret    
 
-010038fb <pagingGet4kPTEntryAddress>:
+01003db4 <pagingGet4kPTEntryAddress>:
 pagingGet4kPTEntryAddress():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:45
+/home/yogi/src/os/chrisOSKernel/src/paging.c:147
 
 uint32_t pagingGet4kPTEntryAddress(uintptr_t pageDirAddress, uint32_t address)
 {
- 10038fb:	53                   	push   ebx
- 10038fc:	83 ec 10             	sub    esp,0x10
- 10038ff:	8b 5c 24 1c          	mov    ebx,DWORD PTR [esp+0x1c]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:47
+ 1003db4:	53                   	push   ebx
+ 1003db5:	83 ec 10             	sub    esp,0x10
+ 1003db8:	8b 5c 24 1c          	mov    ebx,DWORD PTR [esp+0x1c]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:149
     address&=0xFFFFF000;
     uintptr_t pDirPtr=pagingGet4kPDEntryValue(pageDirAddress,address) & 0xFFFFF000;
- 1003903:	89 d8                	mov    eax,ebx
- 1003905:	25 00 f0 ff ff       	and    eax,0xfffff000
- 100390a:	50                   	push   eax
- 100390b:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
- 100390f:	e8 9a ff ff ff       	call   10038ae <pagingGet4kPDEntryValue>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:48
+ 1003dbc:	89 d8                	mov    eax,ebx
+ 1003dbe:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 1003dc3:	50                   	push   eax
+ 1003dc4:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1003dc8:	e8 9a ff ff ff       	call   1003d67 <pagingGet4kPDEntryValue>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:150
     return ((address & 0x3FF000) >> 12) << 2 | pDirPtr;
- 1003914:	81 e3 00 f0 3f 00    	and    ebx,0x3ff000
- 100391a:	c1 eb 0a             	shr    ebx,0xa
- 100391d:	25 00 f0 ff ff       	and    eax,0xfffff000
- 1003922:	09 d8                	or     eax,ebx
-/home/yogi/src/os/chrisOSKernel/src/paging.c:49
+ 1003dcd:	81 e3 00 f0 3f 00    	and    ebx,0x3ff000
+ 1003dd3:	c1 eb 0a             	shr    ebx,0xa
+ 1003dd6:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 1003ddb:	09 d8                	or     eax,ebx
+/home/yogi/src/os/chrisOSKernel/src/paging.c:151
 }
- 1003924:	83 c4 18             	add    esp,0x18
- 1003927:	5b                   	pop    ebx
- 1003928:	c3                   	ret    
+ 1003ddd:	83 c4 18             	add    esp,0x18
+ 1003de0:	5b                   	pop    ebx
+ 1003de1:	c3                   	ret    
 
-01003929 <pagingGet4kPTEntryValue>:
+01003de2 <pagingGet4kPTEntryValue>:
 pagingGet4kPTEntryValue():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:52
+/home/yogi/src/os/chrisOSKernel/src/paging.c:154
 
 uint32_t pagingGet4kPTEntryValue(uintptr_t pageDirAddress, uint32_t address)
 {
- 1003929:	53                   	push   ebx
- 100392a:	83 ec 10             	sub    esp,0x10
-/home/yogi/src/os/chrisOSKernel/src/paging.c:54
+ 1003de2:	53                   	push   ebx
+ 1003de3:	83 ec 10             	sub    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/paging.c:156
     address&=0xFFFFF000;
     uint32_t* pTablePtr=(uint32_t*)pagingGet4kPTEntryAddress(pageDirAddress,address);
- 100392d:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
- 1003931:	25 00 f0 ff ff       	and    eax,0xfffff000
- 1003936:	50                   	push   eax
- 1003937:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
- 100393b:	e8 bb ff ff ff       	call   10038fb <pagingGet4kPTEntryAddress>
- 1003940:	89 c3                	mov    ebx,eax
-/home/yogi/src/os/chrisOSKernel/src/paging.c:55
+ 1003de6:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
+ 1003dea:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 1003def:	50                   	push   eax
+ 1003df0:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1003df4:	e8 bb ff ff ff       	call   1003db4 <pagingGet4kPTEntryAddress>
+ 1003df9:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:157
     printd(DEBUG_PAGING,"pagingGet4kPTEntryValue: pageEntryAddress=0x%08X\n", pTablePtr);
- 1003942:	83 c4 0c             	add    esp,0xc
- 1003945:	50                   	push   eax
- 1003946:	68 44 7b 00 01       	push   0x1007b44
- 100394b:	6a 40                	push   0x40
- 100394d:	e8 3d ec ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:56
+ 1003dfb:	83 c4 0c             	add    esp,0xc
+ 1003dfe:	50                   	push   eax
+ 1003dff:	68 3c 7e 00 01       	push   0x1007e3c
+ 1003e04:	6a 40                	push   0x40
+ 1003e06:	e8 88 e7 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:158
     return *pTablePtr;
- 1003952:	8b 03                	mov    eax,DWORD PTR [ebx]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:57
+ 1003e0b:	8b 03                	mov    eax,DWORD PTR [ebx]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:159
 }
- 1003954:	83 c4 18             	add    esp,0x18
- 1003957:	5b                   	pop    ebx
- 1003958:	c3                   	ret    
+ 1003e0d:	83 c4 18             	add    esp,0x18
+ 1003e10:	5b                   	pop    ebx
+ 1003e11:	c3                   	ret    
 
-01003959 <pagingSetPageReadOnlyFlag>:
+01003e12 <pagingSetPageReadOnlyFlag>:
 pagingSetPageReadOnlyFlag():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:60
+/home/yogi/src/os/chrisOSKernel/src/paging.c:162
 
 void pagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
 {
- 1003959:	56                   	push   esi
- 100395a:	53                   	push   ebx
- 100395b:	83 ec 04             	sub    esp,0x4
- 100395e:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
- 1003962:	8b 74 24 14          	mov    esi,DWORD PTR [esp+0x14]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:61
+ 1003e12:	56                   	push   esi
+ 1003e13:	53                   	push   ebx
+ 1003e14:	83 ec 04             	sub    esp,0x4
+ 1003e17:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
+ 1003e1b:	8b 74 24 14          	mov    esi,DWORD PTR [esp+0x14]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:163
     printd(DEBUG_PAGING,"pagingMakePageReadOnly: 0x%08X - before/after: 0x%08X/", ptEntry, *ptEntry);
- 1003966:	ff 33                	push   DWORD PTR [ebx]
- 1003968:	53                   	push   ebx
- 1003969:	68 78 7b 00 01       	push   0x1007b78
- 100396e:	6a 40                	push   0x40
- 1003970:	e8 1a ec ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:62
+ 1003e1f:	ff 33                	push   DWORD PTR [ebx]
+ 1003e21:	53                   	push   ebx
+ 1003e22:	68 70 7e 00 01       	push   0x1007e70
+ 1003e27:	6a 40                	push   0x40
+ 1003e29:	e8 65 e7 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:164
     if (readOnly)
- 1003975:	83 c4 10             	add    esp,0x10
- 1003978:	89 f0                	mov    eax,esi
- 100397a:	84 c0                	test   al,al
- 100397c:	74 05                	je     1003983 <pagingSetPageReadOnlyFlag+0x2a>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:63
+ 1003e2e:	83 c4 10             	add    esp,0x10
+ 1003e31:	89 f0                	mov    eax,esi
+ 1003e33:	84 c0                	test   al,al
+ 1003e35:	74 05                	je     1003e3c <pagingSetPageReadOnlyFlag+0x2a>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:165
        *ptEntry&=0xFFFFFFFD;
- 100397e:	83 23 fd             	and    DWORD PTR [ebx],0xfffffffd
- 1003981:	eb 03                	jmp    1003986 <pagingSetPageReadOnlyFlag+0x2d>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:65
+ 1003e37:	83 23 fd             	and    DWORD PTR [ebx],0xfffffffd
+ 1003e3a:	eb 03                	jmp    1003e3f <pagingSetPageReadOnlyFlag+0x2d>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:167
     else
        *ptEntry|=2; 
- 1003983:	83 0b 02             	or     DWORD PTR [ebx],0x2
-/home/yogi/src/os/chrisOSKernel/src/paging.c:66
+ 1003e3c:	83 0b 02             	or     DWORD PTR [ebx],0x2
+/home/yogi/src/os/chrisOSKernel/src/paging.c:168
     RELOAD_CR3
- 1003986:	0f 20 d8             	mov    eax,cr3
- 1003989:	0f 22 d8             	mov    cr3,eax
-/home/yogi/src/os/chrisOSKernel/src/paging.c:67
+ 1003e3f:	0f 20 d8             	mov    eax,cr3
+ 1003e42:	0f 22 d8             	mov    cr3,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:169
     printd(DEBUG_PAGING,"0x%08X\n", *ptEntry);
- 100398c:	83 ec 04             	sub    esp,0x4
- 100398f:	ff 33                	push   DWORD PTR [ebx]
- 1003991:	68 66 77 00 01       	push   0x1007766
- 1003996:	6a 40                	push   0x40
- 1003998:	e8 f2 eb ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:68
+ 1003e45:	83 ec 04             	sub    esp,0x4
+ 1003e48:	ff 33                	push   DWORD PTR [ebx]
+ 1003e4a:	68 8d 7a 00 01       	push   0x1007a8d
+ 1003e4f:	6a 40                	push   0x40
+ 1003e51:	e8 3d e7 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:170
 }
- 100399d:	83 c4 14             	add    esp,0x14
- 10039a0:	5b                   	pop    ebx
- 10039a1:	5e                   	pop    esi
- 10039a2:	c3                   	ret    
+ 1003e56:	83 c4 14             	add    esp,0x14
+ 1003e59:	5b                   	pop    ebx
+ 1003e5a:	5e                   	pop    esi
+ 1003e5b:	c3                   	ret    
 
-010039a3 <pagingUpdatePTEPresentFlag>:
+01003e5c <pagingUpdatePTEPresentFlag>:
 pagingUpdatePTEPresentFlag():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:71
+/home/yogi/src/os/chrisOSKernel/src/paging.c:173
 
 void pagingUpdatePTEPresentFlag(uintptr_t* ptEntry, bool present)
 {
- 10039a3:	56                   	push   esi
- 10039a4:	53                   	push   ebx
- 10039a5:	83 ec 04             	sub    esp,0x4
- 10039a8:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
- 10039ac:	8b 74 24 14          	mov    esi,DWORD PTR [esp+0x14]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:72
+ 1003e5c:	56                   	push   esi
+ 1003e5d:	53                   	push   ebx
+ 1003e5e:	83 ec 04             	sub    esp,0x4
+ 1003e61:	8b 5c 24 10          	mov    ebx,DWORD PTR [esp+0x10]
+ 1003e65:	8b 74 24 14          	mov    esi,DWORD PTR [esp+0x14]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:174
          printd(DEBUG_PAGING,"pagingUpdatePTEPresentFlag: 0x%08X - before/after: 0x%08X/", ptEntry, *ptEntry);
- 10039b0:	ff 33                	push   DWORD PTR [ebx]
- 10039b2:	53                   	push   ebx
- 10039b3:	68 b0 7b 00 01       	push   0x1007bb0
- 10039b8:	6a 40                	push   0x40
- 10039ba:	e8 d0 eb ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:73
+ 1003e69:	ff 33                	push   DWORD PTR [ebx]
+ 1003e6b:	53                   	push   ebx
+ 1003e6c:	68 a8 7e 00 01       	push   0x1007ea8
+ 1003e71:	6a 40                	push   0x40
+ 1003e73:	e8 1b e7 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:175
          if (present)
- 10039bf:	83 c4 10             	add    esp,0x10
- 10039c2:	89 f0                	mov    eax,esi
- 10039c4:	84 c0                	test   al,al
- 10039c6:	74 05                	je     10039cd <pagingUpdatePTEPresentFlag+0x2a>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:74
+ 1003e78:	83 c4 10             	add    esp,0x10
+ 1003e7b:	89 f0                	mov    eax,esi
+ 1003e7d:	84 c0                	test   al,al
+ 1003e7f:	74 05                	je     1003e86 <pagingUpdatePTEPresentFlag+0x2a>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:176
              *ptEntry=*ptEntry | 1;
- 10039c8:	83 0b 01             	or     DWORD PTR [ebx],0x1
- 10039cb:	eb 03                	jmp    10039d0 <pagingUpdatePTEPresentFlag+0x2d>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:76
+ 1003e81:	83 0b 01             	or     DWORD PTR [ebx],0x1
+ 1003e84:	eb 03                	jmp    1003e89 <pagingUpdatePTEPresentFlag+0x2d>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:178
          else
              *ptEntry&=0xFFFFFFFE;
- 10039cd:	83 23 fe             	and    DWORD PTR [ebx],0xfffffffe
-/home/yogi/src/os/chrisOSKernel/src/paging.c:77
+ 1003e86:	83 23 fe             	and    DWORD PTR [ebx],0xfffffffe
+/home/yogi/src/os/chrisOSKernel/src/paging.c:179
          __asm__("mov eax,cr3\nmov cr3,eax\n":::"eax");
- 10039d0:	0f 20 d8             	mov    eax,cr3
- 10039d3:	0f 22 d8             	mov    cr3,eax
-/home/yogi/src/os/chrisOSKernel/src/paging.c:78
+ 1003e89:	0f 20 d8             	mov    eax,cr3
+ 1003e8c:	0f 22 d8             	mov    cr3,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:180
          printd(DEBUG_PAGING,"0x%08X\n", *ptEntry);
- 10039d6:	83 ec 04             	sub    esp,0x4
- 10039d9:	ff 33                	push   DWORD PTR [ebx]
- 10039db:	68 66 77 00 01       	push   0x1007766
- 10039e0:	6a 40                	push   0x40
- 10039e2:	e8 a8 eb ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:79
+ 1003e8f:	83 ec 04             	sub    esp,0x4
+ 1003e92:	ff 33                	push   DWORD PTR [ebx]
+ 1003e94:	68 8d 7a 00 01       	push   0x1007a8d
+ 1003e99:	6a 40                	push   0x40
+ 1003e9b:	e8 f3 e6 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:181
 }
- 10039e7:	83 c4 14             	add    esp,0x14
- 10039ea:	5b                   	pop    ebx
- 10039eb:	5e                   	pop    esi
- 10039ec:	c3                   	ret    
+ 1003ea0:	83 c4 14             	add    esp,0x14
+ 1003ea3:	5b                   	pop    ebx
+ 1003ea4:	5e                   	pop    esi
+ 1003ea5:	c3                   	ret    
 
-010039ed <pagingSetVirtualRangeRO>:
+01003ea6 <pagingSetVirtualRangeRO>:
 pagingSetVirtualRangeRO():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:82
+/home/yogi/src/os/chrisOSKernel/src/paging.c:184
 
 void pagingSetVirtualRangeRO(uintptr_t pageDirAddress, uint32_t startAddy, uint32_t endAddy, bool readOnly)
 {
- 10039ed:	55                   	push   ebp
- 10039ee:	57                   	push   edi
- 10039ef:	56                   	push   esi
- 10039f0:	53                   	push   ebx
- 10039f1:	83 ec 1c             	sub    esp,0x1c
- 10039f4:	8b 5c 24 34          	mov    ebx,DWORD PTR [esp+0x34]
- 10039f8:	8b 7c 24 38          	mov    edi,DWORD PTR [esp+0x38]
- 10039fc:	8b 74 24 3c          	mov    esi,DWORD PTR [esp+0x3c]
- 1003a00:	89 f0                	mov    eax,esi
- 1003a02:	88 44 24 0f          	mov    BYTE PTR [esp+0xf],al
-/home/yogi/src/os/chrisOSKernel/src/paging.c:84
+ 1003ea6:	55                   	push   ebp
+ 1003ea7:	57                   	push   edi
+ 1003ea8:	56                   	push   esi
+ 1003ea9:	53                   	push   ebx
+ 1003eaa:	83 ec 1c             	sub    esp,0x1c
+ 1003ead:	8b 5c 24 34          	mov    ebx,DWORD PTR [esp+0x34]
+ 1003eb1:	8b 7c 24 38          	mov    edi,DWORD PTR [esp+0x38]
+ 1003eb5:	8b 74 24 3c          	mov    esi,DWORD PTR [esp+0x3c]
+ 1003eb9:	89 f0                	mov    eax,esi
+ 1003ebb:	88 44 24 0f          	mov    BYTE PTR [esp+0xf],al
+/home/yogi/src/os/chrisOSKernel/src/paging.c:186
     uintptr_t* startPTE;
     printd(DEBUG_PAGING,"kMakeVirtualRangeRO: Make 0x%08X-0x%08X r/o\n", startAddy, endAddy);
- 1003a06:	57                   	push   edi
- 1003a07:	53                   	push   ebx
- 1003a08:	68 ec 7b 00 01       	push   0x1007bec
- 1003a0d:	6a 40                	push   0x40
- 1003a0f:	e8 7b eb ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:85
+ 1003ebf:	57                   	push   edi
+ 1003ec0:	53                   	push   ebx
+ 1003ec1:	68 e4 7e 00 01       	push   0x1007ee4
+ 1003ec6:	6a 40                	push   0x40
+ 1003ec8:	e8 c6 e6 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:187
     for (uint32_t cnt=(startAddy);cnt<=(endAddy)+1;cnt+=0x1000)
- 1003a14:	8d 4f 01             	lea    ecx,[edi+0x1]
- 1003a17:	89 4c 24 18          	mov    DWORD PTR [esp+0x18],ecx
- 1003a1b:	83 c4 10             	add    esp,0x10
- 1003a1e:	39 cb                	cmp    ebx,ecx
- 1003a20:	77 4f                	ja     1003a71 <pagingSetVirtualRangeRO+0x84>
- 1003a22:	89 f2                	mov    edx,esi
- 1003a24:	84 d2                	test   dl,dl
- 1003a26:	b8 39 74 00 01       	mov    eax,0x1007439
- 1003a2b:	bd 36 74 00 01       	mov    ebp,0x1007436
- 1003a30:	0f 44 e8             	cmove  ebp,eax
-/home/yogi/src/os/chrisOSKernel/src/paging.c:89
+ 1003ecd:	8d 4f 01             	lea    ecx,[edi+0x1]
+ 1003ed0:	89 4c 24 18          	mov    DWORD PTR [esp+0x18],ecx
+ 1003ed4:	83 c4 10             	add    esp,0x10
+ 1003ed7:	39 cb                	cmp    ebx,ecx
+ 1003ed9:	77 4f                	ja     1003f2a <pagingSetVirtualRangeRO+0x84>
+ 1003edb:	89 f2                	mov    edx,esi
+ 1003edd:	84 d2                	test   dl,dl
+ 1003edf:	b8 35 77 00 01       	mov    eax,0x1007735
+ 1003ee4:	bd 32 77 00 01       	mov    ebp,0x1007732
+ 1003ee9:	0f 44 e8             	cmove  ebp,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:191
     {
         startPTE=(uintptr_t*)pagingGet4kPTEntryAddress(pageDirAddress,cnt);
         printd(DEBUG_PAGING,"0x%08X (0x%08X) %s --> ", cnt, startPTE, readOnly?"ro":"rw");
         kPagingSetPageReadOnlyFlag(startPTE++, readOnly);
- 1003a33:	0f b6 7c 24 0f       	movzx  edi,BYTE PTR [esp+0xf]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:87
+ 1003eec:	0f b6 7c 24 0f       	movzx  edi,BYTE PTR [esp+0xf]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:189
 {
     uintptr_t* startPTE;
     printd(DEBUG_PAGING,"kMakeVirtualRangeRO: Make 0x%08X-0x%08X r/o\n", startAddy, endAddy);
     for (uint32_t cnt=(startAddy);cnt<=(endAddy)+1;cnt+=0x1000)
     {
         startPTE=(uintptr_t*)pagingGet4kPTEntryAddress(pageDirAddress,cnt);
- 1003a38:	83 ec 08             	sub    esp,0x8
- 1003a3b:	53                   	push   ebx
- 1003a3c:	ff 74 24 3c          	push   DWORD PTR [esp+0x3c]
- 1003a40:	e8 b6 fe ff ff       	call   10038fb <pagingGet4kPTEntryAddress>
- 1003a45:	89 c6                	mov    esi,eax
-/home/yogi/src/os/chrisOSKernel/src/paging.c:88
+ 1003ef1:	83 ec 08             	sub    esp,0x8
+ 1003ef4:	53                   	push   ebx
+ 1003ef5:	ff 74 24 3c          	push   DWORD PTR [esp+0x3c]
+ 1003ef9:	e8 b6 fe ff ff       	call   1003db4 <pagingGet4kPTEntryAddress>
+ 1003efe:	89 c6                	mov    esi,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:190
         printd(DEBUG_PAGING,"0x%08X (0x%08X) %s --> ", cnt, startPTE, readOnly?"ro":"rw");
- 1003a47:	89 2c 24             	mov    DWORD PTR [esp],ebp
- 1003a4a:	50                   	push   eax
- 1003a4b:	53                   	push   ebx
- 1003a4c:	68 3c 74 00 01       	push   0x100743c
- 1003a51:	6a 40                	push   0x40
- 1003a53:	e8 37 eb ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:89
+ 1003f00:	89 2c 24             	mov    DWORD PTR [esp],ebp
+ 1003f03:	50                   	push   eax
+ 1003f04:	53                   	push   ebx
+ 1003f05:	68 38 77 00 01       	push   0x1007738
+ 1003f0a:	6a 40                	push   0x40
+ 1003f0c:	e8 82 e6 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:191
         kPagingSetPageReadOnlyFlag(startPTE++, readOnly);
- 1003a58:	83 c4 18             	add    esp,0x18
- 1003a5b:	57                   	push   edi
- 1003a5c:	56                   	push   esi
- 1003a5d:	e8 69 d8 ff ff       	call   10012cb <kPagingSetPageReadOnlyFlag>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:85
+ 1003f11:	83 c4 18             	add    esp,0x18
+ 1003f14:	57                   	push   edi
+ 1003f15:	56                   	push   esi
+ 1003f16:	e8 b0 d3 ff ff       	call   10012cb <kPagingSetPageReadOnlyFlag>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:187
 
 void pagingSetVirtualRangeRO(uintptr_t pageDirAddress, uint32_t startAddy, uint32_t endAddy, bool readOnly)
 {
     uintptr_t* startPTE;
     printd(DEBUG_PAGING,"kMakeVirtualRangeRO: Make 0x%08X-0x%08X r/o\n", startAddy, endAddy);
     for (uint32_t cnt=(startAddy);cnt<=(endAddy)+1;cnt+=0x1000)
- 1003a62:	81 c3 00 10 00 00    	add    ebx,0x1000
- 1003a68:	83 c4 10             	add    esp,0x10
- 1003a6b:	3b 5c 24 08          	cmp    ebx,DWORD PTR [esp+0x8]
- 1003a6f:	76 c7                	jbe    1003a38 <pagingSetVirtualRangeRO+0x4b>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:92
+ 1003f1b:	81 c3 00 10 00 00    	add    ebx,0x1000
+ 1003f21:	83 c4 10             	add    esp,0x10
+ 1003f24:	3b 5c 24 08          	cmp    ebx,DWORD PTR [esp+0x8]
+ 1003f28:	76 c7                	jbe    1003ef1 <pagingSetVirtualRangeRO+0x4b>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:194
         startPTE=(uintptr_t*)pagingGet4kPTEntryAddress(pageDirAddress,cnt);
         printd(DEBUG_PAGING,"0x%08X (0x%08X) %s --> ", cnt, startPTE, readOnly?"ro":"rw");
         kPagingSetPageReadOnlyFlag(startPTE++, readOnly);
             
     }
 }
- 1003a71:	83 c4 1c             	add    esp,0x1c
- 1003a74:	5b                   	pop    ebx
- 1003a75:	5e                   	pop    esi
- 1003a76:	5f                   	pop    edi
- 1003a77:	5d                   	pop    ebp
- 1003a78:	c3                   	ret    
+ 1003f2a:	83 c4 1c             	add    esp,0x1c
+ 1003f2d:	5b                   	pop    ebx
+ 1003f2e:	5e                   	pop    esi
+ 1003f2f:	5f                   	pop    edi
+ 1003f30:	5d                   	pop    ebp
+ 1003f31:	c3                   	ret    
 
-01003a79 <pagingUpdatePresentFlagA>:
+01003f32 <pagingUpdatePresentFlagA>:
 pagingUpdatePresentFlagA():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:96
+/home/yogi/src/os/chrisOSKernel/src/paging.c:198
 
 //Absolute version, page passed is already virtual
 void pagingUpdatePresentFlagA(uintptr_t pageDirAddress, uint32_t address, bool present)
 {
- 1003a79:	56                   	push   esi
- 1003a7a:	53                   	push   ebx
- 1003a7b:	83 ec 04             	sub    esp,0x4
- 1003a7e:	8b 74 24 14          	mov    esi,DWORD PTR [esp+0x14]
- 1003a82:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:97
+ 1003f32:	56                   	push   esi
+ 1003f33:	53                   	push   ebx
+ 1003f34:	83 ec 04             	sub    esp,0x4
+ 1003f37:	8b 74 24 14          	mov    esi,DWORD PTR [esp+0x14]
+ 1003f3b:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:199
     printd(DEBUG_PAGING,"kpagingUpdatePresentFlagA: Make 0x%08X %s\n", address, present?"present":"not present");
- 1003a86:	84 db                	test   bl,bl
- 1003a88:	ba 54 74 00 01       	mov    edx,0x1007454
- 1003a8d:	b8 58 74 00 01       	mov    eax,0x1007458
- 1003a92:	0f 44 c2             	cmove  eax,edx
- 1003a95:	50                   	push   eax
- 1003a96:	56                   	push   esi
- 1003a97:	68 1c 7c 00 01       	push   0x1007c1c
- 1003a9c:	6a 40                	push   0x40
- 1003a9e:	e8 ec ea ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:98
+ 1003f3f:	84 db                	test   bl,bl
+ 1003f41:	ba 50 77 00 01       	mov    edx,0x1007750
+ 1003f46:	b8 54 77 00 01       	mov    eax,0x1007754
+ 1003f4b:	0f 44 c2             	cmove  eax,edx
+ 1003f4e:	50                   	push   eax
+ 1003f4f:	56                   	push   esi
+ 1003f50:	68 14 7f 00 01       	push   0x1007f14
+ 1003f55:	6a 40                	push   0x40
+ 1003f57:	e8 37 e6 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:200
         uintptr_t* pagePTE= (uintptr_t*)pagingGet4kPTEntryAddress(pageDirAddress,address&0xFFFFF000);
- 1003aa3:	83 c4 08             	add    esp,0x8
- 1003aa6:	81 e6 00 f0 ff ff    	and    esi,0xfffff000
- 1003aac:	56                   	push   esi
- 1003aad:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
- 1003ab1:	e8 45 fe ff ff       	call   10038fb <pagingGet4kPTEntryAddress>
- 1003ab6:	89 c6                	mov    esi,eax
-/home/yogi/src/os/chrisOSKernel/src/paging.c:99
+ 1003f5c:	83 c4 08             	add    esp,0x8
+ 1003f5f:	81 e6 00 f0 ff ff    	and    esi,0xfffff000
+ 1003f65:	56                   	push   esi
+ 1003f66:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1003f6a:	e8 45 fe ff ff       	call   1003db4 <pagingGet4kPTEntryAddress>
+ 1003f6f:	89 c6                	mov    esi,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:201
     printd(DEBUG_PAGING,"kpagingUpdatePresentFlagA: updating entry 0x%08X\n", pagePTE);
- 1003ab8:	83 c4 0c             	add    esp,0xc
- 1003abb:	50                   	push   eax
- 1003abc:	68 48 7c 00 01       	push   0x1007c48
- 1003ac1:	6a 40                	push   0x40
- 1003ac3:	e8 c7 ea ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:100
+ 1003f71:	83 c4 0c             	add    esp,0xc
+ 1003f74:	50                   	push   eax
+ 1003f75:	68 40 7f 00 01       	push   0x1007f40
+ 1003f7a:	6a 40                	push   0x40
+ 1003f7c:	e8 12 e6 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:202
     pagingUpdatePTEPresentFlag(pagePTE, present);
- 1003ac8:	83 c4 08             	add    esp,0x8
- 1003acb:	0f b6 db             	movzx  ebx,bl
- 1003ace:	53                   	push   ebx
- 1003acf:	56                   	push   esi
- 1003ad0:	e8 ce fe ff ff       	call   10039a3 <pagingUpdatePTEPresentFlag>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:101
+ 1003f81:	83 c4 08             	add    esp,0x8
+ 1003f84:	0f b6 db             	movzx  ebx,bl
+ 1003f87:	53                   	push   ebx
+ 1003f88:	56                   	push   esi
+ 1003f89:	e8 ce fe ff ff       	call   1003e5c <pagingUpdatePTEPresentFlag>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:203
 }
- 1003ad5:	83 c4 14             	add    esp,0x14
- 1003ad8:	5b                   	pop    ebx
- 1003ad9:	5e                   	pop    esi
- 1003ada:	c3                   	ret    
+ 1003f8e:	83 c4 14             	add    esp,0x14
+ 1003f91:	5b                   	pop    ebx
+ 1003f92:	5e                   	pop    esi
+ 1003f93:	c3                   	ret    
 
-01003adb <pagingUpdatePresentFlagV>:
+01003f94 <pagingUpdatePresentFlagV>:
 pagingUpdatePresentFlagV():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:104
+/home/yogi/src/os/chrisOSKernel/src/paging.c:206
 
 void pagingUpdatePresentFlagV(uintptr_t pageDirAddress,uint32_t address, bool present)
 {
- 1003adb:	83 ec 10             	sub    esp,0x10
-/home/yogi/src/os/chrisOSKernel/src/paging.c:106
+ 1003f94:	83 ec 10             	sub    esp,0x10
+/home/yogi/src/os/chrisOSKernel/src/paging.c:208
     address+=KERNEL_PAGED_BASE_ADDRESS; 
     pagingUpdatePresentFlagA(pageDirAddress,address, present);
- 1003ade:	0f b6 44 24 1c       	movzx  eax,BYTE PTR [esp+0x1c]
- 1003ae3:	50                   	push   eax
- 1003ae4:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
- 1003ae8:	2d 00 00 00 40       	sub    eax,0x40000000
- 1003aed:	50                   	push   eax
- 1003aee:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
- 1003af2:	e8 82 ff ff ff       	call   1003a79 <pagingUpdatePresentFlagA>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:107
+ 1003f97:	0f b6 44 24 1c       	movzx  eax,BYTE PTR [esp+0x1c]
+ 1003f9c:	50                   	push   eax
+ 1003f9d:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
+ 1003fa1:	2d 00 00 00 40       	sub    eax,0x40000000
+ 1003fa6:	50                   	push   eax
+ 1003fa7:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1003fab:	e8 82 ff ff ff       	call   1003f32 <pagingUpdatePresentFlagA>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:209
 }
- 1003af7:	83 c4 1c             	add    esp,0x1c
- 1003afa:	c3                   	ret    
+ 1003fb0:	83 c4 1c             	add    esp,0x1c
+ 1003fb3:	c3                   	ret    
 
-01003afb <pagingMapPage>:
+01003fb4 <pagingMapPage>:
 pagingMapPage():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:113
+/home/yogi/src/os/chrisOSKernel/src/paging.c:213
 
 ///Map a page to a new address
-///mapFrom is the original address
-///mapTo is the new address that the page will be available at
-void pagingMapPage(uintptr_t pageDirAddress, uintptr_t mapTo, uintptr_t mapFrom, uint8_t flags)
+void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, uint8_t flags)
 {
- 1003afb:	55                   	push   ebp
- 1003afc:	57                   	push   edi
- 1003afd:	56                   	push   esi
- 1003afe:	53                   	push   ebx
- 1003aff:	83 ec 0c             	sub    esp,0xc
- 1003b02:	8b 6c 24 20          	mov    ebp,DWORD PTR [esp+0x20]
- 1003b06:	8b 74 24 24          	mov    esi,DWORD PTR [esp+0x24]
- 1003b0a:	8b 5c 24 2c          	mov    ebx,DWORD PTR [esp+0x2c]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:121
+ 1003fb4:	55                   	push   ebp
+ 1003fb5:	57                   	push   edi
+ 1003fb6:	56                   	push   esi
+ 1003fb7:	53                   	push   ebx
+ 1003fb8:	83 ec 0c             	sub    esp,0xc
+ 1003fbb:	8b 6c 24 20          	mov    ebp,DWORD PTR [esp+0x20]
+ 1003fbf:	8b 74 24 24          	mov    esi,DWORD PTR [esp+0x24]
+ 1003fc3:	8b 5c 24 2c          	mov    ebx,DWORD PTR [esp+0x2c]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:221
     uint32_t *ptrT;
     
     //Get pointer to the page directory
     ptr=(uint32_t*)pageDirAddress;
     //Get the appropriate entry in the page table
-    ptrVal=ptr[(mapTo>>22)];
- 1003b0e:	89 f0                	mov    eax,esi
- 1003b10:	c1 e8 16             	shr    eax,0x16
- 1003b13:	8d 7c 85 00          	lea    edi,[ebp+eax*4+0x0]
- 1003b17:	8b 07                	mov    eax,DWORD PTR [edi]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:122
+    ptrVal=ptr[(virtualAddress>>22)];
+ 1003fc7:	89 f0                	mov    eax,esi
+ 1003fc9:	c1 e8 16             	shr    eax,0x16
+ 1003fcc:	8d 7c 85 00          	lea    edi,[ebp+eax*4+0x0]
+ 1003fd0:	8b 07                	mov    eax,DWORD PTR [edi]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:222
     if (ptrVal==0)
- 1003b19:	85 c0                	test   eax,eax
- 1003b1b:	75 46                	jne    1003b63 <pagingMapPage+0x68>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:125
+ 1003fd2:	85 c0                	test   eax,eax
+ 1003fd4:	75 46                	jne    100401c <pagingMapPage+0x68>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:225
     {
         //Get a page for the page table
         *ptrT=(uint32_t*)pagingAllocatePagingTablePage();
- 1003b1d:	e8 7a fd ff ff       	call   100389c <pagingAllocatePagingTablePage>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:126
-        printd(DEBUG_PAGING,"pagingMapPage: Page table didn't exist for address 0x%08X (CR3=0x%08X)\n\tAllocated page @ 0x%08X for the page table\n",mapTo,pageDirAddress,  *ptrT);
- 1003b22:	83 ec 0c             	sub    esp,0xc
- 1003b25:	50                   	push   eax
- 1003b26:	55                   	push   ebp
- 1003b27:	56                   	push   esi
- 1003b28:	68 64 87 00 01       	push   0x1008764
- 1003b2d:	6a 40                	push   0x40
- 1003b2f:	e8 5b ea ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:127
-        ptr[(mapTo>>22)]=0x20000063;
- 1003b34:	c7 07 63 00 00 20    	mov    DWORD PTR [edi],0x20000063
-/home/yogi/src/os/chrisOSKernel/src/paging.c:129
-        ptrT[(mapTo&0x003FFFFF/4096)]=mapFrom | flags;
-        printd(DEBUG_PAGING,"kMapPage: Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)],ptrT[(mapTo&0x003FFFFF/4096)]);
- 1003b3a:	83 c4 18             	add    esp,0x18
- 1003b3d:	0f b6 db             	movzx  ebx,bl
- 1003b40:	0b 5c 24 30          	or     ebx,DWORD PTR [esp+0x30]
- 1003b44:	53                   	push   ebx
- 1003b45:	89 f0                	mov    eax,esi
- 1003b47:	25 ff 03 00 00       	and    eax,0x3ff
- 1003b4c:	c1 e0 02             	shl    eax,0x2
- 1003b4f:	50                   	push   eax
- 1003b50:	57                   	push   edi
- 1003b51:	56                   	push   esi
- 1003b52:	68 7c 7c 00 01       	push   0x1007c7c
- 1003b57:	6a 40                	push   0x40
- 1003b59:	e8 31 ea ff ff       	call   100258f <printd>
- 1003b5e:	83 c4 20             	add    esp,0x20
- 1003b61:	eb 32                	jmp    1003b95 <pagingMapPage+0x9a>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:142
-        ptrVal=ptr[mapTo>>22];
+ 1003fd6:	e8 7a fd ff ff       	call   1003d55 <pagingAllocatePagingTablePage>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:226
+        printd(DEBUG_PAGING,"pagingMapPage: Page table didn't exist for address 0x%08X (CR3=0x%08X)\n\tAllocated page @ 0x%08X for the page table\n",virtualAddress,pageDirAddress,  *ptrT);
+ 1003fdb:	83 ec 0c             	sub    esp,0xc
+ 1003fde:	50                   	push   eax
+ 1003fdf:	55                   	push   ebp
+ 1003fe0:	56                   	push   esi
+ 1003fe1:	68 48 90 00 01       	push   0x1009048
+ 1003fe6:	6a 40                	push   0x40
+ 1003fe8:	e8 a6 e5 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:227
+        ptr[(virtualAddress>>22)]=0x20000063;
+ 1003fed:	c7 07 63 00 00 20    	mov    DWORD PTR [edi],0x20000063
+/home/yogi/src/os/chrisOSKernel/src/paging.c:229
+        ptrT[(virtualAddress&0x003FFFFF/4096)]=physicalAddress | flags;
+        printd(DEBUG_PAGING,"kMapPage: Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", virtualAddress, &ptr[(virtualAddress>>22)], &ptrT[(virtualAddress&0x003FFFFF/4096)],ptrT[(virtualAddress&0x003FFFFF/4096)]);
+ 1003ff3:	83 c4 18             	add    esp,0x18
+ 1003ff6:	0f b6 db             	movzx  ebx,bl
+ 1003ff9:	0b 5c 24 30          	or     ebx,DWORD PTR [esp+0x30]
+ 1003ffd:	53                   	push   ebx
+ 1003ffe:	89 f0                	mov    eax,esi
+ 1004000:	25 ff 03 00 00       	and    eax,0x3ff
+ 1004005:	c1 e0 02             	shl    eax,0x2
+ 1004008:	50                   	push   eax
+ 1004009:	57                   	push   edi
+ 100400a:	56                   	push   esi
+ 100400b:	68 74 7f 00 01       	push   0x1007f74
+ 1004010:	6a 40                	push   0x40
+ 1004012:	e8 7c e5 ff ff       	call   1002593 <printd>
+ 1004017:	83 c4 20             	add    esp,0x20
+ 100401a:	eb 32                	jmp    100404e <pagingMapPage+0x9a>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:242
+        ptrVal=ptr[virtualAddress>>22];
         ptrVal=(ptrVal&0xFFFFF000);
         ptrT=(uint32_t*)ptrVal;
         //Now ptrVal will point to offset within page table
-        ptrVal=(mapTo&0x003FFFFF)/4096;
-        ptrT[ptrVal]=mapFrom | flags;
- 1003b63:	25 00 f0 ff ff       	and    eax,0xfffff000
- 1003b68:	89 c2                	mov    edx,eax
- 1003b6a:	89 f0                	mov    eax,esi
- 1003b6c:	c1 e8 0a             	shr    eax,0xa
- 1003b6f:	25 fc 0f 00 00       	and    eax,0xffc
- 1003b74:	01 d0                	add    eax,edx
- 1003b76:	0f b6 db             	movzx  ebx,bl
- 1003b79:	0b 5c 24 28          	or     ebx,DWORD PTR [esp+0x28]
- 1003b7d:	89 18                	mov    DWORD PTR [eax],ebx
-/home/yogi/src/os/chrisOSKernel/src/paging.c:143
-        printd(DEBUG_PAGING,"2) Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal],ptrT[ptrVal]);
- 1003b7f:	83 ec 08             	sub    esp,0x8
- 1003b82:	53                   	push   ebx
- 1003b83:	50                   	push   eax
- 1003b84:	57                   	push   edi
- 1003b85:	56                   	push   esi
- 1003b86:	68 bc 7c 00 01       	push   0x1007cbc
- 1003b8b:	6a 40                	push   0x40
- 1003b8d:	e8 fd e9 ff ff       	call   100258f <printd>
- 1003b92:	83 c4 20             	add    esp,0x20
-/home/yogi/src/os/chrisOSKernel/src/paging.c:145
+        ptrVal=(virtualAddress&0x003FFFFF)/4096;
+        ptrT[ptrVal]=physicalAddress | flags;
+ 100401c:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 1004021:	89 c2                	mov    edx,eax
+ 1004023:	89 f0                	mov    eax,esi
+ 1004025:	c1 e8 0a             	shr    eax,0xa
+ 1004028:	25 fc 0f 00 00       	and    eax,0xffc
+ 100402d:	01 d0                	add    eax,edx
+ 100402f:	0f b6 db             	movzx  ebx,bl
+ 1004032:	0b 5c 24 28          	or     ebx,DWORD PTR [esp+0x28]
+ 1004036:	89 18                	mov    DWORD PTR [eax],ebx
+/home/yogi/src/os/chrisOSKernel/src/paging.c:243
+        printd(DEBUG_PAGING,"kMapPage:(2) Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", virtualAddress, &ptr[(virtualAddress>>22)], &ptrT[ptrVal],ptrT[ptrVal]);
+ 1004038:	83 ec 08             	sub    esp,0x8
+ 100403b:	53                   	push   ebx
+ 100403c:	50                   	push   eax
+ 100403d:	57                   	push   edi
+ 100403e:	56                   	push   esi
+ 100403f:	68 bc 90 00 01       	push   0x10090bc
+ 1004044:	6a 40                	push   0x40
+ 1004046:	e8 48 e5 ff ff       	call   1002593 <printd>
+ 100404b:	83 c4 20             	add    esp,0x20
+/home/yogi/src/os/chrisOSKernel/src/paging.c:245
     }
 }
- 1003b95:	83 c4 0c             	add    esp,0xc
- 1003b98:	5b                   	pop    ebx
- 1003b99:	5e                   	pop    esi
- 1003b9a:	5f                   	pop    edi
- 1003b9b:	5d                   	pop    ebp
- 1003b9c:	c3                   	ret    
+ 100404e:	83 c4 0c             	add    esp,0xc
+ 1004051:	5b                   	pop    ebx
+ 1004052:	5e                   	pop    esi
+ 1004053:	5f                   	pop    edi
+ 1004054:	5d                   	pop    ebp
+ 1004055:	c3                   	ret    
 
-01003b9d <isPageMapped>:
+01004056 <isPageMapped>:
 isPageMapped():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:148
+/home/yogi/src/os/chrisOSKernel/src/paging.c:248
 
 bool isPageMapped(uintptr_t pageDirAddress, uintptr_t Address)
 {
- 1003b9d:	83 ec 14             	sub    esp,0x14
-/home/yogi/src/os/chrisOSKernel/src/paging.c:149
+ 1004056:	83 ec 14             	sub    esp,0x14
+/home/yogi/src/os/chrisOSKernel/src/paging.c:249
     if (!pagingGet4kPTEntryValue(pageDirAddress,Address))
- 1003ba0:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
- 1003ba4:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
- 1003ba8:	e8 7c fd ff ff       	call   1003929 <pagingGet4kPTEntryValue>
- 1003bad:	85 c0                	test   eax,eax
- 1003baf:	0f 95 c0             	setne  al
-/home/yogi/src/os/chrisOSKernel/src/paging.c:152
+ 1004059:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 100405d:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1004061:	e8 7c fd ff ff       	call   1003de2 <pagingGet4kPTEntryValue>
+ 1004066:	85 c0                	test   eax,eax
+ 1004068:	0f 95 c0             	setne  al
+/home/yogi/src/os/chrisOSKernel/src/paging.c:252
         return false;
     return true;
 }
- 1003bb2:	83 c4 1c             	add    esp,0x1c
- 1003bb5:	c3                   	ret    
+ 100406b:	83 c4 1c             	add    esp,0x1c
+ 100406e:	c3                   	ret    
 
-01003bb6 <unMapPage>:
+0100406f <unMapPage>:
 unMapPage():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:155
+/home/yogi/src/os/chrisOSKernel/src/paging.c:255
 
-void unMapPage(uintptr_t pageDirAddress, uintptr_t mapTo, uint8_t newFlags)
+void unMapPage(uintptr_t pageDirAddress, uintptr_t pageToUnmap, uint8_t newFlags)
 {
- 1003bb6:	57                   	push   edi
- 1003bb7:	56                   	push   esi
- 1003bb8:	53                   	push   ebx
- 1003bb9:	8b 4c 24 14          	mov    ecx,DWORD PTR [esp+0x14]
- 1003bbd:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:160
+ 100406f:	57                   	push   edi
+ 1004070:	56                   	push   esi
+ 1004071:	53                   	push   ebx
+ 1004072:	8b 4c 24 14          	mov    ecx,DWORD PTR [esp+0x14]
+ 1004076:	8b 5c 24 18          	mov    ebx,DWORD PTR [esp+0x18]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:260
     uint32_t *ptr;
     uint32_t ptrVal;
     uint32_t *ptrT;
     ptr=(uint32_t*)pageDirAddress;
-    ptrVal=ptr[(mapTo>>22)];
- 1003bc1:	89 c8                	mov    eax,ecx
- 1003bc3:	c1 e8 16             	shr    eax,0x16
- 1003bc6:	c1 e0 02             	shl    eax,0x2
- 1003bc9:	03 44 24 10          	add    eax,DWORD PTR [esp+0x10]
- 1003bcd:	8b 10                	mov    edx,DWORD PTR [eax]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:161
-    if (ptrVal==0 && mapTo < kE820MemoryBytes)
- 1003bcf:	85 d2                	test   edx,edx
- 1003bd1:	75 4b                	jne    1003c1e <unMapPage+0x68>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:161 (discriminator 1)
- 1003bd3:	bf 00 00 00 00       	mov    edi,0x0
- 1003bd8:	3b 3d 4c 00 12 00    	cmp    edi,DWORD PTR ds:0x12004c
- 1003bde:	72 08                	jb     1003be8 <unMapPage+0x32>
- 1003be0:	3b 0d 48 00 12 00    	cmp    ecx,DWORD PTR ds:0x120048
- 1003be6:	73 36                	jae    1003c1e <unMapPage+0x68>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:164
+    ptrVal=ptr[(pageToUnmap>>22)];
+ 100407a:	89 c8                	mov    eax,ecx
+ 100407c:	c1 e8 16             	shr    eax,0x16
+ 100407f:	c1 e0 02             	shl    eax,0x2
+ 1004082:	03 44 24 10          	add    eax,DWORD PTR [esp+0x10]
+ 1004086:	8b 10                	mov    edx,DWORD PTR [eax]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:261
+    if (ptrVal==0 && pageToUnmap < kE820MemoryBytes)
+ 1004088:	85 d2                	test   edx,edx
+ 100408a:	75 4b                	jne    10040d7 <unMapPage+0x68>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:261 (discriminator 1)
+ 100408c:	bf 00 00 00 00       	mov    edi,0x0
+ 1004091:	3b 3d 4c 00 12 00    	cmp    edi,DWORD PTR ds:0x12004c
+ 1004097:	72 08                	jb     10040a1 <unMapPage+0x32>
+ 1004099:	3b 0d 48 00 12 00    	cmp    ecx,DWORD PTR ds:0x120048
+ 100409f:	73 36                	jae    10040d7 <unMapPage+0x68>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:264
     {
         ptrT=(uint32_t*)0x20000000;
-        ptr[(mapTo>>22)]=0x20000063;
- 1003be8:	c7 00 63 00 00 20    	mov    DWORD PTR [eax],0x20000063
-/home/yogi/src/os/chrisOSKernel/src/paging.c:165
-        ptrT[(mapTo&0x003FFFFF/4096)]=0 | newFlags;
- 1003bee:	89 ca                	mov    edx,ecx
- 1003bf0:	81 e2 ff 03 00 00    	and    edx,0x3ff
- 1003bf6:	8d 34 95 00 00 00 20 	lea    esi,[edx*4+0x20000000]
- 1003bfd:	0f b6 db             	movzx  ebx,bl
- 1003c00:	89 1c 95 00 00 00 20 	mov    DWORD PTR [edx*4+0x20000000],ebx
-/home/yogi/src/os/chrisOSKernel/src/paging.c:166
-        printd(DEBUG_PAGING,"kMapPage: Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)]);
- 1003c07:	83 ec 0c             	sub    esp,0xc
- 1003c0a:	56                   	push   esi
- 1003c0b:	50                   	push   eax
- 1003c0c:	51                   	push   ecx
- 1003c0d:	68 f8 7c 00 01       	push   0x1007cf8
- 1003c12:	6a 40                	push   0x40
- 1003c14:	e8 76 e9 ff ff       	call   100258f <printd>
- 1003c19:	83 c4 20             	add    esp,0x20
- 1003c1c:	eb 2f                	jmp    1003c4d <unMapPage+0x97>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:177
-        ptrVal=ptr[mapTo>>22];
+        ptr[(pageToUnmap>>22)]=0x20000063;
+ 10040a1:	c7 00 63 00 00 20    	mov    DWORD PTR [eax],0x20000063
+/home/yogi/src/os/chrisOSKernel/src/paging.c:265
+        ptrT[(pageToUnmap&0x003FFFFF/4096)]=0 | newFlags;
+ 10040a7:	89 ca                	mov    edx,ecx
+ 10040a9:	81 e2 ff 03 00 00    	and    edx,0x3ff
+ 10040af:	8d 34 95 00 00 00 20 	lea    esi,[edx*4+0x20000000]
+ 10040b6:	0f b6 db             	movzx  ebx,bl
+ 10040b9:	89 1c 95 00 00 00 20 	mov    DWORD PTR [edx*4+0x20000000],ebx
+/home/yogi/src/os/chrisOSKernel/src/paging.c:266
+        printd(DEBUG_PAGING,"kMapPage: Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", pageToUnmap, &ptr[(pageToUnmap>>22)], &ptrT[(pageToUnmap&0x003FFFFF/4096)]);
+ 10040c0:	83 ec 0c             	sub    esp,0xc
+ 10040c3:	56                   	push   esi
+ 10040c4:	50                   	push   eax
+ 10040c5:	51                   	push   ecx
+ 10040c6:	68 f0 7f 00 01       	push   0x1007ff0
+ 10040cb:	6a 40                	push   0x40
+ 10040cd:	e8 c1 e4 ff ff       	call   1002593 <printd>
+ 10040d2:	83 c4 20             	add    esp,0x20
+ 10040d5:	eb 2f                	jmp    1004106 <unMapPage+0x97>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:277
+        ptrVal=ptr[pageToUnmap>>22];
         ptrVal=(ptrVal&0xFFFFF000);
         ptrT=(uint32_t*)ptrVal;
         //Now ptrVal will point to offset within page table
-        ptrVal=(mapTo&0x003FFFFF)/4096;
+        ptrVal=(pageToUnmap&0x003FFFFF)/4096;
         ptrT[ptrVal]=0 | newFlags;
- 1003c1e:	89 d6                	mov    esi,edx
- 1003c20:	81 e6 00 f0 ff ff    	and    esi,0xfffff000
- 1003c26:	89 ca                	mov    edx,ecx
- 1003c28:	c1 ea 0a             	shr    edx,0xa
- 1003c2b:	81 e2 fc 0f 00 00    	and    edx,0xffc
- 1003c31:	01 f2                	add    edx,esi
- 1003c33:	0f b6 db             	movzx  ebx,bl
- 1003c36:	89 1a                	mov    DWORD PTR [edx],ebx
-/home/yogi/src/os/chrisOSKernel/src/paging.c:178
-        printd(DEBUG_PAGING,"2) Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal]);
- 1003c38:	83 ec 0c             	sub    esp,0xc
- 1003c3b:	52                   	push   edx
- 1003c3c:	50                   	push   eax
- 1003c3d:	51                   	push   ecx
- 1003c3e:	68 30 7d 00 01       	push   0x1007d30
- 1003c43:	6a 40                	push   0x40
- 1003c45:	e8 45 e9 ff ff       	call   100258f <printd>
- 1003c4a:	83 c4 20             	add    esp,0x20
-/home/yogi/src/os/chrisOSKernel/src/paging.c:180
+ 10040d7:	89 d6                	mov    esi,edx
+ 10040d9:	81 e6 00 f0 ff ff    	and    esi,0xfffff000
+ 10040df:	89 ca                	mov    edx,ecx
+ 10040e1:	c1 ea 0a             	shr    edx,0xa
+ 10040e4:	81 e2 fc 0f 00 00    	and    edx,0xffc
+ 10040ea:	01 f2                	add    edx,esi
+ 10040ec:	0f b6 db             	movzx  ebx,bl
+ 10040ef:	89 1a                	mov    DWORD PTR [edx],ebx
+/home/yogi/src/os/chrisOSKernel/src/paging.c:278
+        printd(DEBUG_PAGING,"2) Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", pageToUnmap, &ptr[(pageToUnmap>>22)], &ptrT[ptrVal]);
+ 10040f1:	83 ec 0c             	sub    esp,0xc
+ 10040f4:	52                   	push   edx
+ 10040f5:	50                   	push   eax
+ 10040f6:	51                   	push   ecx
+ 10040f7:	68 28 80 00 01       	push   0x1008028
+ 10040fc:	6a 40                	push   0x40
+ 10040fe:	e8 90 e4 ff ff       	call   1002593 <printd>
+ 1004103:	83 c4 20             	add    esp,0x20
+/home/yogi/src/os/chrisOSKernel/src/paging.c:280
     }
 }
- 1003c4d:	5b                   	pop    ebx
- 1003c4e:	5e                   	pop    esi
- 1003c4f:	5f                   	pop    edi
- 1003c50:	c3                   	ret    
+ 1004106:	5b                   	pop    ebx
+ 1004107:	5e                   	pop    esi
+ 1004108:	5f                   	pop    edi
+ 1004109:	c3                   	ret    
 
-01003c51 <pagingSetPhysicalRangeRO>:
+0100410a <pagingSetPhysicalRangeRO>:
 pagingSetPhysicalRangeRO():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:183
+/home/yogi/src/os/chrisOSKernel/src/paging.c:283
 
 void pagingSetPhysicalRangeRO(uintptr_t pageDirAddress, uint32_t startAddy, uint32_t endAddy, bool readOnly)
 {
- 1003c51:	83 ec 14             	sub    esp,0x14
- 1003c54:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
- 1003c58:	8b 54 24 20          	mov    edx,DWORD PTR [esp+0x20]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:184
+ 100410a:	83 ec 14             	sub    esp,0x14
+ 100410d:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
+ 1004111:	8b 54 24 20          	mov    edx,DWORD PTR [esp+0x20]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:284
     printd(DEBUG_PAGING,"kMakePhysicalRangeRO: Make 0x%08X(0x%08X)-0x%08X(0x%08X) r/o\n", startAddy, startAddy&0xFffff000, endAddy, endAddy&0xFFFFF000);
- 1003c5c:	89 d1                	mov    ecx,edx
- 1003c5e:	81 e1 00 f0 ff ff    	and    ecx,0xfffff000
- 1003c64:	51                   	push   ecx
- 1003c65:	52                   	push   edx
- 1003c66:	89 c2                	mov    edx,eax
- 1003c68:	81 e2 00 f0 ff ff    	and    edx,0xfffff000
- 1003c6e:	52                   	push   edx
- 1003c6f:	50                   	push   eax
- 1003c70:	68 60 7d 00 01       	push   0x1007d60
- 1003c75:	6a 40                	push   0x40
- 1003c77:	e8 13 e9 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:185
+ 1004115:	89 d1                	mov    ecx,edx
+ 1004117:	81 e1 00 f0 ff ff    	and    ecx,0xfffff000
+ 100411d:	51                   	push   ecx
+ 100411e:	52                   	push   edx
+ 100411f:	89 c2                	mov    edx,eax
+ 1004121:	81 e2 00 f0 ff ff    	and    edx,0xfffff000
+ 1004127:	52                   	push   edx
+ 1004128:	50                   	push   eax
+ 1004129:	68 58 80 00 01       	push   0x1008058
+ 100412e:	6a 40                	push   0x40
+ 1004130:	e8 5e e4 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:285
         panic("fix this!!!");
- 1003c7c:	83 c4 14             	add    esp,0x14
- 1003c7f:	68 b8 77 00 01       	push   0x10077b8
- 1003c84:	e8 67 e4 ff ff       	call   10020f0 <panic>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:187
+ 1004135:	83 c4 14             	add    esp,0x14
+ 1004138:	68 97 7a 00 01       	push   0x1007a97
+ 100413d:	e8 b2 df ff ff       	call   10020f4 <panic>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:287
         //SetVirtualRangeRO((startAddy + KERNEL_PAGED_BASE_ADDRESS) & 0xFFFFF000, (endAddy + KERNEL_PAGED_BASE_ADDRESS) & 0xFFFFF000, readOnly);
 }
- 1003c89:	83 c4 1c             	add    esp,0x1c
- 1003c8c:	c3                   	ret    
+ 1004142:	83 c4 1c             	add    esp,0x1c
+ 1004145:	c3                   	ret    
 
-01003c8d <pagingSetPageInUseFlag>:
+01004146 <pagingSetPageInUseFlag>:
 pagingSetPageInUseFlag():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:190
+/home/yogi/src/os/chrisOSKernel/src/paging.c:290
 
 void pagingSetPageInUseFlag(uintptr_t pageDirAddress, uintptr_t address, bool inUse)
 {
- 1003c8d:	56                   	push   esi
- 1003c8e:	53                   	push   ebx
- 1003c8f:	83 ec 04             	sub    esp,0x4
- 1003c92:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
- 1003c96:	8b 5c 24 14          	mov    ebx,DWORD PTR [esp+0x14]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:192
+ 1004146:	56                   	push   esi
+ 1004147:	53                   	push   ebx
+ 1004148:	83 ec 04             	sub    esp,0x4
+ 100414b:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+ 100414f:	8b 5c 24 14          	mov    ebx,DWORD PTR [esp+0x14]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:292
     uintptr_t* ptEntry;
     printd(DEBUG_PAGING, "mmKernelSetPageInUseFlag: Marking page with address 0x%08X as %s\n", address, inUse?"in use":"not in use");
- 1003c9a:	80 7c 24 18 00       	cmp    BYTE PTR [esp+0x18],0x0
- 1003c9f:	74 38                	je     1003cd9 <pagingSetPageInUseFlag+0x4c>
- 1003ca1:	68 64 74 00 01       	push   0x1007464
- 1003ca6:	53                   	push   ebx
- 1003ca7:	68 a0 7d 00 01       	push   0x1007da0
- 1003cac:	6a 40                	push   0x40
- 1003cae:	e8 dc e8 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:193
+ 1004153:	80 7c 24 18 00       	cmp    BYTE PTR [esp+0x18],0x0
+ 1004158:	74 38                	je     1004192 <pagingSetPageInUseFlag+0x4c>
+ 100415a:	68 60 77 00 01       	push   0x1007760
+ 100415f:	53                   	push   ebx
+ 1004160:	68 98 80 00 01       	push   0x1008098
+ 1004165:	6a 40                	push   0x40
+ 1004167:	e8 27 e4 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:293
     ptEntry=(uintptr_t*)pagingGet4kPTEntryAddress(pageDirAddress,address);
- 1003cb3:	83 c4 08             	add    esp,0x8
- 1003cb6:	53                   	push   ebx
- 1003cb7:	56                   	push   esi
- 1003cb8:	e8 3e fc ff ff       	call   10038fb <pagingGet4kPTEntryAddress>
- 1003cbd:	89 c3                	mov    ebx,eax
-/home/yogi/src/os/chrisOSKernel/src/paging.c:194
+ 100416c:	83 c4 08             	add    esp,0x8
+ 100416f:	53                   	push   ebx
+ 1004170:	56                   	push   esi
+ 1004171:	e8 3e fc ff ff       	call   1003db4 <pagingGet4kPTEntryAddress>
+ 1004176:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:294
     printd(DEBUG_PAGING,"mmKernelSetPageInUseFlag: PTE=0x%08X, Before PTE value=0x%08X\n",ptEntry,*ptEntry);
- 1003cbf:	ff 30                	push   DWORD PTR [eax]
- 1003cc1:	50                   	push   eax
- 1003cc2:	68 e4 7d 00 01       	push   0x1007de4
- 1003cc7:	6a 40                	push   0x40
- 1003cc9:	e8 c1 e8 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:196
+ 1004178:	ff 30                	push   DWORD PTR [eax]
+ 100417a:	50                   	push   eax
+ 100417b:	68 dc 80 00 01       	push   0x10080dc
+ 1004180:	6a 40                	push   0x40
+ 1004182:	e8 0c e4 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:296
     if (inUse)
         *ptEntry|=PAGING_IN_USE_FLAG_MASK;
- 1003cce:	81 0b 00 08 00 00    	or     DWORD PTR [ebx],0x800
- 1003cd4:	83 c4 20             	add    esp,0x20
- 1003cd7:	eb 36                	jmp    1003d0f <pagingSetPageInUseFlag+0x82>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:192
+ 1004187:	81 0b 00 08 00 00    	or     DWORD PTR [ebx],0x800
+ 100418d:	83 c4 20             	add    esp,0x20
+ 1004190:	eb 36                	jmp    10041c8 <pagingSetPageInUseFlag+0x82>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:292
 }
 
 void pagingSetPageInUseFlag(uintptr_t pageDirAddress, uintptr_t address, bool inUse)
 {
     uintptr_t* ptEntry;
     printd(DEBUG_PAGING, "mmKernelSetPageInUseFlag: Marking page with address 0x%08X as %s\n", address, inUse?"in use":"not in use");
- 1003cd9:	68 60 74 00 01       	push   0x1007460
- 1003cde:	53                   	push   ebx
- 1003cdf:	68 a0 7d 00 01       	push   0x1007da0
- 1003ce4:	6a 40                	push   0x40
- 1003ce6:	e8 a4 e8 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:193
+ 1004192:	68 5c 77 00 01       	push   0x100775c
+ 1004197:	53                   	push   ebx
+ 1004198:	68 98 80 00 01       	push   0x1008098
+ 100419d:	6a 40                	push   0x40
+ 100419f:	e8 ef e3 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:293
     ptEntry=(uintptr_t*)pagingGet4kPTEntryAddress(pageDirAddress,address);
- 1003ceb:	83 c4 08             	add    esp,0x8
- 1003cee:	53                   	push   ebx
- 1003cef:	56                   	push   esi
- 1003cf0:	e8 06 fc ff ff       	call   10038fb <pagingGet4kPTEntryAddress>
- 1003cf5:	89 c3                	mov    ebx,eax
-/home/yogi/src/os/chrisOSKernel/src/paging.c:194
+ 10041a4:	83 c4 08             	add    esp,0x8
+ 10041a7:	53                   	push   ebx
+ 10041a8:	56                   	push   esi
+ 10041a9:	e8 06 fc ff ff       	call   1003db4 <pagingGet4kPTEntryAddress>
+ 10041ae:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/paging.c:294
     printd(DEBUG_PAGING,"mmKernelSetPageInUseFlag: PTE=0x%08X, Before PTE value=0x%08X\n",ptEntry,*ptEntry);
- 1003cf7:	ff 30                	push   DWORD PTR [eax]
- 1003cf9:	50                   	push   eax
- 1003cfa:	68 e4 7d 00 01       	push   0x1007de4
- 1003cff:	6a 40                	push   0x40
- 1003d01:	e8 89 e8 ff ff       	call   100258f <printd>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:198
+ 10041b0:	ff 30                	push   DWORD PTR [eax]
+ 10041b2:	50                   	push   eax
+ 10041b3:	68 dc 80 00 01       	push   0x10080dc
+ 10041b8:	6a 40                	push   0x40
+ 10041ba:	e8 d4 e3 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:298
     if (inUse)
         *ptEntry|=PAGING_IN_USE_FLAG_MASK;
     else
         *ptEntry&=~PAGING_IN_USE_FLAG_MASK;
- 1003d06:	81 23 ff f7 ff ff    	and    DWORD PTR [ebx],0xfffff7ff
- 1003d0c:	83 c4 20             	add    esp,0x20
-/home/yogi/src/os/chrisOSKernel/src/paging.c:199
+ 10041bf:	81 23 ff f7 ff ff    	and    DWORD PTR [ebx],0xfffff7ff
+ 10041c5:	83 c4 20             	add    esp,0x20
+/home/yogi/src/os/chrisOSKernel/src/paging.c:299
 }
- 1003d0f:	83 c4 04             	add    esp,0x4
- 1003d12:	5b                   	pop    ebx
- 1003d13:	5e                   	pop    esi
- 1003d14:	c3                   	ret    
+ 10041c8:	83 c4 04             	add    esp,0x4
+ 10041cb:	5b                   	pop    ebx
+ 10041cc:	5e                   	pop    esi
+ 10041cd:	c3                   	ret    
 
-01003d15 <pagingSetPageRangeInUseFlag>:
+010041ce <pagingSetPageRangeInUseFlag>:
 pagingSetPageRangeInUseFlag():
-/home/yogi/src/os/chrisOSKernel/src/paging.c:202
+/home/yogi/src/os/chrisOSKernel/src/paging.c:302
 
 void pagingSetPageRangeInUseFlag(uintptr_t pageDirAddress, uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse)
 {
- 1003d15:	55                   	push   ebp
- 1003d16:	57                   	push   edi
- 1003d17:	56                   	push   esi
- 1003d18:	53                   	push   ebx
- 1003d19:	83 ec 0c             	sub    esp,0xc
- 1003d1c:	8b 6c 24 20          	mov    ebp,DWORD PTR [esp+0x20]
- 1003d20:	8b 5c 24 24          	mov    ebx,DWORD PTR [esp+0x24]
- 1003d24:	8b 7c 24 28          	mov    edi,DWORD PTR [esp+0x28]
- 1003d28:	0f b6 44 24 30       	movzx  eax,BYTE PTR [esp+0x30]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:203
+ 10041ce:	55                   	push   ebp
+ 10041cf:	57                   	push   edi
+ 10041d0:	56                   	push   esi
+ 10041d1:	53                   	push   ebx
+ 10041d2:	83 ec 0c             	sub    esp,0xc
+ 10041d5:	8b 6c 24 20          	mov    ebp,DWORD PTR [esp+0x20]
+ 10041d9:	8b 5c 24 24          	mov    ebx,DWORD PTR [esp+0x24]
+ 10041dd:	8b 7c 24 28          	mov    edi,DWORD PTR [esp+0x28]
+ 10041e1:	0f b6 44 24 30       	movzx  eax,BYTE PTR [esp+0x30]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:303
     for (uintptr_t cnt=startAddress;cnt<endAddress;cnt+=pageSize)
- 1003d2d:	39 fb                	cmp    ebx,edi
- 1003d2f:	73 19                	jae    1003d4a <pagingSetPageRangeInUseFlag+0x35>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:204 (discriminator 3)
+ 10041e6:	39 fb                	cmp    ebx,edi
+ 10041e8:	73 19                	jae    1004203 <pagingSetPageRangeInUseFlag+0x35>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:304 (discriminator 3)
         pagingSetPageInUseFlag(pageDirAddress,cnt,inUse);
- 1003d31:	0f b6 f0             	movzx  esi,al
- 1003d34:	83 ec 04             	sub    esp,0x4
- 1003d37:	56                   	push   esi
- 1003d38:	53                   	push   ebx
- 1003d39:	55                   	push   ebp
- 1003d3a:	e8 4e ff ff ff       	call   1003c8d <pagingSetPageInUseFlag>
- 1003d3f:	03 5c 24 3c          	add    ebx,DWORD PTR [esp+0x3c]
-/home/yogi/src/os/chrisOSKernel/src/paging.c:203 (discriminator 3)
+ 10041ea:	0f b6 f0             	movzx  esi,al
+ 10041ed:	83 ec 04             	sub    esp,0x4
+ 10041f0:	56                   	push   esi
+ 10041f1:	53                   	push   ebx
+ 10041f2:	55                   	push   ebp
+ 10041f3:	e8 4e ff ff ff       	call   1004146 <pagingSetPageInUseFlag>
+ 10041f8:	03 5c 24 3c          	add    ebx,DWORD PTR [esp+0x3c]
+/home/yogi/src/os/chrisOSKernel/src/paging.c:303 (discriminator 3)
         *ptEntry&=~PAGING_IN_USE_FLAG_MASK;
 }
 
 void pagingSetPageRangeInUseFlag(uintptr_t pageDirAddress, uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse)
 {
     for (uintptr_t cnt=startAddress;cnt<endAddress;cnt+=pageSize)
- 1003d43:	83 c4 10             	add    esp,0x10
- 1003d46:	39 fb                	cmp    ebx,edi
- 1003d48:	72 ea                	jb     1003d34 <pagingSetPageRangeInUseFlag+0x1f>
-/home/yogi/src/os/chrisOSKernel/src/paging.c:205
+ 10041fc:	83 c4 10             	add    esp,0x10
+ 10041ff:	39 fb                	cmp    ebx,edi
+ 1004201:	72 ea                	jb     10041ed <pagingSetPageRangeInUseFlag+0x1f>
+/home/yogi/src/os/chrisOSKernel/src/paging.c:305
         pagingSetPageInUseFlag(pageDirAddress,cnt,inUse);
 }
- 1003d4a:	83 c4 0c             	add    esp,0xc
- 1003d4d:	5b                   	pop    ebx
- 1003d4e:	5e                   	pop    esi
- 1003d4f:	5f                   	pop    edi
- 1003d50:	5d                   	pop    ebp
- 1003d51:	c3                   	ret    
- 1003d52:	66 90                	xchg   ax,ax
+ 1004203:	83 c4 0c             	add    esp,0xc
+ 1004206:	5b                   	pop    ebx
+ 1004207:	5e                   	pop    esi
+ 1004208:	5f                   	pop    edi
+ 1004209:	5d                   	pop    ebp
+ 100420a:	c3                   	ret    
+ 100420b:	90                   	nop
 
-01003d54 <syscall169>:
+0100420c <destroyProcess>:
+destroyProcess():
+/home/yogi/src/os/chrisOSKernel/src/process.c:15
+#include "process.h"
+#include "alloc.h"
+#include "printf.h"
+
+void destroyProcess(process_t* process)
+{
+ 100420c:	83 ec 18             	sub    esp,0x18
+/home/yogi/src/os/chrisOSKernel/src/process.c:16
+    freePage(process);
+ 100420f:	ff 74 24 1c          	push   DWORD PTR [esp+0x1c]
+ 1004213:	e8 b3 f2 ff ff       	call   10034cb <freePage>
+/home/yogi/src/os/chrisOSKernel/src/process.c:17
+}
+ 1004218:	83 c4 1c             	add    esp,0x1c
+ 100421b:	c3                   	ret    
+
+0100421c <createProcess>:
+createProcess():
+/home/yogi/src/os/chrisOSKernel/src/process.c:20
+
+process_t* createProcess(bool kernelTSS, char* path)
+{
+ 100421c:	53                   	push   ebx
+ 100421d:	83 ec 14             	sub    esp,0x14
+/home/yogi/src/os/chrisOSKernel/src/process.c:24
+
+    process_t* process;
+    
+    process=(process_t*)allocPages(sizeof(process_t));
+ 1004220:	68 04 02 00 00       	push   0x204
+ 1004225:	e8 05 f2 ff ff       	call   100342f <allocPages>
+ 100422a:	89 c3                	mov    ebx,eax
+/home/yogi/src/os/chrisOSKernel/src/process.c:25
+    printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
+ 100422c:	83 c4 0c             	add    esp,0xc
+ 100422f:	50                   	push   eax
+ 1004230:	68 a3 7a 00 01       	push   0x1007aa3
+ 1004235:	68 00 00 04 00       	push   0x40000
+ 100423a:	e8 54 e3 ff ff       	call   1002593 <printd>
+/home/yogi/src/os/chrisOSKernel/src/process.c:26
+    process->task=createTask(true);
+ 100423f:	c7 04 24 01 00 00 00 	mov    DWORD PTR [esp],0x1
+ 1004246:	e8 42 01 00 00       	call   100438d <createTask>
+ 100424b:	89 03                	mov    DWORD PTR [ebx],eax
+/home/yogi/src/os/chrisOSKernel/src/process.c:29
+    
+    
+ 100424d:	83 c4 18             	add    esp,0x18
+ 1004250:	5b                   	pop    ebx
+ 1004251:	c3                   	ret    
+ 1004252:	66 90                	xchg   ax,ax
+
+01004254 <syscall169>:
 syscall169():
 /home/yogi/src/os/chrisOSKernel/src/syscall.c:25
 
@@ -10381,7 +11303,7 @@ void syscall169()
     uint8_t temp;
  
     __asm__ volatile ("cli"); /* disable all interrupts */
- 1003d54:	fa                   	cli    
+ 1004254:	fa                   	cli    
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
 }
@@ -10390,8 +11312,8 @@ static __inline unsigned char inb(unsigned short __port)
 {
 	unsigned char __val;
 	__asm__ volatile ("inb %0, %1" : "=a" (__val) : "dN" (__port));
- 1003d55:	e4 64                	in     al,0x64
- 1003d57:	89 c2                	mov    edx,eax
+ 1004255:	e4 64                	in     al,0x64
+ 1004257:	89 c2                	mov    edx,eax
 syscall169():
 /home/yogi/src/os/chrisOSKernel/src/syscall.c:30
     /* Clear all keyboard buffers (output and command buffers) */
@@ -10399,17 +11321,17 @@ syscall169():
     {
         temp = inb(KBRD_INTRFC); /* empty user data */
         if (check_flag(temp, KBRD_BIT_KDATA) != 0)
- 1003d59:	a8 01                	test   al,0x1
- 1003d5b:	74 02                	je     1003d5f <syscall169+0xb>
+ 1004259:	a8 01                	test   al,0x1
+ 100425b:	74 02                	je     100425f <syscall169+0xb>
 inb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:39
- 1003d5d:	e4 60                	in     al,0x60
+ 100425d:	e4 60                	in     al,0x60
 syscall169():
 /home/yogi/src/os/chrisOSKernel/src/syscall.c:32
             inb(KBRD_IO); /* empty keyboard data */
     } while (check_flag(temp, KBRD_BIT_UDATA) != 0);
- 1003d5f:	f6 c2 02             	test   dl,0x2
- 1003d62:	75 f1                	jne    1003d55 <syscall169+0x1>
+ 100425f:	f6 c2 02             	test   dl,0x2
+ 1004262:	75 f1                	jne    1004255 <syscall169+0x1>
 outb():
 /home/yogi/src/os/chrisOSKernel/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
@@ -10418,19 +11340,19 @@ void IRQ_clear_mask(unsigned char IRQline);
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
- 1003d64:	b8 fe ff ff ff       	mov    eax,0xfffffffe
- 1003d69:	e6 64                	out    0x64,al
+ 1004264:	b8 fe ff ff ff       	mov    eax,0xfffffffe
+ 1004269:	e6 64                	out    0x64,al
 syscall169():
 /home/yogi/src/os/chrisOSKernel/src/syscall.c:36 (discriminator 1)
  
     outb(KBRD_INTRFC, KBRD_RESET); /* pulse CPU reset line */
 loop:
     __asm__ volatile ("hlt"); /* if that didn't work, halt the CPU */
- 1003d6b:	f4                   	hlt    
- 1003d6c:	eb fd                	jmp    1003d6b <syscall169+0x17>
- 1003d6e:	66 90                	xchg   ax,ax
+ 100426b:	f4                   	hlt    
+ 100426c:	eb fd                	jmp    100426b <syscall169+0x17>
+ 100426e:	66 90                	xchg   ax,ax
 
-01003d70 <taskInit>:
+01004270 <taskInit>:
 taskInit():
 /home/yogi/src/os/chrisOSKernel/src/task.c:15
 extern tss_t* kTSSTable;
@@ -10439,14 +11361,14 @@ extern uint32_t kDebugLevel;
 
 void taskInit()
 {
- 1003d70:	b8 00 00 00 00       	mov    eax,0x0
+ 1004270:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/src/task.c:18 (discriminator 3)
     for (int cnt=0;cnt<TSS_TABLE_RECORD_COUNT/8;cnt++)
     {
         kTaskSlotAvailableInd[cnt]=0xFFFFFFFF;
- 1003d75:	8b 15 48 01 12 00    	mov    edx,DWORD PTR ds:0x120148
- 1003d7b:	c7 04 02 ff ff ff ff 	mov    DWORD PTR [edx+eax*1],0xffffffff
- 1003d82:	83 c0 04             	add    eax,0x4
+ 1004275:	8b 15 48 01 12 00    	mov    edx,DWORD PTR ds:0x120148
+ 100427b:	c7 04 02 ff ff ff ff 	mov    DWORD PTR [edx+eax*1],0xffffffff
+ 1004282:	83 c0 04             	add    eax,0x4
 /home/yogi/src/os/chrisOSKernel/src/task.c:16 (discriminator 3)
 extern task_t* kTaskTable;
 extern uint32_t kDebugLevel;
@@ -10454,29 +11376,29 @@ extern uint32_t kDebugLevel;
 void taskInit()
 {
     for (int cnt=0;cnt<TSS_TABLE_RECORD_COUNT/8;cnt++)
- 1003d85:	3d 00 20 00 00       	cmp    eax,0x2000
- 1003d8a:	75 e9                	jne    1003d75 <taskInit+0x5>
+ 1004285:	3d 00 20 00 00       	cmp    eax,0x2000
+ 100428a:	75 e9                	jne    1004275 <taskInit+0x5>
 /home/yogi/src/os/chrisOSKernel/src/task.c:20
     {
         kTaskSlotAvailableInd[cnt]=0xFFFFFFFF;
     }
 }
- 1003d8c:	f3 c3                	repz ret 
+ 100428c:	f3 c3                	repz ret 
 
-01003d8e <getTaskSlot>:
+0100428e <getTaskSlot>:
 getTaskSlot():
 /home/yogi/src/os/chrisOSKernel/src/task.c:24
 
 ///Find an open TSS slot and mark it in use
 task_t* getTaskSlot()
 {
- 1003d8e:	57                   	push   edi
- 1003d8f:	56                   	push   esi
- 1003d90:	53                   	push   ebx
+ 100428e:	57                   	push   edi
+ 100428f:	56                   	push   esi
+ 1004290:	53                   	push   ebx
 /home/yogi/src/os/chrisOSKernel/src/task.c:26
    int cnt=0,slot=0;
    uint32_t* ptr=kTaskSlotAvailableInd;
- 1003d91:	8b 1d 48 01 12 00    	mov    ebx,DWORD PTR ds:0x120148
+ 1004291:	8b 1d 48 01 12 00    	mov    ebx,DWORD PTR ds:0x120148
 /home/yogi/src/os/chrisOSKernel/src/task.c:25
 }
 
@@ -10484,84 +11406,84 @@ task_t* getTaskSlot()
 task_t* getTaskSlot()
 {
    int cnt=0,slot=0;
- 1003d97:	be 00 00 00 00       	mov    esi,0x0
+ 1004297:	be 00 00 00 00       	mov    esi,0x0
 /home/yogi/src/os/chrisOSKernel/src/task.c:29
    uint32_t* ptr=kTaskSlotAvailableInd;
     while (cnt < TSS_TABLE_RECORD_COUNT/32)
     {
         printd (DEBUG_TASK,"getTask: Checking slots at 0x%08X, cnt=%u\n",ptr,cnt);
- 1003d9c:	56                   	push   esi
- 1003d9d:	53                   	push   ebx
- 1003d9e:	68 d8 87 00 01       	push   0x10087d8
- 1003da3:	68 00 40 00 00       	push   0x4000
- 1003da8:	e8 e2 e7 ff ff       	call   100258f <printd>
+ 100429c:	56                   	push   esi
+ 100429d:	53                   	push   ebx
+ 100429e:	68 00 91 00 01       	push   0x1009100
+ 10042a3:	68 00 40 00 00       	push   0x4000
+ 10042a8:	e8 e6 e2 ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/task.c:30
         slot=bitsScanF(ptr);
- 1003dad:	89 1c 24             	mov    DWORD PTR [esp],ebx
- 1003db0:	e8 b6 c8 ff ff       	call   100066b <bitsScanF>
- 1003db5:	89 c7                	mov    edi,eax
+ 10042ad:	89 1c 24             	mov    DWORD PTR [esp],ebx
+ 10042b0:	e8 b6 c3 ff ff       	call   100066b <bitsScanF>
+ 10042b5:	89 c7                	mov    edi,eax
 /home/yogi/src/os/chrisOSKernel/src/task.c:31
         if (slot>-1)
- 1003db7:	83 c4 10             	add    esp,0x10
- 1003dba:	85 c0                	test   eax,eax
- 1003dbc:	78 5f                	js     1003e1d <getTaskSlot+0x8f>
+ 10042b7:	83 c4 10             	add    esp,0x10
+ 10042ba:	85 c0                	test   eax,eax
+ 10042bc:	78 5f                	js     100431d <getTaskSlot+0x8f>
 /home/yogi/src/os/chrisOSKernel/src/task.c:33
         {
             task_t* task=&kTaskTable[slot];
- 1003dbe:	89 c6                	mov    esi,eax
- 1003dc0:	c1 e6 04             	shl    esi,0x4
- 1003dc3:	03 35 fc 03 12 00    	add    esi,DWORD PTR ds:0x1203fc
+ 10042be:	89 c6                	mov    esi,eax
+ 10042c0:	c1 e6 04             	shl    esi,0x4
+ 10042c3:	03 35 fc 03 12 00    	add    esi,DWORD PTR ds:0x1203fc
 /home/yogi/src/os/chrisOSKernel/src/task.c:34
             printd(DEBUG_TASK,"getTask: Marking TSS %u used\n",slot);
- 1003dc9:	83 ec 04             	sub    esp,0x4
- 1003dcc:	50                   	push   eax
- 1003dcd:	68 c4 77 00 01       	push   0x10077c4
- 1003dd2:	68 00 40 00 00       	push   0x4000
- 1003dd7:	e8 b3 e7 ff ff       	call   100258f <printd>
+ 10042c9:	83 ec 04             	sub    esp,0x4
+ 10042cc:	50                   	push   eax
+ 10042cd:	68 bd 7a 00 01       	push   0x1007abd
+ 10042d2:	68 00 40 00 00       	push   0x4000
+ 10042d7:	e8 b7 e2 ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/task.c:35
             bitsReset(ptr,slot);
- 1003ddc:	83 c4 08             	add    esp,0x8
- 1003ddf:	57                   	push   edi
- 1003de0:	53                   	push   ebx
- 1003de1:	e8 53 c8 ff ff       	call   1000639 <bitsReset>
+ 10042dc:	83 c4 08             	add    esp,0x8
+ 10042df:	57                   	push   edi
+ 10042e0:	53                   	push   ebx
+ 10042e1:	e8 53 c3 ff ff       	call   1000639 <bitsReset>
 /home/yogi/src/os/chrisOSKernel/src/task.c:36
             task->tss=&kTSSTable[slot];
- 1003de6:	6b c7 68             	imul   eax,edi,0x68
- 1003de9:	03 05 f8 03 12 00    	add    eax,DWORD PTR ds:0x1203f8
- 1003def:	89 06                	mov    DWORD PTR [esi],eax
+ 10042e6:	6b c7 68             	imul   eax,edi,0x68
+ 10042e9:	03 05 f8 03 12 00    	add    eax,DWORD PTR ds:0x1203f8
+ 10042ef:	89 06                	mov    DWORD PTR [esi],eax
 /home/yogi/src/os/chrisOSKernel/src/task.c:37
             if (slot>0)
- 1003df1:	83 c4 10             	add    esp,0x10
- 1003df4:	85 ff                	test   edi,edi
- 1003df6:	7e 09                	jle    1003e01 <getTaskSlot+0x73>
+ 10042f1:	83 c4 10             	add    esp,0x10
+ 10042f4:	85 ff                	test   edi,edi
+ 10042f6:	7e 09                	jle    1004301 <getTaskSlot+0x73>
 /home/yogi/src/os/chrisOSKernel/src/task.c:39
             {
                 (task-1)->next=task;
- 1003df8:	89 76 f8             	mov    DWORD PTR [esi-0x8],esi
+ 10042f8:	89 76 f8             	mov    DWORD PTR [esi-0x8],esi
 /home/yogi/src/os/chrisOSKernel/src/task.c:40
                 task->prev=(task-1);
- 1003dfb:	8d 56 f0             	lea    edx,[esi-0x10]
- 1003dfe:	89 56 0c             	mov    DWORD PTR [esi+0xc],edx
+ 10042fb:	8d 56 f0             	lea    edx,[esi-0x10]
+ 10042fe:	89 56 0c             	mov    DWORD PTR [esi+0xc],edx
 /home/yogi/src/os/chrisOSKernel/src/task.c:42
             }
             printd(DEBUG_TASK,"getTask: Using task %u @ 0x%08X, set TSS to 0x%08X\n",slot, task,task->tss);
- 1003e01:	83 ec 0c             	sub    esp,0xc
- 1003e04:	50                   	push   eax
- 1003e05:	56                   	push   esi
- 1003e06:	57                   	push   edi
- 1003e07:	68 04 88 00 01       	push   0x1008804
- 1003e0c:	68 00 40 00 00       	push   0x4000
- 1003e11:	e8 79 e7 ff ff       	call   100258f <printd>
+ 1004301:	83 ec 0c             	sub    esp,0xc
+ 1004304:	50                   	push   eax
+ 1004305:	56                   	push   esi
+ 1004306:	57                   	push   edi
+ 1004307:	68 2c 91 00 01       	push   0x100912c
+ 100430c:	68 00 40 00 00       	push   0x4000
+ 1004311:	e8 7d e2 ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/task.c:43
             return task;
- 1003e16:	83 c4 20             	add    esp,0x20
- 1003e19:	89 f0                	mov    eax,esi
- 1003e1b:	eb 27                	jmp    1003e44 <getTaskSlot+0xb6>
+ 1004316:	83 c4 20             	add    esp,0x20
+ 1004319:	89 f0                	mov    eax,esi
+ 100431b:	eb 27                	jmp    1004344 <getTaskSlot+0xb6>
 /home/yogi/src/os/chrisOSKernel/src/task.c:45
         }
-        ptr+=4;cnt++;
- 1003e1d:	83 c3 10             	add    ebx,0x10
- 1003e20:	83 c6 01             	add    esi,0x1
+        ptr++;cnt++;
+ 100431d:	83 c3 04             	add    ebx,0x4
+ 1004320:	83 c6 01             	add    esi,0x1
 /home/yogi/src/os/chrisOSKernel/src/task.c:27
 ///Find an open TSS slot and mark it in use
 task_t* getTaskSlot()
@@ -10569,56 +11491,56 @@ task_t* getTaskSlot()
    int cnt=0,slot=0;
    uint32_t* ptr=kTaskSlotAvailableInd;
     while (cnt < TSS_TABLE_RECORD_COUNT/32)
- 1003e23:	81 fe 00 02 00 00    	cmp    esi,0x200
- 1003e29:	0f 85 6d ff ff ff    	jne    1003d9c <getTaskSlot+0xe>
+ 1004323:	81 fe 00 02 00 00    	cmp    esi,0x200
+ 1004329:	0f 85 6d ff ff ff    	jne    100429c <getTaskSlot+0xe>
 /home/yogi/src/os/chrisOSKernel/src/task.c:47
             printd(DEBUG_TASK,"getTask: Using task %u @ 0x%08X, set TSS to 0x%08X\n",slot, task,task->tss);
             return task;
         }
-        ptr+=4;cnt++;
+        ptr++;cnt++;
     }
     printk("tssUseAvailable: Cannot allocate TSS for new task");
- 1003e2f:	83 ec 0c             	sub    esp,0xc
- 1003e32:	68 38 88 00 01       	push   0x1008838
- 1003e37:	e8 3b e7 ff ff       	call   1002577 <printk>
+ 100432f:	83 ec 0c             	sub    esp,0xc
+ 1004332:	68 60 91 00 01       	push   0x1009160
+ 1004337:	e8 3f e2 ff ff       	call   100257b <printk>
 /home/yogi/src/os/chrisOSKernel/src/task.c:48
     return NULL;
- 1003e3c:	83 c4 10             	add    esp,0x10
- 1003e3f:	b8 00 00 00 00       	mov    eax,0x0
+ 100433c:	83 c4 10             	add    esp,0x10
+ 100433f:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/src/task.c:49
 }
- 1003e44:	5b                   	pop    ebx
- 1003e45:	5e                   	pop    esi
- 1003e46:	5f                   	pop    edi
- 1003e47:	c3                   	ret    
+ 1004344:	5b                   	pop    ebx
+ 1004345:	5e                   	pop    esi
+ 1004346:	5f                   	pop    edi
+ 1004347:	c3                   	ret    
 
-01003e48 <mmMapKernelIntoTask>:
+01004348 <mmMapKernelIntoTask>:
 mmMapKernelIntoTask():
 /home/yogi/src/os/chrisOSKernel/src/task.c:52
 
 void mmMapKernelIntoTask(task_t* task)
 {
- 1003e48:	57                   	push   edi
- 1003e49:	56                   	push   esi
- 1003e4a:	53                   	push   ebx
- 1003e4b:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+ 1004348:	57                   	push   edi
+ 1004349:	56                   	push   esi
+ 100434a:	53                   	push   ebx
+ 100434b:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
 /home/yogi/src/os/chrisOSKernel/src/task.c:53
     uint32_t debugVal=kDebugLevel;
- 1003e4f:	8b 3d 38 03 12 00    	mov    edi,DWORD PTR ds:0x120338
+ 100434f:	8b 3d 38 03 12 00    	mov    edi,DWORD PTR ds:0x120338
 /home/yogi/src/os/chrisOSKernel/src/task.c:54
     kDebugLevel=0;
- 1003e55:	c7 05 38 03 12 00 00 	mov    DWORD PTR ds:0x120338,0x0
- 1003e5c:	00 00 00 
- 1003e5f:	bb 00 00 00 c0       	mov    ebx,0xc0000000
+ 1004355:	c7 05 38 03 12 00 00 	mov    DWORD PTR ds:0x120338,0x0
+ 100435c:	00 00 00 
+ 100435f:	bb 00 00 00 c0       	mov    ebx,0xc0000000
 /home/yogi/src/os/chrisOSKernel/src/task.c:56 (discriminator 3)
     for (int cnt=KERNEL_PAGED_BASE_ADDRESS;cnt<KERNEL_PAGED_BASE_ADDRESS+0x0FFFFFFF;cnt+=1000)
         pagingMapPage(task->tss->CR3,cnt,cnt,0x3);
- 1003e64:	6a 03                	push   0x3
- 1003e66:	53                   	push   ebx
- 1003e67:	53                   	push   ebx
- 1003e68:	8b 06                	mov    eax,DWORD PTR [esi]
- 1003e6a:	ff 70 1c             	push   DWORD PTR [eax+0x1c]
- 1003e6d:	e8 89 fc ff ff       	call   1003afb <pagingMapPage>
+ 1004364:	6a 03                	push   0x3
+ 1004366:	53                   	push   ebx
+ 1004367:	53                   	push   ebx
+ 1004368:	8b 06                	mov    eax,DWORD PTR [esi]
+ 100436a:	ff 70 1c             	push   DWORD PTR [eax+0x1c]
+ 100436d:	e8 42 fc ff ff       	call   1003fb4 <pagingMapPage>
 /home/yogi/src/os/chrisOSKernel/src/task.c:55 (discriminator 3)
 
 void mmMapKernelIntoTask(task_t* task)
@@ -10626,134 +11548,134 @@ void mmMapKernelIntoTask(task_t* task)
     uint32_t debugVal=kDebugLevel;
     kDebugLevel=0;
     for (int cnt=KERNEL_PAGED_BASE_ADDRESS;cnt<KERNEL_PAGED_BASE_ADDRESS+0x0FFFFFFF;cnt+=1000)
- 1003e72:	81 c3 e8 03 00 00    	add    ebx,0x3e8
- 1003e78:	83 c4 10             	add    esp,0x10
- 1003e7b:	81 fb 20 02 00 d0    	cmp    ebx,0xd0000220
- 1003e81:	75 e1                	jne    1003e64 <mmMapKernelIntoTask+0x1c>
+ 1004372:	81 c3 e8 03 00 00    	add    ebx,0x3e8
+ 1004378:	83 c4 10             	add    esp,0x10
+ 100437b:	81 fb 20 02 00 d0    	cmp    ebx,0xd0000220
+ 1004381:	75 e1                	jne    1004364 <mmMapKernelIntoTask+0x1c>
 /home/yogi/src/os/chrisOSKernel/src/task.c:57
         pagingMapPage(task->tss->CR3,cnt,cnt,0x3);
     kDebugLevel=debugVal;
- 1003e83:	89 3d 38 03 12 00    	mov    DWORD PTR ds:0x120338,edi
+ 1004383:	89 3d 38 03 12 00    	mov    DWORD PTR ds:0x120338,edi
 /home/yogi/src/os/chrisOSKernel/src/task.c:58
 }
- 1003e89:	5b                   	pop    ebx
- 1003e8a:	5e                   	pop    esi
- 1003e8b:	5f                   	pop    edi
- 1003e8c:	c3                   	ret    
+ 1004389:	5b                   	pop    ebx
+ 100438a:	5e                   	pop    esi
+ 100438b:	5f                   	pop    edi
+ 100438c:	c3                   	ret    
 
-01003e8d <createTask>:
+0100438d <createTask>:
 createTask():
 /home/yogi/src/os/chrisOSKernel/src/task.c:61
 
 task_t* createTask(bool kernelTSS)
 {
- 1003e8d:	56                   	push   esi
- 1003e8e:	53                   	push   ebx
- 1003e8f:	83 ec 04             	sub    esp,0x4
- 1003e92:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+ 100438d:	56                   	push   esi
+ 100438e:	53                   	push   ebx
+ 100438f:	83 ec 04             	sub    esp,0x4
+ 1004392:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
 /home/yogi/src/os/chrisOSKernel/src/task.c:62
-    task_t* task=getTaskSlot();
- 1003e96:	e8 f3 fe ff ff       	call   1003d8e <getTaskSlot>
+    task_t* task=getTaskSlot();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
+ 1004396:	e8 f3 fe ff ff       	call   100428e <getTaskSlot>
 /home/yogi/src/os/chrisOSKernel/src/task.c:64
     
     if (task==0)
- 1003e9b:	85 c0                	test   eax,eax
- 1003e9d:	0f 84 c0 00 00 00    	je     1003f63 <createTask+0xd6>
- 1003ea3:	89 c3                	mov    ebx,eax
+ 100439b:	85 c0                	test   eax,eax
+ 100439d:	0f 84 c0 00 00 00    	je     1004463 <createTask+0xd6>
+ 10043a3:	89 c3                	mov    ebx,eax
 /home/yogi/src/os/chrisOSKernel/src/task.c:66
         return NULL;
     kDebugLevel |= DEBUG_PAGING;
- 1003ea5:	83 0d 38 03 12 00 40 	or     DWORD PTR ds:0x120338,0x40
+ 10043a5:	83 0d 38 03 12 00 40 	or     DWORD PTR ds:0x120338,0x40
 /home/yogi/src/os/chrisOSKernel/src/task.c:69
     
     //Configure the task registers
     task->tss->EAX=0;
- 1003eac:	8b 00                	mov    eax,DWORD PTR [eax]
- 1003eae:	c7 40 28 00 00 00 00 	mov    DWORD PTR [eax+0x28],0x0
+ 10043ac:	8b 00                	mov    eax,DWORD PTR [eax]
+ 10043ae:	c7 40 28 00 00 00 00 	mov    DWORD PTR [eax+0x28],0x0
 /home/yogi/src/os/chrisOSKernel/src/task.c:70
     task->tss->EBX=task->tss->ECX=task->tss->EDX=task->tss->ESI=task->tss->EDI=task->tss->EBP=0;
- 1003eb5:	8b 03                	mov    eax,DWORD PTR [ebx]
- 1003eb7:	c7 40 3c 00 00 00 00 	mov    DWORD PTR [eax+0x3c],0x0
- 1003ebe:	c7 40 44 00 00 00 00 	mov    DWORD PTR [eax+0x44],0x0
- 1003ec5:	c7 40 40 00 00 00 00 	mov    DWORD PTR [eax+0x40],0x0
- 1003ecc:	c7 40 30 00 00 00 00 	mov    DWORD PTR [eax+0x30],0x0
- 1003ed3:	c7 40 2c 00 00 00 00 	mov    DWORD PTR [eax+0x2c],0x0
- 1003eda:	c7 40 34 00 00 00 00 	mov    DWORD PTR [eax+0x34],0x0
+ 10043b5:	8b 03                	mov    eax,DWORD PTR [ebx]
+ 10043b7:	c7 40 3c 00 00 00 00 	mov    DWORD PTR [eax+0x3c],0x0
+ 10043be:	c7 40 44 00 00 00 00 	mov    DWORD PTR [eax+0x44],0x0
+ 10043c5:	c7 40 40 00 00 00 00 	mov    DWORD PTR [eax+0x40],0x0
+ 10043cc:	c7 40 30 00 00 00 00 	mov    DWORD PTR [eax+0x30],0x0
+ 10043d3:	c7 40 2c 00 00 00 00 	mov    DWORD PTR [eax+0x2c],0x0
+ 10043da:	c7 40 34 00 00 00 00 	mov    DWORD PTR [eax+0x34],0x0
 /home/yogi/src/os/chrisOSKernel/src/task.c:71
     task->tss->SS0=0x10;
- 1003ee1:	8b 03                	mov    eax,DWORD PTR [ebx]
- 1003ee3:	66 c7 40 0a 10 00    	mov    WORD PTR [eax+0xa],0x10
+ 10043e1:	8b 03                	mov    eax,DWORD PTR [ebx]
+ 10043e3:	66 c7 40 0a 10 00    	mov    WORD PTR [eax+0xa],0x10
 /home/yogi/src/os/chrisOSKernel/src/task.c:74
     
     //If it is a kernel task
     if (kernelTSS)
- 1003ee9:	89 f0                	mov    eax,esi
- 1003eeb:	84 c0                	test   al,al
- 1003eed:	74 1c                	je     1003f0b <createTask+0x7e>
+ 10043e9:	89 f0                	mov    eax,esi
+ 10043eb:	84 c0                	test   al,al
+ 10043ed:	74 1c                	je     100440b <createTask+0x7e>
 /home/yogi/src/os/chrisOSKernel/src/task.c:75
         task->tss->ES=task->tss->DS=task->tss->FS=task->tss->GS=0x10;
- 1003eef:	8b 03                	mov    eax,DWORD PTR [ebx]
- 1003ef1:	66 c7 40 5e 10 00    	mov    WORD PTR [eax+0x5e],0x10
- 1003ef7:	66 c7 40 5a 10 00    	mov    WORD PTR [eax+0x5a],0x10
- 1003efd:	66 c7 40 56 10 00    	mov    WORD PTR [eax+0x56],0x10
- 1003f03:	66 c7 40 4a 10 00    	mov    WORD PTR [eax+0x4a],0x10
- 1003f09:	eb 10                	jmp    1003f1b <createTask+0x8e>
+ 10043ef:	8b 03                	mov    eax,DWORD PTR [ebx]
+ 10043f1:	66 c7 40 5e 10 00    	mov    WORD PTR [eax+0x5e],0x10
+ 10043f7:	66 c7 40 5a 10 00    	mov    WORD PTR [eax+0x5a],0x10
+ 10043fd:	66 c7 40 56 10 00    	mov    WORD PTR [eax+0x56],0x10
+ 1004403:	66 c7 40 4a 10 00    	mov    WORD PTR [eax+0x4a],0x10
+ 1004409:	eb 10                	jmp    100441b <createTask+0x8e>
 /home/yogi/src/os/chrisOSKernel/src/task.c:77
     else
         panic("write non-kernel segment pop code");
- 1003f0b:	83 ec 0c             	sub    esp,0xc
- 1003f0e:	68 6c 88 00 01       	push   0x100886c
- 1003f13:	e8 d8 e1 ff ff       	call   10020f0 <panic>
- 1003f18:	83 c4 10             	add    esp,0x10
+ 100440b:	83 ec 0c             	sub    esp,0xc
+ 100440e:	68 94 91 00 01       	push   0x1009194
+ 1004413:	e8 dc dc ff ff       	call   10020f4 <panic>
+ 1004418:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/chrisOSKernel/src/task.c:78
-    task->tss->IOPB=0xABCD;
- 1003f1b:	8b 03                	mov    eax,DWORD PTR [ebx]
- 1003f1d:	66 c7 40 64 cd ab    	mov    WORD PTR [eax+0x64],0xabcd
+    task->tss->IOPB=0xFFFF;
+ 100441b:	8b 03                	mov    eax,DWORD PTR [ebx]
+ 100441d:	66 c7 40 64 ff ff    	mov    WORD PTR [eax+0x64],0xffff
 /home/yogi/src/os/chrisOSKernel/src/task.c:79
-    task->tss->CR3=(uint32_t)malloc(0x1000);
- 1003f23:	8b 33                	mov    esi,DWORD PTR [ebx]
- 1003f25:	83 ec 0c             	sub    esp,0xc
- 1003f28:	68 00 10 00 00       	push   0x1000
- 1003f2d:	e8 b9 f4 ff ff       	call   10033eb <malloc>
- 1003f32:	89 46 1c             	mov    DWORD PTR [esi+0x1c],eax
+    task->tss->CR3=(uint32_t)allocPages(0x1000);
+ 1004423:	8b 33                	mov    esi,DWORD PTR [ebx]
+ 1004425:	83 ec 0c             	sub    esp,0xc
+ 1004428:	68 00 10 00 00       	push   0x1000
+ 100442d:	e8 fd ef ff ff       	call   100342f <allocPages>
+ 1004432:	89 46 1c             	mov    DWORD PTR [esi+0x1c],eax
 /home/yogi/src/os/chrisOSKernel/src/task.c:80
     printd(DEBUG_TASK,"Malloc'd 1k task page directory @ 0x%08X\n",task->tss->CR3);
- 1003f35:	83 c4 0c             	add    esp,0xc
- 1003f38:	8b 03                	mov    eax,DWORD PTR [ebx]
- 1003f3a:	ff 70 1c             	push   DWORD PTR [eax+0x1c]
- 1003f3d:	68 90 88 00 01       	push   0x1008890
- 1003f42:	68 00 40 00 00       	push   0x4000
- 1003f47:	e8 43 e6 ff ff       	call   100258f <printd>
+ 1004435:	83 c4 0c             	add    esp,0xc
+ 1004438:	8b 03                	mov    eax,DWORD PTR [ebx]
+ 100443a:	ff 70 1c             	push   DWORD PTR [eax+0x1c]
+ 100443d:	68 b8 91 00 01       	push   0x10091b8
+ 1004442:	68 00 40 00 00       	push   0x4000
+ 1004447:	e8 47 e1 ff ff       	call   1002593 <printd>
 /home/yogi/src/os/chrisOSKernel/src/task.c:81
     task->pageTable=(uint32_t*)task->tss->CR3;
- 1003f4c:	8b 03                	mov    eax,DWORD PTR [ebx]
- 1003f4e:	8b 40 1c             	mov    eax,DWORD PTR [eax+0x1c]
- 1003f51:	89 43 04             	mov    DWORD PTR [ebx+0x4],eax
+ 100444c:	8b 03                	mov    eax,DWORD PTR [ebx]
+ 100444e:	8b 40 1c             	mov    eax,DWORD PTR [eax+0x1c]
+ 1004451:	89 43 04             	mov    DWORD PTR [ebx+0x4],eax
 /home/yogi/src/os/chrisOSKernel/src/task.c:82
     mmMapKernelIntoTask(task);
- 1003f54:	89 1c 24             	mov    DWORD PTR [esp],ebx
- 1003f57:	e8 ec fe ff ff       	call   1003e48 <mmMapKernelIntoTask>
+ 1004454:	89 1c 24             	mov    DWORD PTR [esp],ebx
+ 1004457:	e8 ec fe ff ff       	call   1004348 <mmMapKernelIntoTask>
 /home/yogi/src/os/chrisOSKernel/src/task.c:83
     return task;
- 1003f5c:	83 c4 10             	add    esp,0x10
- 1003f5f:	89 d8                	mov    eax,ebx
- 1003f61:	eb 05                	jmp    1003f68 <createTask+0xdb>
+ 100445c:	83 c4 10             	add    esp,0x10
+ 100445f:	89 d8                	mov    eax,ebx
+ 1004461:	eb 05                	jmp    1004468 <createTask+0xdb>
 /home/yogi/src/os/chrisOSKernel/src/task.c:65
 task_t* createTask(bool kernelTSS)
 {
-    task_t* task=getTaskSlot();
+    task_t* task=getTaskSlot();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
     
     if (task==0)
         return NULL;
- 1003f63:	b8 00 00 00 00       	mov    eax,0x0
+ 1004463:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/chrisOSKernel/src/task.c:84
-    task->tss->CR3=(uint32_t)malloc(0x1000);
+    task->tss->CR3=(uint32_t)allocPages(0x1000);
     printd(DEBUG_TASK,"Malloc'd 1k task page directory @ 0x%08X\n",task->tss->CR3);
     task->pageTable=(uint32_t*)task->tss->CR3;
     mmMapKernelIntoTask(task);
     return task;
 }
- 1003f68:	83 c4 04             	add    esp,0x4
- 1003f6b:	5b                   	pop    ebx
- 1003f6c:	5e                   	pop    esi
- 1003f6d:	c3                   	ret    
+ 1004468:	83 c4 04             	add    esp,0x4
+ 100446b:	5b                   	pop    ebx
+ 100446c:	5e                   	pop    esi
+ 100446d:	c3                   	ret    

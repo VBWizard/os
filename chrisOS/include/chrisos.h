@@ -16,6 +16,7 @@
 //kernelDataLoadAddress is defined in kernelData2.ld.  It is the address of kernelData
 extern char kernelDataLoadAddress;
 //KERNEL_DATA_LOAD_ADDRESS is used by our loader to skip loading of kernel data by programs which are loaded.
+#define PAGE_SIZE 0x1000
 #define KERNEL_DATA_LOAD_ADDRESS kernelDataLoadAddress         //Change this if the kernelData1.ld kernelData load address changes
 #define KERNEL_PHYSICAL_EXEC_ADDRESS 0x01000000
 #define KERNEL_DATA_NAME "kernelData"
@@ -109,9 +110,11 @@ extern char kernelDataLoadAddress;
 #define DEBUG_KERNEL_PAGING 1<<15
 #define DEBUG_MEMORY_MANAGEMENT 1<<16
 #define DEBUG_LOADER 1<<17
+#define DEBUG_PROCESS 1<<18
+#define DEBUG_MALLOC 1<<19
 #define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_TASK
-//| DEBUG_KERNEL_PAGING | DEBUG_MEMORY_MANAGEMENT// DEBUG_ELF_LOADER//| DEBUG_KEYBOARD//| DEBUG_AHCI
+#define KDEBUGLEVEL DEBUG_EXCEPTIONS 
+//DEBUG_TASK | DEBUG_PROCESS | DEBUG_KERNEL_PAGING | DEBUG_MEMORY_MANAGEMENT// DEBUG_ELF_LOADER//| DEBUG_KEYBOARD//| DEBUG_AHCI
 //DEBUG_TICK | 
 #define SCREEN_SPACES_PER_TAB 5
 
