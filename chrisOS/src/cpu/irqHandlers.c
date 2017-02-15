@@ -238,11 +238,13 @@ void pagingExceptionHandler()
           printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
 #endif
+    if (lOldDebugLevel)
+        kDebugLevel=lOldDebugLevel;
     if ((exceptionCR2&0xFFFFF000)==0xC0000000 && (!kPagingInitDone))
     {
 #ifndef DEBUG_NONE
-        if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
-            printk("pagingExceptionHandler: Updating readonly flag for 0x%08X\n",exceptionCR2);
+        if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
+            printk("\n\tpagingExceptionHandler: Updating 0x%08X to read/write for WP test ...\n\t",exceptionCR2);
 #endif
         kPagingSetPageReadOnlyFlag((uintptr_t*)lPTEAddress, false);
     }
@@ -255,8 +257,6 @@ void pagingExceptionHandler()
 //    }
 #endif
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
-    if (lOldDebugLevel)
-        kDebugLevel=lOldDebugLevel;
     if ((!kPagingInitDone) && exceptionCR2==0xC0000000)
     {
         exceptionCR2=0;

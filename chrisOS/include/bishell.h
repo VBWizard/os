@@ -50,6 +50,7 @@ void HIGH_CODE_SECTION listParts(char* cmdline);
 void HIGH_CODE_SECTION attach(char* cmdline);
 void HIGH_CODE_SECTION listDir(char* cmdline);
 void HIGH_CODE_SECTION execProgram(char* cmdline);
+void HIGH_CODE_SECTION displayGDTTable(char *cmdline);
 
 command_table_t cmds[] = { 
         {"help","Get help (this information)",helpMe,0},
@@ -61,6 +62,7 @@ command_table_t cmds[] = {
         {"dko","Dump kernel object addresses",dumpKernelAddresses,0},
         {"e820","Print E820 Memory Map",printE820Map,0},
         {"exec","Execute a program from disk",execProgram,1},
+        {"gdt","Display the GDT table",displayGDTTable,1},
         {"inb","Get a byte from a port",inPortB,1},
         {"inw","Get a word from a port",inPortW,1},
         {"ind","Get a dword from a port",inPortD,1},

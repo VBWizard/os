@@ -38,6 +38,7 @@ extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 extern void pciInitialize();
 extern void kSetPhysicalRangeRO(uint32_t startAddy, uint32_t endPage, bool readOnly);
+extern void kUnMapPage(uintptr_t mapTo);
 extern uint64_t kE820MemoryBytes;
 extern struct mbr_t* kMBR;
 extern uint8_t* lowSmapTablePtr;
@@ -188,6 +189,25 @@ bool HIGH_CODE_SECTION ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH]
             return true;
     return false;
 }
+void extern enableCR0_WP();
+
+void HIGH_CODE_SECTION testWPBit()
+{
+    enableCR0_WP();
+    printk("PAGING: Kernel paged base: 0x%08X\n",KERNEL_PAGED_BASE_ADDRESS);
+    printk("PAGING: Making page @ 0x00000000 read only\n");
+    kSetPhysicalRangeRO(0x0,0xFFF,true);
+    printk("PAGING: Testing whether CPU honors WP flag ... ");
+  __asm__("cli\n");
+  __asm__("mov %0,[0x0]\n":"=r" (kOriginalAddressZeroValue));
+  __asm__("mov eax,0xdeadbeef\n mov [0x0],eax\n");    //purposely write address 0 which we made "read only"
+  __asm__("mov eax,cr0\n":::"eax");
+  if (kPagingExceptionsSinceStart==1)
+    printk("WP bit works!\n");
+  else
+      printk("WP bit does not work\n");
+  kUnMapPage(0x0);
+}
 
 void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/) {
     
@@ -285,15 +305,8 @@ struct tm theDateTime;
     printk("PAGING: remapping APIC from 0x%08X to 0x%08X\n", kCPU[0].registerBase, kAPICRegisterRemapAddress);
     //map APIC address 0xFEE00000 to 0x825000
     kMapPage(kAPICRegisterRemapAddress, kCPU[0].registerBase,0x13);  //0x63 + cache disabled
-    printk("PAGING: Kernel paged base: 0x%08X\n",KERNEL_PAGED_BASE_ADDRESS);
-    printk("PAGING: Making page @ 0x00000000 read only\n");
     kSetPhysicalRangeRO(0x0,0xFFF,true);
-    printk("PAGING: Testing whether CPU honors WP flag ... ");
-  __asm__("cli\n");
-  __asm__("mov %0,[0x0]\n":"=r" (kOriginalAddressZeroValue));
-  __asm__("mov eax,0xdeadbeef\n mov [0x0],eax\n");    //purposely read address 0 which we made "read only"
-    printk("works\n");
-    kSetPhysicalRangeRO(0x0,0xFFF,true);
+    testWPBit();
     kPagingInitDone=true;
 #endif
     printk("CLOCK: tick frequency is %uhz\n",kTicksPerSecond);

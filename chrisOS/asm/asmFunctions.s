@@ -42,10 +42,21 @@ storeGDT:
     mov eax,[esp+4]
     sgdt [eax]
     ret
+
 .global getCS
 .type getCS, @function
 getCS:
 .code32
     push cs
+    pop eax
+    ret
+
+.global enableCR0_WP
+.type enableCR0_WP, @function
+enableCR0_WP:
+    push eax
+    mov eax,cr0
+    or eax,0x10000
+    mov cr0,eax
     pop eax
     ret

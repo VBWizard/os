@@ -7,8 +7,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/mm/malloc.c</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/paging.c</file>
             <file>file:/home/yogi/src/os/chrisOSKernel/src/kernel.c</file>
-            <file>file:/home/yogi/src/os/chrisOS/include/chrisos.h</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/mm/alloc.c</file>
         </group>
     </open-files>
 </project-private>

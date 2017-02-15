@@ -207,6 +207,11 @@ char **buildargv (const char *input)
   return (argv);
 }
 
+void HIGH_CODE_SECTION displayGDTTable(char *cmdline)
+{
+    displayGDT();
+}
+
 void HIGH_CODE_SECTION QueryBDF(char* cmdline)
 {
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
@@ -281,7 +286,12 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
         printk("Error: Requested address (0x%08X) or address+count (0x%08X) > memory size ()", lAddress, lAddress+lCount);
         return;
     }*/
-    printk("dumpP: Dumping %u %c (%c) from 0x%08X%s\n", lCount, lCharSize , lCharType, lAddress, addrIsVirtual?"(v)":"");;
+    printk("dump");
+    if (addrIsVirtual)
+        printk("V");
+    else
+        printk("P");
+    printk(": Dumping %u %c (%c) from 0x%08X\n", lCount, lCharSize , lCharType, lAddress);
     uint8_t* mem=(uint8_t*)lAddress;
     uint16_t* memw=(uint16_t*)lAddress;
     uint32_t* memd=(uint32_t*)lAddress;
@@ -299,17 +309,16 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
     lTemp=0; //column
     if (!addrIsVirtual)
     {
-        //NOTE: Have to include SS here, as code below uses ebp references which implies SS
         SWITCH_TO_NON_KERNEL_DATA_AND_STACK
         __asm__("cli\n");
         doNonPagingJump();
-        //printk("Switching to 0 based GDT entry for DS,ES,FS,GS,SS\n");
     }
     if (lCharSize=='b')
     {
         printk("%08X:\t", &mem[0]);
         for (int cnt=0;cnt<lCount;cnt++)
         {
+            //After every 16 bytes, print the character values, a newline, and the start address of the next 16 bytes
             if (lTemp==16)
             {
                 puts("\t");
@@ -364,7 +373,7 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
     puts("\n");
     if (!addrIsVirtual)
     {
-       __asm__("mov eax,cr0\n or eax,0x80000000\n mov cr0,eax\n");
+        __asm__("push eax\nmov eax,cr0\n or eax,0x80000000\n mov cr0,eax\nljmp 0x20:pEnableJmp\npEnableJmp:pop eax\n");
        doPagingJump();
         SWITCH_TO_KERNEL_DATA_AND_STACK
         __asm__("sti\n");

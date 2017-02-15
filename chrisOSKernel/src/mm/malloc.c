@@ -85,29 +85,31 @@ void allocateMemoryToProcess(heapPtr* ptr, size_t size, bool isKernel)
     uint32_t newSize=size;
     uint32_t* allocdPage;
     
+    //While we are using allocPages, we need to adjust the size to a multiple of 4096
+    //*******************************************************************************
     if (newSize%PAGE_SIZE)
     {
         newSize+=(PAGE_SIZE-(size % PAGE_SIZE));
-        printd(DEBUG_MALLOC,"allocateMemoryToProcess: Size adjusted from %u to %u\n",size,newSize);
+        printd(DEBUG_MALLOC,"aMTP: Size adjusted from %u to %u\n",size,newSize);
     }
-
+    //*******************************************************************************
     allocdPage=allocPages(newSize);
-    printd(DEBUG_MALLOC,"Used allocPages to allocate 0x%08X bytes at 0x%08X\n",ptr->size,allocdPage);
-    uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
-    ptr->address=virtualAddress;
-    if (isKernel)
+    printd(DEBUG_MALLOC,"aMTP: Used allocPages to allocate 0x%08X bytes at 0x%08X\n",ptr->size,allocdPage);
+    uintptr_t virtualAddress=allocdPage;  //=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
+   ptr->address=virtualAddress;
+/*    if (isKernel)
     {
         uint32_t cs=getCS()>>3;
         printk("getCS=0x%08X, bootGdt.base_high=0x%02X\n",(cs,bootGdt[getCS()].base_high<<24));
         virtualAddress|=bootGdt[cs].base_low;
         virtualAddress|=bootGdt[cs].base_middle<<16;
         virtualAddress|=bootGdt[cs].base_high<<24;
-        printd(DEBUG_MALLOC,"allocateMemoryToProcess: Adjusted virtual address to 0x%08X since we're running a kernel process\n",virtualAddress);
+        printd(DEBUG_MALLOC,"aMTP: Adjusted virtual address to 0x%08X since we're running a kernel process\n",virtualAddress);
     }
-    for (void* physicalAddress=allocdPage;physicalAddress<(uint32_t)(allocdPage)+newSize;physicalAddress+=PAGE_SIZE)
+*/    for (void* physicalAddress=allocdPage;physicalAddress<(uint32_t)(allocdPage)+newSize;physicalAddress+=PAGE_SIZE)
     {
         pagingMapPage(CURRENT_CR3,virtualAddress,physicalAddress,0x07);
-        printd(DEBUG_MALLOC,"allocateMemoryToProcess: Mapped phys page 0x%08X to process' virt page 0x%08X\n",physicalAddress,virtualAddress);
+        printd(DEBUG_MALLOC,"aMTP: Mapped phys page 0x%08X to process' virt page 0x%08X\n",physicalAddress,virtualAddress);
         virtualAddress+=PAGE_SIZE;
     }
 }

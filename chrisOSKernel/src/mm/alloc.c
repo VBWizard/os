@@ -49,7 +49,7 @@ sMemInfo* findBlockByMemoryAddress(uintptr_t* address)
 }
 
 //Returns a block with enough memory to fulfill the request
-uintptr_t* findAvailableBlockBySize(uint32_t pSize)
+sMemInfo* findAvailableBlockBySize(uint32_t pSize)
 {
     sMemInfo* mInfo=heapMemoryInfo;
     
@@ -59,10 +59,10 @@ uintptr_t* findAvailableBlockBySize(uint32_t pSize)
         mInfo++;
     while (mInfo>=heapMemoryInfo)
     {
-        if (mInfo->size>=pSize && (!mInfo->inUse))
+        if (mInfo->size>=pSize && (mInfo->inUse==false))
         {
             printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
-            return (uintptr_t*)mInfo;
+            return mInfo;
         }
         mInfo--;
     }
@@ -100,18 +100,20 @@ void* allocPages(uint32_t size)
         printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Size adjusted from %u to %u\n",size,newSize);
     }
     uintptr_t* lRetVal;
-    uintptr_t* block=findAvailableBlockBySize(newSize);
-    if ( ((sMemInfo*)(block))->size > newSize)
-       lRetVal=allocateBlockFrom((sMemInfo*)block,newSize);
+    sMemInfo* block=findAvailableBlockBySize(newSize);
+    block->inUse=true;
+    if ( block->size > newSize)
+       lRetVal=allocateBlockFrom(block,newSize);
     else
-        lRetVal=((sMemInfo*)(block))->address;
+        lRetVal=block->address;
     //Map page into our address space
-    pagingMapPage(CURRENT_CR3,lRetVal,lRetVal,0x7);
+    uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
+    pagingMapPage(CURRENT_CR3,virtualAddress,lRetVal,0x7);
     //Zero out the memory
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Zeroing out page(s) at 0x%08X for 0x%08X\n",lRetVal,newSize);
     memset(lRetVal,0,newSize);
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Returning address 0x%08X\n",lRetVal);
-    return lRetVal;
+    return virtualAddress & 0xFFFFF000;
 }
 
 void freePage(void* address)

@@ -26,7 +26,7 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
     dir=(uint32_t*)pageDirAddress;
     uint32_t* tablePtr;
     uint32_t* currentPDE,*lastPDE;
-    int foundEntryCount;
+    int foundPageEntryCount;
     bool found=false;
     uint32_t foundPageTableEntry;
     uint32_t foundPageTableEntryNum;
@@ -35,11 +35,11 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
     currentPDE=dir;
     lastPDE=dir+(PAGE_SIZE/4);
     
-    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding page entries to accomodate 0x%08X pages\n",pagesToFind);
+    printd(DEBUG_PAGING,"pFAATMT: Finding PTEs to accomodate 0x%08X pgs\n",pagesToFind);
     //Scan the page directory for an entry that is in use
     do
     {
-        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding existing page directory entry\n");
+        //printd(DEBUG_PAGING,"pFAATMT: Finding existing page directory entry\n");
         for (uint32_t* cnt=currentPDE;cnt<=lastPDE;cnt++)
         {
             if (*dir==0)
@@ -59,21 +59,21 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
             *dir &= 0xFFFFF000;
             *dir |= 0x7;
             dirEntryNumber=0;
-            printd(DEBUG_PAGING,"pagingFindAvailablePageTable: No available directory entry, allocated one at 0x%08X, placed at PDE entry 0 (0x%08X)\n",*dir,dir);
+            printd(DEBUG_PAGING,"pFAATMT: No available directory entry, allocated one at 0x%08X, placed at PDE entry 0 (0x%08X)\n",*dir,dir);
         }
 
         currentPDE=dir;
-        foundEntryCount=0;
+        foundPageEntryCount=0;
         foundPageTableEntry=0;
         foundPageTableEntryNum=0;
         
         tablePtr=(uint32_t*)*dir;
         tablePtr=(uint32_t*)((uint32_t)tablePtr & 0xFFFFF000);
         
-        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found PDE=0x%08X (0x%08X)\n",currentPDE,*currentPDE);
+        //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found PDE=0x%08X (0x%08X)\n",currentPDE,*currentPDE);
         
         //Find sequential table entries large enough to hold the requested amount of memory
-        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding free page table entries\n");
+        //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Finding free page table entries\n");
         for (int cnt=0;cnt<(PAGE_SIZE/4)-1;cnt++)
         {
             //If entry is in use
@@ -81,7 +81,7 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
             {
                 //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u is in use (0x%08X=0x%08X), starting again\n",foundEntryCount+1,pagesToFind,tablePtr,*tablePtr);
                 //reset the found entry count and move to the next entry
-                foundEntryCount=0;
+                foundPageEntryCount=0;
                 tablePtr++;
                 foundPageTableEntry=0;
                 foundPageTableEntryNum=0;
@@ -89,34 +89,36 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
             else
             {
                 //Entry not in use, increment the found entry count
-                foundEntryCount++;
-                printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u available ... continuing\n",foundEntryCount,pagesToFind);
+                foundPageEntryCount++;
+                //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Page %u of %u available ... continuing\n",foundEntryCount,pagesToFind);
                 if (foundPageTableEntry==0)
                 {
                     foundPageTableEntry=(uint32_t)tablePtr;
                     foundPageTableEntryNum=cnt;
                 }
                 //If we found enough entries which aren't in use, bail out of the FOR
-                if (foundEntryCount==pagesToFind)
+                if (foundPageEntryCount==pagesToFind)
                 {
-                    printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found available page entries at entry 0x%08X\n",foundPageTableEntry);
+                    //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found available page entries at entry 0x%08X\n",foundPageTableEntry);
                     found=true;
                     break;
                 }
             }
         }
-        printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Not enough pages at dir entry 0x%08X (%u-%u)\n",currentPDE,foundEntryCount,pagesToFind);
+        //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Not enough pages at dir entry 0x%08X (%u-%u)\n",currentPDE,foundEntryCount,pagesToFind);
         dir++;
         dirEntryNumber++;
     } while ( !found && currentPDE<lastPDE);
     
     if (!found)
-        panic("pagingFindAvailablePageTable: Could not find a free PTE, PDE=0x%08X\n",pageDirAddress);
+        panic("pFAATMT: Could not find a free PTE, PDE=0x%08X\n",pageDirAddress);
 
-    printd(DEBUG_PAGING,"dirEntryNumber=0x%08X, foundPageTableEntry=0x%08X\n",dirEntryNumber,foundPageTableEntryNum);
-    lRetVal=(uint32_t)((dirEntryNumber*0x400000) + (foundPageTableEntryNum*4096));
-    printd(DEBUG_PAGING,"Found page directory entry 0x%08X, starting page entry 0x%08X\n",currentPDE,foundPageTableEntry);
-    printd(DEBUG_PAGING,"\tfor 0x%08X bytes of memory starting at address 0x%08X\n",pagesToFind*PAGE_SIZE,lRetVal);
+    dirEntryNumber--;
+    
+    printd(DEBUG_PAGING,"pFAATMT: dirEntry#=0x%08X, ptEntry#=0x%08X\n",dirEntryNumber,foundPageTableEntryNum);
+    lRetVal=(uint32_t)((dirEntryNumber*(PAGE_SIZE*1024)) + (foundPageTableEntryNum*PAGE_SIZE));
+    printd(DEBUG_PAGING,"pFAATMT: Found PDE 0x%08X, starting PTE 0x%08X\n",currentPDE,foundPageTableEntry);
+    printd(DEBUG_PAGING,"\tfor 0x%08X bytes at virt address 0x%08X\n",pagesToFind*PAGE_SIZE,lRetVal);
     return lRetVal;
 }
 

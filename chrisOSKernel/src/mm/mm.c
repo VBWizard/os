@@ -88,7 +88,7 @@ void mmInit()
 
     mmInitHeapTracking();    
     //We need to
-    uintptr_t startAddr=0x0;
+    uintptr_t startAddr=0x1000;
     uintptr_t endAddr= (kernelMemoryUsed + 0x1000) & 0xFFFFF000;
     //Mark everything from the beginning of memory (0xC0000000) to the end of the kernel objects as in-use
     printd(DEBUG_KERNEL_PAGING,"Setting kernel memory range from 0x%08X-0x%08X as in-use\n",startAddr,endAddr);

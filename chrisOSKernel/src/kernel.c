@@ -20,6 +20,7 @@
 
 extern char kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
+
 /*
  * 
  */
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
     kDebugLevel |= DEBUG_KERNEL_PAGING;
     mmInit();
 //    kDebugLevel |= DEBUG_MEMORY_MANAGEMENT;
-//    kDebugLevel |= DEBUG_PAGING;
+    kDebugLevel |= DEBUG_PAGING;
     kDebugLevel |= DEBUG_MALLOC;
     printk("Done initializing memory management.\n\nInitializing malloc ...\n");
     initMalloc();
@@ -48,12 +49,39 @@ int main(int argc, char** argv) {
     
     //process_t* process = createProcess(false,'/myhelloworld');
 
-    int* a = malloc(50);
+    printk("\n\n***************************MALLOC TEST 1***********************************\n");
+    int* a = malloc(5000);
     a[0]=0xDEADBEEF;
-    printk("a[0](0x%08X)=0x%08X\n",&a[0],a[0]);
+    uint32_t* v=(uint32_t*)0x4c39ec;
     a[1]=0xBEADFEED;
-    return 0;
+    printk("\n\n***************************MALLOC TEST 2***********************************\n");
     char* b = malloc(512);
+    strcpy(b,"Hello world!!!\n");
+    printk("a[0](0x%08X)=0x%08X\n\n\n",&a[0],a[0]);
+    printk("b[0](0x%08X)=0x%08X=%s\n",&b[0],b[0],b);
+
+    terminal_clear();
+    printk("\n\n*************************** MALLOC TEST 3 ***********************************\n");
+    uint32_t* ca[10];
+    goto MALLOCTESTS;   
+    MALLOCTESTS:
+    ca[0]=malloc(10);
+    uint32_t* c = 0x4c3a00;
+    printk ("ca[0] mapping = 0x%08X\n",(uint32_t*)*c);
+    printk("\n\n***NEXT***\n");
+    ca[1]=malloc(10);
+    c = 0x4c3a04;
+    printk ("ca[1] mapping = 0x%08X\n",(uint32_t*)*c);
+    *ca[0]=1;
+    *ca[1]=2;
+    c = 0x4c3a00;
+    printk ("ca[0] mapping = 0x%08X\n",(uint32_t*)*c);
+    c = 0x4c3a04;
+    printk ("ca[1] mapping = 0x%08X\n",(uint32_t*)*c);
+
+    printk("ca[0]=0x%08X, *ca[0]=%u\n",ca[0],*ca[0]);
+    printk("ca[1]=0x%08X, *ca[1]=%u\n",ca[1],*ca[1]);
+    printk("\n");
     
     return (0xbad);
 }

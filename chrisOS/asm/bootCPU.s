@@ -382,12 +382,14 @@ ret
  .globl doNonPagingJump
 .type doNonPagingJump, @function
 doNonPagingJump:
+ljmp 0x28:pagingDisableJmp1
+pagingDisableJmp1:
 push eax
 mov eax,cr0
-and eax,0xEFFFFFFF
+and eax,0x7FFFFFFF
 mov cr0,eax
-ljmp 0x28:pagingDisableJmp
-pagingDisableJmp:
+ljmp 0x28:pagingDisableJmp2
+pagingDisableJmp2:
 mov ax, 0x18
 mov ds, ax
 mov es, ax
