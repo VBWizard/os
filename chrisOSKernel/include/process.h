@@ -12,6 +12,8 @@
  */
 
 #include "task.h"
+#include "../../chrisOS/include/i386/gdt.h"
+#include "../../chrisOS/include/elfloader.h"
 
 #ifndef PROCESS_H
 #define PROCESS_H
@@ -23,11 +25,14 @@ extern "C" {
 typedef struct sprocess
 {
     task_t* task;
-    char image[512];
+    //char image[512];
+    sGDT* gdtEntry;
+    elfInfo_t* elf;
+    char* path;
 } process_t;
 
     
-process_t* createProcess(bool kernelTSS, char* path);
+process_t* createProcess(char* path,bool kernelProcess);
 void destroyProcess(process_t* process);
 
 #ifdef __cplusplus
@@ -35,4 +40,3 @@ void destroyProcess(process_t* process);
 #endif
 
 #endif /* PROCESS_H */
-

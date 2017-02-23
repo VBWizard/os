@@ -73,7 +73,6 @@ KERNEL_DATA_SECTION uintptr_t* kIOAPICPtr;
 KERNEL_DATA_SECTION mpConfig_t* kMPConfigTable=(mpConfig_t*)MP_CONFIG_TABLE_ADDRESS;
 KERNEL_DATA_SECTION cpuid_features_t kCPUFeatures;
 KERNEL_DATA_SECTION cpu_t kCPU[8];
-KERNEL_DATA_SECTION volatile char* kKeyboardBuffer = (char*)KEYBOARD_BUFFER_ADDRESS-1;
 KERNEL_DATA_SECTION uint32_t kOriginalAddressZeroValue=0;
 KERNEL_DATA_SECTION ahcicaps_t* ahciCaps=(ahcicaps_t*)AHCI_CAPS_ADDRESS;
 KERNEL_DATA_SECTION int ahciCapsCount=0;
@@ -87,7 +86,7 @@ KERNEL_DATA_SECTION int kSelectedDiskNum=-1;
 KERNEL_DATA_SECTION int kSelectedPartNum=-1;
 KERNEL_DATA_SECTION volatile HBA_PORT* kAHCICurrentDisk;
 KERNEL_DATA_SECTION partEntry_t kAHCICurrentPart;
-KERNEL_DATA_SECTION volatile char* kKeyboardBufferBase = (char*)KEYBOARD_BUFFER_ADDRESS;
+KERNEL_DATA_SECTION volatile char* kKbdBuffCurrTop = (char*)KEYBOARD_BUFFER_ADDRESS;
 
 /*time.h*/
 KERNEL_DATA_SECTION int _daylight = 0;                  // Non-zero if daylight savings time is used
@@ -97,9 +96,10 @@ KERNEL_DATA_SECTION int ticksToWait;
 
 //NOTE: This is a temporary table in the .asm section.  It is copied to smap_table_ptr as soon as the E820 reading is complete
 KERNEL_DATA_SECTION struct gdt_ptr rmGdtp;
-KERNEL_DATA_SECTION struct GDT* rmGdt = (struct GDT*)GDT_PMODE_16BIT_TABLE_ADDRESS;
-KERNEL_DATA_SECTION struct GDT* bootGdt = (struct GDT*)INIT_GDT_TABLE_ADDRESS;
+KERNEL_DATA_SECTION sGDT* rmGdt = (sGDT*)GDT_PMODE_16BIT_TABLE_ADDRESS;
+KERNEL_DATA_SECTION sGDT* bootGdt = (sGDT*)INIT_GDT_TABLE_ADDRESS;
 KERNEL_DATA_SECTION struct gdt_ptr kernelGDT;
+KERNEL_DATA_SECTION volatile char* kKbdBuffCurrChar = (char*)KEYBOARD_BUFFER_ADDRESS;
 
 //AHCI
 KERNEL_DATA_SECTION HBA_MEM* ahciABAR = (struct HBA_MEM*)AHCI_ABAR_ADDRESS;

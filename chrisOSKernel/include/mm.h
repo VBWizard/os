@@ -12,5 +12,10 @@
 void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse);
 void mmKernelSetPageInUseFlag(uintptr_t address, bool inUse);
 void buildTaskPaging(uint32_t* cr3);
+
+#define CURRENT_CR3 ({uint32_t cr3Val; \
+                      __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
+                      cr3Val;});
+
 #endif	/* MM_H */
 

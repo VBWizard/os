@@ -15,7 +15,7 @@
 
 unsigned volatile char kKeyChar=0;
 unsigned volatile char kKeyStatus[11];
-extern volatile char* kKeyboardBuffer;
+extern volatile char* kKbdBuffCurrTop;
 extern volatile uint32_t kDebugLevel;
 extern volatile uint32_t exceptionErrorCode;
 extern volatile uint16_t exceptionNumber;
@@ -62,8 +62,8 @@ void kbd_handler_generic()
 //printk("%02X",rawKey);
            //changed from if rawkey & 0x80, so that keydown triggers the key being input
            if (rawKey==BREAK_RIGHT || rawKey==BREAK_LEFT || rawKey==BREAK_UP || rawKey==BREAK_DOWN)
-               if (kKeyboardBuffer<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
-                   *kKeyboardBuffer++=rawKey;
+               if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
+                   *kKbdBuffCurrTop++=rawKey;
            if (!(rawKey & 0x80))
            {
                 //rawKey &= 0x7f;

@@ -36,15 +36,27 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/_ext/9e029b58/asmFunctions.o \
+	${OBJECTDIR}/_ext/734293bf/ahci.o \
+	${OBJECTDIR}/_ext/734293bf/pci.o \
 	${OBJECTDIR}/_ext/7450142c/basic_display.o \
 	${OBJECTDIR}/_ext/f33415e4/keyboard.o \
 	${OBJECTDIR}/_ext/101a755a/bits.o \
+	${OBJECTDIR}/_ext/101a755a/gdt.o \
+	${OBJECTDIR}/_ext/101a7ecb/fat_access.o \
+	${OBJECTDIR}/_ext/101a7ecb/fat_cache.o \
+	${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o \
+	${OBJECTDIR}/_ext/101a7ecb/fat_format.o \
+	${OBJECTDIR}/_ext/101a7ecb/fat_misc.o \
+	${OBJECTDIR}/_ext/101a7ecb/fat_string.o \
+	${OBJECTDIR}/_ext/101a7ecb/fat_table.o \
+	${OBJECTDIR}/_ext/101a7ecb/fat_write.o \
 	${OBJECTDIR}/_ext/f336e79e/ata_disk.o \
 	${OBJECTDIR}/_ext/f336e79e/kpaging.o \
 	${OBJECTDIR}/_ext/f336e79e/utility.o \
 	${OBJECTDIR}/_ext/9e02dec1/memcpy.o \
 	${OBJECTDIR}/_ext/9e02dec1/panic.o \
 	${OBJECTDIR}/_ext/9e02dec1/printf.o \
+	${OBJECTDIR}/_ext/3e0a6d34/strcat.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcpy.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strlen.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strncmp.o \
@@ -59,7 +71,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/paging.o \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/syscall.o \
-	${OBJECTDIR}/src/task.o
+	${OBJECTDIR}/src/sysloader.o \
+	${OBJECTDIR}/src/task.o \
+	${OBJECTDIR}/src/x86.o
 
 
 # C Compiler Flags
@@ -90,6 +104,16 @@ ${OBJECTDIR}/_ext/9e029b58/asmFunctions.o: ../chrisOS/asm/asmFunctions.s
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e029b58
 	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/_ext/9e029b58/asmFunctions.o ../chrisOS/asm/asmFunctions.s
 
+${OBJECTDIR}/_ext/734293bf/ahci.o: ../chrisOS/src/block/ahci.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/734293bf
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/734293bf/ahci.o ../chrisOS/src/block/ahci.c
+
+${OBJECTDIR}/_ext/734293bf/pci.o: ../chrisOS/src/block/pci.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/734293bf
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/734293bf/pci.o ../chrisOS/src/block/pci.c
+
 ${OBJECTDIR}/_ext/7450142c/basic_display.o: ../chrisOS/src/char/console/basic_display.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/7450142c
 	${RM} "$@.d"
@@ -104,6 +128,51 @@ ${OBJECTDIR}/_ext/101a755a/bits.o: ../chrisOS/src/cpu/bits.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a755a/bits.o ../chrisOS/src/cpu/bits.c
+
+${OBJECTDIR}/_ext/101a755a/gdt.o: ../chrisOS/src/cpu/gdt.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a755a/gdt.o ../chrisOS/src/cpu/gdt.c
+
+${OBJECTDIR}/_ext/101a7ecb/fat_access.o: ../chrisOS/src/fat/fat_access.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_access.o ../chrisOS/src/fat/fat_access.c
+
+${OBJECTDIR}/_ext/101a7ecb/fat_cache.o: ../chrisOS/src/fat/fat_cache.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_cache.o ../chrisOS/src/fat/fat_cache.c
+
+${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o: ../chrisOS/src/fat/fat_filelib.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o ../chrisOS/src/fat/fat_filelib.c
+
+${OBJECTDIR}/_ext/101a7ecb/fat_format.o: ../chrisOS/src/fat/fat_format.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_format.o ../chrisOS/src/fat/fat_format.c
+
+${OBJECTDIR}/_ext/101a7ecb/fat_misc.o: ../chrisOS/src/fat/fat_misc.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_misc.o ../chrisOS/src/fat/fat_misc.c
+
+${OBJECTDIR}/_ext/101a7ecb/fat_string.o: ../chrisOS/src/fat/fat_string.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_string.o ../chrisOS/src/fat/fat_string.c
+
+${OBJECTDIR}/_ext/101a7ecb/fat_table.o: ../chrisOS/src/fat/fat_table.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_table.o ../chrisOS/src/fat/fat_table.c
+
+${OBJECTDIR}/_ext/101a7ecb/fat_write.o: ../chrisOS/src/fat/fat_write.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_write.o ../chrisOS/src/fat/fat_write.c
 
 ${OBJECTDIR}/_ext/f336e79e/ata_disk.o: ../chrisOS/src/init/ata_disk.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/f336e79e
@@ -134,6 +203,11 @@ ${OBJECTDIR}/_ext/9e02dec1/printf.o: ../chrisOS/src/printf.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/printf.o ../chrisOS/src/printf.c
+
+${OBJECTDIR}/_ext/3e0a6d34/strcat.o: ../chrisOS/src/strings/strcat.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strcat.o ../chrisOS/src/strings/strcat.c
 
 ${OBJECTDIR}/_ext/3e0a6d34/strcpy.o: ../chrisOS/src/strings/strcpy.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
@@ -205,10 +279,19 @@ ${OBJECTDIR}/src/syscall.o: src/syscall.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/syscall.o src/syscall.c
 
+${OBJECTDIR}/src/sysloader.o: src/sysloader.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/sysloader.o src/sysloader.c
+
 ${OBJECTDIR}/src/task.o: src/task.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/task.o src/task.c
+
+${OBJECTDIR}/src/x86.o: src/x86.s 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/src/x86.o src/x86.s
 
 # Subprojects
 .build-subprojects:

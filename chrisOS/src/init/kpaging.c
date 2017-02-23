@@ -15,46 +15,71 @@ extern uint32_t*  kKernelPageDir;
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 
-uint32_t kPagingGet4kPDEntryValue(uint32_t address)
+
+
+uint32_t kPagingGet4kPDEntryValueCR3(uintptr_t PageDirAddress, uint32_t address)
 {
     address&=0xFFFFF000;
-    uintptr_t* lTemp=(uint32_t*)((KERNEL_PAGE_DIR_ADDRESS + (((address & 0xFFC00000) >> 22) << 2)));
+    uintptr_t*pageDirEntry=((PageDirAddress + (((address & 0xFFC00000) >> 22) << 2)));
+    uintptr_t* lTemp=(uint32_t*)((PageDirAddress + (((address & 0xFFC00000) >> 22) << 2)));
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("pagingGet4kPDEntryValue: dirAddressPtr=0x%08x\n", *lTemp);
+            printk("kPagingGet4kPDEntryValueCR3: dirAddressPtr=0x%08x (PDIR=0x%08X)\n", *lTemp,PageDirAddress);
 #endif
     return (uint32_t)*lTemp;
 }
 
-uint32_t kPagingGet4kPDEntryAddress(uint32_t address)
+uint32_t kPagingGet4kPDEntryValue(uint32_t address)
+{
+    return kPagingGet4kPDEntryValueCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+}
+
+uint32_t kPagingGet4kPDEntryAddressCR3(uintptr_t PageDirAddress, uint32_t address)
 {
     address&=0xFFFFF000;
-    uintptr_t lTemp=((KERNEL_PAGE_DIR_ADDRESS  | (((address & 0xFFC00000) >> 22) << 2)));
+    uintptr_t lTemp=((PageDirAddress  | (((address & 0xFFC00000) >> 22) << 2)));
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("dirEntryAddress=0x%08x\n", lTemp);
+            printk("kPagingGet4kPDEntryAddressCR3: dirEntryAddress=0x%08x  (PDIR=0x%08X)\n", lTemp, PageDirAddress);
 #endif
     return (uint32_t)lTemp & 0xFFFFFFFF;
 }
 
-uint32_t kPagingGet4kPTEntryAddress(uint32_t address)
+uint32_t kPagingGet4kPDEntryAddress(uint32_t address)
+{
+    return kPagingGet4kPDEntryAddressCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+}
+
+uint32_t kPagingGet4kPTEntryAddressCR3(uintptr_t pageDirAddress, uint32_t address)
 {
     address&=0xFFFFF000;
-    uintptr_t pDirPtr=kPagingGet4kPDEntryValue(address) & 0xFFFFF000;
+    uintptr_t pDirPtr=kPagingGet4kPDEntryValueCR3(pageDirAddress,address) & 0xFFFFF000;
     return ((address & 0x3FF000) >> 12) << 2 | pDirPtr;
+}
+
+uint32_t kPagingGet4kPTEntryAddress(uint32_t address)
+{
+    return kPagingGet4kPTEntryAddressCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+}
+
+uint32_t kPagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address)
+{
+    address&=0xFFFFF000;
+    uint32_t* pTablePtr=(uint32_t*)kPagingGet4kPTEntryAddressCR3(pageDirAddress,address);
+#ifndef DEBUG_NONE
+         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
+             printk("kPagingGet4kPTEntryValueCR3: PTAddress=0x%08X, PTValue=0x%08X (PDIR=0x%08X)\n", pTablePtr,*pTablePtr,pageDirAddress);
+#endif
+    return *pTablePtr;
 }
 
 uint32_t kPagingGet4kPTEntryValue(uint32_t address)
 {
-    address&=0xFFFFF000;
-    uint32_t* pTablePtr=(uint32_t*)kPagingGet4kPTEntryAddress(address);
-#ifndef DEBUG_NONE
-         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-             printk("pagingGet4kPTEntryValue: pageEntryAddress=0x%08X\n", pTablePtr);
-             //printf("pageEntryValue=0x%08X\n", *pTablePtr);
-#endif
-    return *pTablePtr;
+    return kPagingGet4kPTEntryValueCR3(KERNEL_PAGE_DIR_ADDRESS,address);
 }
+
+
+
 
 void kPagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
 {

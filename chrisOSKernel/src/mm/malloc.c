@@ -17,7 +17,7 @@
 heapPtrPage* kHeapPagePtr;
 void* currAssignableMemoryPage;
 int currAssignableMemoryPtr;
-extern struct GDT* bootGdt;
+extern sGDT* bootGdt;
 extern uint32_t getCS();
 
 #define NO_PREV_HEAP_PTR (heapPtrPage*)0xFFFFFFFE
@@ -31,7 +31,7 @@ void initHeapPagePtr(heapPtrPage* pagePtr);
 
 void initMalloc()
 {
-    kHeapPagePtr = allocPages(sizeof(heapPtrPage));
+    kHeapPagePtr = allocPagesAndMap(sizeof(heapPtrPage));
     kHeapPagePtr->prev=NO_PREV_HEAP_PTR;
     initHeapPagePtr(kHeapPagePtr);
 }
@@ -68,7 +68,7 @@ void* findFreeMallocPointer()
         {
             printd(DEBUG_MALLOC,"No next heapPtrPage, creating one\n",ptrPg->next);
             //Create a new page and link it to the existing one
-            newPtrPage=allocPages(sizeof(heapPtrPage));
+            newPtrPage=allocPagesAndMap(sizeof(heapPtrPage));
             initHeapPagePtr(newPtrPage);
             ptrPg->next=newPtrPage;
             newPtrPage->prev=ptrPg;
@@ -93,25 +93,10 @@ void allocateMemoryToProcess(heapPtr* ptr, size_t size, bool isKernel)
         printd(DEBUG_MALLOC,"aMTP: Size adjusted from %u to %u\n",size,newSize);
     }
     //*******************************************************************************
-    allocdPage=allocPages(newSize);
-    printd(DEBUG_MALLOC,"aMTP: Used allocPages to allocate 0x%08X bytes at 0x%08X\n",ptr->size,allocdPage);
+    allocdPage=allocPagesAndMap(newSize);
+    printd(DEBUG_MALLOC,"aMTP: Used allocPagesAndMap to allocate 0x%08X bytes at 0x%08X\n",ptr->size,allocdPage);
     uintptr_t virtualAddress=allocdPage;  //=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
    ptr->address=virtualAddress;
-/*    if (isKernel)
-    {
-        uint32_t cs=getCS()>>3;
-        printk("getCS=0x%08X, bootGdt.base_high=0x%02X\n",(cs,bootGdt[getCS()].base_high<<24));
-        virtualAddress|=bootGdt[cs].base_low;
-        virtualAddress|=bootGdt[cs].base_middle<<16;
-        virtualAddress|=bootGdt[cs].base_high<<24;
-        printd(DEBUG_MALLOC,"aMTP: Adjusted virtual address to 0x%08X since we're running a kernel process\n",virtualAddress);
-    }
-*/    for (void* physicalAddress=allocdPage;physicalAddress<(uint32_t)(allocdPage)+newSize;physicalAddress+=PAGE_SIZE)
-    {
-        pagingMapPage(CURRENT_CR3,virtualAddress,physicalAddress,0x07);
-        printd(DEBUG_MALLOC,"aMTP: Mapped phys page 0x%08X to process' virt page 0x%08X\n",physicalAddress,virtualAddress);
-        virtualAddress+=PAGE_SIZE;
-    }
 }
 
 

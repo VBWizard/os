@@ -7,8 +7,7 @@
 
 #ifndef SYSLOADER_H
 #define	SYSLOADER_H
-
-int sysExec(char* fileName,int argc,char** argv);
-uint32_t sysLoadElf(void* file);   //returns entry point;
-
+#include "process.h"
+int sysExec(process_t* process,int argc,char** argv);
+uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isLibrary);
 #endif	/* SYSLOADER_H */

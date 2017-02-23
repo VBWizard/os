@@ -27,6 +27,7 @@ extern int kTicksPerSecond;
 extern time_t kSystemCurrentTime;
 extern uint32_t exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR3, exceptionCR4;
 extern bool kPagingInitDone;
+extern volatile char* kKbdBuffCurrTop;
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
@@ -107,11 +108,11 @@ void kbd_handler()
 //printk("%02X",rawKey);
            //changed from if rawkey & 0x80, so that keydown triggers the key being input
            if (rawKey==BREAK_RIGHT || rawKey==BREAK_LEFT || rawKey==BREAK_UP || rawKey==BREAK_DOWN)
-               if (kKeyboardBuffer<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
+               if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
                //CLR 01/10/2017: Increment the buffer pointer first
                {    
-                   kKeyboardBuffer++;
-                   *kKeyboardBuffer=rawKey;
+                   kKbdBuffCurrTop++;
+                   *kKbdBuffCurrTop=rawKey;
                }
            if (!(rawKey & 0x80))
            {
@@ -134,15 +135,16 @@ void kbd_handler()
                     printk("^");
                     translatedKeypress-=32;
                 }
-            if (kKeyboardBuffer<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
+            if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
             {
                 //CLR 01/10/2017: Increment the buffer pointer first
-                {   kKeyboardBuffer++;
-                    *kKeyboardBuffer=translatedKeypress;
+                {   
+                    kKbdBuffCurrTop++;
+                    *kKbdBuffCurrTop=translatedKeypress;
                 }
 #ifndef DEBUG_NONE
                  if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-                    printk("kbd_handler: %c-(%08X)\n",translatedKeypress, kKeyboardBuffer);
+                    printk("kbd_handler: %c-(%08X)\n",translatedKeypress, kKbdBuffCurrTop);
 #endif
                 cursorSavePosition();
                 cursorMoveTo(78,0);
@@ -153,7 +155,7 @@ void kbd_handler()
             {
 #ifndef DEBUG_NONE
                 if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-                      printk("noRoomForKey: %c\n",kKeyboardBuffer);
+                      printk("noRoomForKey: %c\n",kKbdBuffCurrTop);
 #endif
                 cursorSavePosition();
                 cursorMoveTo(78,0);
@@ -290,6 +292,8 @@ void defaultISRHandler()
 //    return;
     
 defaultHandlerLoop:
+    __asm__("cli");
+    __asm__("hlt");
     goto defaultHandlerLoop;
 }
 

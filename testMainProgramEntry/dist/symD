@@ -1,5 +1,5 @@
-pushd
+pushd ../
 ./make_debug
 popd
-objdump -x -t Debug/cross-Linux-x86/testmainprogramentry > testmainprogramentry.sym
+objdump -x -t Debug/cross-Linux/testmainprogramentry > testmainprogramentry.sym
 vi testmainprogramentry.sym

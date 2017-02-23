@@ -81,16 +81,32 @@ struct gdt_ptr lGDT;
  */
 void HIGH_CODE_SECTION gdt_init()
 {
-    gdtEntry(1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
+    gdtEntry(0x1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,       //Kernel code segment starting at 0x00
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,
+    gdtEntry(0x2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,       //Kernel data segment starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(3, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,      //this will stay at base 0x0, never 0xc0000000
+    gdtEntry(0x3, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //18 - kernel data segment starting at 0x0 ***Need to change this to KERNEL_PAGED_BASE_ADDRESS base
+              GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntry(0x4, KERNEL_PAGED_BASE_ADDRESS , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - Kernel code segment (main) starting at 0xC0000000
+              GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntry(0x5, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE | GDT_GROW_DOWN,       //kernel data segment starting at 0x0
+              GDT_GRANULAR | GDT_32BIT,true);
+
+    gdtEntry(0x6, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE,    //30 (33) - user data segment starting at 0x0
+              GDT_GRANULAR | GDT_32BIT,true);
+
+    gdtEntry(0x7, 0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE ,       //38 (3b) - user code segment starting at 0x0
+              GDT_GRANULAR | GDT_32BIT,true);
+
+    gdtEntry(0x8, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE | GDT_GROW_DOWN,       //40 (43) - user stack segment starting at 0x0
           GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(4, KERNEL_PAGED_BASE_ADDRESS , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
+
+    gdtEntry(0x20, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //100 - Kernel code segment will always start at 0
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(5, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,       //this will always stay at base 0x0, never 0xC0000000
+
+    gdtEntry(0x21, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE | GDT_GROW_DOWN,       //108 Kernel stack segment starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
+    
     
     gdtEntryRM(1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
               GDT_GRANULAR | GDT_16BIT);
@@ -99,10 +115,11 @@ void HIGH_CODE_SECTION gdt_init()
     gdtEntryRM(3, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_WRITABLE,
               GDT_GRANULAR | GDT_32BIT);
 
-    kernelGDT.limit = (sizeof(struct GDT) * GDT_ENTRIES) - 1;
+    kernelGDT.limit = 0x7ff; // (sizeof(sGDT) * GDT_ENTRIES) - 1;
     kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
-    rmGdtp.limit = sizeof(struct GDT) * GDT_ENTRIES - 1;
+    rmGdtp.limit = sizeof(sGDT) * GDT_ENTRIES - 1;
     rmGdtp.base = (unsigned int)rmGdt;
+    set_gdt(&kernelGDT);
 }
 
 void HIGH_CODE_SECTION quietHardware()
@@ -206,7 +223,9 @@ void HIGH_CODE_SECTION testWPBit()
     printk("WP bit works!\n");
   else
       printk("WP bit does not work\n");
-  kUnMapPage(0x0);
+  //Can't unmap page 0x0 or the memory manager will see it as free space, so set it read-only again
+  __asm__("mov eax,0x0\n mov [0x0],eax\n");    //purposely write address 0 which we made "read only"
+  kSetPhysicalRangeRO(0x0,0xFFF,true);
 }
 
 void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/) {
@@ -215,6 +234,8 @@ char currTime[150];
 struct tm theDateTime;
     //Zero out all of the memory we will be using as rebooting a computer doesn't necessarily clear memory
     //memset(0x200000,0,0x1000000);
+__asm__("sgdt [eax]\n"::"a" (&kernelGDT));
+gdt_init();
     kTicksPerSecond=TICKS_PER_SECOND;
     kTermInit();
     kInitDone=false;
@@ -232,7 +253,6 @@ struct tm theDateTime;
     identify_data_sizes(&kDataSizes);
     terminal_clear();
     printk("Booting ...\n");
-    gdt_init();
 
     quietHardware();
     int lLowMemKB = getInt12Memory();
@@ -276,8 +296,8 @@ struct tm theDateTime;
         printk("\n\nE820: Either the available memory is less than the minimum required of %d MB\nor memory capacity cannot be determined\n.", MINIMUM_USABLE_MEMORY / 1024 / 1024);
         printk("3820: Ignore? ");
         
-        while (getKeyboardKey()!='y')
-        {__asm("hlt\n");}
+        while (waitForKeyboardKey()!='y')
+        {}
     }
     __asm__ ("mov eax,%0\n push eax\n pop esp\n"::"r" (STACK_BASE_ADDRESS):"eax");
     detect_cpu();

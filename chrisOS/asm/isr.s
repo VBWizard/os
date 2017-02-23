@@ -564,7 +564,6 @@ done:
         iretd
 
 
-
 .global _call_gate_wrapper
 _call_gate_wrapper:
         push    ds

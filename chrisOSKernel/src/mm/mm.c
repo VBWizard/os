@@ -16,7 +16,7 @@
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 extern uint32_t kKernelPoolMemoryAddress;       //Address to locate page defs at
-extern char kernelDataLoadAddress, kernelLoadAddress, kernelLoadSize;
+extern char* kernelDataLoadAddress, kernelLoadAddress, kernelLoadSize;
 
 
 uint32_t KERNEL_DATA_SECTION 
@@ -89,7 +89,8 @@ void mmInit()
     mmInitHeapTracking();    
     //We need to
     uintptr_t startAddr=0x1000;
-    uintptr_t endAddr= (kernelMemoryUsed + 0x1000) & 0xFFFFF000;
+    //CLR 02/21/2017 - Changed from (kernelMemoryUsed + 0x1000) & 0xFFFFF000 to heap memory base address
+    uintptr_t endAddr= kmmHeapMemoryBaseAddress;
     //Mark everything from the beginning of memory (0xC0000000) to the end of the kernel objects as in-use
     printd(DEBUG_KERNEL_PAGING,"Setting kernel memory range from 0x%08X-0x%08X as in-use\n",startAddr,endAddr);
     mmKernelSetPageRangeInUseFlag(startAddr,

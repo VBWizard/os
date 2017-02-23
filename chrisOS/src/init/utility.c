@@ -20,7 +20,7 @@ extern uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, d
             debugErrorCode,debugCS, debugEIP, debugSavedESP, debugDS, debugES, debugFS, debugGS, debugSS, debugFlags;
 extern uint32_t  *debugSavedStack;
 extern struct gdt_ptr kernelGDT;
-extern struct GDT* bootGdt;
+extern sGDT* bootGdt;
 
 //#include <string.h>
 
@@ -193,9 +193,9 @@ void printDumpedRegs()
     printk("GDT=%08X\n",kernelGDT.base);
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
           printk("Bytes at CS:EIP: ");
-          for (int cnt=0;cnt<19;cnt++)
+/*          for (int cnt=0;cnt<19;cnt++)
               printk("%02X ", lCSIPPtr[cnt]);
-          printk("\n");
+*/          printk("\n");
           printk ("Stack @ 0x%08x:0x%08X:\n",exceptionSS, esp);
           for (int cnt=0;cnt<10;cnt++)
           {
@@ -322,20 +322,19 @@ uintptr_t* mallocTemp(int size)
 
 void displayGDT()
 {
-    struct GDT* theGDT=bootGdt;
-    
+    sGDT* theGDT=bootGdt;
     
     printk("Listing GDT Table\n");
     printk("Entry\tBase\t\t\tlimit\t\tAccess\tFlags\n");
-    for (int cnt=0;cnt<(int)(kernelGDT.limit/sizeof(struct GDT));cnt++)
+    for (int cnt=0;cnt<(int)(kernelGDT.limit/sizeof(sGDT));cnt++)
     {
         if (theGDT->access!=0 || cnt==0)
         {
-            printk("%u\t\t"    /*GDT#*/
-                    "0x%08X\t" /*base*/
-                    "0x%08X\t" /*limit*/
+            printk("%u\t\t"     /*GDT#*/
+                    "0x%08X\t"  /*base*/
+                    "0x%08X\t"  /*limit*/
                     "0x%02X\t\t" /*Access*/
-                    "0x%01X\n",  /*Flags*/
+                    "0x%01X\n" ,  /*Flags*/
                     cnt,
                     theGDT->base_high<<24 | theGDT->base_middle<<16 | theGDT->base_low,
                     theGDT->limit_low | (theGDT->flags_and_limit & 0x0F)<<16,

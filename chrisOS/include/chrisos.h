@@ -14,7 +14,7 @@
 #define TICKS_PER_SECOND 100
 
 //kernelDataLoadAddress is defined in kernelData2.ld.  It is the address of kernelData
-extern char kernelDataLoadAddress;
+extern char* kernelDataLoadAddress;
 //KERNEL_DATA_LOAD_ADDRESS is used by our loader to skip loading of kernel data by programs which are loaded.
 #define PAGE_SIZE 0x1000
 #define KERNEL_DATA_LOAD_ADDRESS kernelDataLoadAddress         //Change this if the kernelData1.ld kernelData load address changes
@@ -26,7 +26,7 @@ extern char kernelDataLoadAddress;
 //#define HIGH_CODE_NAME "hiCode"
 #define HIGH_CODE_SECTION __attribute__ ((section(HIGH_CODE_NAME)))
 ///Base address for library loading
-#define LIBRARY_BASE_LOAD_ADDRESS 0x07f00000
+#define LIBRARY_BASE_LOAD_ADDRESS 0x0
 /***************************************** CONFIG ****************************************/
 //#define DISABLE_PAGING 1
 #define __SMP__
@@ -40,18 +40,18 @@ extern char kernelDataLoadAddress;
 #define GDT_PMODE_16BIT_TABLE_SIZE 256*8
 #define RAM_AMT_TO_PAGE_INITIALLY 0x1000000
 #define KERNEL_PAGE_DIR_SIZE 0x10000 //64GB max memory (0x1000000000) max
-#define KERNEL_PAGE_TABLE_INITIAL_SIZE 0x400000      //4GB (100000000) max visible initially
+#define KERNEL_PAGE_TABLE_INITIAL_SIZE 0x400000 + 0x200000      //4GB + map 0xC0000000-0xDFFFFFFF to 0x00000000-0x3FFFFFFF
 #define SAVED_STACK_FOR_EXCEPTIONS_SIZE 0x1000
 #define TSS_TABLE_RECORD_COUNT 16384
 #define TSS_TABLE_SIZE (0x68*TSS_TABLE_RECORD_COUNT)
 #define TASK_TABLE_SIZE (TSS_TABLE_RECORD_COUNT*(100))          //need task_t size
 
-#define KERNEL_OBJECT_BASE_ADDRESS 0x150000     //NOTE: Needs to be larger than KERNEL_DATA_LOAD_ADDRESS by the size of the kernel variables
+#define KERNEL_OBJECT_BASE_ADDRESS 0x160000     //NOTE: Needs to be larger than KERNEL_DATA_LOAD_ADDRESS by the size of the kernel variables
 #define E820_TABLE_ADDRESS KERNEL_OBJECT_BASE_ADDRESS
 #define MP_CONFIG_TABLE_ADDRESS (E820_TABLE_ADDRESS + E820_TABLE_SIZE)
 #define KEYBOARD_BUFFER_ADDRESS (MP_CONFIG_TABLE_ADDRESS + MP_CONFIG_TABLE_SIZE)
 #define IDT_TABLE_ADDRESS ((KEYBOARD_BUFFER_ADDRESS + KEYBOARD_BUFFER_SIZE + 4096) & 0xFFFFF000)
-#define INIT_GDT_TABLE_ADDRESS ((IDT_TABLE_ADDRESS + IDT_TABLE_SIZE + 4096) & 0xFFFFF000)
+#define INIT_GDT_TABLE_ADDRESS ((IDT_TABLE_ADDRESS + IDT_TABLE_SIZE + 4096))
 #define TASK_TABLE_ADDRESS ((INIT_GDT_TABLE_ADDRESS + GDT_TABLE_SIZE + 4096) & 0xFFFFF000)
 #define TSS_TABLE_ADDRESS ((TASK_TABLE_ADDRESS + TASK_TABLE_SIZE+4096) & 0xFFFFF000)
 #define ATA_MBR_ARRAY_ADDRESS (TSS_TABLE_ADDRESS + TSS_TABLE_SIZE)
@@ -78,7 +78,7 @@ extern char kernelDataLoadAddress;
 #define END_OF_KERNEL_OBJECTS_ADDRESS (AHCI_ABAR_ADDRESS+0x100000)
 
 //#define KERNEL_CODE_BASE_ADDRESS
-#define STACK_BASE_ADDRESS 0x99ffe0
+#define STACK_BASE_ADDRESS 0xFFFF00
 #define KERNEL_PAGED_BASE_ADDRESS 0xC0000000
 #define KERNEL_TEMP_LOW_PAGE_TABLE_BASE_ADDRESS 0x5090000
 
@@ -112,10 +112,10 @@ extern char kernelDataLoadAddress;
 #define DEBUG_LOADER 1<<17
 #define DEBUG_PROCESS 1<<18
 #define DEBUG_MALLOC 1<<19
+#define DEBUG_KEYBOARD_DRIVER 1<<20
 #define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS 
-//DEBUG_TASK | DEBUG_PROCESS | DEBUG_KERNEL_PAGING | DEBUG_MEMORY_MANAGEMENT// DEBUG_ELF_LOADER//| DEBUG_KEYBOARD//| DEBUG_AHCI
-//DEBUG_TICK | 
+#define KDEBUGLEVEL DEBUG_EXCEPTIONS
+
 #define SCREEN_SPACES_PER_TAB 5
 
 #define MAX_PARAM_COUNT 10

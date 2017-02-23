@@ -12,6 +12,7 @@
 #include "filesystem.h"
 #include "fat/fat_filelib.h"
 #include "../include/elfloader.h"
+#include "i386/kPaging.h"
 
 
 extern uint64_t kE820MemoryBytes;
@@ -231,13 +232,15 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
     int lTemp=0;
     char lTempS[MAX_PARAM_WIDTH];
     bool addrIsVirtual=false;
+    uint32_t cr3=0;
+    
 //    for (int cnt=0;cnt<paramCount;cnt++)
 //        printk("Param # %u is %s\n", cnt, params[cnt]);
     
     memset(lTempS,0,MAX_PARAM_WIDTH);
     for (int cnt=0;cnt<=paramCount;cnt++)
     {
-        //printk("Processing parameter %u, value='%s'\n",cnt,params[cnt]);
+        printk("Processing parameter %u, value='%s'\n",cnt,params[cnt]);
         if (params[cnt][0]=='v')
         {
             //printk("Address is virtual parameter found\n");
@@ -259,6 +262,11 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
         {
             lAddress=strtoul(params[cnt],0,16);
         }
+        else if (params[cnt][0]!=0)
+        {
+            cr3=strtoul(params[cnt],0,16);
+            printk("Using CR3=0x%08X",cr3);
+        }
     }
 //    if (addrIsVirtual)
 //    {
@@ -268,17 +276,17 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
 //    }
     if (lCount>65535)
     {
-        printk("Error: Count is too large (%u), max is 500, can't dump", lCount);
+        printk("\nError: Count is too large (%u), max is 500, can't dump", lCount);
         return;
     }
     if (lCharSize!='b' && lCharSize!='h' && lCharSize!='w' && lCharSize!='d')
     {
-        printk("Error: Character size (%c) must be in bhwd", lCharSize);
+        printk("\nError: Character size (%c) must be in bhwd", lCharSize);
         return;
     }
     if (lCharType!='x' && lCharType!='c' && lCharType!='e')
     {
-        printk("Error: Character type (%c) must be in xce", lCharType);
+        printk("\nError: Character type (%c) must be in xce", lCharType);
         return;
     }
 /*    if ((lAddress>kE820MemoryBytes || lAddress+lCount>kE820MemoryBytes) && (!addrIsVirtual))
@@ -286,6 +294,15 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
         printk("Error: Requested address (0x%08X) or address+count (0x%08X) > memory size ()", lAddress, lAddress+lCount);
         return;
     }*/
+    
+    if (cr3!=0)
+    {
+        lAddress=(kPagingGet4kPTEntryValueCR3(cr3,lAddress) & 0xFFFFF000) | (lAddress & 0x00000FFF) ;
+        printk(", physical address is 0x%08X\n");
+    }
+    else
+        printk("\n");
+    
     printk("dump");
     if (addrIsVirtual)
         printk("V");
@@ -321,7 +338,7 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
             //After every 16 bytes, print the character values, a newline, and the start address of the next 16 bytes
             if (lTemp==16)
             {
-                puts("\t");
+                puts(" ");
                 for (int cnt2=0;cnt2<16;cnt2++)
                 {
                     if (ISALPHA(lTempS[cnt2]) || ISDIGIT(lTempS[cnt2]) || (lTempS[cnt2]>=32&&lTempS[cnt2]<=47) || (lTempS[cnt2]>=123&&lTempS[cnt2]<=126) || (lTempS[cnt2]>=91&&lTempS[cnt2]<=96) || (lTempS[cnt2]>=58&&lTempS[cnt2]<=64) )
@@ -341,6 +358,8 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
             }
             printk("%02X ",mem[cnt]);
             lTempS[lTemp++]=mem[cnt];
+            if (lTemp%4==0)
+                printk(" ");
         }
     }
     else
@@ -382,8 +401,10 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
 
 void HIGH_CODE_SECTION dumpV(char* cmdline)
 {
-    strcat(cmdline," v");
-    dumpP(cmdline);
+    char newCmdLine[MAX_PARAM_WIDTH];
+    strcpy(newCmdLine,cmdline);
+    strcat(newCmdLine," v");
+    dumpP(newCmdLine);
 }
 
 void HIGH_CODE_SECTION helpMe()
@@ -474,10 +495,28 @@ void HIGH_CODE_SECTION writeDWords(char* cmdline)
 void HIGH_CODE_SECTION showMapping(char* cmdline)
 {
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-    parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
+    int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
 
-    uintptr_t lAddress=strtoul(params[0],0,16);
-    printk("\tPD address=0x%08X, \n\tPD value=0x%08X, \n\tPT address=0x%08X, \n\tPT value=0x%08X\n\tPhysical Address=0x%08X\n",kPagingGet4kPDEntryAddress(lAddress),kPagingGet4kPDEntryValue(lAddress),kPagingGet4kPTEntryAddress(lAddress),kPagingGet4kPTEntryValue(lAddress),(kPagingGet4kPTEntryValue(lAddress) & 0xFFFFF000) | (lAddress & 0x00000FFF));
+    uintptr_t CR3;
+    uintptr_t lAddress;
+    printk("Param count = %u\n",paramCount);
+    if (paramCount==2)
+    {
+        CR3=strtoul(params[0],0,16);
+        lAddress=strtoul(params[1],0,16);
+        printk("\tMapping based on CR3=0x%08X\n\tPD address=0x%08X, \n\tPD value=0x%08X, \n\tPT address=0x%08X, \n\tPT value=0x%08X\n\tPhysical Address=0x%08X\n",
+                CR3,
+                kPagingGet4kPDEntryAddressCR3(CR3,lAddress),
+                kPagingGet4kPDEntryValueCR3(CR3,lAddress),
+                kPagingGet4kPTEntryAddressCR3(CR3,lAddress),
+                kPagingGet4kPTEntryValueCR3(CR3,lAddress),
+                (kPagingGet4kPTEntryValueCR3(CR3,lAddress) & 0xFFFFF000) | (lAddress & 0x00000FFF));
+    }
+    else
+    {
+        lAddress=strtoul(params[0],0,16);
+        printk("\tMapping based on current CR3\n\tPD address=0x%08X, \n\tPD value=0x%08X, \n\tPT address=0x%08X, \n\tPT value=0x%08X\n\tPhysical Address=0x%08X\n",kPagingGet4kPDEntryAddress(lAddress),kPagingGet4kPDEntryValue(lAddress),kPagingGet4kPTEntryAddress(lAddress),kPagingGet4kPTEntryValue(lAddress),(kPagingGet4kPTEntryValue(lAddress) & 0xFFFFF000) | (lAddress & 0x00000FFF));
+    }
 }
 
 void HIGH_CODE_SECTION selectHDNum (char* cmdline)
@@ -626,8 +665,7 @@ getAKey:
         lCurrKey=0;
         while(lCurrKey==0)
         {
-            __asm__("sti\nhlt\n");
-            lCurrKey=getKeyboardKey();
+            lCurrKey=waitForKeyboardKey();
         }
         //printk("key='%08X'",lCurrKey);
         if(lCurrKey==0xc8) //up

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -37,13 +37,21 @@
       </toolsSet>
       <compileType>
         <cTool>
+          <architecture>1</architecture>
+          <standard>3</standard>
           <incDir>
             <pElem>../chrisOS/include</pElem>
             <pElem>../processManager/include</pElem>
           </incDir>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <linkerTool>
-          <commandLine>-ffreestanding -nostdlib -lgcc -O -T linker.ld</commandLine>
+          <linkerAddLib>
+            <pElem>/usr/local/lib</pElem>
+            <pElem>/home/yogi/opt/cross/lib</pElem>
+          </linkerAddLib>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
       <item path="../chrisOS/include/printf.h" ex="false" tool="3" flavor2="0">

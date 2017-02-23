@@ -1,6 +1,6 @@
 .intel_syntax noprefix
 .section .asm
-
+.extern bootGdt
 .extern tos
 .extern kAPICRegisterRemapAddress
 
@@ -130,19 +130,17 @@ ret
 set_gdt:
 .code32
 push eax
-    mov eax, [esp + 0x8]
+    mov eax,[esp+8]
     lgdt [eax]
-    pop eax
     jmp 0x08:.reload_CS
 .reload_CS:
-.code16
-    mov ax, 0x10
+    mov eax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-.code32
+    pop eax
     ret
 hang:
     hlt

@@ -64,7 +64,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libLoad.${CND_DLIB_EXT}: ${OBJECTFILE
 
 ${OBJECTDIR}/src/main.o: src/main.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -fPIC  -o ${OBJECTDIR}/src/main.o src/main.c
+	$(COMPILE.c) -g -I/usr/local/lib -I/home/yogi/opt/cross/lib -I/home/yogi/src/os/chrisOS/include -fPIC  -o ${OBJECTDIR}/src/main.o src/main.c
 
 # Subprojects
 .build-subprojects:

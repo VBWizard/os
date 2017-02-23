@@ -14,11 +14,13 @@
 typedef struct s_task
 {
     tss_t* tss;
-    uint32_t* pageTable;
-    uintptr_t* next, prev;
+    uint32_t* pageDir;
+    uintptr_t* next, *prev;
+    bool kernel;
 } task_t;
 
 task_t* createTask(bool kernelTSS);
+task_t* getTaskSlot();
 
 #endif	/* TASK_H */
 

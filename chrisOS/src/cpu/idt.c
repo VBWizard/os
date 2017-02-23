@@ -10,7 +10,7 @@ void idt_set_gate(struct idt_entry *idt, unsigned short sel, uint32_t base, unsi
 {
   idt->base_lo = base & 0xFFFF;
   idt->sel = sel;
-  idt->flags = flags;
+  idt->flags = flags | 0x80;
   idt->base_hi = (base >> 16) & 0xFFFF;}
 
 /* Installs the IDT */
@@ -70,11 +70,13 @@ void idt_init(struct idt_ptr* idtp, int remap_offset)
     idt_set_gate (&idtTable[0x1f], 0x08, (int)&_isr_31_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0x20+remap_offset], 0x08, (int)&_isr_32_wrapper, ACS_INT);               //
     idt_set_gate (&idtTable[0x21+remap_offset], 0x08, (int)&_isr_32_wrapper, ACS_INT);               //
-    
+
     for (int cnt=0x22;cnt<0xff;cnt++)
         idt_set_gate (&idtTable[cnt], 0x08, (int)&_isr_32_wrapper, ACS_INT);
     idt_install(idtp);
 
+    idt_set_gate (&idtTable[0x80], 0x3b, (int)&_call_gate_wrapper, ACS_TASK_GATE | ACS_DPL_3);               //
+    
 }
 
 //void idt_get_gate(struct idt_entry* idtTable, uint8_t idtIndex, unsigned short *sel, uint32_t *base, unsigned *char flags)

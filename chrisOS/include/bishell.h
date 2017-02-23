@@ -44,6 +44,7 @@ void writeWords(char* cmdline);
 void writeDWords(char* cmdline);
 void printAHCICaps();
 void showMapping(char* cmdline);
+void HIGH_CODE_SECTION showMappingCR3(char* cmdline);
 void HIGH_CODE_SECTION selectHDNum (char* cmdline);
 void HIGH_CODE_SECTION selectPart(char* cmdline);
 void HIGH_CODE_SECTION listParts(char* cmdline);
@@ -71,7 +72,7 @@ command_table_t cmds[] = {
         {"outb","Write a byte to a port",outPortB,1},
         {"outw","Write a word to a port",outPortW,1},
         {"outd","Write a dword to a port",outPortD,1},
-        {"page","Show the mapping for a virtual address",showMapping,1},
+        {"page","Show the mapping for a virtual address (optionally pass CR3 as first parameter)",showMapping,1},
         {"pci","Dump PCI table",printPCIConfig,0},
         {"part","select partition of selected HD",selectPart,1},
         {"reboot","Reboot the computer",reboot,0},

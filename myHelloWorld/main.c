@@ -16,13 +16,14 @@ extern uint16_t* savedPosPointer;
  */
 
 volatile  uint32_t* kTicksSinceStart;
-uint32_t test=0;
+char test[25]="myHelloWorld 1 loaded!\n";
+uint32_t test2=0;
 void dddd(void) {
     uint32_t savedESP;
-    test=&savedPosPointer;
+    test2=&savedPosPointer;
     terminal_setcolor(make_color(COLOR_LIGHT_BROWN,COLOR_BLUE));
     terminal_clear();
-    printk("myHelloWorld 1 loaded!\n");
+    printk(&test);
     printk("Inside/before testFunction, system ticks=%u\n", *kTicksSinceStart);
     uint32_t ticks=*kTicksSinceStart;
     __asm__("sti\n");

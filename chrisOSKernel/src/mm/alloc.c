@@ -94,6 +94,7 @@ uintptr_t* allocateBlockFrom(sMemInfo* mInfoToAllocateFrom, uint32_t size)
 void* allocPages(uint32_t size)
 {
     uint32_t newSize=size;
+
     if (newSize%PAGE_SIZE)
     {
         newSize+=(PAGE_SIZE-(size % PAGE_SIZE));
@@ -106,13 +107,31 @@ void* allocPages(uint32_t size)
        lRetVal=allocateBlockFrom(block,newSize);
     else
         lRetVal=block->address;
-    //Map page into our address space
+    return lRetVal;
+}
+
+void* allocPagesAndMap(uint32_t size)
+{
+    uintptr_t* lRetVal;
+    uint32_t newSize=size;
+
+    if (newSize%PAGE_SIZE)
+    {
+        newSize+=(PAGE_SIZE-(size % PAGE_SIZE));
+        printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Size adjusted from %u to %u\n",size,newSize);
+    }
+    
+    lRetVal=allocPages(newSize);
+    printd("allocPagesAndMap: allocPage'd 0x%08X bytes at 0x%08X\n",newSize,lRetVal);
+    
     uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
+    //Map page into our address space
     pagingMapPage(CURRENT_CR3,virtualAddress,lRetVal,0x7);
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",virtualAddress,lRetVal);
     //Zero out the memory
-    printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Zeroing out page(s) at 0x%08X for 0x%08X\n",lRetVal,newSize);
-    memset(lRetVal,0,newSize);
-    printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Returning address 0x%08X\n",lRetVal);
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Zeroing out page(s) at 0x%08X for 0x%08X\n",lRetVal,newSize);
+    memset(virtualAddress,0,newSize);
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Returning address 0x%08X\n",lRetVal);
     return virtualAddress & 0xFFFFF000;
 }
 

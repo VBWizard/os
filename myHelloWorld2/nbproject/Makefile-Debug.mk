@@ -45,7 +45,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-ffreestanding -Wall -Wextra -masm=intel -O
+CFLAGS=-ffreestanding -Wall -Wextra -masm=intel
 
 # CC Compiler Flags
 CCFLAGS=
