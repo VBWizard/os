@@ -35,7 +35,7 @@ KERNEL_DATA_SECTION uint32_t exceptionNumber;
 uint32_t KERNEL_DATA_SECTION *exceptionSavedStack = (uint32_t *)SAVED_STACK_FOR_EXCEPTIONS_ADDRESS;
 KERNEL_DATA_SECTION uint32_t *debugSavedStack = (uint32_t *)SAVED_STACK_FOR_DEBUGGING_ADDRESS;
 uint32_t KERNEL_DATA_SECTION exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR3, exceptionCR4,
-                             exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionSavedESP,exceptionFlags, exceptionErrorCode, exceptionEIP, exceptionCS, exceptionCR2;
+                             exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionSavedESP,exceptionFlags, exceptionErrorCode, exceptionEIP, exceptionCS, exceptionCR2, exceptionTR;
 KERNEL_DATA_SECTION uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR3, debugCR4,
                              debugDS, debugES, debugFS, debugGS, debugSS, debugSavedESP,debugFlags, debugErrorCode, debugCS, debugEIP;
 KERNEL_DATA_SECTION sizeof_t kDataSizes;
@@ -104,7 +104,7 @@ KERNEL_DATA_SECTION volatile char* kKbdBuffCurrChar = (char*)KEYBOARD_BUFFER_ADD
 //AHCI
 KERNEL_DATA_SECTION HBA_MEM* ahciABAR = (struct HBA_MEM*)AHCI_ABAR_ADDRESS;
 
-
+KERNEL_DATA_SECTION task_t* kKernelTask;
 
 KERNEL_DATA_SECTION const char *_days[7] = {
   "Sunday", "Monday", "Tuesday", "Wednesday",

@@ -63,6 +63,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strncpy.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strparts.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
+	${OBJECTDIR}/_ext/e6f004ae/x86idt.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
 	${OBJECTDIR}/src/kernel.o \
 	${OBJECTDIR}/src/mm/alloc.o \
@@ -77,7 +78,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-ffreestanding -Wall -Wextra -masm=intel -O
+CFLAGS=-pipe -ffreestanding -Wall -Wextra -masm=intel -O
 
 # CC Compiler Flags
 CCFLAGS=
@@ -238,6 +239,11 @@ ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/time.o ../chrisOS/src/time.c
+
+${OBJECTDIR}/_ext/e6f004ae/x86idt.o: /home/yogi/src/os/chrisOSKernel/x86idt.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/e6f004ae
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e6f004ae/x86idt.o /home/yogi/src/os/chrisOSKernel/x86idt.c
 
 ${OBJECTDIR}/src/drivers/drv_genKeyboard.o: src/drivers/drv_genKeyboard.c 
 	${MKDIR} -p ${OBJECTDIR}/src/drivers

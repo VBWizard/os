@@ -50,7 +50,7 @@ void HIGH_CODE_SECTION selectPart(char* cmdline);
 void HIGH_CODE_SECTION listParts(char* cmdline);
 void HIGH_CODE_SECTION attach(char* cmdline);
 void HIGH_CODE_SECTION listDir(char* cmdline);
-void HIGH_CODE_SECTION execProgram(char* cmdline);
+void HIGH_CODE_SECTION execCommand(char* cmdline);
 void HIGH_CODE_SECTION displayGDTTable(char *cmdline);
 
 command_table_t cmds[] = { 
@@ -62,7 +62,7 @@ command_table_t cmds[] = {
         {"disk","Make a disk the 'current' disk (integer)",selectHDNum,1},
         {"dko","Dump kernel object addresses",dumpKernelAddresses,0},
         {"e820","Print E820 Memory Map",printE820Map,0},
-        {"exec","Execute a program from disk",execProgram,1},
+        {"exec","Execute a program from disk",execCommand,1},
         {"gdt","Display the GDT table",displayGDTTable,1},
         {"inb","Get a byte from a port",inPortB,1},
         {"inw","Get a word from a port",inPortW,1},

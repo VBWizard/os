@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include "chrisos.h"
 #include "../../chrisOS/include/i386/bits/types.h"
 #include "../../chrisOS/include/utility.h"  //for panic
@@ -17,12 +16,9 @@ extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 uint32_t kKernelPoolMemoryAddress;
 
-
-
 uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToFind)
 {
-    uint32_t* dir;
-    dir=(uint32_t*)pageDirAddress;
+    uint32_t* dir=(uint32_t*)pageDirAddress;
     uint32_t* tablePtr;
     uint32_t* currentPDE,*lastPDE;
     int foundPageEntryCount;
@@ -31,14 +27,14 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
     uint32_t foundPageTableEntryNum;
     int dirEntryNumber=0;
     uint32_t lRetVal;
+
     currentPDE=dir;
     lastPDE=dir+(PAGE_SIZE/4);
-    
     printd(DEBUG_PAGING,"pFAATMT: Finding PTEs to accomodate 0x%08X pgs\n",pagesToFind);
     //Scan the page directory for an entry that is in use
     do
     {
-        //printd(DEBUG_PAGING,"pFAATMT: Finding existing page directory entry\n");
+        printd(DEBUG_PAGING,"pFAATMT: Finding existing page directory entry (0x%08X)\n",dir);
         for (uint32_t* cnt=currentPDE;cnt<=lastPDE;cnt++)
         {
             if (*dir==0)
@@ -54,7 +50,9 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
         if (*dir==0)
         {
             dir=(uint32_t*)pageDirAddress;
-            *dir=(uint32_t)allocPagesAndMap(PAGE_SIZE);
+            *dir=(uint32_t)allocPages(PAGE_SIZE);
+            pagingMapPage(pageDirAddress,*dir,*dir,0x07);
+            pagingMapPage(KERNEL_PAGE_DIR_ADDRESS,*dir | KERNEL_PAGED_BASE_ADDRESS,*dir,0x03);
             *dir &= 0xFFFFF000;
             *dir |= 0x7;
             dirEntryNumber=0;
@@ -68,6 +66,9 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
         
         tablePtr=(uint32_t*)*dir;
         tablePtr=(uint32_t*)((uint32_t)tablePtr & 0xFFFFF000);
+        
+//        pagingMapPage(pageDirAddress,*dir | KERNEL_PAGED_BASE_ADDRESS,*dir,0x03);
+        
         
         //printd(DEBUG_PAGING,"pagingFindAvailablePageTable: Found PDE=0x%08X (0x%08X)\n",currentPDE,*currentPDE);
         
@@ -242,38 +243,61 @@ void pagingUpdatePresentFlagV(uintptr_t pageDirAddress,uint32_t address, bool pr
 ///Map a page to a new address
 void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, uint8_t flags)
 {
-    uint32_t *ptr;
-    uint32_t ptrVal;
-    uint32_t *ptrT;
+    uint32_t *dirPtr;
+    uint32_t dirPtrVal;
+    uint32_t *pagePtr;
+    
+    virtualAddress &= 0xFFFFF000;
+    physicalAddress &= 0xFFFFF000;
+    
+    printd(DEBUG_PAGING,"pagingMapPage: Via CR3=0x%08X, mapping v=0x%08X to p=0x%08X with flags 0x%02X\n",pageDirAddress,virtualAddress,physicalAddress,flags);
     
     //Get pointer to the page directory
-    ptr=(uint32_t*)pageDirAddress;
+    dirPtr=(uint32_t*)pageDirAddress;
     //Get the appropriate entry in the page table
-    ptrVal=ptr[(virtualAddress>>22)];
-    if (ptrVal==0)
+    dirPtrVal=dirPtr[(virtualAddress>>22)];
+    if (dirPtrVal==0)
     {
         //Get a page for the page table
-        ptrT=(uint32_t*)pagingAllocatePagingTablePage();
-        printd(DEBUG_PAGING,"pagingMapPage: Page table didn't exist for address 0x%08X (CR3=0x%08X)\n\tAllocated page @ 0x%08X for the page table\n",virtualAddress,pageDirAddress, ptrT);
-        ptr[(virtualAddress>>22)]=ptrT;
-        ptr[(virtualAddress>>22)] |= flags;
-        ptrT[(virtualAddress&0x003FFFFF/4096)]=physicalAddress | flags;
-        printd(DEBUG_PAGING,"kMapPage: Mapped v=0x%08X via dir=0x%08X, page=0x%08X, to p=0x%08X\n", virtualAddress, &ptr[(virtualAddress>>22)], &ptrT[(virtualAddress&0x003FFFFF/4096)],ptrT[(virtualAddress&0x003FFFFF/4096)]);
+        pagePtr=(uint32_t*)pagingAllocatePagingTablePage();
+        printd(DEBUG_PAGING,"pmp:Page table doesn't exist for address 0x%08X (CR3=0x%08X)\n",virtualAddress,pageDirAddress);
+        //Set the page directory entry to the newly allocated page, with flags
+        dirPtr[(virtualAddress>>22)]=((uint32_t)(pagePtr) | flags);
+        printd(DEBUG_PAGING,"pmp:Allocated page @ 0x%08X for the page table, PDE=0x%08X (flags=0x%02X)\n", pagePtr,dirPtr[(virtualAddress>>22)],flags);
+/*        ptrT[(virtualAddress&0x003FFFFF/4096)]=physicalAddress | flags;
+        printd(DEBUG_PAGING,"kMapPage: Mapped v=0x%08X via dir=0x%08X, page=0x%08X, to p=0x%08X\n", virtualAddress, &dirPtr[(virtualAddress>>22)], &pagePtr[(virtualAddress&0x003FFFFF/4096)],pagePtr[(virtualAddress&0x003FFFFF/4096)]);
+*/
     }
-    else
-    {
-        //ptrVal right now points to the pdir entry
-        ptr=(uint32_t*)pageDirAddress;
-        if (ptr[(virtualAddress>>22)]==0)
-            ptr[virtualAddress>>22]=(KERNEL_PAGE_TABLE_BASE_ADDRESS + ((virtualAddress&0x003FFFFF)/4096)) | 0x63;
-        ptrVal=ptr[virtualAddress>>22];
-        ptrVal=(ptrVal&0xFFFFF000);
-        ptrT=(uint32_t*)ptrVal;
-        //Now ptrVal will point to offset within page table
-        ptrVal=(virtualAddress&0x003FFFFF)/4096;
-        ptrT[ptrVal]=physicalAddress | flags;
-        printd(DEBUG_PAGING,"kMapPage:(2) Mapped v=0x%08X via dir=0x%08X, page=0x%08X, to p=0x%08X\n", virtualAddress, &ptr[(virtualAddress>>22)], &ptrT[ptrVal],ptrT[ptrVal]);
-    }
+    if (dirPtr[(virtualAddress>>22)]==0)
+        dirPtr[virtualAddress>>22]=(pageDirAddress + ((virtualAddress&0x003FFFFF)/4096)) | flags;
+    dirPtrVal=dirPtr[virtualAddress>>22];
+    dirPtrVal=(dirPtrVal&0xFFFFF000);
+    pagePtr=(uint32_t*)dirPtrVal;
+    //Now ptrVal will point to offset within page table
+    dirPtrVal=(virtualAddress&0x003FFFFF)/4096;
+    pagePtr[dirPtrVal]=physicalAddress | flags;
+    printd(DEBUG_PAGING,"pmp:v=0x%08X via dir=0x%08X, page=0x%08X, to p=0x%08X, flags=%02X\n", virtualAddress, &dirPtr[(virtualAddress>>22)], &pagePtr[dirPtrVal],pagePtr[dirPtrVal],flags);
+}
+
+void pagingMapPageRange(uintptr_t pageDirAddress, uintptr_t startVirtualAddress, uintptr_t endVirtualAddress, uintptr_t startPhysicalAddress,uint8_t flags)
+{
+    while (startVirtualAddress<=endVirtualAddress)
+        pagingMapPage(pageDirAddress,
+                startVirtualAddress+=0x1000,
+                startPhysicalAddress+=0x1000,
+                flags);
+}
+void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress,int pageCount, uint8_t flags)
+{
+    for (int cnt=0;cnt<pageCount;cnt++)
+        pagingMapPage(pageDirAddress,virtualAddress+(0x1000*cnt),physicalAddress+(0x1000*cnt),flags);
+}
+
+//Can only be called by kernel code
+bool pagingMapPageIntoKernel(uintptr_t processCR3, uintptr_t virtualAddress, uint8_t flags)
+{
+    
+    pagingMapPage(KERNEL_PAGE_DIR_ADDRESS, virtualAddress, pagingGet4kPTEntryValueCR3(processCR3,virtualAddress), flags);
 }
 
 bool isPageMapped(uintptr_t pageDirAddress, uintptr_t Address)

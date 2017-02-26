@@ -15,15 +15,18 @@ main():
 int main(int argc, char** argv) {
 10000000:	55                   	push   ebp
 10000001:	89 e5                	mov    ebp,esp
-/home/yogi/src/os/testMainProgramEntry/main.c:14
-    __asm__("pop ebx\nmov eax,0xDEADBEEE\ncli\nhlt\niret\n");
-10000003:	5b                   	pop    ebx
-10000004:	b8 ee be ad de       	mov    eax,0xdeadbeee
-10000009:	fa                   	cli    
-1000000a:	f4                   	hlt    
-1000000b:	cf                   	iret   
-/home/yogi/src/os/testMainProgramEntry/main.c:15
+/home/yogi/src/os/testMainProgramEntry/main.c:21
+            "push edx\n"        //return esp
+            "pushfd\n"     //return flags
+            "push ebx\n"        //return CS
+            "push esi\n"        //return eip
+            "nop\njmpd 0x48:0\n");
+*/        __asm__("cld\nint 0x80\n");
+10000003:	fc                   	cld    
+10000004:	cd 80                	int    0x80
+/home/yogi/src/os/testMainProgramEntry/main.c:23
+            //xxx
 }
-1000000c:	90                   	nop
-1000000d:	5d                   	pop    ebp
-1000000e:	c3                   	ret    
+10000006:	90                   	nop
+10000007:	5d                   	pop    ebp
+10000008:	c3                   	ret    

@@ -110,9 +110,9 @@ void* allocPages(uint32_t size)
     return lRetVal;
 }
 
-void* allocPagesAndMap(uint32_t size)
+void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
 {
-    uintptr_t* lRetVal;
+    uintptr_t* phys;
     uint32_t newSize=size;
 
     if (newSize%PAGE_SIZE)
@@ -121,18 +121,29 @@ void* allocPagesAndMap(uint32_t size)
         printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Size adjusted from %u to %u\n",size,newSize);
     }
     
-    lRetVal=allocPages(newSize);
-    printd("allocPagesAndMap: allocPage'd 0x%08X bytes at 0x%08X\n",newSize,lRetVal);
+    phys=allocPages(newSize);
+    printd("allocPagesAndMap: allocPage'd 0x%08X bytes at 0x%08X\n",newSize,phys);
     
-    uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
-    //Map page into our address space
-    pagingMapPage(CURRENT_CR3,virtualAddress,lRetVal,0x7);
-    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",virtualAddress,lRetVal);
+    uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(cr3,newSize/PAGE_SIZE);
+    //Map page into cr3 address space
+    pagingMapPageCount(cr3,virtualAddress,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",virtualAddress,phys);
     //Zero out the memory
-    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Zeroing out page(s) at 0x%08X for 0x%08X\n",lRetVal,newSize);
+    pagingMapPageCount(KERNEL_PAGE_DIR_ADDRESS,virtualAddress | 0xC0000000,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Zeroing out page(s) at 0x%08X for 0x%08X\n",phys,newSize);
     memset(virtualAddress,0,newSize);
-    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Returning address 0x%08X\n",lRetVal);
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Returning address 0x%08X\n",phys);
     return virtualAddress & 0xFFFFF000;
+}
+
+void* allocProcessPages(uintptr_t cr3, uint32_t size)
+{
+    return allocPagesAndMapI(cr3,size);
+}
+
+void* allocPagesAndMap(uint32_t size)
+{
+    return allocPagesAndMapI(CURRENT_CR3, size);
 }
 
 void freePage(void* address)

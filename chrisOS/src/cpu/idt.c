@@ -75,8 +75,6 @@ void idt_init(struct idt_ptr* idtp, int remap_offset)
         idt_set_gate (&idtTable[cnt], 0x08, (int)&_isr_32_wrapper, ACS_INT);
     idt_install(idtp);
 
-    idt_set_gate (&idtTable[0x80], 0x3b, (int)&_call_gate_wrapper, ACS_TASK_GATE | ACS_DPL_3);               //
-    
 }
 
 //void idt_get_gate(struct idt_entry* idtTable, uint8_t idtIndex, unsigned short *sel, uint32_t *base, unsigned *char flags)

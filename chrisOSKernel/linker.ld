@@ -37,7 +37,7 @@ SECTIONS
                 *(COMMON)
                 *(.bss)
                 *(.bootstrap_stack)
-		kernelLoadSize = . - kernelLoadAddress;
+		kernelLoadEnd = .;
         }
 
 INCLUDE kernelData.ld

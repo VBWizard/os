@@ -16,7 +16,7 @@
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 extern uint32_t kKernelPoolMemoryAddress;       //Address to locate page defs at
-extern char* kernelDataLoadAddress, kernelLoadAddress, kernelLoadSize;
+extern char* kernelDataLoadAddress, kernelLoadAddress, kernelLoadEnd;
 
 
 uint32_t KERNEL_DATA_SECTION 
@@ -25,7 +25,7 @@ uint32_t KERNEL_DATA_SECTION
         kmmGrossUserMemoryAvailable,            
         kMallocBaseAddress,kMallocCurrAddress;  
 
-uint32_t kernelSize = (uint32_t)&kernelLoadSize;
+uint32_t kernelSize;
 uint32_t kernelStart = (uint32_t)&kernelLoadAddress;
 uint32_t kernelMemoryUsed;
 uint32_t kernelPoolMemorySize=1400000;   //20 MB kernel memory
@@ -66,6 +66,7 @@ void mmInitHeapTracking()
 
 void mmInit()
 {
+    kernelSize=kernelLoadEnd-kernelLoadAddress;
     //0x10000000 represents segment 0xC0000000-0xCFFFFFFF ... don't want to map anything there for now
     kernelMemoryUsed=kernelStart + kernelSize;
     kmmGrossUserMemoryAvailable=kE820MemoryBytes - kernelMemoryUsed;

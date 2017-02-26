@@ -622,7 +622,7 @@ void HIGH_CODE_SECTION listDir(char* cmdline)
     fl_listdirectory(params[0]);
 }
 
-void HIGH_CODE_SECTION execProgram(char* cmdline)
+void HIGH_CODE_SECTION execCommand(char* cmdline)
 {
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
@@ -642,6 +642,29 @@ void HIGH_CODE_SECTION execProgram(char* cmdline)
     strcpy(sExecutingProgram,sbiShellProgramName);
 }
 
+void HIGH_CODE_SECTION execInternalCommand(char lCommand[256])
+{
+    int i = findCommand(lCommand);
+
+    if(i>0)
+    {
+        i--;
+        //printk("Executing command # %u (%s)\n", i, cmds[i].name);
+        command_function = cmds[i].function;
+        command_function_p = cmds[i].function;
+        if (cmds[i].paramCount==0)
+            command_function();
+        else
+        {
+            command_function_p(&lCommand[strlen(cmds[i].name)+1]);  
+        }
+    }
+    else
+    {
+        printk("Invalid command '%s' ya dummy!\n",lCommand);
+    }
+}
+
 void HIGH_CODE_SECTION biShell()
 {
     char lCommand[256];
@@ -654,6 +677,18 @@ void HIGH_CODE_SECTION biShell()
     bool stopCountingKeys=false;
     strcpy(sExecutingProgram,sbiShellProgramName);
     puts("\nWelcome to biShell ... hang a while!\n");
+    
+    /*******************************************************/
+    //CLR 02/23/2017 - Temporary code to execute commands on boot
+    char lcmd1[40]="disk 4";
+    execInternalCommand(lcmd1);
+    char lcmd2[40]="part 5";
+    execInternalCommand(lcmd2);
+    char lcmd3[40]="exec /kernel";
+    execInternalCommand(lcmd3);
+    /*******************************************************/
+    
+    
     while (1==1)
     {
 getACommand:
@@ -746,18 +781,11 @@ doneGettingKeys:
             goto getACommand;
         int i = findCommand(lCommand);
 
+        execInternalCommand(lCommand);
         if(i>0)
         {
             i--;
             //printk("Executing command # %u (%s)\n", i, cmds[i].name);
-            command_function = cmds[i].function;
-            command_function_p = cmds[i].function;
-            if (cmds[i].paramCount==0)
-                command_function();
-            else
-            {
-                command_function_p(&lCommand[strlen(cmds[i].name)+1]);  
-            }
             if (commandWasFromThisBufferPtr)
             {
                 for (int cnt=commandWasFromThisBufferPtr;cnt<=commandsPtr;cnt++)

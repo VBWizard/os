@@ -16,7 +16,8 @@
 #include "../include/mm.h"
 #include "../include/paging.h"
 #include "../include/alloc.h"
-#include "i386/kPaging.h"
+#include "malloc.h"
+#include "../include/x86idt.h"
 
 extern struct ataDeviceInfo_t* kATADeviceInfo;
 extern tss_t* kTSSTable;
@@ -29,19 +30,20 @@ extern void set_gdt(struct gdt_ptr *);
 extern struct gdt_ptr kernelGDT;
 extern int kExecLoadCount;
 extern elfInfo_t* kExecLoadInfo;
+extern task_t* kKernelTask;
+extern uint32_t getCS();
+extern uint32_t getDS();
+extern uint32_t getES();
+extern uint32_t getFS();
+extern uint32_t getGS();
+extern uint32_t getSS();
+extern uint32_t getESP();
 
 uint32_t libLoadOffset=LIBRARY_BASE_LOAD_ADDRESS;
 uintptr_t oldCR3=0,newCR3;
 
 #define GET_OLD_CR3 __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
 #define SWITCH_CR3 __asm__("mov cr3,eax\n"::[newCR3] "a" (newCR3));
-
-void switchCR3(uintptr_t newCR3)
-{
-    //Have to do this as two separate steps.  Save the old CR3 before switching to the new CR3
-    __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
-    __asm__("mov cr3,eax\n"::[newCR3] "a" (newCR3));
-}
 
 char* strTabEntry(elfInfo_t* elf, int index)
 {
@@ -183,7 +185,7 @@ void processELFDynamicSection(elfInfo_t* elfInfo)
 }
 
 //Read the data from the file and write it to the virtual addresses, mapping new pages as necessary
-int putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue)
+bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue)
 {
     int startVirtAddr=virtAddr;
     int startPhysAddr=0;
@@ -225,15 +227,16 @@ int putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFrom
         printd(DEBUG_ELF_LOADER,"putDataOnPages: Reading %u bytes to 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
         //write the data to the page
         if (writeFromFile)
-            fl_fread(startPhysAddr, 1, countToWrite, file);
+            fl_fread((void*)startPhysAddr, 1, countToWrite, file);
         else
-            memset(startPhysAddr,nonFileWriteValue,countToWrite);
+            memset((void*)startPhysAddr,nonFileWriteValue,countToWrite);
         //Decrement the total left to write by the count written
         totalLeftToWrite-=countToWrite;
         printd(DEBUG_ELF_LOADER,"putDataOnPages: Page written, 0x%08X bytes left to go\n",totalLeftToWrite);
         startVirtAddr+=countToWrite;
         startPhysAddr+=countToWrite;
     }
+    return true;
 }
 
 bool loadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3,bool isLibrary)
@@ -292,7 +295,7 @@ bool loadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3,bool isLibrary)
             //elfInfo->pgmHdrTable[cnt].p_vaddr=virtualLoadAddress;
         }
 
-        if (virtualLoadAddress==KERNEL_DATA_LOAD_ADDRESS)
+        if (virtualLoadAddress==(uint32_t)KERNEL_DATA_LOAD_ADDRESS)
         {
             printd(DEBUG_ELF_LOADER,"Section %u load address is kernel data base address (0x%08X), skipping load\n",pgmSectionNum,virtualLoadAddress);
             continue;
@@ -383,7 +386,6 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
         if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
         {
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            kDebugLevel |= DEBUG_MEMORY_MANAGEMENT | DEBUG_PAGING;
             elfInfo->dynamicInfo.strTableAddress=malloc(elfInfo->secHdrTable[cnt].sh_size);
             fl_fread((char*)elfInfo->dynamicInfo.strTableAddress,1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
             elfInfo->dynamicInfo.strTableFilePtr=elfInfo->secHdrTable[cnt].sh_offset;
@@ -438,77 +440,67 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
             printd(DEBUG_ELF_LOADER,"Found (%s) section address 0x%08X.\n",strTabEntry(elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
         }
     }
-     waitForKeyboardKey();
      processELFDynamicSection(elfInfo);   
-    return 0;
+     return true;
 }
 
 int sysExec(process_t* process,int argc,char** argv)
 {
     int lsysExecRetVal=0;
-    register int *eax __asm__("eax");
-    
-     newCR3=process->task->tss->CR3;
+     register int *eax __asm__("eax");
+
+    newCR3=process->task->tss->CR3;
     printd(DEBUG_LOADER,"sysExec: Entered ... executing '%s'\n",process->path);
+    process->task->tss->CS=0x3B;
     process->task->tss->EIP=process->elf->hdr.e_entry;
     //If loaded successfully then execute
-    uint8_t access = GDT_PRESENT  | GDT_CODE | GDT_READABLE;
-    if (process->task->kernel)
-    {
-        access |= GDT_DPL0;
-        process->task->tss->CS=0x100;
-    }
-    else
-    {
-        access |= GDT_DPL3;
-        process->task->tss->CS=0x3B;  //CS=38, NOT 48 which is the TSS segment, 3b not 38 as is user mode
-    }
-
-  
-    //Create our task gate
-    gdtEntry(0x9,(uint32_t)process->task->tss,sizeof(tss_t)-1,access , GDT_GRANULAR | GDT_32BIT ,true);
-
-    tss_t* tss=&kTSSTable[0];
-    //Create a taks gate entry for the blank task
-    gdtEntry(0x40,(uint32_t)tss,sizeof(tss_t),access | GDT_CONFORMING |1 , GDT_GRANULAR | GDT_32BIT ,true);
 
     //__asm__("mov ax,0x203\nltr ax\n");
     
+    if (process->elf->loadCompleted)
+    {
+        printd(DEBUG_ELF_LOADER,"exec: Executing %s at 0x%08X, CR3=0x%08X, return address is =0x%08X\n", process->path, process->elf->hdr.e_entry, newCR3 ,__builtin_return_address(0));
+    
+        GET_OLD_CR3;
+        kKernelTask->tss->EIP=(uint32_t)_call_gate_wrapper;
+        kKernelTask->tss->CS=getCS();
+        kKernelTask->tss->DS=getDS();
+        kKernelTask->tss->ES=getES();
+        kKernelTask->tss->FS=getFS();
+        kKernelTask->tss->GS=getGS();
+        kKernelTask->tss->SS=getSS();
+        kKernelTask->tss->CR3=oldCR3;
+        kKernelTask->tss->SS0=getSS();
+        kKernelTask->tss->ESP0=0xFFF000;
+        kKernelTask->tss->EFLAGS=0x200207;
+        kKernelTask->tss->LINK=allocPagesAndMap(0x1000); //need an old TSS entry (garbage) to "store" the old variables to on LTR
+        kKernelTask->tss->IOPB=kKernelTask->tss;
+        printk("kernel tss is at 0x%08X\n",kKernelTask->tss);
+        tss_t* t=kKernelTask->tss;
+        printd(DEBUG_ELF_LOADER,"cs=%2X, ds=%2X, es=%2X, fs=%2X, gs=%2X, ss=%2X, cr3=0x%08X, flags=0x%08X, return=0x%08X\n",t->CS, t->DS, t->ES, t->FS, t->GS, t->SS,t->EFLAGS,_call_gate_wrapper);
+    struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
+    idt_set_gate (&idtTable[0x80], 0x48, (int)&_call_gate_wrapper, ACS_INT_GATE | ACS_DPL_0);               //
+    //Create our return task gate
+    gdtEntry(0x9,(uint32_t)kKernelTask->tss,sizeof(tss_t)-1,GDT_PRESENT | GDT_CODE | GDT_READABLE | GDT_DPL0 | GDT_CONFORMING, GDT_GRANULAR | GDT_32BIT ,true);
+    //Create tss GDT entry for the process
+    gdtEntry(0x10, (uint32_t)process->task->tss,process->task->tss+sizeof(tss_t)-1, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE ,GDT_GRANULAR | GDT_32BIT,true);
     kernelGDT.limit = sizeof(sGDT) * GDT_ENTRIES - 1;
     kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
     set_gdt(&kernelGDT);
-    if (process->elf->loadCompleted)
-    {
-//    printk("CR3 switch: newCR3=0x%08X, next address PT entry = 0x%08X\n",newCR3, kPagingGet4kPTEntryValueCR3(newCR3,0xC100c376));
-//    STOPHERE2
-    //__asm__("mov edx,%[pgmptr]\n"::[pgmptr] "d" (process->elf->hdr.e_entry));
-        //switchCR3(process->task->tss->CR3);
-        //      __asm__("mov eax,%[cr3]\nmov cr3,eax\n"::[cr3] "a" (process->task->tss->CR3));
-        //__asm__("mov [0x12345678],ecx\ncall 0x38:[0x12345678]\n"::[pgmptr] "c" (process->elf->hdr.e_entry));
-        //NOTE: 4b instead of 48 because last 2 bits are RPL
-        
-        
-        //if (process->task->kernel)
-        //  __asm__("mov ax,0x100\nltr ax\n");
-        //else
-        //  __asm__("mov ax,0x4B\nltr ax\n");
-        
-        printd(DEBUG_ELF_LOADER,"exec: Executing %s at 0x%08X, CR3=0x%08X, return address is =0x%08X\n", process->path, process->elf->hdr.e_entry, newCR3 ,__builtin_return_address(0));
-        //waitForKeyboardKey();
-return 0;
- 
-        pagingMapPage(newCR3,__builtin_return_address(0),__builtin_return_address(0),0x7);
-        pagingMapPage(newCR3,((uintptr_t)(__builtin_return_address(0))) & 0xC0000000,__builtin_return_address(0),0x7);
-        //Map a page for the stack at 0x1000 ... fix this to malloc to a variable so you an free
 
+
+//return 0;
+ 
         __asm__("push ds\n"
                 "push es\n"
                 "push fs\n"
                 "push gs\n");
-        __asm__("mov  ds,ax\n":: "a" (0x33));
-        __asm__("mov  es,ax\n":: "a" (0x33));
-        __asm__("mov  fs,ax\n":: "a" (0x33));
-        __asm__("mov  gs,ax\n":: "a" (0x33));
+        __asm__("mov  ds,bx\n":: "b" (0x33));
+        __asm__("mov  es,bx\n":: "b" (0x33));
+        __asm__("mov  fs,bx\n":: "b" (0x33));
+        __asm__("mov  gs,bx\n":: "b" (0x33));
+        kKernelTask->tss->ESP=getESP() + 21;
+        kKernelTask->tss->ESP0=getESP() + 21;
         if (process->task->kernel)
         {
             __asm__("mov ax,0x48\nltr ax\n");
@@ -517,11 +509,10 @@ return 0;
         }
         else
         {
-            __asm__("cli \n"
-                    "mov eax,0x00000043\n"                              //Target SS
+            //__asm__("mov eax,0x400\nltr ax\n");
+            __asm__("mov eax,0x00000043\n"                              //Target SS
                     "push eax\n"
-                    "mov eax,0x0000FFC\n"                              //Target ESP
-                    "push eax\n"
+                    "push %[stackPtr]\n"                                //Target esp
                     "pushf\n"
                     "ord [esp],0x200\n"                                 //Target EFLAGS with I=1
                     "mov eax,0x0000003b\n"
@@ -530,14 +521,14 @@ return 0;
                     "mov esi,ReturnPoint\n"                             //ESI: Return EIP
                     "mov ebx,0x20\n"                                    //EBX: Return CS
                     "mov ecx,ds\n"                                      //ECX: Return DS, ES, FS, GS, SS
+                    "mov edi,ss\n"                                      //EDI: Return SS
                     "mov edx,esp\n"                                     //EDX: Return ESP
-                    ::[exec] "d" (process->elf->hdr.e_entry));
+                    ::[stackPtr] "b" (process->task->tss->ESP),[exec] "d" (process->elf->hdr.e_entry));
            SWITCH_CR3
                     __asm__("iretd\n");
             __asm__("ReturnPoint:nop\n");
             __asm__("mov cr3,eax\n"::[oldCR3] "a" (INIT_GDT_TABLE_ADDRESS));
        }
-        restoreCR3();
         lsysExecRetVal=(uint32_t)eax;
         printd(DEBUG_ELF_LOADER,"exec: Back from executing %s, return value is 0x%08X, 0x%08X, __bra=0x%08X\n", process->path, lsysExecRetVal, &process->path, __builtin_return_address(0));
     }
@@ -547,4 +538,10 @@ return 0;
         STOPHERE2
     }
     return lsysExecRetVal;
+}
+
+void _call_gate_wrapper()
+{
+    printk("Returned from user process\n");
+    STOPHERE2
 }

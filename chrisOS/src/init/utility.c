@@ -14,7 +14,7 @@
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
 extern uint32_t exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4, 
-            exceptionErrorCode,exceptionCS, exceptionEIP, exceptionSavedESP, exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionFlags;
+            exceptionErrorCode,exceptionCS, exceptionEIP, exceptionSavedESP, exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionFlags, exceptionTR;
 extern uint32_t  *exceptionSavedStack;
 extern uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR3, debugCR4, 
             debugErrorCode,debugCS, debugEIP, debugSavedESP, debugDS, debugES, debugFS, debugGS, debugSS, debugFlags;
@@ -190,7 +190,7 @@ void printDumpedRegs()
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
     printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionGS, exceptionFS);
-    printk("GDT=%08X\n",kernelGDT.base);
+    printk("GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
           printk("Bytes at CS:EIP: ");
 /*          for (int cnt=0;cnt<19;cnt++)

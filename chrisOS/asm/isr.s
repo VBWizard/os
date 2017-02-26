@@ -18,7 +18,7 @@
 .extern puts
 .extern kKbdHandlerActivateDebugger
 .extern exceptionCS, exceptionEIP, exceptionErrorCode, exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR1, exceptionCR4, exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionNumber, exceptionCR2, exceptionSavedESP, exceptionFlags, exceptionSavedStack
-.extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack
+.extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, exceptionTR
 
 irq13ESP: .WORD 0x00, 0x10, 0x10, 0x00
 irq13SavedESP: .WORD 0,0,0,0
@@ -193,6 +193,7 @@ isr_My_Common:
         mov exceptionDX, edx
         mov exceptionSI, esi
         mov exceptionDI, edi
+        str exceptionTR
         mov eax, cr0
         mov exceptionCR0, eax
         mov eax, cr3
@@ -522,6 +523,7 @@ cli
         mov exceptionDX, edx
         mov exceptionSI, esi
         mov exceptionDI, edi
+        str exceptionTR
         mov exceptionBP, ebp
         mov eax, cr0
         mov exceptionCR0, eax

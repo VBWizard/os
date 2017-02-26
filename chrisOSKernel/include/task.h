@@ -15,6 +15,7 @@ typedef struct s_task
 {
     tss_t* tss;
     uint32_t* pageDir;
+    uint32_t* kernelPageDirPtr; //Kernel's paged pointer to pageDir
     uintptr_t* next, *prev;
     bool kernel;
 } task_t;

@@ -19,7 +19,7 @@ EH_FRAME off    0x00002114 vaddr 0x10001114 paddr 0x10001114 align 2**2
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         0000000f  10000000  10000000  00001000  2**12
+  0 .text         00000009  10000000  10000000  00001000  2**12
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   1 .rodata       000000db  10001000  10001000  00002000  2**12
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
@@ -31,17 +31,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
   5 kernelData    000004d0  00120000  00120000  00002000  2**13
                   ALLOC
-  6 .debug_info   00002d22  00000000  00000000  00002128  2**0
+  6 .debug_info   00002da7  00000000  00000000  00002128  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000279  00000000  00000000  00004e4a  2**0
+  7 .debug_abbrev 00000270  00000000  00000000  00004ecf  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_aranges 00000020  00000000  00000000  000050c3  2**0
+  8 .debug_aranges 00000020  00000000  00000000  0000513f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_line   00000286  00000000  00000000  000050e3  2**0
+  9 .debug_line   00000286  00000000  00000000  0000515f  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00001600  00000000  00000000  00005369  2**0
+ 10 .debug_str    0000166e  00000000  00000000  000053e5  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .comment      00000011  00000000  00000000  00006969  2**0
+ 11 .comment      00000011  00000000  00000000  00006a53  2**0
                   CONTENTS, READONLY
 SYMBOL TABLE:
 10000000 l    d  .text	00000000 .text
@@ -65,12 +65,13 @@ SYMBOL TABLE:
 001245a0 g     O kernelData	00000144 kcpuInfo
 001246e4 g     O kernelData	00000004 exceptionNumber
 001246f4 g     O kernelData	00000004 exceptionBX
-00124968 g     O kernelData	00000004 _daylight
+00124964 g     O kernelData	00000004 _daylight
 00124580 g     O kernelData	00000004 smap_table
-00124944 g     O kernelData	00000004 kExecLoadCount
+00124940 g     O kernelData	00000004 kExecLoadCount
 00124730 g     O kernelData	00000004 exceptionFlags
 001247ec g     O kernelData	00000001 kPCIDeviceCount
 001246ec g     O kernelData	00000004 debugSavedStack
+00124990 g     O kernelData	00000004 kKbdBuffCurrChar
 0012001c g       kernelData	00000000 savedPosY
 00120008 g       kernelData	00000000 terminal_color
 0012487c g     O kernelData	00000004 kIOAPICPtr
@@ -81,18 +82,18 @@ SYMBOL TABLE:
 001247f0 g     O kernelData	00000001 kDebugStartsNow
 00124710 g     O kernelData	00000004 exceptionCR3
 001247b0 g     O kernelData	00000008 kRTCTicksSinceStart
-00124930 g     O kernelData	00000004 kGDTSlotAvailableInd
-0012497c g     O kernelData	00000006 rmGdtp
+0012492c g     O kernelData	00000004 kGDTSlotAvailableInd
+00124978 g     O kernelData	00000006 rmGdtp
 001247d8 g     O kernelData	00000008 kKernelPagedBaseAddress
 00124700 g     O kernelData	00000004 exceptionSI
 00124718 g     O kernelData	00000004 exceptionDS
 00124724 g     O kernelData	00000004 exceptionGS
-0012494c g     O kernelData	00000004 kSelectedPartNum
+00124948 g     O kernelData	00000004 kSelectedPartNum
 00120027 g       kernelData	00000000 kTerminalHeight
 001247f8 g     O kernelData	00000004 kPCIBridgeHeaders
-00124938 g     O kernelData	00000004 kTSSTable
-00124954 g     O kernelData	0000000e kAHCICurrentPart
-00124950 g     O kernelData	00000004 kAHCICurrentDisk
+00124934 g     O kernelData	00000004 kTSSTable
+00124950 g     O kernelData	0000000e kAHCICurrentPart
+0012494c g     O kernelData	00000004 kAHCICurrentDisk
 00124784 g     O kernelData	00000004 debugFlags
 00124714 g     O kernelData	00000004 exceptionCR4
 00124588 g     O kernelData	00000008 kE820MemoryBytes
@@ -101,12 +102,13 @@ SYMBOL TABLE:
 00124870 g     O kernelData	00000004 kAPICRegisterRemapAddress
 00124750 g     O kernelData	00000004 debugDX
 10002000 g     O .bss	00000004 cpuid_extended_feature_bits
-00124998 g     O kernelData	0000001c _days
+00124960 g     O kernelData	00000004 kKbdBuffCurrTop
+0012499c g     O kernelData	0000001c _days
 001247bc g     O kernelData	00000004 kExceptionsSinceStart
 001247d0 g     O kernelData	00000004 kTimeZone
 001246f8 g     O kernelData	00000004 exceptionCX
 00124878 g     O kernelData	00000004 kDebugLevel
-001249b4 g     O kernelData	0000001c _days_abbrev
+001249b8 g     O kernelData	0000001c _days_abbrev
 0012472c g     O kernelData	00000004 exceptionSavedESP
 001247ee g     O kernelData	00000001 kPCIFunctionCount
 00124570 g       kernelData	00000000 _free_file_list
@@ -115,21 +117,22 @@ SYMBOL TABLE:
 00124770 g     O kernelData	00000004 debugES
 00124744 g     O kernelData	00000004 debugAX
 10002020 g     O .bss	0000aa00 ABARs
-00124924 g     O kernelData	00000004 kOriginalAddressZeroValue
+00124920 g     O kernelData	00000004 kOriginalAddressZeroValue
 00124704 g     O kernelData	00000004 exceptionDI
 0012478c g     O kernelData	00000004 debugCS
 001240f0 g       kernelData	00000000 _filelib_init
-00124970 g     O kernelData	00000008 _tzname
+0012496c g     O kernelData	00000008 _tzname
 001246fc g     O kernelData	00000004 exceptionDX
 00124728 g     O kernelData	00000004 exceptionSS
-00124988 g     O kernelData	00000004 bootGdt
+00124984 g     O kernelData	00000004 bootGdt
 00124568 g       kernelData	00000000 _open_file_list
 00124774 g     O kernelData	00000004 debugFS
 00124a20 g     O kernelData	00000030 _months_abbrev
+00124998 g     O kernelData	00000004 kKernelTask
 00124740 g     O kernelData	00000004 exceptionCR2
 0012473c g     O kernelData	00000004 exceptionCS
 0012476c g     O kernelData	00000004 debugDS
-00124948 g     O kernelData	00000004 kSelectedDiskNum
+00124944 g     O kernelData	00000004 kSelectedDiskNum
 00120004 g       kernelData	00000000 terminal_column
 001247ef g     O kernelData	00000001 kPCIBusCount
 001249e0 g     O kernelData	00000030 _months
@@ -142,8 +145,8 @@ SYMBOL TABLE:
 0012477c g     O kernelData	00000004 debugSS
 001247e8 g     O kernelData	00000004 kKernelPageTables
 001247e0 g     O kernelData	00000001 kInitDone
-0012496c g     O kernelData	00000004 _dstbias
-0012498c g     O kernelData	00000006 kernelGDT
+00124968 g     O kernelData	00000004 _dstbias
+00124988 g     O kernelData	00000006 kernelGDT
 00124800 g     O kernelData	00000004 kATADeviceInfo
 00124760 g     O kernelData	00000004 debugCR0
 00124880 g     O kernelData	00000004 kMPConfigTable
@@ -151,19 +154,18 @@ SYMBOL TABLE:
 001247b8 g     O kernelData	00000004 kPagingExceptionsSinceStart
 00124734 g     O kernelData	00000004 exceptionErrorCode
 1000ca20 g     O .bss	00000004 cpuid_procinfo
-10000000 g     F .text	0000000f main
+10000000 g     F .text	00000009 main
 001247ed g     O kernelData	00000001 kPCIBridgeCount
 00124804 g     O kernelData	00000004 kATADeviceInfoCount
 001246f0 g     O kernelData	00000004 exceptionAX
-00124928 g     O kernelData	00000004 ahciCaps
+00124924 g     O kernelData	00000004 ahciCaps
 001247f4 g     O kernelData	00000004 kPCIDeviceHeaders
 00124788 g     O kernelData	00000004 debugErrorCode
 0012000c g       kernelData	00000000 terminal_buffer
 00120026 g       kernelData	00000000 savedPosPointer
-00124934 g     O kernelData	00000004 kTaskSlotAvailableInd
+00124930 g     O kernelData	00000004 kTaskSlotAvailableInd
 001247e1 g     O kernelData	00000001 kPagingInitDone
-0012492c g     O kernelData	00000004 ahciCapsCount
-00124964 g     O kernelData	00000004 kKeyboardBufferBase
+00124928 g     O kernelData	00000004 ahciCapsCount
 0012471c g     O kernelData	00000004 exceptionES
 00124748 g     O kernelData	00000004 debugBX
 001240f4 g       kernelData	00000000 _filelib_valid
@@ -171,23 +173,22 @@ SYMBOL TABLE:
 001247c8 g     O kernelData	00000004 kSystemStartTime
 00124884 g     O kernelData	0000000c kCPUFeatures
 00124758 g     O kernelData	00000004 debugDI
-00124978 g     O kernelData	00000004 ticksToWait
+00124974 g     O kernelData	00000004 ticksToWait
 00120040 g       kernelData	00000000 _files
 0012475c g     O kernelData	00000004 debugBP
 00124754 g     O kernelData	00000004 debugSI
 00124820 g     O kernelData	0000004a kPCISATADevice
-00124920 g     O kernelData	00000004 kKeyboardBuffer
 00124994 g     O kernelData	00000004 ahciABAR
-00124940 g     O kernelData	00000004 kExecLoadInfo
+0012493c g     O kernelData	00000004 kExecLoadInfo
 00124720 g     O kernelData	00000004 exceptionFS
 00124768 g     O kernelData	00000004 debugCR4
 00120000 g       kernelData	00000000 terminal_row
 001248a0 g     O kernelData	00000080 kCPU
 00124708 g     O kernelData	00000004 exceptionBP
-00124984 g     O kernelData	00000004 rmGdt
+00124980 g     O kernelData	00000004 rmGdt
 001247a8 g     O kernelData	00000008 kISRsSinceStart
 00120010 g       kernelData	00000000 savedPosX
-0012493c g     O kernelData	00000004 kTaskTable
+00124938 g     O kernelData	00000004 kTaskTable
 00124780 g     O kernelData	00000004 debugSavedESP
 00124738 g     O kernelData	00000004 exceptionEIP
 

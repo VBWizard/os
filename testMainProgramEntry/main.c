@@ -11,6 +11,13 @@
  * testMainProgramEntry
  */
 int main(int argc, char** argv) {
-    __asm__("pop ebx\nmov eax,0xDEADBEEE\ncli\nhlt\niret\n");
+/*    __asm__("pop ebp\n"
+            "push edi\n"          //return SS
+            "push edx\n"        //return esp
+            "pushfd\n"     //return flags
+            "push ebx\n"        //return CS
+            "push esi\n"        //return eip
+            "nop\njmpd 0x48:0\n");
+*/        __asm__("cld\nint 0x80\n");
+            //xxx
 }
-

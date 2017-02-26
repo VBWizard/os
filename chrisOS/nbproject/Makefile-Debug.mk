@@ -90,7 +90,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-m32 -ffreestanding -Wall -Wextra -masm=intel
+CFLAGS=-m32 -pipe -ffreestanding -Wall -Wextra -masm=intel
 
 # CC Compiler Flags
 CCFLAGS=

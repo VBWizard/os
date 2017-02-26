@@ -53,6 +53,7 @@
       <itemPath>include/task.h</itemPath>
       <itemPath>../chrisOS/include/time_os.h</itemPath>
       <itemPath>include/tss.h</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/include/x86idt.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -92,6 +93,7 @@
       <itemPath>../chrisOS/src/time.c</itemPath>
       <itemPath>../chrisOS/src/init/utility.c</itemPath>
       <itemPath>src/x86.s</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/x86idt.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -123,7 +125,7 @@
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -O</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel -O</commandLine>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>
@@ -257,6 +259,16 @@
       <item path="../chrisOS/src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/include/x86idt.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/x86idt.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -469,6 +481,16 @@
       <item path="../chrisOS/src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/include/x86idt.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/x86idt.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>

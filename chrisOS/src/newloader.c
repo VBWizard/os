@@ -266,7 +266,6 @@ void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary)
                         elfInfo->secHdrTable[cnt].sh_type);
         }
         printd(DEBUG_ELF_LOADER,"End of section table... press a key to continue\n");
-        waitForKeyboardKey();
     }
     
     //Find the symbol and string tables in the dynamic section

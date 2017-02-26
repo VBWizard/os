@@ -27,7 +27,8 @@ process_t* createProcess(char* path,bool kernelProcess)
 
     process_t* process;
     
-    
+
+    printd(DEBUG_PROCESS,"Creating %s process for %s\n",kernelProcess?"kernel":"user",path);
     process=(process_t*)malloc(sizeof(process_t));
     process->path=(char*)malloc(512);
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
@@ -52,12 +53,10 @@ process_t* createProcess(char* path,bool kernelProcess)
         process->task->tss->FS=getNonKernelDataGDTIndex();
         process->task->tss->GS=getNonKernelDataGDTIndex();
     }
-*/    process->gdtEntry=getNewGDTEntry();
-
+*/
     //CR3 was set and PDir created by createTask.  Page tables will be created by the load process
     if (!sysLoadElf(process->path,process->elf,process->task->tss->CR3,false))
         return NULL;
-    
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
     return process;
 }

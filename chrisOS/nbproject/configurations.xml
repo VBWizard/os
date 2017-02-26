@@ -158,7 +158,7 @@
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <asmTool>

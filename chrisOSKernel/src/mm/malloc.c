@@ -115,3 +115,4 @@ void* malloc(size_t size)
     allocateMemoryToProcess(ptr,size,isKernel);
     return ptr->address;
 }
+

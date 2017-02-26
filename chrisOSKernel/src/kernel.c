@@ -20,10 +20,12 @@
 #include "../include/sysloader.h"
 #include "../../chrisOS/src/fat/fat_access.h"
 #include "../include/task.h"
+#include "kbd.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
-
+extern task_t* kKernelTask;
+uint32_t saveESP;
 /*
  * 
  */
@@ -39,7 +41,6 @@ int main(int argc, char** argv) {
     }
 */
     printk("Initializing memory management ...\n");
-    kDebugLevel |= DEBUG_ELF_LOADER;
     mmInit();
     printk("Done initializing memory management.\n\nInitializing malloc ...\n");
     initMalloc();
@@ -48,15 +49,15 @@ int main(int argc, char** argv) {
     printk("Done initializing task management\n\n");
     
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
-    //printk("Loading libLoad.so\n");
-    //elfInfo_t* libLoad=(elfInfo_t*)sysLoadElf("/libLoad.so",NULL,0x0,true);
+
+    kDebugLevel |= DEBUG_TASK;
+    kKernelTask=getTaskSlot();
     
-    kDebugLevel |= DEBUG_MEMORY_MANAGEMENT | DEBUG_PAGING | DEBUG_MALLOC  | DEBUG_KERNEL_PAGING | DEBUG_PROCESS | DEBUG_EXCEPTIONS | DEBUG_TASK;
-    kDebugLevel = DEBUG_EXCEPTIONS | DEBUG_ELF_LOADER  ;
     
-    printk("Loading testmainprogramentry\n");
-    process_t* process = createProcess("/testmainprogramentry",false);
-    printk("Executing %s\n",process->path);
+    char program[40]="/testmainprogramentry";
+    printk("Loading %s\n",program);
+    process_t* process = createProcess(program,false);
+    printk("Executing %u %s\n",process->task->kernel, process->path);
     sysExec(process,1,"");
 /*    printk("\n\n***************************MALLOC TEST 1***********************************\n");
     int* a = malloc(5000);

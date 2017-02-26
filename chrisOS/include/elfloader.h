@@ -22,7 +22,7 @@ typedef struct sElfDynamicInfo
     int neededPtr;
     int neededExecLoadNum[10];
     int jmpRelSz, relATableSize, relAEntrySize, strTableSize, symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
-    uintptr_t pltGOTTableAddress, hashTableAddress, strTableAddress, strTableFilePtr, symTableAddress, relATableAddress, initFunctionAddress, termFunctionAddress, relTableAddress;
+    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress, strTableFilePtr, symTableAddress, relATableAddress, initFunctionAddress, termFunctionAddress, relTableAddress;
     
 } elfDynamic_t;
 
@@ -39,6 +39,7 @@ typedef struct sElfInfo
 } elfInfo_t;
 
 void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);
+void sysProcessReturn();
 
 #ifdef	__cplusplus
 }
