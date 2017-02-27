@@ -71,9 +71,9 @@ void initializeKernelPaging()
  1 (0x08) - code @ 0x0
  2 (0x10) - data @ 0x0
 */
-       gdtEntry(1, KERNEL_PAGED_BASE_ADDRESS, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
+       gdtEntryApplication(1, KERNEL_PAGED_BASE_ADDRESS, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
                   GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(2, KERNEL_PAGED_BASE_ADDRESS, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,
+    gdtEntryApplication(2, KERNEL_PAGED_BASE_ADDRESS, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,
                   GDT_GRANULAR | GDT_32BIT,true);
     /*AFTER:
  0 - blank
@@ -81,7 +81,7 @@ void initializeKernelPaging()
  2 (0x10) - data @ 0xC0000000
 */
 
-        kernelGDT.limit = sizeof(sGDT) * GDT_ENTRIES - 1;
+        kernelGDT.limit = sizeof(sGDT) * (GDT_TABLE_SIZE/8) - 1;
         kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
         set_gdt(&kernelGDT);
         idt_init(&kInitialIDTReg, PIC_REMAP_OFFSET);

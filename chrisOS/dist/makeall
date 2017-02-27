@@ -10,5 +10,5 @@ cd $basePath/chrisOSKernel/dist
 ./makeit
 #cd $basePath/fatLib/dist
 #./makeit
-cd $pp
+#cd $pp
 

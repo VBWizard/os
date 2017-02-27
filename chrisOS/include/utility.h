@@ -49,7 +49,7 @@ void displayPause();
 void printDumpedRegs();
 void reboot(bool waitFirst);
 bool pauseDisplay(bool offerToQuit);
-void displayGDT();
+void displayGDTTable();
 
 #if defined(__i386__)
 

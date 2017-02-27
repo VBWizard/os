@@ -38,6 +38,7 @@ extern uint32_t getFS();
 extern uint32_t getGS();
 extern uint32_t getSS();
 extern uint32_t getESP();
+extern sGDT* bootGdt;
 
 uint32_t libLoadOffset=LIBRARY_BASE_LOAD_ADDRESS;
 uintptr_t oldCR3=0,newCR3;
@@ -288,7 +289,6 @@ bool loadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3,bool isLibrary)
     for (int pgmSectionNum=0;pgmSectionNum<elfInfo->hdr.e_phnum;pgmSectionNum++)
     {
         virtualLoadAddress = elfInfo->pgmHdrTable[pgmSectionNum].p_vaddr;
-        printk("virtualLoadAddress=0x%08X\n",virtualLoadAddress);
         if (isLibrary)
         {
             //virtualLoadAddress+=libLoadOffset;
@@ -468,66 +468,78 @@ int sysExec(process_t* process,int argc,char** argv)
         kKernelTask->tss->ES=getES();
         kKernelTask->tss->FS=getFS();
         kKernelTask->tss->GS=getGS();
-        kKernelTask->tss->SS=getSS();
+        kKernelTask->tss->SS=0x108;
         kKernelTask->tss->CR3=oldCR3;
-        kKernelTask->tss->SS0=getSS();
-        kKernelTask->tss->ESP0=0xFFF000;
+        kKernelTask->tss->SS0=0x108;
+        kKernelTask->tss->ESP0=0xFF000;
         kKernelTask->tss->EFLAGS=0x200207;
-        kKernelTask->tss->LINK=allocPagesAndMap(0x1000); //need an old TSS entry (garbage) to "store" the old variables to on LTR
-        kKernelTask->tss->IOPB=kKernelTask->tss;
-        printk("kernel tss is at 0x%08X\n",kKernelTask->tss);
+        kKernelTask->tss->ESP=getESP() + 21;
+        kKernelTask->tss->ESP0=getESP() + 21;
+        kKernelTask->tss->LINK=0x0;
+        kKernelTask->tss->IOPB=sizeof(tss_t);
         tss_t* t=kKernelTask->tss;
+        tss_t* junk=(tss_t*)allocPages(0x1000);
+        pagingMapPage(KERNEL_PAGE_DIR_ADDRESS,(uint32_t)junk|0xC0000000,(uint32_t)junk,0x07);
+        memcpy(junk,process->task->tss,sizeof(tss_t)-1);
+        junk->LINK=0x82;
         printd(DEBUG_ELF_LOADER,"cs=%2X, ds=%2X, es=%2X, fs=%2X, gs=%2X, ss=%2X, cr3=0x%08X, flags=0x%08X, return=0x%08X\n",t->CS, t->DS, t->ES, t->FS, t->GS, t->SS,t->EFLAGS,_call_gate_wrapper);
-    struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
-    idt_set_gate (&idtTable[0x80], 0x48, (int)&_call_gate_wrapper, ACS_INT_GATE | ACS_DPL_0);               //
-    //Create our return task gate
-    gdtEntry(0x9,(uint32_t)kKernelTask->tss,sizeof(tss_t)-1,GDT_PRESENT | GDT_CODE | GDT_READABLE | GDT_DPL0 | GDT_CONFORMING, GDT_GRANULAR | GDT_32BIT ,true);
-    //Create tss GDT entry for the process
-    gdtEntry(0x10, (uint32_t)process->task->tss,process->task->tss+sizeof(tss_t)-1, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE ,GDT_GRANULAR | GDT_32BIT,true);
-    kernelGDT.limit = sizeof(sGDT) * GDT_ENTRIES - 1;
-    kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
-    set_gdt(&kernelGDT);
+
+        struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
+        idt_set_gate (&idtTable[0x80], 9<<3, (int)&_call_gate_wrapper, ACS_INT_GATE | ACS_DPL_0);               //
+        //Create our return task gate
+        gdtEntryApplication(0x9,(uint32_t)kKernelTask->tss,sizeof(tss_t)-1,0x89 ,GDT_GRANULAR | GDT_32BIT,true);
+        //Create tss GDT entry for the process
+        gdtEntryApplication(0x11,(uint32_t)process->task->tss,sizeof(tss_t)-1, GDT_PRESENT | GDT_DPL3 | GDT_CODE,GDT_GRANULAR | GDT_32BIT,true);
+        //This is the gdt entry to iret to
+        gdtEntryOS(0x10,(uint32_t)process->task->tss,sizeof(tss_t), ACS_DPL_3 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
+        //Create a junk GDT to point at a junk TSS to go in the previous field
+        gdtEntryOS(0x12,(uint32_t)junk              ,sizeof(tss_t), ACS_DPL_3 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
+        //displayTSS(kKernelTask->tss);
+        kernelGDT.limit = sizeof(sGDT) * GDT_TABLE_SIZE - 1;
+        kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
+        set_gdt(&kernelGDT);
 
 
-//return 0;
- 
+        //return 0;
+
         __asm__("push ds\n"
                 "push es\n"
                 "push fs\n"
                 "push gs\n");
-        __asm__("mov  ds,bx\n":: "b" (0x33));
-        __asm__("mov  es,bx\n":: "b" (0x33));
-        __asm__("mov  fs,bx\n":: "b" (0x33));
-        __asm__("mov  gs,bx\n":: "b" (0x33));
-        kKernelTask->tss->ESP=getESP() + 21;
-        kKernelTask->tss->ESP0=getESP() + 21;
         if (process->task->kernel)
         {
+            __asm__("mov  ds,bx\n":: "b" (0x33));
+            __asm__("mov  es,bx\n":: "b" (0x33));
+            __asm__("mov  fs,bx\n":: "b" (0x33));
+            __asm__("mov  gs,bx\n":: "b" (0x33));
             __asm__("mov ax,0x48\nltr ax\n");
             //__asm__("push ebx\npush ecx\n"::[argvp] "b" (argv), [argcv] "c" (argc));
             __asm__("ljmp 0x100:sysExec_reload_CS\n sysExec_reload_CS:\ncall 0x01000a14");
         }
         else
         {
-            //__asm__("mov eax,0x400\nltr ax\n");
+            __asm__("mov  ds,bx\n":: "b" (0x33));
+            __asm__("mov  es,bx\n":: "b" (0x33));
+            __asm__("mov  fs,bx\n":: "b" (0x33));
+            __asm__("mov  gs,bx\n":: "b" (0x33));
             __asm__("mov eax,0x00000043\n"                              //Target SS
-                    "push eax\n"
-                    "push %[stackPtr]\n"                                //Target esp
-                    "pushf\n"
-                    "ord [esp],0x200\n"                                 //Target EFLAGS with I=1
-                    "mov eax,0x0000003b\n"
-                    "push eax\n"                                        //Target CS
-                    "push %[exec]\n"                                    //Target EIP
-                    "mov esi,ReturnPoint\n"                             //ESI: Return EIP
-                    "mov ebx,0x20\n"                                    //EBX: Return CS
-                    "mov ecx,ds\n"                                      //ECX: Return DS, ES, FS, GS, SS
-                    "mov edi,ss\n"                                      //EDI: Return SS
-                    "mov edx,esp\n"                                     //EDX: Return ESP
-                    ::[stackPtr] "b" (process->task->tss->ESP),[exec] "d" (process->elf->hdr.e_entry));
-           SWITCH_CR3
-                    __asm__("iretd\n");
+            "push eax\n"
+            "push %[stackPtr]\n"                                //Target esp
+            "push %[eFlags]\n"
+            //"ord [esp],0x200\n"                                 //Target EFLAGS with I=1
+            "mov eax,0x82\n" 
+            "ltr ax\n"
+            "mov eax,0x3b\n" //7
+            "push eax\n"                                        //Target CS
+            //"push %[exec]\n"                                    //Target EIP
+            "lea eax,jmpHere\npush eax\n"
+            ::[stackPtr] "b" (process->task->tss->ESP),[eFlags] "d" (process->task->tss->EFLAGS));
+           SWITCH_CR3;
+            __asm__("iretd\njmpHere:nop\n");
             __asm__("ReturnPoint:nop\n");
-            __asm__("mov cr3,eax\n"::[oldCR3] "a" (INIT_GDT_TABLE_ADDRESS));
+            printk("MADE IT!!!\n");
+           __asm__("mov eax,esp\nadd eax,12\npush eax\npush cs\npush %[entryPoint]\nretf\n"::[entryPoint] "r" (process->task->tss->EIP));
+            JMPHR: goto JMPHR;
        }
         lsysExecRetVal=(uint32_t)eax;
         printd(DEBUG_ELF_LOADER,"exec: Back from executing %s, return value is 0x%08X, 0x%08X, __bra=0x%08X\n", process->path, lsysExecRetVal, &process->path, __builtin_return_address(0));

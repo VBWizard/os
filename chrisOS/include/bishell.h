@@ -52,6 +52,7 @@ void HIGH_CODE_SECTION attach(char* cmdline);
 void HIGH_CODE_SECTION listDir(char* cmdline);
 void HIGH_CODE_SECTION execCommand(char* cmdline);
 void HIGH_CODE_SECTION displayGDTTable(char *cmdline);
+void HIGH_CODE_SECTION displayTSSEntry(char *cmdline);
 
 command_table_t cmds[] = { 
         {"help","Get help (this information)",helpMe,0},
@@ -61,6 +62,7 @@ command_table_t cmds[] = {
         {"cls","Clear screen",terminal_clear,0}, 
         {"disk","Make a disk the 'current' disk (integer)",selectHDNum,1},
         {"dko","Dump kernel object addresses",dumpKernelAddresses,0},
+        {"dtss","Show TSS entry",displayTSSEntry,1},
         {"e820","Print E820 Memory Map",printE820Map,0},
         {"exec","Execute a program from disk",execCommand,1},
         {"gdt","Display the GDT table",displayGDTTable,1},

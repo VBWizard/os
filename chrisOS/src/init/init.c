@@ -27,7 +27,7 @@
 #include "ahci.h"
 #include "kernelObjects.h"
 
-extern storeGDT(struct gdt_ptr* gdtp);
+extern uint32_t storeGDT(struct gdt_ptr* gdtp);
 extern void set_gdt(struct gdt_ptr *);
 extern int detect_cpu();
 extern bool kInitDone;
@@ -81,30 +81,30 @@ struct gdt_ptr lGDT;
  */
 void HIGH_CODE_SECTION gdt_init()
 {
-    gdtEntry(0x1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,       //Kernel code segment starting at 0x00
+    gdtEntryApplication(0x1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,       //Kernel code segment starting at 0x00
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(0x2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,       //Kernel data segment starting at 0x0
+    gdtEntryApplication(0x2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,       //Kernel data segment starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(0x3, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //18 - kernel data segment starting at 0x0 ***Need to change this to KERNEL_PAGED_BASE_ADDRESS base
+    gdtEntryApplication(0x3, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //18 - kernel data segment starting at 0x0 ***Need to change this to KERNEL_PAGED_BASE_ADDRESS base
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(0x4, KERNEL_PAGED_BASE_ADDRESS , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - Kernel code segment (main) starting at 0xC0000000
+    gdtEntryApplication(0x4, KERNEL_PAGED_BASE_ADDRESS , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - Kernel code segment (main) starting at 0xC0000000
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(0x5, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE | GDT_GROW_DOWN,       //kernel data segment starting at 0x0
-              GDT_GRANULAR | GDT_32BIT,true);
-
-    gdtEntry(0x6, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE,    //30 (33) - user data segment starting at 0x0
+    gdtEntryApplication(0x5, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE | GDT_GROW_DOWN,       //kernel data segment starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
 
-    gdtEntry(0x7, 0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE ,       //38 (3b) - user code segment starting at 0x0
+    gdtEntryApplication(0x6, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE,    //30 (33) - user data segment starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
 
-    gdtEntry(0x8, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE | GDT_GROW_DOWN,       //40 (43) - user stack segment starting at 0x0
+    gdtEntryApplication(0x7, 0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE ,       //38 (3b) - user code segment starting at 0x0
+              GDT_GRANULAR | GDT_32BIT,true);
+
+    gdtEntryApplication(0x8, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE | GDT_GROW_DOWN,       //40 (43) - user stack segment starting at 0x0
           GDT_GRANULAR | GDT_32BIT,true);
 
-    gdtEntry(0x20, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //100 - Kernel code segment will always start at 0
+    gdtEntryApplication(0x20, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //100 - Kernel code segment will always start at 0
               GDT_GRANULAR | GDT_32BIT,true);
 
-    gdtEntry(0x21, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE | GDT_GROW_DOWN,       //108 Kernel stack segment starting at 0x0
+    gdtEntryApplication(0x21, 0x0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE /*| GDT_GROW_DOWN*/,       //108 Kernel stack segment starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
     
     
@@ -117,7 +117,7 @@ void HIGH_CODE_SECTION gdt_init()
 
     kernelGDT.limit = 0x7ff; // (sizeof(sGDT) * GDT_ENTRIES) - 1;
     kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
-    rmGdtp.limit = sizeof(sGDT) * GDT_ENTRIES - 1;
+    rmGdtp.limit = sizeof(sGDT) * (GDT_TABLE_SIZE*8) - 1;
     rmGdtp.base = (unsigned int)rmGdt;
     set_gdt(&kernelGDT);
 }
@@ -234,7 +234,7 @@ char currTime[150];
 struct tm theDateTime;
     //Zero out all of the memory we will be using as rebooting a computer doesn't necessarily clear memory
     //memset(0x200000,0,0x1000000);
-__asm__("sgdt [eax]\n"::"a" (&kernelGDT));
+__asm__("cli\nsgdt [eax]\n"::"a" (&kernelGDT));
 gdt_init();
     kTicksPerSecond=TICKS_PER_SECOND;
     kTermInit();
@@ -267,6 +267,7 @@ gdt_init();
     PIC_remap(0x00+PIC_REMAP_OFFSET, 0x8+PIC_REMAP_OFFSET);
     IRQ_clear_mask(0);
     IRQ_clear_mask(1);
+    __asm__("sti\n");
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
     printk("Boot: ");
@@ -358,6 +359,7 @@ gdt_init();
         printk("PCI: initialization complete ...\n");
     }
     doHDSetup();
+    __asm__("mov eax,0x108\nmov ss,eax\n":::"eax");
 kInitDone = true;
     goto overStuff; /*******************************************/
     
@@ -411,7 +413,6 @@ overStuff:
         
 //        terminal_clear();
 MAINLOOPv:
-        __asm__("nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n");
 //    char a[255];
 //    gets(a,255);
 //    if (!strncmp(a,"debug",5))

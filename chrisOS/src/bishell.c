@@ -210,7 +210,21 @@ char **buildargv (const char *input)
 
 void HIGH_CODE_SECTION displayGDTTable(char *cmdline)
 {
-    displayGDT();
+    dumpGDTTable();
+}
+
+void HIGH_CODE_SECTION displayTSSEntry(char *cmdline)
+{
+    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
+
+    parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
+    if (params[0][0]==0)
+    {
+        printk("Requires 1 parameter which is the address of the TSS record\n");
+        return;
+    }
+    displayTSS(strtoul(params[0],0,16));
+    
 }
 
 void HIGH_CODE_SECTION QueryBDF(char* cmdline)

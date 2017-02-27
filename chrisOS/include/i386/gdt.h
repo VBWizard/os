@@ -12,6 +12,11 @@
 
 #pragma once
 #pragma pack(1)
+
+typedef struct sgdtflags
+{
+    
+};
 typedef struct sgdt
 {
     unsigned short limit_low;       //2
@@ -51,14 +56,13 @@ enum {
     GDT_16BIT       = 0x00
 };
 //80+60+
-#define GDT_ENTRIES 100
 
 void gdt_init();
-void gdtEntry(int entryNo, int base, int limit, char access, char flags,bool inUse);
+void gdtEntryApplication(int entryNo, int base, int limit, char access, char flags,bool inUse);
+void gdtEntryOS(int entryNo, int base, int limit, char access, char flags,bool inUse);
 sGDT* getNewGDTEntry();
 uint16_t getNonKernelCodeGDTIndex();
 uint16_t getNonKernelDataGDTIndex();
 uint16_t getKernelCodeGDTIndex();
 uint16_t getKernelDataGDTIndex();
-
 #endif	/* GDT_H */

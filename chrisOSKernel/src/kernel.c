@@ -50,7 +50,6 @@ int main(int argc, char** argv) {
     
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
 
-    kDebugLevel |= DEBUG_TASK;
     kKernelTask=getTaskSlot();
     
     

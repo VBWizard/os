@@ -35,7 +35,7 @@ extern char* kernelDataLoadAddress;
 #define MP_CONFIG_TABLE_SIZE 8192
 #define IDT_TABLE_SIZE 256*8                    //IDT table of 256 records
 #define KEYBOARD_BUFFER_SIZE 128
-#define GDT_TABLE_SIZE 16384/8                   //GDT table of 1024 entries
+#define GDT_TABLE_SIZE 8*256                   //GDT table of 256 entries
 #define ATA_MBR_ARRAY_SIZE 0x1000
 #define GDT_PMODE_16BIT_TABLE_SIZE 256*8
 #define RAM_AMT_TO_PAGE_INITIALLY 0x1000000
@@ -114,7 +114,7 @@ extern char* kernelDataLoadAddress;
 #define DEBUG_MALLOC 1<<19
 #define DEBUG_KEYBOARD_DRIVER 1<<20
 #define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PROCESS | DEBUG_ELF_LOADER
+#define KDEBUGLEVEL DEBUG_EXCEPTIONS
 
 #define SCREEN_SPACES_PER_TAB 5
 

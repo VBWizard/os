@@ -167,7 +167,6 @@ idt_load:
     //we always put our IDT in idtPtrToLoad before calling idt_load
 //    mov eax, word ptr idtPtrToLoad
     lidt [idtPtrToLoad]
-    sti
     pop ebx
     pop eax
     pop ebp
@@ -270,7 +269,6 @@ init_PIT:
  
     popad
     pop ebp
-    sti
     ret
 
  .globl getE820Memory_asm

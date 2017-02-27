@@ -8,10 +8,10 @@
 .extern irq0_handler
 .extern	kbd_handler
 .extern call_gate_proc
-.extern kTicksSinceStart;
-.extern kRTCTicksSinceStart;
-.extern kISRsSinceStart;
-.extern defaultISRHandler;
+.extern kTicksSinceStart
+.extern kRTCTicksSinceStart
+.extern kISRsSinceStart
+.extern defaultISRHandler
 .extern kInitDone
 .extern doubleFaultHandler
 .extern pagingExceptionHandler
@@ -156,7 +156,7 @@ _isr_11_wrapper:
         mov exceptionAX,eax
         mov exceptionBP, ebp
         mov     ebp, esp
-        mov     ax, 0x8                  # save exception number
+        mov     ax, 0xb                  # save exception number
         jmp isr_My_Common
 .global _isr_12_wrapper        
 _isr_12_wrapper:                        #remapped to 0x14
@@ -253,12 +253,12 @@ overSaveTheStack:
         mov ax,exceptionNumber
         cmp ax,0xe
         jne notPagingHandler
-        call 0x08:pagingExceptionHandler
+        call pagingExceptionHandler
         jmp onTheWayOut
 
 notPagingHandler:
 toDefaultHandler:
-        call 0x08:defaultISRHandler
+        call defaultISRHandler
 onTheWayOut:
         popad                           # restoring the regs
         mov esp, exceptionSavedESP
@@ -438,8 +438,8 @@ cli
     mov debugDI, edi
     mov debugAX,eax
 
-    movw ax,ds
-    movw debugDS,eax
+    mov ax,ds
+    mov debugDS,eax
     mov eax, cr0
     mov debugCR0, eax
     mov eax, cr3

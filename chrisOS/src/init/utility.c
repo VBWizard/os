@@ -10,6 +10,7 @@
 #include "kbd.h"
 #include "time_os.h"
 #include "i386/gdt.h"
+#include "../../../chrisOSKernel/include/tss.h"
 
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
@@ -189,7 +190,7 @@ void printDumpedRegs()
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
-    printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionGS, exceptionFS);
+    printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
     printk("GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
           printk("Bytes at CS:EIP: ");
@@ -215,7 +216,7 @@ void printDebugRegs()
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", debugAX, debugBX, debugCX, debugDX,debugFlags);
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", debugBP, debugSI, debugDI, debugSavedESP);
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\n", debugCR0, debugCR3, debugCR4);
-    printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", debugDS, debugES, debugGS, debugFS);
+    printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", debugDS, debugES, debugFS, debugGS);
     printk("CS:EIP = %04X:%08X, error code=%08X\n", debugCS, debugEIP, debugErrorCode);
           printk("Bytes at CS:EIP: ");
           for (int cnt=0;cnt<19;cnt++)
@@ -320,7 +321,7 @@ uintptr_t* mallocTemp(int size)
     return (uintptr_t*)lRetVal;
 }
 
-void displayGDT()
+void dumpGDTTable()
 {
     sGDT* theGDT=bootGdt;
     
@@ -328,9 +329,9 @@ void displayGDT()
     printk("Entry\tBase\t\t\tlimit\t\tAccess\tFlags\n");
     for (int cnt=0;cnt<(int)(kernelGDT.limit/sizeof(sGDT));cnt++)
     {
-        if (theGDT->access!=0 || cnt==0)
+        if ((theGDT->access & 0x80)!=0 || cnt==0)
         {
-            printk("%u\t\t"     /*GDT#*/
+            printk("0x%02X\t\t"     /*GDT#*/
                     "0x%08X\t"  /*base*/
                     "0x%08X\t"  /*limit*/
                     "0x%02X\t\t" /*Access*/
@@ -343,4 +344,15 @@ void displayGDT()
         }
         theGDT++;
     }
+}
+
+void displayTSS(int tssAddress)
+{
+    tss_t* tss=(tss_t*)tssAddress;
+    printk("TSS Entry at 0x%08X:\n",tssAddress);
+    printk("\tEAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", tss->EAX, tss->EBX, tss->ECX, tss->EDX,tss->EFLAGS);
+    printk("\tEBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\tCR3=%08X\n", tss->EBP, tss->ESI, tss->EDI, tss->ESP,tss->CR3);
+    printk("\t DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\tLDT=%08X\n", tss->DS, tss->ES, tss->FS, tss->GS,tss->LDTR);
+    printk("\t SS=%08X\tSS0=%08X\tESP0=%08X\tLINK=%08X\tIOP=%08X\n",tss->SS,tss->SS0,tss->ESP0,tss->LINK,tss->IOPB);
+    printk("\tCS:EIP = %04X:%08X\n", tss->CS, tss->EIP);
 }
