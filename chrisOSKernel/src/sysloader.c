@@ -46,6 +46,9 @@ uintptr_t oldCR3=0,newCR3;
 #define GET_OLD_CR3 __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
 #define SWITCH_CR3 __asm__("mov cr3,eax\n"::[newCR3] "a" (newCR3));
 
+void _syscall();
+
+
 char* strTabEntry(elfInfo_t* elf, int index)
 {
     char* addr=NULL;
@@ -462,8 +465,8 @@ int sysExec(process_t* process,int argc,char** argv)
         printd(DEBUG_ELF_LOADER,"exec: Executing %s at 0x%08X, CR3=0x%08X, return address is =0x%08X\n", process->path, process->elf->hdr.e_entry, newCR3 ,__builtin_return_address(0));
     
         GET_OLD_CR3;
-        kKernelTask->tss->EIP=(uint32_t)_call_gate_wrapper;
-        kKernelTask->tss->CS=getCS();
+        kKernelTask->tss->EIP=(uint32_t)_syscall;
+         kKernelTask->tss->CS=getCS();
         kKernelTask->tss->DS=getDS();
         kKernelTask->tss->ES=getES();
         kKernelTask->tss->FS=getFS();
@@ -478,29 +481,28 @@ int sysExec(process_t* process,int argc,char** argv)
         kKernelTask->tss->LINK=0x0;
         kKernelTask->tss->IOPB=sizeof(tss_t);
         tss_t* t=kKernelTask->tss;
-        tss_t* junk=(tss_t*)allocPages(0x1000);
-        pagingMapPage(KERNEL_PAGE_DIR_ADDRESS,(uint32_t)junk|0xC0000000,(uint32_t)junk,0x07);
-        memcpy(junk,process->task->tss,sizeof(tss_t)-1);
-        junk->LINK=0x82;
-        printd(DEBUG_ELF_LOADER,"cs=%2X, ds=%2X, es=%2X, fs=%2X, gs=%2X, ss=%2X, cr3=0x%08X, flags=0x%08X, return=0x%08X\n",t->CS, t->DS, t->ES, t->FS, t->GS, t->SS,t->EFLAGS,_call_gate_wrapper);
+        printd(DEBUG_ELF_LOADER,"cs=%2X, ds=%2X, es=%2X, fs=%2X, gs=%2X, ss=%2X, cr3=0x%08X, flags=0x%08X, return=0x%08X\n",t->CS, t->DS, t->ES, t->FS, t->GS, t->SS,t->EFLAGS,_syscall);
 
         struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
-        idt_set_gate (&idtTable[0x80], 9<<3, (int)&_call_gate_wrapper, ACS_INT_GATE | ACS_DPL_0);               //
-        //Create our return task gate
-        gdtEntryApplication(0x9,(uint32_t)kKernelTask->tss,sizeof(tss_t)-1,0x89 ,GDT_GRANULAR | GDT_32BIT,true);
+        //Set up syscall IDT entry
+        idt_set_gate (&idtTable[0x80], 0x9<<3, (int)&_syscall, ACS_TASK_GATE | ACS_DPL_3);               //
+        
+        //Create our TSS for syscall
+        gdtEntryOS(0x9 ,(uint32_t)kKernelTask->tss  ,sizeof(tss_t), ACS_DPL_3 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
+
         //Create tss GDT entry for the process
         gdtEntryApplication(0x11,(uint32_t)process->task->tss,sizeof(tss_t)-1, GDT_PRESENT | GDT_DPL3 | GDT_CODE,GDT_GRANULAR | GDT_32BIT,true);
-        //This is the gdt entry to iret to
+
+        //This is the gdt entry for the process
         gdtEntryOS(0x10,(uint32_t)process->task->tss,sizeof(tss_t), ACS_DPL_3 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
-        //Create a junk GDT to point at a junk TSS to go in the previous field
-        gdtEntryOS(0x12,(uint32_t)junk              ,sizeof(tss_t), ACS_DPL_3 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
         //displayTSS(kKernelTask->tss);
+
         kernelGDT.limit = sizeof(sGDT) * GDT_TABLE_SIZE - 1;
         kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
         set_gdt(&kernelGDT);
 
 
-        //return 0;
+//return 0;
 
         __asm__("push ds\n"
                 "push es\n"
@@ -552,8 +554,8 @@ int sysExec(process_t* process,int argc,char** argv)
     return lsysExecRetVal;
 }
 
-void _call_gate_wrapper()
+void _syscall()
 {
-    printk("Returned from user process\n");
-    STOPHERE2
+    printk("In _sysCall\n");
+    gohere:goto gohere;
 }

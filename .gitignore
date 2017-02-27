@@ -42,3 +42,9 @@ myhelloworld
 myhelloworld2
 build_num.h
 *.o.d
+/libLoad/dist/
+/libLoad/build/
+/myHelloWorld/build/
+/testMainProgramEntry/build/
+/myHelloWorld2/build/
+*.swp
