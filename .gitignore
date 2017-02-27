@@ -48,3 +48,6 @@ build_num.h
 /testMainProgramEntry/build/
 /myHelloWorld2/build/
 *.swp
+*debug*.asm
+*.sym
+*.log
