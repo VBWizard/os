@@ -13,6 +13,7 @@
 #include "tss.h"
 typedef struct s_task
 {
+    int taskNum;
     tss_t* tss;
     uint32_t* pageDir;
     uint32_t* kernelPageDirPtr; //Kernel's paged pointer to pageDir

@@ -26,9 +26,9 @@ void initKernelInternals()
 
     //Set up syscall IDT entry
     idt_set_gate (&idtTable[0x80], 0x9<<3, (int)&_sysCall, ACS_TASK_GATE | ACS_DPL_3);               //
-    idt_install();
+    //idt_install();
 
-    //Create our TSS for syscall (0x80)
+    //Create up syscall (0x80) TSS
      gdtEntryOS(0x9 ,(uint32_t)kKernelTask->tss  ,sizeof(tss_t), ACS_DPL_0 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
 
      __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
@@ -50,6 +50,6 @@ void initKernelInternals()
     kKernelTask->tss->IOPB=sizeof(tss_t);
     //displayTSS(kKernelTask->tss);
     tss_t* t=kKernelTask->tss;
-    printd(DEBUG_ELF_LOADER,"cs=%2X, ds=%2X, es=%2X, fs=%2X, gs=%2X, ss=%2X, cr3=0x%08X, flags=0x%08X, return=0x%08X\n",t->CS, t->DS, t->ES, t->FS, t->GS, t->SS,t->EFLAGS,_sysCall);
+    printd(DEBUG_TASK,"cs=%2X, ds=%2X, es=%2X, fs=%2X, gs=%2X, ss=%2X, cr3=0x%08X, flags=0x%08X, return=0x%08X\n",t->CS, t->DS, t->ES, t->FS, t->GS, t->SS,t->EFLAGS,_sysCall);
 
 }

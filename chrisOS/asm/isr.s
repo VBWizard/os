@@ -168,7 +168,6 @@ _isr_12_wrapper:                        #remapped to 0x14
         jmp isr_My_Common
 .global _isr_13_wrapper                 #remapped to 0x15
 _isr_13_wrapper:
-cli;
         mov exceptionSavedESP, esp
         mov exceptionAX,eax
         mov exceptionBP, ebp
@@ -177,7 +176,7 @@ cli;
         jmp isr_My_Common
 .global _isr_14_wrapper                 #remapped to 0x16
 _isr_14_wrapper:
-#cli;hlt;
+cli
 mov exceptionSavedESP, esp
         mov exceptionAX,eax
         mov exceptionBP, ebp

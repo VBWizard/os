@@ -25,6 +25,9 @@ void taskInit()
     {
         kTaskSlotAvailableInd[cnt]=0xFFFFFFFF;
     }
+    for (int cnt=1;cnt<10;cnt++)
+        bitsReset(kTaskSlotAvailableInd, cnt);
+    
 }
 
 ///Find an open TSS slot and mark it in use
@@ -39,6 +42,7 @@ task_t* getTaskSlot()
         if (slot>-1)
         {
             task_t* task=&kTaskTable[slot];
+            task->taskNum=slot;
             printd(DEBUG_TASK,"getTaskSlot: Marking TSS %u used\n",slot);
             bitsReset(ptr,slot);
             task->tss=allocPages(PAGE_SIZE); //&kTSSTable[slot];
@@ -112,21 +116,34 @@ task_t* createTask(bool kernelTSS)
     //Configure the task registers
     printd(DEBUG_TASK,"createTask: Set task CR3 to 1k page directory @ 0x%08X\n",task->tss->CR3);
     task->tss->CR3=(uint32_t)pagingAllocatePagingTablePage();
+    
     //Map the CR3 into our memory space for before the iRet
     pagingMapPage(KERNEL_PAGE_DIR_ADDRESS,task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,task->tss->CR3,0x3);
     task->pageDir=(uint32_t*)task->tss->CR3;
+    
     mmMapKernelIntoTask(task);
+    
     //Map our CR3 into program's memory space, needed before the iRet
     printd(DEBUG_TASK,"Mapping our CR3 into program, v=0x%08X, p=0x%08X\n",KERNEL_PAGE_DIR_ADDRESS & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_PAGE_DIR_ADDRESS & ~KERNEL_PAGED_BASE_ADDRESS);
     pagingMapPageCount(task->tss->CR3,KERNEL_PAGE_DIR_ADDRESS & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_PAGE_DIR_ADDRESS & ~KERNEL_PAGED_BASE_ADDRESS,(0xFFFFFFFF/0x400000)+1,0x7);
     printd(DEBUG_TASK,"createTask: Mapping kernel into task\n");
+    
+    //Initialize task registers
     task->tss->EAX=0;
     task->tss->EBX=task->tss->ECX=task->tss->EDX=task->tss->ESI=task->tss->EDI=task->tss->EBP=0;
     task->tss->SS0=0x10;
     if (kernelTSS)
-        task->tss->SS=0x10;
+    {
+        task->tss->SS=0x28;
+        task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x18;
+        task->tss->CS=0x10<<3;
+    }
     else
+    {
         task->tss->SS=0x43;
+        task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x33;
+        task->tss->CS=(0x7<<3)|3;
+    }
     task->tss->ESP0=0x1ffffff0;
     //Allocate space for the stack
     task->tss->ESP=(uint32_t)allocPages(0x16000);
@@ -135,14 +152,11 @@ task_t* createTask(bool kernelTSS)
     pagingMapPageCount(KERNEL_PAGE_DIR_ADDRESS,task->tss->ESP,task->tss->ESP,0x16,0x7);
     //Set the pointer so that we don't go off the pages
     task->tss->ESP+=0x15000;
+    
     task->tss->EFLAGS=0x200046;
     task->tss->LINK=0x0; //need an old TSS entry (garbage) to "store" the old variables to on LTR
     //If it is a kernel task
     task->kernel=kernelTSS;
-    if (kernelTSS)
-        task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x108;
-    else
-        task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x33;
     task->tss->IOPB=sizeof(tss_t);
     return task;
 }

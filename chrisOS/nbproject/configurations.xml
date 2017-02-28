@@ -157,6 +157,7 @@
           <incDir>
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
+            <pElem>include</pElem>
           </incDir>
           <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
@@ -457,8 +458,9 @@
           <incDir>
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
+            <pElem>include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <ccTool>
@@ -481,7 +483,7 @@
             <linkerOptionItem>-static</linkerOptionItem>
             <linkerLibLibItem>cpuid</linkerLibLibItem>
           </linkerLibItems>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc -g</commandLine>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
       <item path="/home/yogi/src/os//chrisOS/asm/isr.s"
@@ -784,8 +786,9 @@
           <incDir>
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
+            <pElem>include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <ccTool>
@@ -808,7 +811,7 @@
             <linkerOptionItem>-static</linkerOptionItem>
             <linkerLibLibItem>cpuid</linkerLibLibItem>
           </linkerLibItems>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc -g</commandLine>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
       <item path="/home/yogi/src/os//chrisOS/asm/isr.s"

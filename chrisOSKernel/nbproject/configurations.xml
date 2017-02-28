@@ -39,6 +39,7 @@
       <itemPath>../chrisOS/include/chrisos.h</itemPath>
       <itemPath>include/drv_genKeyboard.h</itemPath>
       <itemPath>../chrisOS/include/filesystem.h</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/include/initKernel.h</itemPath>
       <itemPath>../chrisOS/include/i386/kPaging.h</itemPath>
       <itemPath>include/kernel.h</itemPath>
       <itemPath>../chrisOS/include/kernelObjects.h</itemPath>
@@ -70,6 +71,7 @@
       <itemPath>../chrisOS/src/cpu/bits.c</itemPath>
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
       <itemPath>../chrisOS/src/cpu/gdt.c</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/src/kInit.c</itemPath>
       <itemPath>src/kernel.c</itemPath>
       <itemPath>../chrisOS/src/char/keyboard.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
@@ -81,6 +83,7 @@
       <itemPath>../chrisOS/src/block/pci.c</itemPath>
       <itemPath>../chrisOS/src/printf.c</itemPath>
       <itemPath>src/process.c</itemPath>
+      <itemPath>src/schedule.c</itemPath>
       <itemPath>../chrisOS/src/strings/strcat.c</itemPath>
       <itemPath>../chrisOS/src/strings/strcpy.c</itemPath>
       <itemPath>../chrisOS/src/strings/strlen.c</itemPath>
@@ -125,7 +128,7 @@
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
-          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel -O</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>
@@ -260,9 +263,19 @@
       </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/include/initKernel.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="/home/yogi/src/os/chrisOSKernel/include/x86idt.h"
             ex="false"
             tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/src/kInit.c"
+            ex="false"
+            tool="0"
             flavor2="0">
       </item>
       <item path="/home/yogi/src/os/chrisOSKernel/x86idt.c"
@@ -306,6 +319,8 @@
       </item>
       <item path="src/process.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/schedule.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
@@ -325,7 +340,11 @@
         <cTool>
           <developmentMode>5</developmentMode>
           <standard>3</standard>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -O</commandLine>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>../chrisOS/include</pElem>
+          </incDir>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
@@ -341,20 +360,6 @@
             <pElem>/usr/local/lib</pElem>
             <pElem>/home/yogi/opt/cross/lib</pElem>
           </linkerAddLib>
-          <linkerLibItems>
-            <linkerLibProjectItem>
-              <makeArtifact PL="../fatLib"
-                            CT="2"
-                            CN="Debug"
-                            AC="true"
-                            BL="true"
-                            WD="../fatLib"
-                            BC="${MAKE}  -f Makefile CONF=Debug"
-                            CC="${MAKE}  -f Makefile CONF=Debug clean"
-                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libfatLib.${CND_DLIB_EXT}">
-              </makeArtifact>
-            </linkerLibProjectItem>
-          </linkerLibItems>
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
@@ -482,9 +487,19 @@
       </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/include/initKernel.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="/home/yogi/src/os/chrisOSKernel/include/x86idt.h"
             ex="false"
             tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/src/kInit.c"
+            ex="false"
+            tool="0"
             flavor2="0">
       </item>
       <item path="/home/yogi/src/os/chrisOSKernel/x86idt.c"
@@ -527,6 +542,8 @@
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/process.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/schedule.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>

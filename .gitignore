@@ -51,3 +51,4 @@ build_num.h
 *debug*.asm
 *.sym
 *.log
+/fatLib/build/

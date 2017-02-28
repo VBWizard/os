@@ -63,6 +63,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strncpy.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strparts.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
+	${OBJECTDIR}/_ext/30f91903/kInit.o \
 	${OBJECTDIR}/_ext/e6f004ae/x86idt.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
 	${OBJECTDIR}/src/kernel.o \
@@ -71,6 +72,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/mm/mm.o \
 	${OBJECTDIR}/src/paging.o \
 	${OBJECTDIR}/src/process.o \
+	${OBJECTDIR}/src/schedule.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
@@ -78,7 +80,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-pipe -ffreestanding -Wall -Wextra -masm=intel -O
+CFLAGS=-pipe -ffreestanding -Wall -Wextra -masm=intel
 
 # CC Compiler Flags
 CCFLAGS=
@@ -240,6 +242,11 @@ ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/time.o ../chrisOS/src/time.c
 
+${OBJECTDIR}/_ext/30f91903/kInit.o: /home/yogi/src/os/chrisOSKernel/src/kInit.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/30f91903
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/30f91903/kInit.o /home/yogi/src/os/chrisOSKernel/src/kInit.c
+
 ${OBJECTDIR}/_ext/e6f004ae/x86idt.o: /home/yogi/src/os/chrisOSKernel/x86idt.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/e6f004ae
 	${RM} "$@.d"
@@ -279,6 +286,11 @@ ${OBJECTDIR}/src/process.o: src/process.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/process.o src/process.c
+
+${OBJECTDIR}/src/schedule.o: src/schedule.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/schedule.o src/schedule.c
 
 ${OBJECTDIR}/src/syscall.o: src/syscall.c 
 	${MKDIR} -p ${OBJECTDIR}/src

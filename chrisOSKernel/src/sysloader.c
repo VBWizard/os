@@ -449,57 +449,54 @@ int sysExec(process_t* process,int argc,char** argv)
     int lsysExecRetVal=0;
      register int *eax __asm__("eax");
 
-    GET_OLD_CR3;
+     GET_OLD_CR3;
     newCR3=process->task->tss->CR3;
     printd(DEBUG_LOADER,"sysExec: Entered ... executing '%s'\n",process->path);
-    process->task->tss->CS=0x3B;
-    process->task->tss->EIP=process->elf->hdr.e_entry;
     //If loaded successfully then execute
-
-    //__asm__("mov ax,0x203\nltr ax\n");
-    
     if (process->elf->loadCompleted)
     {
         printd(DEBUG_ELF_LOADER,"exec: Executing %s at 0x%08X, CR3=0x%08X, return address is =0x%08X\n", process->path, process->elf->hdr.e_entry, newCR3 ,__builtin_return_address(0));
         //Create tss GDT entry for the process
-        gdtEntryApplication(0x11,(uint32_t)process->task->tss,sizeof(tss_t)-1, GDT_PRESENT | GDT_DPL3 | GDT_CODE,GDT_GRANULAR | GDT_32BIT,true);
-
-        //This is the gdt TSS entry for the process
-        gdtEntryOS(0x10,(uint32_t)process->task->tss,sizeof(tss_t), ACS_DPL_3 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
-
+        uint32_t tssFlags=ACS_TSS;
+        uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;
         if (process->task->kernel)
         {
-            __asm__("mov  ds,bx\n":: "b" (0x33));
-            __asm__("mov  es,bx\n":: "b" (0x33));
-            __asm__("mov  fs,bx\n":: "b" (0x33));
-            __asm__("mov  gs,bx\n":: "b" (0x33));
-            __asm__("mov ax,0x48\nltr ax\n");
-            //__asm__("push ebx\npush ecx\n"::[argvp] "b" (argv), [argcv] "c" (argc));
-            __asm__("ljmp 0x100:sysExec_reload_CS\n sysExec_reload_CS:\ncall 0x01000a14");
+            gdtFlags |= GDT_DPL0;
+            tssFlags |= ACS_DPL_0;
         }
         else
         {
-            __asm__("mov  ds,bx\n":: "b" (0x33));
-            __asm__("mov  es,bx\n":: "b" (0x33));
-            __asm__("mov  fs,bx\n":: "b" (0x33));
-            __asm__("mov  gs,bx\n":: "b" (0x33));
-            __asm__("mov eax,0x00000043\n"                              //Target SS
-            "push eax\n"
-            "push %[stackPtr]\n"                                //Target esp
-            "push %[eFlags]\n"                                  //Target EFLAGS
-            "mov eax,0x82\n"                                    //Load task register with user process TSS entry
-            "ltr ax\n"
-            "mov eax,0x3b\n"                                    //GDT of DPL 3 code segment, not specific to the process
-            "push eax\n"                                        //Target CS
-            "lea eax,jmpHere\npush eax\n"                       //Target EIP is right after the iRet
-            ::[stackPtr] "b" (process->task->tss->ESP),[eFlags] "d" (process->task->tss->EFLAGS));
-           SWITCH_CR3;                                          //Switch to the process CR3 before the jump
-            __asm__("iretd\njmpHere:nop\n");                    //Jump to ring 3
-            printk("MADE IT!!!\n");                             //We've made it!
-           //Now jump to the user task
-           __asm__("mov eax,esp\nadd eax,12\npush eax\npush cs\npush %[entryPoint]\nretf\n"::[entryPoint] "r" (process->task->tss->EIP));
-            JMPHR: goto JMPHR;
-       }
+            gdtFlags |= GDT_DPL3;
+            tssFlags |= ACS_DPL_3;
+        }
+        
+        //This is the gdt TSS entry for the process
+        gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
+        printk("Process CS=0x%08X\n",process->task->tss->CS);
+        __asm__("mov  ds,bx\n":: "b" (process->task->tss->DS));
+        __asm__("mov  es,bx\n":: "b" (process->task->tss->ES));
+        __asm__("mov  fs,bx\n":: "b" (process->task->tss->FS));
+        __asm__("mov  gs,bx\n":: "b" (process->task->tss->GS));
+        __asm__("push %[ssTSS]\n"
+        "push %[stackPtr]\n"                                //Target esp
+        "push %[eFlags]\n"                                  //Target EFLAGS
+        "mov eax,%[taskTSS]\n"                                    //Load task register with user process TSS entry
+        "ltr ax\n"
+        "mov eax,%[procCSTSS]\n"                            //GDT of DPL 0/3 code segment, not specific to the process
+        "push eax\n"                                        //Target CS
+        "lea eax,jmpHere\npush eax\n"                       //Target EIP is right after the iRet
+        ::[stackPtr] "b" (process->task->tss->ESP),
+                [eFlags] "d" (process->task->tss->EFLAGS),
+                [procCSTSS] "r" (process->task->tss->CS),
+                [ssTSS] "r" (process->task->tss->SS),
+                        [taskTSS] "r" (process->task->taskNum<<3));
+       SWITCH_CR3;                                          //Switch to the process CR3 before the jump
+        __asm__("iretd\njmpHere:nop\n");                    //Jump to (possibly) ring 3
+         printk("MADE IT!!!\n");                             //We've made it!
+        //Now jump to the user task
+        printd(DEBUG_ELF_LOADER,"sysExec: Jumping to 0x%04X:0x%08X\n", process->task->tss->CS,process->task->tss->EIP);
+        __asm__("push cs\npush %[entryPoint]\nretf\n"::[entryPoint] "r" (process->task->tss->EIP));
+        JMPHR: goto JMPHR;
         panic("SysExec: Should never get here!!!");
         lsysExecRetVal=(uint32_t)eax;
         printd(DEBUG_ELF_LOADER,"exec: Back from executing %s, return value is 0x%08X, 0x%08X, __bra=0x%08X\n", process->path, lsysExecRetVal, &process->path, __builtin_return_address(0));
@@ -514,5 +511,8 @@ int sysExec(process_t* process,int argc,char** argv)
 void _sysCall()
 {
     printk("In _sysCall\n");
-    gohere:goto gohere;
+    __asm__("sti\n");
+    gohere:
+    __asm__("hlt\n");
+    goto gohere;
 }

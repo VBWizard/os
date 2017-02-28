@@ -57,6 +57,7 @@ process_t* createProcess(char* path,bool kernelProcess)
     //CR3 was set and PDir created by createTask.  Page tables will be created by the load process
     if (!sysLoadElf(process->path,process->elf,process->task->tss->CR3,false))
         return NULL;
+    process->task->tss->EIP=process->elf->hdr.e_entry;
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
     return process;
 }

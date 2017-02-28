@@ -11,7 +11,7 @@
 #include "i386/cpu.h"
 #include "memory.h"
 
-#define TICKS_PER_SECOND 100
+#define TICKS_PER_SECOND 200
 
 //kernelDataLoadAddress is defined in kernelData2.ld.  It is the address of kernelData
 extern char* kernelDataLoadAddress;
