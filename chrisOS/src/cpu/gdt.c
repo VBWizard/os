@@ -6,6 +6,8 @@
 extern sGDT* rmGdt;
 extern sGDT* bootGdt;
 extern uint32_t* kGDTSlotAvailableInd;
+extern struct gdt_ptr kernelGDT;
+extern void set_gdt(struct gdt_ptr *);
 
 uint16_t HIGH_CODE_SECTION getNonKernelCodeGDTIndex()
 {
@@ -29,11 +31,19 @@ uint16_t HIGH_CODE_SECTION getKernelDataGDTIndex()
 
 sGDT* HIGH_CODE_SECTION getNewGDTEntry()
 {
-   int cnt=0,slot=0;
+   int slot=0;
    uint32_t* ptr=kGDTSlotAvailableInd;
     slot=bitsScanF(ptr);
    sGDT* gdt=bootGdt+slot; 
    return gdt;
+}
+
+void HIGH_CODE_SECTION installGDT()
+{
+    kernelGDT.limit = sizeof(sGDT) * GDT_TABLE_SIZE - 1;
+    kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
+    set_gdt(&kernelGDT);
+   
 }
 
 void HIGH_CODE_SECTION gdtEntryI(int entryNo, int base, int limit, char access, char flags,bool inUse,bool setSFlag)

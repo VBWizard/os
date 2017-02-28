@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 void idt_set_gate(struct idt_entry *idt, unsigned short sel, uint32_t base, unsigned char flags);
-void idt_install(struct idt_ptr* idtp);
+void idt_install();
 
 #ifdef __cplusplus
 }

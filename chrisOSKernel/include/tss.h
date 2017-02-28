@@ -8,6 +8,8 @@
 #ifndef TSS_H
 #define	TSS_H
 
+#include <stdint.h>
+
 typedef struct sTss
 {
     uint32_t    LINK;               //0x0

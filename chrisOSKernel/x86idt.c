@@ -18,8 +18,9 @@ void idt_set_gate(struct idt_entry *idt, unsigned short sel, uint32_t base, unsi
   idt->base_hi = (base >> 16) & 0xFFFF;}
 
 /* Installs the IDT */
-void idt_install(struct idt_ptr* idtp)
+void idt_install()
 {
+    struct idt_ptr* idtp;
     /* Sets the special IDT pointer up, just like in 'gdt.c' */
     idtp->limit = (sizeof (struct idt_entry) * 256) - 1;
     idtp->base = (int)IDT_TABLE_ADDRESS;

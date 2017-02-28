@@ -13,10 +13,6 @@
 #pragma once
 #pragma pack(1)
 
-typedef struct sgdtflags
-{
-    
-};
 typedef struct sgdt
 {
     unsigned short limit_low;       //2
@@ -65,4 +61,5 @@ uint16_t getNonKernelCodeGDTIndex();
 uint16_t getNonKernelDataGDTIndex();
 uint16_t getKernelCodeGDTIndex();
 uint16_t getKernelDataGDTIndex();
+void installGDT();
 #endif	/* GDT_H */

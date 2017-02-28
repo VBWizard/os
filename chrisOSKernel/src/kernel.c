@@ -30,7 +30,6 @@ uint32_t saveESP;
  * 
  */
 int main(int argc, char** argv) {
-    //terminal_clear();
     printk("\nkernel loaded ... \n");
 /*    printk("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
@@ -46,17 +45,14 @@ int main(int argc, char** argv) {
     initMalloc();
     printk("Done initializing malloc\n\nInitializing task management ...\n");
     taskInit();
-    printk("Done initializing task management\n\n");
-    
+    printk("Done initializing task management\nInitializing kernel\n");
+    initKernelInternals();
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
-
-    kKernelTask=getTaskSlot();
-    
     
     char program[40]="/testmainprogramentry";
     printk("Loading %s\n",program);
     process_t* process = createProcess(program,false);
-    printk("Executing %u %s\n",process->task->kernel, process->path);
+    printk("Executing %s\n", process->path);
     sysExec(process,1,"");
 /*    printk("\n\n***************************MALLOC TEST 1***********************************\n");
     int* a = malloc(5000);

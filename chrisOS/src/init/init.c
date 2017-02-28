@@ -81,15 +81,15 @@ struct gdt_ptr lGDT;
  */
 void HIGH_CODE_SECTION gdt_init()
 {
-    gdtEntryApplication(0x1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,       //Kernel code segment starting at 0x00
+    gdtEntryApplication(0x1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,       //Kernel code segment starting at 0x00, always
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntryApplication(0x2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,       //Kernel data segment starting at 0x0
+    gdtEntryApplication(0x2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,       //Kernel data segment starting at 0x0, updated to 0xC0000000 when paging initialized
               GDT_GRANULAR | GDT_32BIT,true);
     gdtEntryApplication(0x3, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //18 - kernel data segment starting at 0x0 ***Need to change this to KERNEL_PAGED_BASE_ADDRESS base
               GDT_GRANULAR | GDT_32BIT,true);
     gdtEntryApplication(0x4, KERNEL_PAGED_BASE_ADDRESS , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - Kernel code segment (main) starting at 0xC0000000
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntryApplication(0x5, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE | GDT_GROW_DOWN,       //kernel data segment starting at 0x0
+    gdtEntryApplication(0x5, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE /*| GDT_GROW_DOWN*/,       //28 - kernel stack(?) segment starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
 
     gdtEntryApplication(0x6, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE,    //30 (33) - user data segment starting at 0x0
@@ -104,9 +104,6 @@ void HIGH_CODE_SECTION gdt_init()
     gdtEntryApplication(0x20, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //100 - Kernel code segment will always start at 0
               GDT_GRANULAR | GDT_32BIT,true);
 
-    gdtEntryApplication(0x21, 0x0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE /*| GDT_GROW_DOWN*/,       //108 Kernel stack segment starting at 0x0
-              GDT_GRANULAR | GDT_32BIT,true);
-    
     
     gdtEntryRM(1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
               GDT_GRANULAR | GDT_16BIT);
@@ -359,7 +356,7 @@ gdt_init();
         printk("PCI: initialization complete ...\n");
     }
     doHDSetup();
-    __asm__("mov eax,0x108\nmov ss,eax\n":::"eax");
+    __asm__("mov eax,0x28\nmov ss,eax\n":::"eax");
 kInitDone = true;
     goto overStuff; /*******************************************/
     

@@ -1,5 +1,5 @@
 #include <stdbool.h>
-#include "chrisos.h"
+#include "../../../chrisOS/include/chrisos.h"
 #include "i386/kPaging.h"
 #include "pci/pci.h"
 #include "memory.h"

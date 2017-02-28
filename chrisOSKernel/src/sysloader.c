@@ -17,7 +17,7 @@
 #include "../include/paging.h"
 #include "../include/alloc.h"
 #include "malloc.h"
-#include "../include/x86idt.h"
+#include "../../chrisOS/include/printf.h"
 
 extern struct ataDeviceInfo_t* kATADeviceInfo;
 extern tss_t* kTSSTable;
@@ -26,11 +26,8 @@ extern int kAHCISelectedDiskNum;
 extern int kAHCISelectedPartNum;
 extern int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count);
 extern int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count);
-extern void set_gdt(struct gdt_ptr *);
-extern struct gdt_ptr kernelGDT;
 extern int kExecLoadCount;
 extern elfInfo_t* kExecLoadInfo;
-extern task_t* kKernelTask;
 extern uint32_t getCS();
 extern uint32_t getDS();
 extern uint32_t getES();
@@ -46,7 +43,7 @@ uintptr_t oldCR3=0,newCR3;
 #define GET_OLD_CR3 __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
 #define SWITCH_CR3 __asm__("mov cr3,eax\n"::[newCR3] "a" (newCR3));
 
-void _syscall();
+void _sysCall();
 
 
 char* strTabEntry(elfInfo_t* elf, int index)
@@ -452,6 +449,7 @@ int sysExec(process_t* process,int argc,char** argv)
     int lsysExecRetVal=0;
      register int *eax __asm__("eax");
 
+    GET_OLD_CR3;
     newCR3=process->task->tss->CR3;
     printd(DEBUG_LOADER,"sysExec: Entered ... executing '%s'\n",process->path);
     process->task->tss->CS=0x3B;
@@ -463,51 +461,12 @@ int sysExec(process_t* process,int argc,char** argv)
     if (process->elf->loadCompleted)
     {
         printd(DEBUG_ELF_LOADER,"exec: Executing %s at 0x%08X, CR3=0x%08X, return address is =0x%08X\n", process->path, process->elf->hdr.e_entry, newCR3 ,__builtin_return_address(0));
-    
-        GET_OLD_CR3;
-        kKernelTask->tss->EIP=(uint32_t)_syscall;
-         kKernelTask->tss->CS=getCS();
-        kKernelTask->tss->DS=getDS();
-        kKernelTask->tss->ES=getES();
-        kKernelTask->tss->FS=getFS();
-        kKernelTask->tss->GS=getGS();
-        kKernelTask->tss->SS=0x108;
-        kKernelTask->tss->CR3=oldCR3;
-        kKernelTask->tss->SS0=0x108;
-        kKernelTask->tss->ESP0=0xFF000;
-        kKernelTask->tss->EFLAGS=0x200207;
-        kKernelTask->tss->ESP=getESP() + 21;
-        kKernelTask->tss->ESP0=getESP() + 21;
-        kKernelTask->tss->LINK=0x0;
-        kKernelTask->tss->IOPB=sizeof(tss_t);
-        tss_t* t=kKernelTask->tss;
-        printd(DEBUG_ELF_LOADER,"cs=%2X, ds=%2X, es=%2X, fs=%2X, gs=%2X, ss=%2X, cr3=0x%08X, flags=0x%08X, return=0x%08X\n",t->CS, t->DS, t->ES, t->FS, t->GS, t->SS,t->EFLAGS,_syscall);
-
-        struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
-        //Set up syscall IDT entry
-        idt_set_gate (&idtTable[0x80], 0x9<<3, (int)&_syscall, ACS_TASK_GATE | ACS_DPL_3);               //
-        
-        //Create our TSS for syscall
-        gdtEntryOS(0x9 ,(uint32_t)kKernelTask->tss  ,sizeof(tss_t), ACS_DPL_3 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
-
         //Create tss GDT entry for the process
         gdtEntryApplication(0x11,(uint32_t)process->task->tss,sizeof(tss_t)-1, GDT_PRESENT | GDT_DPL3 | GDT_CODE,GDT_GRANULAR | GDT_32BIT,true);
 
-        //This is the gdt entry for the process
+        //This is the gdt TSS entry for the process
         gdtEntryOS(0x10,(uint32_t)process->task->tss,sizeof(tss_t), ACS_DPL_3 | ACS_TSS ,GDT_GRANULAR | GDT_32BIT,true);
-        //displayTSS(kKernelTask->tss);
 
-        kernelGDT.limit = sizeof(sGDT) * GDT_TABLE_SIZE - 1;
-        kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
-        set_gdt(&kernelGDT);
-
-
-//return 0;
-
-        __asm__("push ds\n"
-                "push es\n"
-                "push fs\n"
-                "push gs\n");
         if (process->task->kernel)
         {
             __asm__("mov  ds,bx\n":: "b" (0x33));
@@ -527,34 +486,32 @@ int sysExec(process_t* process,int argc,char** argv)
             __asm__("mov eax,0x00000043\n"                              //Target SS
             "push eax\n"
             "push %[stackPtr]\n"                                //Target esp
-            "push %[eFlags]\n"
-            //"ord [esp],0x200\n"                                 //Target EFLAGS with I=1
-            "mov eax,0x82\n" 
+            "push %[eFlags]\n"                                  //Target EFLAGS
+            "mov eax,0x82\n"                                    //Load task register with user process TSS entry
             "ltr ax\n"
-            "mov eax,0x3b\n" //7
+            "mov eax,0x3b\n"                                    //GDT of DPL 3 code segment, not specific to the process
             "push eax\n"                                        //Target CS
-            //"push %[exec]\n"                                    //Target EIP
-            "lea eax,jmpHere\npush eax\n"
+            "lea eax,jmpHere\npush eax\n"                       //Target EIP is right after the iRet
             ::[stackPtr] "b" (process->task->tss->ESP),[eFlags] "d" (process->task->tss->EFLAGS));
-           SWITCH_CR3;
-            __asm__("iretd\njmpHere:nop\n");
-            __asm__("ReturnPoint:nop\n");
-            printk("MADE IT!!!\n");
+           SWITCH_CR3;                                          //Switch to the process CR3 before the jump
+            __asm__("iretd\njmpHere:nop\n");                    //Jump to ring 3
+            printk("MADE IT!!!\n");                             //We've made it!
+           //Now jump to the user task
            __asm__("mov eax,esp\nadd eax,12\npush eax\npush cs\npush %[entryPoint]\nretf\n"::[entryPoint] "r" (process->task->tss->EIP));
             JMPHR: goto JMPHR;
        }
+        panic("SysExec: Should never get here!!!");
         lsysExecRetVal=(uint32_t)eax;
         printd(DEBUG_ELF_LOADER,"exec: Back from executing %s, return value is 0x%08X, 0x%08X, __bra=0x%08X\n", process->path, lsysExecRetVal, &process->path, __builtin_return_address(0));
     }
     else
     {
-        printk("sysExec: Should never get here!!!\n");
-        STOPHERE2
+        panic("SysExec: Should never get here!!!");
     }
     return lsysExecRetVal;
 }
 
-void _syscall()
+void _sysCall()
 {
     printk("In _sysCall\n");
     gohere:goto gohere;
