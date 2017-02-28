@@ -1,3 +1,4 @@
 symbol-file Debug/cross-Linux/chrisos
-break kernel_main
+#break kernel_main
+add-symbol-file /home/yogi/src/os/chrisOSKernel/dist/Debug/cross-Linux/kernel 0x01000000
 target remote localhost:1234

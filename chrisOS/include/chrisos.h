@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "i386/cpu.h"
 #include "memory.h"
+#include "../../chrisOSKernel/include/task.h"
 
 #define TICKS_PER_SECOND 200
 
@@ -44,7 +45,7 @@ extern char* kernelDataLoadAddress;
 #define SAVED_STACK_FOR_EXCEPTIONS_SIZE 0x1000
 #define TSS_TABLE_RECORD_COUNT 16384
 #define TSS_TABLE_SIZE (0x68*TSS_TABLE_RECORD_COUNT)
-#define TASK_TABLE_SIZE (TSS_TABLE_RECORD_COUNT*(100))          //need task_t size
+#define TASK_TABLE_SIZE (((TSS_TABLE_RECORD_COUNT)/sizeof(uint32_t))*sizeof(task_t))          //need task_t size
 
 #define KERNEL_OBJECT_BASE_ADDRESS 0x160000     //NOTE: Needs to be larger than KERNEL_DATA_LOAD_ADDRESS by the size of the kernel variables
 #define E820_TABLE_ADDRESS KERNEL_OBJECT_BASE_ADDRESS

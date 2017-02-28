@@ -3,10 +3,9 @@
 #include "chrisos.h"
 #include "i386/bits/bits.h"
 #include "../include/tss.h"
-#include "../../chrisOSKernel/include/task.h"
+#include "task.h"
 #include "../../chrisOSKernel/include/alloc.h"
 #include "i386/kPaging.h"
-#include "kbd.h"
 #include "paging.h"
 #include "alloc.h"
 
@@ -25,38 +24,34 @@ void taskInit()
     {
         kTaskSlotAvailableInd[cnt]=0xFFFFFFFF;
     }
-    for (int cnt=1;cnt<10;cnt++)
+    for (int cnt=1;cnt<RESERVED_TASKS;cnt++)
         bitsReset(kTaskSlotAvailableInd, cnt);
     
+    //There is padding at the end of the task table.  Make sure the padding is 0's so that we don's BSF past the end
+    kTaskSlotAvailableInd[TSS_TABLE_RECORD_COUNT]=0x0;
 }
 
 ///Find an open TSS slot and mark it in use
-task_t* getTaskSlot()
+task_t* getAvailableTask()
 {
    int cnt=1,slot=0; //The first slot will ALWAYS be blank, so start with slot 1
-   uint32_t* ptr=kTaskSlotAvailableInd;
-    while (cnt < TSS_TABLE_RECORD_COUNT/32)
+    uint32_t* ptr=kTaskSlotAvailableInd;
+    ptr=(uint32_t*)(uint32_t)ptr+RESERVED_TASKS;    //don't touch the first 10 tasks, kernel is 0, other 9 undefined used internally
+    slot=bitsScanF(ptr);
+    if (slot>-1)
     {
-        printd (DEBUG_TASK,"getTask: Checking slots at 0x%08X, cnt=%u\n",ptr,cnt);
-        slot=bitsScanF(ptr);
-        if (slot>-1)
-        {
-            task_t* task=&kTaskTable[slot];
-            task->taskNum=slot;
-            printd(DEBUG_TASK,"getTaskSlot: Marking TSS %u used\n",slot);
-            bitsReset(ptr,slot);
-            task->tss=allocPages(PAGE_SIZE); //&kTSSTable[slot];
-            pagingMapPage(KERNEL_PAGE_DIR_ADDRESS,(uint32_t)task->tss | KERNEL_PAGED_BASE_ADDRESS,task->tss,0x3);
-            if (slot>0)
-            {
-                (task-1)->next=task;
-                task->prev=(task-1);
-            }
-            printd(DEBUG_TASK,"getTaskSlot: Using task %u @ 0x%08X, set TSS to 0x%08X\n",slot, task,task->tss);
-            return task;
-        }
-        ptr++;cnt++;
+        task_t* task=&kTaskTable[slot+RESERVED_TASKS];
+        task->taskNum=slot+RESERVED_TASKS;
+        printd(DEBUG_TASK,"getTaskSlot: Marking TSS %u used\n",slot);
+        bitsReset(ptr,slot+RESERVED_TASKS);
+        task->tss=allocPages(PAGE_SIZE); //&kTSSTable[slot];
+        pagingMapPage(KERNEL_PAGE_DIR_ADDRESS,(uint32_t)task->tss | KERNEL_PAGED_BASE_ADDRESS,task->tss,0x3);
+        (task-1)->next=task;
+        task->prev=(task-1);
+        printd(DEBUG_TASK,"getTaskSlot: Using task %u @ 0x%08X, set TSS to 0x%08X\n",slot, task,task->tss);
+        return task;
     }
+        ptr++;cnt++;
     printk("tssUseAvailable: Cannot allocate TSS for new task");
     return NULL;
 }
@@ -108,7 +103,7 @@ void mmMapKernelIntoTask(task_t* task)
 task_t* createTask(bool kernelTSS)
 {
     printd(DEBUG_TASK,"createTask: calling getTaskSlot\n");
-    task_t* task=getTaskSlot();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
+    task_t* task=getAvailableTask();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
     
     if (task==0)
         return NULL;
@@ -158,6 +153,7 @@ task_t* createTask(bool kernelTSS)
     //If it is a kernel task
     task->kernel=kernelTSS;
     task->tss->IOPB=sizeof(tss_t);
+    submitNewTask(task);
     return task;
 }
 

@@ -9,20 +9,34 @@
 #define	TASK_H
 #include <stdbool.h>
 #include <stdint.h>
-
 #include "tss.h"
+
+#define RESERVED_TASKS 10
+
+typedef enum etaskstate
+{
+    TASK_ZOMBIE,
+    TASK_RUNNING,
+    TASK_RUNNABLE,
+    TASK_STOPPED,
+    TASK_USLEEP,
+    TASK_ISLEEP
+} eTaskState;
+
 typedef struct s_task
 {
     int taskNum;
     tss_t* tss;
     uint32_t* pageDir;
     uint32_t* kernelPageDirPtr; //Kernel's paged pointer to pageDir
-    uintptr_t* next, *prev;
+    void* next, *prev;
     bool kernel;
+    eTaskState taskStatus;
+    uint64_t ticksSinceLastInterrupted, ticksSincePutInRunnable;
 } task_t;
 
 task_t* createTask(bool kernelTSS);
-task_t* getTaskSlot();
+task_t* getAvailableTask();
 
 #endif	/* TASK_H */
 

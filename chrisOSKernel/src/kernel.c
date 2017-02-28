@@ -20,7 +20,7 @@
 #include "../include/sysloader.h"
 #include "../../chrisOS/src/fat/fat_access.h"
 #include "../include/task.h"
-#include "kbd.h"
+#include "kernelVariables.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -47,7 +47,9 @@ int main(int argc, char** argv) {
     taskInit();
     printk("Done initializing task management\nInitializing kernel...\n");
     initKernelInternals();
-    printk("Done initializing kernel\n");
+    printk("Done initializing kernel\nInitializing scheduler...\n");
+    initSched();
+    printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
     char program[40]="/testmainprogramentry";
     printk("Loading %s\n",program);

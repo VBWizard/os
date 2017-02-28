@@ -18,6 +18,7 @@
 extern "C" {
 #endif
 
+#include "kernel.h"
 void syscall169();
 
 #define sysReboot() syscall169()

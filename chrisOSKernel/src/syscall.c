@@ -5,8 +5,6 @@
  */
 
 #include "syscall.h"
-#include "kbd.h"
-#include "io.h"
 
 #define KBRD_INTRFC 0x64
 /* keyboard interface bits */

@@ -4,7 +4,6 @@
 #include <string.h>
 #include "elfloader.h"
 #include "printf.h"
-#include "kbd.h"
 #include "utility.h"
 #include "exec.h"
 #include "task.h"
@@ -42,6 +41,9 @@ uintptr_t oldCR3=0,newCR3;
 
 #define GET_OLD_CR3 __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
 #define SWITCH_CR3 __asm__("mov cr3,eax\n"::[newCR3] "a" (newCR3));
+#define CURRENT_CR3 ({uint32_t cr3Val; \
+                      __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
+                      cr3Val;})
 
 void _sysCall();
 
@@ -361,7 +363,7 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
     GET_OLD_CR3;
             
     if (CR3==0x0)
-        CR3=CURRENT_CR3
+        CR3=CURRENT_CR3;
     elfInfo_t* elfInfo;
     if (pElfInfo==NULL)
         //Get a slot in the load info
@@ -470,9 +472,9 @@ int sysExec(process_t* process,int argc,char** argv)
             tssFlags |= ACS_DPL_3;
         }
         
+        printk("Process CS=0x%08X, taskNum=0x%08X\n",process->task->tss->CS,process->task->taskNum);
         //This is the gdt TSS entry for the process
         gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
-        printk("Process CS=0x%08X\n",process->task->tss->CS);
         __asm__("mov  ds,bx\n":: "b" (process->task->tss->DS));
         __asm__("mov  es,bx\n":: "b" (process->task->tss->ES));
         __asm__("mov  fs,bx\n":: "b" (process->task->tss->FS));

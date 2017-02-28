@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-#include "initKernel.h"
+#include "kInit.h"
 
 extern task_t* kKernelTask;
-
+extern void vector32();
 extern void _sysCall();
 extern uint32_t getCS();
 extern uint32_t getDS();
@@ -22,10 +22,14 @@ void initKernelInternals()
 {
     uint32_t oldCR3=0;
 
-    kKernelTask=getTaskSlot();
+    kKernelTask=getAvailableTask();
 
     //Set up syscall IDT entry
     idt_set_gate (&idtTable[0x80], 0x9<<3, (int)&_sysCall, ACS_TASK_GATE | ACS_DPL_3);               //
+    //Change timer handler to our own
+    printk("Installing new IRQ0 handler\n");
+    idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
+    idt_set_gate (&idtTable[0x21], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
     //idt_install();
 
     //Create up syscall (0x80) TSS

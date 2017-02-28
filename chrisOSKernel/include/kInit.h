@@ -25,6 +25,7 @@ extern "C" {
 #include "../../chrisOS/include/printf.h"
 #include "../../chrisOS/include/i386/gdt.h"
     
+extern void kIRQ0_handler();
     
 void initKernelInternals();
 

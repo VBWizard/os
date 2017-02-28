@@ -3,11 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-#include "kbd.h"
-#include "io.h"
+#include "kernel.h"
 #include "../../../chrisOS/include/chrisos.h"
 #include "printf.h"
-#include "utility.h"
 #include "drv_genKeyboard.h"
 
 #define KEYB_DATA_PORT 0x60

@@ -1,22 +1,13 @@
-#include "chrisos.h"
-#include "i386/kPaging.h"
 #include "mm.h"
-#include "kbd.h"
-#include "charDev.h"
-#include <stdbool.h>
-#include <stdint.h>
-#include "printf.h"
-#include "paging.h"
-#include "alloc.h"
-
-#define CURRENT_CR3 ({uint32_t cr3Val; \
-                      __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
-                      cr3Val;})
 
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 extern uint32_t kKernelPoolMemoryAddress;       //Address to locate page defs at
 extern char* kernelDataLoadAddress, kernelLoadAddress, kernelLoadEnd;
+
+#define CURRENT_CR3 ({uint32_t cr3Val; \
+                      __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
+                      cr3Val;})
 
 
 uint32_t KERNEL_DATA_SECTION 
@@ -34,7 +25,7 @@ sMemInfo* heapMemoryInfo;
 
 void mmInitHeapTracking()
 {
-    heapMemoryInfo=kmmHeapMemoryBaseAddress;
+    heapMemoryInfo=(sMemInfo*)kmmHeapMemoryBaseAddress;
     printd(DEBUG_MEMORY_MANAGEMENT,"Assigning heapMemoryInfo address of 0x%08X\n",heapMemoryInfo);
     
     kmmHeapMemoryBaseAddress += sizeof(sMemInfo)*1000;

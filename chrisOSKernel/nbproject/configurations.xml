@@ -39,15 +39,18 @@
       <itemPath>../chrisOS/include/chrisos.h</itemPath>
       <itemPath>include/drv_genKeyboard.h</itemPath>
       <itemPath>../chrisOS/include/filesystem.h</itemPath>
-      <itemPath>/home/yogi/src/os/chrisOSKernel/include/initKernel.h</itemPath>
+      <itemPath>include/kIRQHandlers.h</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/include/kInit.h</itemPath>
       <itemPath>../chrisOS/include/i386/kPaging.h</itemPath>
       <itemPath>include/kernel.h</itemPath>
       <itemPath>../chrisOS/include/kernelObjects.h</itemPath>
+      <itemPath>include/kernelVariables.h</itemPath>
       <itemPath>include/malloc.h</itemPath>
       <itemPath>include/mm.h</itemPath>
       <itemPath>include/paging.h</itemPath>
       <itemPath>../chrisOS/include/pci/pci.h</itemPath>
       <itemPath>include/process.h</itemPath>
+      <itemPath>include/schedule.h</itemPath>
       <itemPath>../chrisOS/include/strings.h</itemPath>
       <itemPath>include/syscall.h</itemPath>
       <itemPath>include/sysloader.h</itemPath>
@@ -70,9 +73,12 @@
       <itemPath>../chrisOS/src/char/console/basic_display.c</itemPath>
       <itemPath>../chrisOS/src/cpu/bits.c</itemPath>
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
+      <itemPath>src/exceptions.c</itemPath>
       <itemPath>../chrisOS/src/cpu/gdt.c</itemPath>
+      <itemPath>src/kIRQHandlers.c</itemPath>
       <itemPath>/home/yogi/src/os/chrisOSKernel/src/kInit.c</itemPath>
       <itemPath>src/kernel.c</itemPath>
+      <itemPath>src/kernelISR.s</itemPath>
       <itemPath>../chrisOS/src/char/keyboard.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
       <itemPath>src/mm/malloc.c</itemPath>
@@ -86,6 +92,7 @@
       <itemPath>src/schedule.c</itemPath>
       <itemPath>../chrisOS/src/strings/strcat.c</itemPath>
       <itemPath>../chrisOS/src/strings/strcpy.c</itemPath>
+      <itemPath>../chrisOS/src/char/console/strftime.c</itemPath>
       <itemPath>../chrisOS/src/strings/strlen.c</itemPath>
       <itemPath>../chrisOS/src/strings/strncmp.c</itemPath>
       <itemPath>../chrisOS/src/strings/strncpy.c</itemPath>
@@ -167,6 +174,11 @@
       <item path="../chrisOS/src/block/pci.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/char/console/basic_display.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/char/console/strftime.c"
             ex="false"
             tool="0"
             flavor2="0">
@@ -263,7 +275,7 @@
       </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="/home/yogi/src/os/chrisOSKernel/include/initKernel.h"
+      <item path="/home/yogi/src/os/chrisOSKernel/include/kInit.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -287,7 +299,11 @@
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -296,6 +312,8 @@
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/process.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/schedule.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -307,7 +325,13 @@
       </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/kernel.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -395,6 +419,11 @@
             tool="0"
             flavor2="0">
       </item>
+      <item path="../chrisOS/src/char/console/strftime.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
       <item path="../chrisOS/src/char/keyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/cpu/bits.c" ex="false" tool="0" flavor2="0">
@@ -487,7 +516,7 @@
       </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="/home/yogi/src/os/chrisOSKernel/include/initKernel.h"
+      <item path="/home/yogi/src/os/chrisOSKernel/include/kInit.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -511,7 +540,11 @@
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -520,6 +553,8 @@
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/process.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/schedule.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -531,7 +566,13 @@
       </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/kernel.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>

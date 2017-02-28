@@ -15,13 +15,12 @@
 #ifndef MALLOC_H
 #define MALLOC_H
 
-#include <stddef.h>
-#include "../../chrisOS/include/chrisos.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#include <stddef.h>
+#include "../../chrisOS/include/chrisos.h"
+    
     typedef struct s_heapptr
     {
         void* address;     //4
