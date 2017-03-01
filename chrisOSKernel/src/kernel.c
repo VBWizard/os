@@ -20,15 +20,14 @@
 #include "../include/sysloader.h"
 #include "../../chrisOS/src/fat/fat_access.h"
 #include "../include/task.h"
-#include "kernelVariables.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
-extern task_t* kKernelTask;
+extern bool schedulerEnabled;
+
+task_t* kKernelTask;
 uint32_t saveESP;
-/*
- * 
- */
+
 int main(int argc, char** argv) {
     printk("\nkernel loaded ... \n");
 /*    printk("Param count=%u\n",argc);
@@ -39,6 +38,7 @@ int main(int argc, char** argv) {
         //    break;
     }
 */
+    schedulerEnabled=false;
     printk("Initializing memory management ...\n");
     mmInit();
     printk("Done initializing memory management.\n\nInitializing malloc ...\n");
@@ -52,11 +52,10 @@ int main(int argc, char** argv) {
     printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
     char program[40]="/testmainprogramentry";
-    printk("Loading %s\n",program);
+    printk("Loading and executing %s\n",program);
     process_t* process = createProcess(program,false);
-    printk("Executing %s\n", process->path);
-    sysExec(process,1,"");
-
+    //sysExec(process,1,"");
+    schedulerEnabled=true;
     return (0xbad);
 }
 

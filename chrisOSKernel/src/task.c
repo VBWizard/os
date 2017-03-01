@@ -40,7 +40,7 @@ task_t* getAvailableTask()
     slot=bitsScanF(ptr);
     if (slot>-1)
     {
-        task_t* task=&kTaskTable[slot+RESERVED_TASKS];
+        task_t* task=(task_t*)malloc(sizeof(task_t));//&kTaskTable[slot+RESERVED_TASKS];
         task->taskNum=slot+RESERVED_TASKS;
         printd(DEBUG_TASK,"getTaskSlot: Marking TSS %u used\n",slot);
         bitsReset(ptr,slot+RESERVED_TASKS);
@@ -153,7 +153,6 @@ task_t* createTask(bool kernelTSS)
     //If it is a kernel task
     task->kernel=kernelTSS;
     task->tss->IOPB=sizeof(tss_t);
-    submitNewTask(task);
     return task;
 }
 

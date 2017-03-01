@@ -16,6 +16,9 @@
 
 extern elfInfo_t* kExecLoadInfo;
 extern int kExecLoadCount;
+extern void submitNewTask(task_t* task);
+
+bool taskRegInitialized=false;
 
 void destroyProcess(process_t* process)
 {
@@ -59,5 +62,27 @@ process_t* createProcess(char* path,bool kernelProcess)
         return NULL;
     process->task->tss->EIP=process->elf->hdr.e_entry;
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
-    return process;
+ 
+    uint32_t tssFlags=ACS_TSS;
+    uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;
+    if (process->task->kernel)
+    {
+        gdtFlags |= GDT_DPL0;
+        tssFlags |= ACS_DPL_0;
+    }
+    else
+    {
+        gdtFlags |= GDT_DPL3;
+        tssFlags |= ACS_DPL_3;
+    }
+    gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
+    if (!taskRegInitialized)
+    {
+        __asm__("mov eax,%[taskTSS]\n"                                    //Load task register with user process TSS entry
+                "ltr ax\n"
+                ::[taskTSS] "r" (process->task->taskNum<<3));
+        taskRegInitialized=true;
+    }
+    submitNewTask(process->task);
+    printk("Submitted process 0x%04X to be run",process->task->taskNum);
 }

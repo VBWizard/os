@@ -512,9 +512,11 @@ int sysExec(process_t* process,int argc,char** argv)
 
 void _sysCall()
 {
+    int a=0;
     printk("In _sysCall\n");
     __asm__("sti\n");
     gohere:
+                printk("User process current count=%u\n",a++);
     __asm__("hlt\n");
     goto gohere;
 }

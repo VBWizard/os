@@ -12,7 +12,7 @@
 #include "memory.h"
 #include "../../chrisOSKernel/include/task.h"
 
-#define TICKS_PER_SECOND 200
+#define TICKS_PER_SECOND 100
 
 //kernelDataLoadAddress is defined in kernelData2.ld.  It is the address of kernelData
 extern char* kernelDataLoadAddress;
@@ -115,7 +115,7 @@ extern char* kernelDataLoadAddress;
 #define DEBUG_MALLOC 1<<19
 #define DEBUG_KEYBOARD_DRIVER 1<<20
 #define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS
+#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PROCESS
 
 #define SCREEN_SPACES_PER_TAB 5
 

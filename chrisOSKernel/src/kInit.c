@@ -29,7 +29,6 @@ void initKernelInternals()
     //Change timer handler to our own
     printk("Installing new IRQ0 handler\n");
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
-    idt_set_gate (&idtTable[0x21], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
     //idt_install();
 
     //Create up syscall (0x80) TSS
@@ -55,5 +54,4 @@ void initKernelInternals()
     //displayTSS(kKernelTask->tss);
     tss_t* t=kKernelTask->tss;
     printd(DEBUG_TASK,"cs=%2X, ds=%2X, es=%2X, fs=%2X, gs=%2X, ss=%2X, cr3=0x%08X, flags=0x%08X, return=0x%08X\n",t->CS, t->DS, t->ES, t->FS, t->GS, t->SS,t->EFLAGS,_sysCall);
-
 }

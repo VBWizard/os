@@ -15,12 +15,13 @@
 
 typedef enum etaskstate
 {
-    TASK_ZOMBIE,
-    TASK_RUNNING,
-    TASK_RUNNABLE,
-    TASK_STOPPED,
-    TASK_USLEEP,
-    TASK_ISLEEP
+    TASK_ZOMBIE = 0,
+    TASK_RUNNING = 1,
+    TASK_RUNNABLE = 2,
+    TASK_STOPPED = 3,
+    TASK_USLEEP = 4,
+    TASK_ISLEEP = 5,
+    TASK_NONE = 0xFF
 } eTaskState;
 
 typedef struct s_task
@@ -31,8 +32,8 @@ typedef struct s_task
     uint32_t* kernelPageDirPtr; //Kernel's paged pointer to pageDir
     void* next, *prev;
     bool kernel;
-    eTaskState taskStatus;
-    uint64_t ticksSinceLastInterrupted, ticksSincePutInRunnable;
+    eTaskState taskState;
+    int32_t ticksSinceLastInterrupted, ticksSincePutInRunnable;
 } task_t;
 
 task_t* createTask(bool kernelTSS);

@@ -6,16 +6,21 @@
 
 #include "kIRQHandlers.h"
 
+bool schedulerEnabled=false;
+
+
 void kIRQ0_handler()
 {
 #ifndef DEBUG_NONE
-static char currTime[50];
+static char currTime[200];
 static struct tm theDateTime;
 #endif
-        *kTicksSinceStart=*kTicksSinceStart+1;
-        if (*kTicksSinceStart % kTicksPerSecond == 0)
-            kSystemCurrentTime++;
-#ifndef DEBUG_NONE
+    *kTicksSinceStart=*kTicksSinceStart+1;
+    if (*kTicksSinceStart % kTicksPerSecond == 0)
+        kSystemCurrentTime++;
+    if (schedulerEnabled)
+        scheduler();
+#ifndef DEBUG_EXPANDED_TICK
         if ((kDebugLevel & DEBUG_EXPANDED_TICK) == DEBUG_EXPANDED_TICK)
         {
             cursorSavePosition();
@@ -28,7 +33,7 @@ static struct tm theDateTime;
             cursorRestorePosition();
         }
 #endif
-#ifndef DEBUG_NONE
+#ifndef DEBUG_TICK
         if ((kDebugLevel & DEBUG_TICK) == DEBUG_TICK)
         {
             cursorSavePosition();
