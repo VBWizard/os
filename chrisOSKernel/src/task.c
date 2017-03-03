@@ -148,6 +148,7 @@ task_t* createTask(bool kernelTSS)
     //Set the pointer so that we don't go off the pages
     task->tss->ESP+=0x15000;
     
+    
     task->tss->EFLAGS=0x200046;
     task->tss->LINK=0x0; //need an old TSS entry (garbage) to "store" the old variables to on LTR
     //If it is a kernel task

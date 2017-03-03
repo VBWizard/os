@@ -1,4 +1,5 @@
   8 kernelData    00009a50  00120000  00120000  0008a000  2**13
+00120000 g       kernelData	00000000 kernelData
 00120000 g       kernelData	00000000 kernelDataLoadAddress
 00120000 g     O kernelData	00000004 terminal_row
 00120000 l    d  kernelData	00000000 kernelData
@@ -9,11 +10,17 @@
 0012001c g     O kernelData	0000000a savedPosY
 00120026 g     O kernelData	00000001 savedPosPointer
 00120027 g     O kernelData	00000001 kTerminalHeight
+00120040 g       kernelData	00000000 _files
 00120040 l     O kernelData	000090b0 _files
+001290f0 g       kernelData	00000000 _filelib_init
 001290f0 l     O kernelData	00000004 _filelib_init
+001290f4 g       kernelData	00000000 _filelib_valid
 001290f4 l     O kernelData	00000004 _filelib_valid
+00129100 g       kernelData	00000000 _fs
 00129100 l     O kernelData	00000468 _fs
+00129568 g       kernelData	00000000 _open_file_list
 00129568 l     O kernelData	00000008 _open_file_list
+00129570 g       kernelData	00000000 _free_file_list
 00129570 l     O kernelData	00000008 _free_file_list
 00129580 g     O kernelData	00000004 smap_table
 00129584 g     O kernelData	00000004 kE820Status

@@ -32,7 +32,7 @@ typedef struct sprocess
 } process_t;
 
     
-process_t* createProcess(char* path,bool kernelProcess);
+process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess);
 void destroyProcess(process_t* process);
 
 #ifdef __cplusplus

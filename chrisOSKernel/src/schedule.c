@@ -17,11 +17,11 @@ static task_t *kTaskList[6];
 extern uint32_t* kTicksSinceStart;
 void* NO_TASK=(void*)0xFFFFFFFF;
 
-#define TICKS_PER_SCHEDULE TICKS_PER_SECOND * 5
+#define TICKS_PER_SCHEDULE TICKS_PER_SECOND * 1
 uint32_t nextScheduleTicks;
 
 const char* TASK_STATE_NAMES[] = {"Zombie","Stopped","Running","Runnable","Uninterruptable Sleep","Interruptable Sleep"};
-bool schedulerTaskSwitched=0;
+extern bool schedulerTaskSwitched;
 
 void initSched()
 {
@@ -52,7 +52,6 @@ void initSched()
     kTaskList[3]=kTaskList3;
     kTaskList[4]=kTaskList4;
     kTaskList[5]=kTaskList5;
-
 }
 
 

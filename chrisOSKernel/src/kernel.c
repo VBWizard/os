@@ -17,6 +17,7 @@
 #include "../../chrisOS/include/i386/gdt.h"
 #include "process.h"
 #include <stddef.h>
+#include <unistd.h>
 #include "../include/sysloader.h"
 #include "../../chrisOS/src/fat/fat_access.h"
 #include "../include/task.h"
@@ -24,6 +25,7 @@
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
 extern bool schedulerEnabled;
+bool schedulerTaskSwitched=0;
 
 task_t* kKernelTask;
 uint32_t saveESP;
@@ -39,6 +41,7 @@ int main(int argc, char** argv) {
     }
 */
     schedulerEnabled=false;
+    schedulerTaskSwitched=false;
     printk("Initializing memory management ...\n");
     mmInit();
     printk("Done initializing memory management.\n\nInitializing malloc ...\n");
@@ -53,7 +56,17 @@ int main(int argc, char** argv) {
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
     char program[40]="/testmainprogramentry";
     printk("Loading and executing %s\n",program);
-    process_t* process = createProcess(program,false);
+    /*NOTE: This is how to create argv!!!*/
+    char test[2][50];
+    strcpy(test[0],"hello");
+    strcpy(test[1],"there");
+    char* testp[2];
+    testp[0]=&test[0];
+    testp[1]=&test[1];
+    /*************************************/
+    process_t* process = createProcess(program,2,&testp,false);
+    printk("Loading and executing %s again\n",program);
+//    process_t* process = createProcess(program,1,"hello!",false);
     //sysExec(process,1,"");
     schedulerEnabled=true;
     return (0xbad);

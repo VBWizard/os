@@ -13,7 +13,11 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>../chrisOS/src/char/console/basic_display.c</itemPath>
       <itemPath>main.c</itemPath>
+      <itemPath>../chrisOS/src/memcpy.c</itemPath>
+      <itemPath>../chrisOS/src/printf.c</itemPath>
+      <itemPath>../chrisOS/src/strings/strlen.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -56,6 +60,17 @@
       </compileType>
       <item path="../chrisOS/include/printf.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../chrisOS/src/char/console/basic_display.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/memcpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/printf.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/strings/strlen.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
@@ -83,6 +98,17 @@
         </linkerTool>
       </compileType>
       <item path="../chrisOS/include/printf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/char/console/basic_display.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/memcpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/printf.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/strings/strlen.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>

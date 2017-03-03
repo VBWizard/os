@@ -188,44 +188,49 @@ irq0_special_handling:
     #Stack is already where it was when we started the ISR
     mov al,schedulerTaskSwitched
     cmp al,0
+    jnz loadNewTask
     mov eax, isrSavedEAX
     jz  isrCommonExit
 
 loadNewTask:
+    #reset the task switched indicator
     mov eax,0
     mov schedulerTaskSwitched,eax
+    #set up registers for new task
+    #eax/ebx set up below
     mov ecx, isrSavedECX
     mov edx, isrSavedEDX
     #mov ebp, isrSavedEBP #already did this
     mov esi, isrSavedESI
     mov edi, isrSavedEDI
-
+    #esp pushed onto stack
+    #ds/es/fs/gs already set
     #Need to get the RPL from the CS to determine if we need to push SS/ESP
     mov eax,isrSavedCS
     and eax,3
-    jz overStackPushes
+    jz samePrivLvlJmp
 
     #Diff priv lvl, push SS/ESP for IRET
     mov eax,isrSavedSS
-    mov [esp+16],eax
+    push eax
     mov eax,isrSavedESP
-    mov [esp+12],eax
+    push eax
     jmp overRestoreSSESP
 
-overStackPushes:
+samePrivLvlJmp:
     #Same priv lvl, restore SS/ESP
     mov eax,isrSavedSS
     mov ss,eax
     mov esp,isrSavedESP
 
 overRestoreSSESP:
-    #pushes for all IRETs
+    #push iretJumpsHere so that we can retf after iret instead of iret directly to the process
     mov eax,isrSavedFlags
-    mov [esp+8],eax
+    push eax
     mov eax,isrSavedCS
-    mov [esp+4],eax
-    mov eax,isrSavedEIP
-    mov [esp],eax
+    push eax
+    lea eax,iretJumpsHere
+    push eax
     
     mov eax,isrSavedCR3
     mov ebx,cr3
@@ -237,6 +242,13 @@ overSetCR3:
     mov ebx, isrSavedEBX            #already did this
     sti
     iret
+iretJumpsHere:
+    #pushes for all IRETs
+    mov eax,isrSavedCS
+    push eax
+    mov eax,isrSavedEIP
+    push eax
+    retf
 .globl alltraps
 .globl vector0
 vector0:

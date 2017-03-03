@@ -1,5 +1,6 @@
 	0008a000 =  8;
 	 =  00120000;
+	 =  00120000;
 	terminal_row =  00120000;
 	kernelData =  00120000;
 	terminal_column =  00120004;
@@ -9,11 +10,17 @@
 	savedPosY =  0012001c;
 	savedPosPointer =  00120026;
 	kTerminalHeight =  00120027;
+	 =  00120040;
 	_files =  00120040;
+	 =  001290f0;
 	_filelib_init =  001290f0;
+	 =  001290f4;
 	_filelib_valid =  001290f4;
+	 =  00129100;
 	_fs =  00129100;
+	 =  00129568;
 	_open_file_list =  00129568;
+	 =  00129570;
 	_free_file_list =  00129570;
 	smap_table =  00129580;
 	kE820Status =  00129584;

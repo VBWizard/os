@@ -15,6 +15,7 @@ extern uint32_t getFS();
 extern uint32_t getGS();
 extern uint32_t getSS();
 extern uint32_t getESP();
+extern bool schedulerTaskSwitched;
 
 struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
 

@@ -516,7 +516,7 @@ void _sysCall()
     printk("In _sysCall\n");
     __asm__("sti\n");
     gohere:
-                printk("User process current count=%u\n",a++);
+ //               printk("User process current count=%u\n",a++);
     __asm__("hlt\n");
     goto gohere;
 }

@@ -11,13 +11,18 @@
  * testMainProgramEntry
  */
 int main(int argc, char** argv) {
-/*    __asm__("pop ebp\n"
-            "push edi\n"          //return SS
-            "push edx\n"        //return esp
-            "pushfd\n"     //return flags
-            "push ebx\n"        //return CS
-            "push esi\n"        //return eip
-            "nop\njmpd 0x48:0\n");
-*/        __asm__("cld\nint 0x80\n");
-            //xxx
+    register int *esp __asm__("esp");
+    //printk("Hello from testmainprogramentry!!!");
+    //__asm__("cld\nint 0x80\n");
+    int a=argc;
+    printk("Param count=%u\n",argc);
+    char** b=argv;
+    for (int cnt=0;cnt<argc;cnt++)
+    {
+        printk("Param %u=%s\n",cnt,argv[cnt]);
+    }
+jumpPoint:
+    __asm__("int 0x80\n");
+    goto jumpPoint;
+    return 0x1234;
 }

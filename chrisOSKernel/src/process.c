@@ -25,7 +25,7 @@ void destroyProcess(process_t* process)
     freePage(process);
 }
 
-process_t* createProcess(char* path,bool kernelProcess)
+process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
 {
 
     process_t* process;
@@ -40,27 +40,16 @@ process_t* createProcess(char* path,bool kernelProcess)
     printd(DEBUG_PROCESS,"process->path (0x%08X)=%s\n",process->path,process->path);
     process->elf=&kExecLoadInfo[kExecLoadCount++];
     process->task=createTask(kernelProcess);
-/*    if (kernelProcess)
-    {
-        process->task->tss->CS=getKernelCodeGDTIndex();
-        process->task->tss->DS=getKernelDataGDTIndex();
-        process->task->tss->ES=getKernelDataGDTIndex();
-        process->task->tss->FS=getKernelDataGDTIndex();
-        process->task->tss->GS=getKernelDataGDTIndex();
-    }
-    else
-    {
-        process->task->tss->CS=getNonKernelCodeGDTIndex();
-        process->task->tss->DS=getNonKernelDataGDTIndex();
-        process->task->tss->ES=getNonKernelDataGDTIndex();
-        process->task->tss->FS=getNonKernelDataGDTIndex();
-        process->task->tss->GS=getNonKernelDataGDTIndex();
-    }
-*/
     //CR3 was set and PDir created by createTask.  Page tables will be created by the load process
     if (!sysLoadElf(process->path,process->elf,process->task->tss->CR3,false))
         return NULL;
     process->task->tss->EIP=process->elf->hdr.e_entry;
+
+    //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
+    printk("************task ESP=0x%08X************\n",process->task->tss->ESP);
+    memcpy(process->task->tss->ESP+4,&argc,4);
+    memcpy(process->task->tss->ESP+8,&argv,4);
+    
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
  
     uint32_t tssFlags=ACS_TSS;
