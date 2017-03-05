@@ -126,7 +126,7 @@ void ahciEnablePortMultiplier(volatile HBA_PORT* port) {
     port->cmd.ST = 0;
 
     //waitForPortIdle(port);
-
+    printk("Entered ahciEnablePortMultiplier, shouldn't be here?!?!?!\n");
     printd(DEBUG_AHCI, "AHCI: EnablePortMultipler: port=0x%08X\n", port);
     int slot = find_cmdslot(port);
     if (slot == -1)

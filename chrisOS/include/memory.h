@@ -30,8 +30,8 @@ void __attribute__((noinline)) __attribute__((regparm(3))) detectE820Memory(SMAP
 void print_e820_map(SMAP_entry* buffer, int entryCount);
 void printE820Map();
 uint64_t sum_e820_usable_memory(SMAP_entry* buffer, int entryCount);
-void *memset(void *d1, int val, size_t len);
-void * memcpy(void *s1, const void *s2, size_t n);
+void* memset(void *d1, int val, size_t len);
+void* memcpy(void *s1, const void *s2, size_t n);
 int getE820Memory_asm(void);
 void initializeKernelPaging(void);
 #define __pa(x)                 ((unsigned long)(x)-KERNEL_PAGED_BASE_ADDRESS)

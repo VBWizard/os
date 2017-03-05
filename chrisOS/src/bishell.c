@@ -32,6 +32,7 @@ struct mbr_t mbr;
 HBA_PORT* port;
 char programParams[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
 char** lTemp;
+extern char kBootCmd[];
 
 
 int HIGH_CODE_SECTION findCommand(char* command)
@@ -211,6 +212,11 @@ char **buildargv (const char *input)
 void HIGH_CODE_SECTION displayGDTTable(char *cmdline)
 {
     dumpGDTTable();
+}
+
+void HIGH_CODE_SECTION displayIDTTable(char *cmdline)
+{
+    dumpIDTTable();
 }
 
 void HIGH_CODE_SECTION displayTSSEntry(char *cmdline)
@@ -691,17 +697,19 @@ void HIGH_CODE_SECTION biShell()
     bool stopCountingKeys=false;
     strcpy(sExecutingProgram,sbiShellProgramName);
     puts("\nWelcome to biShell ... hang a while!\n");
-    
-    /*******************************************************/
-    //CLR 02/23/2017 - Temporary code to execute commands on boot
-    char lcmd1[40]="disk 4";
-    execInternalCommand(lcmd1);
-    char lcmd2[40]="part 5";
-    execInternalCommand(lcmd2);
-    char lcmd3[40]="exec /kernel";
-    execInternalCommand(lcmd3);
-    /*******************************************************/
-    
+
+    if (kBootCmd[0]==0x0)
+    {
+        /*******************************************************/
+        //CLR 02/23/2017 - Temporary code to execute commands on boot
+        char lcmd1[40]="disk 4";
+        execInternalCommand(lcmd1);
+        char lcmd2[40]="part 5";
+        execInternalCommand(lcmd2);
+        char lcmd3[40]="exec /kernel";
+        execInternalCommand(lcmd3);
+        /*******************************************************/
+    }    
     
     while (1==1)
     {

@@ -6,11 +6,11 @@ Disassembly of section .text:
 
 10000000 <outb>:
 outb():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:22
-
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:23
 void IRQ_set_mask(unsigned char IRQline);
 void IRQ_clear_mask(unsigned char IRQline);
-
+void printp(const char *format, ...);
+void init_serial();
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 10000000:	55                   	push   ebp
@@ -20,12 +20,12 @@ static __inline void outb(unsigned short __port, unsigned char __val)
 10000009:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
 1000000c:	66 89 55 fc          	mov    WORD PTR [ebp-0x4],dx
 10000010:	88 45 f8             	mov    BYTE PTR [ebp-0x8],al
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:23
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:24
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
 10000013:	0f b6 45 f8          	movzx  eax,BYTE PTR [ebp-0x8]
 10000017:	0f b7 55 fc          	movzx  edx,WORD PTR [ebp-0x4]
 1000001b:	ee                   	out    dx,al
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:24
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:25
 }
 1000001c:	90                   	nop
 1000001d:	c9                   	leave  
@@ -33,7 +33,6 @@ static __inline void outb(unsigned short __port, unsigned char __val)
 
 1000001f <update_cursor>:
 update_cursor():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:25
 KERNEL_DATA_SECTION uint8_t savedPosY[10];
 KERNEL_DATA_SECTION int8_t savedPosPointer=0;
 KERNEL_DATA_SECTION uint8_t kTerminalHeight;
@@ -926,7 +925,7 @@ void kTermPrint(const char* data) {
         size_t datalen = strlen(data);
 1000059f:	83 ec 0c             	sub    esp,0xc
 100005a2:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-100005a5:	e8 0a 07 00 00       	call   10000cb4 <strlen>
+100005a5:	e8 ea 07 00 00       	call   10000d94 <strlen>
 100005aa:	83 c4 10             	add    esp,0x10
 100005ad:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:215
@@ -1360,931 +1359,1079 @@ void * memcpy(void *dest, const void *src, size_t n)
 10000801:	66 90                	xchg   ax,ax
 10000803:	90                   	nop
 
-10000804 <printchar>:
+10000804 <outb>:
+outb():
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:23
+void IRQ_set_mask(unsigned char IRQline);
+void IRQ_clear_mask(unsigned char IRQline);
+void printp(const char *format, ...);
+void init_serial();
+static __inline void outb(unsigned short __port, unsigned char __val)
+{
+10000804:	55                   	push   ebp
+10000805:	89 e5                	mov    ebp,esp
+10000807:	83 ec 08             	sub    esp,0x8
+1000080a:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
+1000080d:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000810:	66 89 55 fc          	mov    WORD PTR [ebp-0x4],dx
+10000814:	88 45 f8             	mov    BYTE PTR [ebp-0x8],al
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:24
+	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
+10000817:	0f b6 45 f8          	movzx  eax,BYTE PTR [ebp-0x8]
+1000081b:	0f b7 55 fc          	movzx  edx,WORD PTR [ebp-0x4]
+1000081f:	ee                   	out    dx,al
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/include/io.h:25
+}
+10000820:	90                   	nop
+10000821:	c9                   	leave  
+10000822:	c3                   	ret    
+
+10000823 <printchar>:
 printchar():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:41
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:45
 //extern bool pauseDisplay(bool offerToQuit);
 extern uint32_t kDebugLevel;
 uint8_t printDLineCount;
 
 static void printchar(char **str, int c)
 {
-10000804:	55                   	push   ebp
-10000805:	89 e5                	mov    ebp,esp
-10000807:	83 ec 08             	sub    esp,0x8
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:43
-	
-	if (str) {
-1000080a:	83 7d 08 00          	cmp    DWORD PTR [ebp+0x8],0x0
-1000080e:	74 19                	je     10000829 <printchar+0x25>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:44
-		**str = c;
-10000810:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10000813:	8b 00                	mov    eax,DWORD PTR [eax]
-10000815:	8b 55 0c             	mov    edx,DWORD PTR [ebp+0xc]
-10000818:	88 10                	mov    BYTE PTR [eax],dl
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:45
-		++(*str);
-1000081a:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000081d:	8b 00                	mov    eax,DWORD PTR [eax]
-1000081f:	8d 50 01             	lea    edx,[eax+0x1]
-10000822:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10000825:	89 10                	mov    DWORD PTR [eax],edx
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:48
-	}
-	else terminal_putchar((unsigned char)c);
-}
-10000827:	eb 12                	jmp    1000083b <printchar+0x37>
+10000823:	55                   	push   ebp
+10000824:	89 e5                	mov    ebp,esp
+10000826:	83 ec 08             	sub    esp,0x8
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:47
 	
 	if (str) {
+10000829:	83 7d 08 00          	cmp    DWORD PTR [ebp+0x8],0x0
+1000082d:	74 19                	je     10000848 <printchar+0x25>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:48
+		**str = c;
+1000082f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10000832:	8b 00                	mov    eax,DWORD PTR [eax]
+10000834:	8b 55 0c             	mov    edx,DWORD PTR [ebp+0xc]
+10000837:	88 10                	mov    BYTE PTR [eax],dl
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:49
+		++(*str);
+10000839:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000083c:	8b 00                	mov    eax,DWORD PTR [eax]
+1000083e:	8d 50 01             	lea    edx,[eax+0x1]
+10000841:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10000844:	89 10                	mov    DWORD PTR [eax],edx
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:52
+	}
+	else terminal_putchar((unsigned char)c);
+}
+10000846:	eb 12                	jmp    1000085a <printchar+0x37>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:51
+	
+	if (str) {
 		**str = c;
 		++(*str);
 	}
 	else terminal_putchar((unsigned char)c);
-10000829:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-1000082c:	0f b6 c0             	movzx  eax,al
-1000082f:	83 ec 0c             	sub    esp,0xc
-10000832:	50                   	push   eax
-10000833:	e8 de fa ff ff       	call   10000316 <terminal_putchar>
-10000838:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:48
+10000848:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+1000084b:	0f b6 c0             	movzx  eax,al
+1000084e:	83 ec 0c             	sub    esp,0xc
+10000851:	50                   	push   eax
+10000852:	e8 bf fa ff ff       	call   10000316 <terminal_putchar>
+10000857:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:52
 }
-1000083b:	90                   	nop
-1000083c:	c9                   	leave  
-1000083d:	c3                   	ret    
+1000085a:	90                   	nop
+1000085b:	c9                   	leave  
+1000085c:	c3                   	ret    
 
-1000083e <prints>:
+1000085d <prints>:
 prints():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:54
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:58
 
 #define PAD_RIGHT 1
 #define PAD_ZERO 2
 
 static int prints(char **out, const char *string, int width, int pad)
 {
-1000083e:	55                   	push   ebp
-1000083f:	89 e5                	mov    ebp,esp
-10000841:	57                   	push   edi
-10000842:	56                   	push   esi
-10000843:	53                   	push   ebx
-10000844:	83 ec 1c             	sub    esp,0x1c
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:55
+1000085d:	55                   	push   ebp
+1000085e:	89 e5                	mov    ebp,esp
+10000860:	57                   	push   edi
+10000861:	56                   	push   esi
+10000862:	53                   	push   ebx
+10000863:	83 ec 1c             	sub    esp,0x1c
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:59
 	register int pc = 0, padchar = ' ';
-10000847:	bb 00 00 00 00       	mov    ebx,0x0
-1000084c:	c7 45 e4 20 00 00 00 	mov    DWORD PTR [ebp-0x1c],0x20
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:57
+10000866:	bb 00 00 00 00       	mov    ebx,0x0
+1000086b:	c7 45 e4 20 00 00 00 	mov    DWORD PTR [ebp-0x1c],0x20
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:61
 
 	if (width > 0) {
-10000853:	83 7d 10 00          	cmp    DWORD PTR [ebp+0x10],0x0
-10000857:	7e 39                	jle    10000892 <prints+0x54>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:58
+10000872:	83 7d 10 00          	cmp    DWORD PTR [ebp+0x10],0x0
+10000876:	7e 39                	jle    100008b1 <prints+0x54>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:62
 		register int len = 0;
-10000859:	be 00 00 00 00       	mov    esi,0x0
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:60
+10000878:	be 00 00 00 00       	mov    esi,0x0
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:64
 		register const char *ptr;
 		for (ptr = string; *ptr; ++ptr) ++len;
-1000085e:	8b 7d 0c             	mov    edi,DWORD PTR [ebp+0xc]
-10000861:	eb 06                	jmp    10000869 <prints+0x2b>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:60 (discriminator 3)
-10000863:	83 c6 01             	add    esi,0x1
-10000866:	83 c7 01             	add    edi,0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:60 (discriminator 1)
-10000869:	0f b6 07             	movzx  eax,BYTE PTR [edi]
-1000086c:	84 c0                	test   al,al
-1000086e:	75 f3                	jne    10000863 <prints+0x25>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:61
-		if (len >= width) width = 0;
-10000870:	3b 75 10             	cmp    esi,DWORD PTR [ebp+0x10]
-10000873:	7c 09                	jl     1000087e <prints+0x40>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:61 (discriminator 1)
-10000875:	c7 45 10 00 00 00 00 	mov    DWORD PTR [ebp+0x10],0x0
-1000087c:	eb 03                	jmp    10000881 <prints+0x43>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:62
-		else width -= len;
-1000087e:	29 75 10             	sub    DWORD PTR [ebp+0x10],esi
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:63
-		if (pad & PAD_ZERO) padchar = '0';
-10000881:	8b 45 14             	mov    eax,DWORD PTR [ebp+0x14]
-10000884:	83 e0 02             	and    eax,0x2
-10000887:	85 c0                	test   eax,eax
-10000889:	74 07                	je     10000892 <prints+0x54>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:63 (discriminator 1)
-1000088b:	c7 45 e4 30 00 00 00 	mov    DWORD PTR [ebp-0x1c],0x30
+1000087d:	8b 7d 0c             	mov    edi,DWORD PTR [ebp+0xc]
+10000880:	eb 06                	jmp    10000888 <prints+0x2b>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:64 (discriminator 3)
+10000882:	83 c6 01             	add    esi,0x1
+10000885:	83 c7 01             	add    edi,0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:64 (discriminator 1)
+10000888:	0f b6 07             	movzx  eax,BYTE PTR [edi]
+1000088b:	84 c0                	test   al,al
+1000088d:	75 f3                	jne    10000882 <prints+0x25>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:65
+		if (len >= width) width = 0;
+1000088f:	3b 75 10             	cmp    esi,DWORD PTR [ebp+0x10]
+10000892:	7c 09                	jl     1000089d <prints+0x40>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:65 (discriminator 1)
+10000894:	c7 45 10 00 00 00 00 	mov    DWORD PTR [ebp+0x10],0x0
+1000089b:	eb 03                	jmp    100008a0 <prints+0x43>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:66
+		else width -= len;
+1000089d:	29 75 10             	sub    DWORD PTR [ebp+0x10],esi
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:67
+		if (pad & PAD_ZERO) padchar = '0';
+100008a0:	8b 45 14             	mov    eax,DWORD PTR [ebp+0x14]
+100008a3:	83 e0 02             	and    eax,0x2
+100008a6:	85 c0                	test   eax,eax
+100008a8:	74 07                	je     100008b1 <prints+0x54>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:67 (discriminator 1)
+100008aa:	c7 45 e4 30 00 00 00 	mov    DWORD PTR [ebp-0x1c],0x30
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:69
 	}
 	if (!(pad & PAD_RIGHT)) {
-10000892:	8b 45 14             	mov    eax,DWORD PTR [ebp+0x14]
-10000895:	83 e0 01             	and    eax,0x1
-10000898:	85 c0                	test   eax,eax
-1000089a:	75 41                	jne    100008dd <prints+0x9f>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:66
+100008b1:	8b 45 14             	mov    eax,DWORD PTR [ebp+0x14]
+100008b4:	83 e0 01             	and    eax,0x1
+100008b7:	85 c0                	test   eax,eax
+100008b9:	75 41                	jne    100008fc <prints+0x9f>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:70
 		for ( ; width > 0; --width) {
-1000089c:	eb 18                	jmp    100008b6 <prints+0x78>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:67 (discriminator 2)
+100008bb:	eb 18                	jmp    100008d5 <prints+0x78>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:71 (discriminator 2)
 			printchar (out, padchar);
-1000089e:	83 ec 08             	sub    esp,0x8
-100008a1:	ff 75 e4             	push   DWORD PTR [ebp-0x1c]
-100008a4:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-100008a7:	e8 58 ff ff ff       	call   10000804 <printchar>
-100008ac:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:68 (discriminator 2)
+100008bd:	83 ec 08             	sub    esp,0x8
+100008c0:	ff 75 e4             	push   DWORD PTR [ebp-0x1c]
+100008c3:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+100008c6:	e8 58 ff ff ff       	call   10000823 <printchar>
+100008cb:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:72 (discriminator 2)
 			++pc;
-100008af:	83 c3 01             	add    ebx,0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:66 (discriminator 2)
+100008ce:	83 c3 01             	add    ebx,0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:70 (discriminator 2)
 		if (len >= width) width = 0;
 		else width -= len;
 		if (pad & PAD_ZERO) padchar = '0';
 	}
 	if (!(pad & PAD_RIGHT)) {
 		for ( ; width > 0; --width) {
-100008b2:	83 6d 10 01          	sub    DWORD PTR [ebp+0x10],0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:66 (discriminator 1)
-100008b6:	83 7d 10 00          	cmp    DWORD PTR [ebp+0x10],0x0
-100008ba:	7f e2                	jg     1000089e <prints+0x60>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:71
+100008d1:	83 6d 10 01          	sub    DWORD PTR [ebp+0x10],0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:70 (discriminator 1)
+100008d5:	83 7d 10 00          	cmp    DWORD PTR [ebp+0x10],0x0
+100008d9:	7f e2                	jg     100008bd <prints+0x60>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:75
 			printchar (out, padchar);
 			++pc;
 		}
 	}
 	for ( ; *string ; ++string) {
-100008bc:	eb 1f                	jmp    100008dd <prints+0x9f>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:72 (discriminator 2)
+100008db:	eb 1f                	jmp    100008fc <prints+0x9f>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:76 (discriminator 2)
 		printchar (out, *string);
-100008be:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-100008c1:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-100008c4:	0f be c0             	movsx  eax,al
-100008c7:	83 ec 08             	sub    esp,0x8
-100008ca:	50                   	push   eax
-100008cb:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-100008ce:	e8 31 ff ff ff       	call   10000804 <printchar>
-100008d3:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:73 (discriminator 2)
-		++pc;
-100008d6:	83 c3 01             	add    ebx,0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:71 (discriminator 2)
-		for ( ; width > 0; --width) {
-			printchar (out, padchar);
-			++pc;
-		}
-	}
-	for ( ; *string ; ++string) {
-100008d9:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:71 (discriminator 1)
 100008dd:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
 100008e0:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-100008e3:	84 c0                	test   al,al
-100008e5:	75 d7                	jne    100008be <prints+0x80>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:75
+100008e3:	0f be c0             	movsx  eax,al
+100008e6:	83 ec 08             	sub    esp,0x8
+100008e9:	50                   	push   eax
+100008ea:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+100008ed:	e8 31 ff ff ff       	call   10000823 <printchar>
+100008f2:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:77 (discriminator 2)
+		++pc;
+100008f5:	83 c3 01             	add    ebx,0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:75 (discriminator 2)
+		for ( ; width > 0; --width) {
+			printchar (out, padchar);
+			++pc;
+		}
+	}
+	for ( ; *string ; ++string) {
+100008f8:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:75 (discriminator 1)
+100008fc:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+100008ff:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000902:	84 c0                	test   al,al
+10000904:	75 d7                	jne    100008dd <prints+0x80>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:79
 		printchar (out, *string);
 		++pc;
 	}
 	for ( ; width > 0; --width) {
-100008e7:	eb 18                	jmp    10000901 <prints+0xc3>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:76 (discriminator 2)
+10000906:	eb 18                	jmp    10000920 <prints+0xc3>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:80 (discriminator 2)
 		printchar (out, padchar);
-100008e9:	83 ec 08             	sub    esp,0x8
-100008ec:	ff 75 e4             	push   DWORD PTR [ebp-0x1c]
-100008ef:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-100008f2:	e8 0d ff ff ff       	call   10000804 <printchar>
-100008f7:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:77 (discriminator 2)
+10000908:	83 ec 08             	sub    esp,0x8
+1000090b:	ff 75 e4             	push   DWORD PTR [ebp-0x1c]
+1000090e:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000911:	e8 0d ff ff ff       	call   10000823 <printchar>
+10000916:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:81 (discriminator 2)
 		++pc;
-100008fa:	83 c3 01             	add    ebx,0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:75 (discriminator 2)
+10000919:	83 c3 01             	add    ebx,0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:79 (discriminator 2)
 	}
 	for ( ; *string ; ++string) {
 		printchar (out, *string);
 		++pc;
 	}
 	for ( ; width > 0; --width) {
-100008fd:	83 6d 10 01          	sub    DWORD PTR [ebp+0x10],0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:75 (discriminator 1)
-10000901:	83 7d 10 00          	cmp    DWORD PTR [ebp+0x10],0x0
-10000905:	7f e2                	jg     100008e9 <prints+0xab>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:80
+1000091c:	83 6d 10 01          	sub    DWORD PTR [ebp+0x10],0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:79 (discriminator 1)
+10000920:	83 7d 10 00          	cmp    DWORD PTR [ebp+0x10],0x0
+10000924:	7f e2                	jg     10000908 <prints+0xab>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:84
 		printchar (out, padchar);
 		++pc;
 	}
 
 	return pc;
-10000907:	89 d8                	mov    eax,ebx
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:81
+10000926:	89 d8                	mov    eax,ebx
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:85
 }
-10000909:	8d 65 f4             	lea    esp,[ebp-0xc]
-1000090c:	5b                   	pop    ebx
-1000090d:	5e                   	pop    esi
-1000090e:	5f                   	pop    edi
-1000090f:	5d                   	pop    ebp
-10000910:	c3                   	ret    
+10000928:	8d 65 f4             	lea    esp,[ebp-0xc]
+1000092b:	5b                   	pop    ebx
+1000092c:	5e                   	pop    esi
+1000092d:	5f                   	pop    edi
+1000092e:	5d                   	pop    ebp
+1000092f:	c3                   	ret    
 
-10000911 <printi>:
+10000930 <printi>:
 printi():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:87
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:91
 
 /* the following should be enough for 32 bit int */
 #define PRINT_BUF_LEN 12
 
 static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
 {
-10000911:	55                   	push   ebp
-10000912:	89 e5                	mov    ebp,esp
-10000914:	57                   	push   edi
-10000915:	56                   	push   esi
-10000916:	53                   	push   ebx
-10000917:	83 ec 2c             	sub    esp,0x2c
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:90
+10000930:	55                   	push   ebp
+10000931:	89 e5                	mov    ebp,esp
+10000933:	57                   	push   edi
+10000934:	56                   	push   esi
+10000935:	53                   	push   ebx
+10000936:	83 ec 2c             	sub    esp,0x2c
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:94
 	char print_buf[PRINT_BUF_LEN];
 	register char *s;
 	register int t, neg = 0, pc = 0;
-1000091a:	c7 45 d4 00 00 00 00 	mov    DWORD PTR [ebp-0x2c],0x0
-10000921:	c7 45 d0 00 00 00 00 	mov    DWORD PTR [ebp-0x30],0x0
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:91
+10000939:	c7 45 d4 00 00 00 00 	mov    DWORD PTR [ebp-0x2c],0x0
+10000940:	c7 45 d0 00 00 00 00 	mov    DWORD PTR [ebp-0x30],0x0
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:95
 	register unsigned int u = i;
-10000928:	8b 75 0c             	mov    esi,DWORD PTR [ebp+0xc]
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:93
+10000947:	8b 75 0c             	mov    esi,DWORD PTR [ebp+0xc]
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:97
 
 	if (i == 0) {
-1000092b:	83 7d 0c 00          	cmp    DWORD PTR [ebp+0xc],0x0
-1000092f:	75 22                	jne    10000953 <printi+0x42>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:94
+1000094a:	83 7d 0c 00          	cmp    DWORD PTR [ebp+0xc],0x0
+1000094e:	75 22                	jne    10000972 <printi+0x42>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:98
 		print_buf[0] = '0';
-10000931:	c6 45 dc 30          	mov    BYTE PTR [ebp-0x24],0x30
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:95
-		print_buf[1] = '\0';
-10000935:	c6 45 dd 00          	mov    BYTE PTR [ebp-0x23],0x0
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:96
-		return prints (out, print_buf, width, pad);
-10000939:	ff 75 1c             	push   DWORD PTR [ebp+0x1c]
-1000093c:	ff 75 18             	push   DWORD PTR [ebp+0x18]
-1000093f:	8d 45 dc             	lea    eax,[ebp-0x24]
-10000942:	50                   	push   eax
-10000943:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000946:	e8 f3 fe ff ff       	call   1000083e <prints>
-1000094b:	83 c4 10             	add    esp,0x10
-1000094e:	e9 af 00 00 00       	jmp    10000a02 <printi+0xf1>
+10000950:	c6 45 dc 30          	mov    BYTE PTR [ebp-0x24],0x30
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:99
+		print_buf[1] = '\0';
+10000954:	c6 45 dd 00          	mov    BYTE PTR [ebp-0x23],0x0
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:100
+		return prints (out, print_buf, width, pad);
+10000958:	ff 75 1c             	push   DWORD PTR [ebp+0x1c]
+1000095b:	ff 75 18             	push   DWORD PTR [ebp+0x18]
+1000095e:	8d 45 dc             	lea    eax,[ebp-0x24]
+10000961:	50                   	push   eax
+10000962:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000965:	e8 f3 fe ff ff       	call   1000085d <prints>
+1000096a:	83 c4 10             	add    esp,0x10
+1000096d:	e9 af 00 00 00       	jmp    10000a21 <printi+0xf1>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:103
 	}
 
 	if (sg && b == 10 && i < 0) {
-10000953:	83 7d 14 00          	cmp    DWORD PTR [ebp+0x14],0x0
-10000957:	74 1a                	je     10000973 <printi+0x62>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:99 (discriminator 1)
-10000959:	83 7d 10 0a          	cmp    DWORD PTR [ebp+0x10],0xa
-1000095d:	75 14                	jne    10000973 <printi+0x62>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:99 (discriminator 2)
-1000095f:	83 7d 0c 00          	cmp    DWORD PTR [ebp+0xc],0x0
-10000963:	79 0e                	jns    10000973 <printi+0x62>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:100
-		neg = 1;
-10000965:	c7 45 d4 01 00 00 00 	mov    DWORD PTR [ebp-0x2c],0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:101
-		u = -i;
-1000096c:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-1000096f:	f7 d8                	neg    eax
-10000971:	89 c6                	mov    esi,eax
+10000972:	83 7d 14 00          	cmp    DWORD PTR [ebp+0x14],0x0
+10000976:	74 1a                	je     10000992 <printi+0x62>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:103 (discriminator 1)
+10000978:	83 7d 10 0a          	cmp    DWORD PTR [ebp+0x10],0xa
+1000097c:	75 14                	jne    10000992 <printi+0x62>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:103 (discriminator 2)
+1000097e:	83 7d 0c 00          	cmp    DWORD PTR [ebp+0xc],0x0
+10000982:	79 0e                	jns    10000992 <printi+0x62>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:104
-	}
-
-	s = print_buf + PRINT_BUF_LEN-1;
-10000973:	8d 5d dc             	lea    ebx,[ebp-0x24]
-10000976:	83 c3 0b             	add    ebx,0xb
+		neg = 1;
+10000984:	c7 45 d4 01 00 00 00 	mov    DWORD PTR [ebp-0x2c],0x1
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:105
+		u = -i;
+1000098b:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+1000098e:	f7 d8                	neg    eax
+10000990:	89 c6                	mov    esi,eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:108
+	}
+
+	s = print_buf + PRINT_BUF_LEN-1;
+10000992:	8d 5d dc             	lea    ebx,[ebp-0x24]
+10000995:	83 c3 0b             	add    ebx,0xb
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:109
 	*s = '\0';
-10000979:	c6 03 00             	mov    BYTE PTR [ebx],0x0
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:107
+10000998:	c6 03 00             	mov    BYTE PTR [ebx],0x0
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:111
 
 	while (u) {
-1000097c:	eb 35                	jmp    100009b3 <printi+0xa2>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:108
-		t = u % b;
-1000097e:	8b 4d 10             	mov    ecx,DWORD PTR [ebp+0x10]
-10000981:	89 f0                	mov    eax,esi
-10000983:	ba 00 00 00 00       	mov    edx,0x0
-10000988:	f7 f1                	div    ecx
-1000098a:	89 d0                	mov    eax,edx
-1000098c:	89 c7                	mov    edi,eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:109
-		if( t >= 10 )
-1000098e:	83 ff 09             	cmp    edi,0x9
-10000991:	7e 08                	jle    1000099b <printi+0x8a>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:110
-			t += letbase - '0' - 10;
-10000993:	8b 45 20             	mov    eax,DWORD PTR [ebp+0x20]
-10000996:	83 e8 3a             	sub    eax,0x3a
-10000999:	01 c7                	add    edi,eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:111
-		*--s = t + '0';
-1000099b:	83 eb 01             	sub    ebx,0x1
-1000099e:	89 f8                	mov    eax,edi
-100009a0:	83 c0 30             	add    eax,0x30
-100009a3:	88 03                	mov    BYTE PTR [ebx],al
+1000099b:	eb 35                	jmp    100009d2 <printi+0xa2>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:112
+		t = u % b;
+1000099d:	8b 4d 10             	mov    ecx,DWORD PTR [ebp+0x10]
+100009a0:	89 f0                	mov    eax,esi
+100009a2:	ba 00 00 00 00       	mov    edx,0x0
+100009a7:	f7 f1                	div    ecx
+100009a9:	89 d0                	mov    eax,edx
+100009ab:	89 c7                	mov    edi,eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:113
+		if( t >= 10 )
+100009ad:	83 ff 09             	cmp    edi,0x9
+100009b0:	7e 08                	jle    100009ba <printi+0x8a>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:114
+			t += letbase - '0' - 10;
+100009b2:	8b 45 20             	mov    eax,DWORD PTR [ebp+0x20]
+100009b5:	83 e8 3a             	sub    eax,0x3a
+100009b8:	01 c7                	add    edi,eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:115
+		*--s = t + '0';
+100009ba:	83 eb 01             	sub    ebx,0x1
+100009bd:	89 f8                	mov    eax,edi
+100009bf:	83 c0 30             	add    eax,0x30
+100009c2:	88 03                	mov    BYTE PTR [ebx],al
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:116
 		u /= b;
-100009a5:	8b 4d 10             	mov    ecx,DWORD PTR [ebp+0x10]
-100009a8:	89 f0                	mov    eax,esi
-100009aa:	ba 00 00 00 00       	mov    edx,0x0
-100009af:	f7 f1                	div    ecx
-100009b1:	89 c6                	mov    esi,eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:107
+100009c4:	8b 4d 10             	mov    ecx,DWORD PTR [ebp+0x10]
+100009c7:	89 f0                	mov    eax,esi
+100009c9:	ba 00 00 00 00       	mov    edx,0x0
+100009ce:	f7 f1                	div    ecx
+100009d0:	89 c6                	mov    esi,eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:111
 	}
 
 	s = print_buf + PRINT_BUF_LEN-1;
 	*s = '\0';
 
 	while (u) {
-100009b3:	85 f6                	test   esi,esi
-100009b5:	75 c7                	jne    1000097e <printi+0x6d>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:115
+100009d2:	85 f6                	test   esi,esi
+100009d4:	75 c7                	jne    1000099d <printi+0x6d>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:119
 			t += letbase - '0' - 10;
 		*--s = t + '0';
 		u /= b;
 	}
 
 	if (neg) {
-100009b7:	83 7d d4 00          	cmp    DWORD PTR [ebp-0x2c],0x0
-100009bb:	74 30                	je     100009ed <printi+0xdc>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:116
+100009d6:	83 7d d4 00          	cmp    DWORD PTR [ebp-0x2c],0x0
+100009da:	74 30                	je     10000a0c <printi+0xdc>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:120
 		if( width && (pad & PAD_ZERO) ) {
-100009bd:	83 7d 18 00          	cmp    DWORD PTR [ebp+0x18],0x0
-100009c1:	74 24                	je     100009e7 <printi+0xd6>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:116 (discriminator 1)
-100009c3:	8b 45 1c             	mov    eax,DWORD PTR [ebp+0x1c]
-100009c6:	83 e0 02             	and    eax,0x2
-100009c9:	85 c0                	test   eax,eax
-100009cb:	74 1a                	je     100009e7 <printi+0xd6>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:117
+100009dc:	83 7d 18 00          	cmp    DWORD PTR [ebp+0x18],0x0
+100009e0:	74 24                	je     10000a06 <printi+0xd6>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:120 (discriminator 1)
+100009e2:	8b 45 1c             	mov    eax,DWORD PTR [ebp+0x1c]
+100009e5:	83 e0 02             	and    eax,0x2
+100009e8:	85 c0                	test   eax,eax
+100009ea:	74 1a                	je     10000a06 <printi+0xd6>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:121
 			printchar (out, '-');
-100009cd:	83 ec 08             	sub    esp,0x8
-100009d0:	6a 2d                	push   0x2d
-100009d2:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-100009d5:	e8 2a fe ff ff       	call   10000804 <printchar>
-100009da:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:118
-			++pc;
-100009dd:	83 45 d0 01          	add    DWORD PTR [ebp-0x30],0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:119
-			--width;
-100009e1:	83 6d 18 01          	sub    DWORD PTR [ebp+0x18],0x1
-100009e5:	eb 06                	jmp    100009ed <printi+0xdc>
+100009ec:	83 ec 08             	sub    esp,0x8
+100009ef:	6a 2d                	push   0x2d
+100009f1:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+100009f4:	e8 2a fe ff ff       	call   10000823 <printchar>
+100009f9:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:122
+			++pc;
+100009fc:	83 45 d0 01          	add    DWORD PTR [ebp-0x30],0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:123
+			--width;
+10000a00:	83 6d 18 01          	sub    DWORD PTR [ebp+0x18],0x1
+10000a04:	eb 06                	jmp    10000a0c <printi+0xdc>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:126
 		}
 		else {
 			*--s = '-';
-100009e7:	83 eb 01             	sub    ebx,0x1
-100009ea:	c6 03 2d             	mov    BYTE PTR [ebx],0x2d
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:126
+10000a06:	83 eb 01             	sub    ebx,0x1
+10000a09:	c6 03 2d             	mov    BYTE PTR [ebx],0x2d
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:130
 		}
 	}
 
 	return pc + prints (out, s, width, pad);
-100009ed:	ff 75 1c             	push   DWORD PTR [ebp+0x1c]
-100009f0:	ff 75 18             	push   DWORD PTR [ebp+0x18]
-100009f3:	53                   	push   ebx
-100009f4:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-100009f7:	e8 42 fe ff ff       	call   1000083e <prints>
-100009fc:	83 c4 10             	add    esp,0x10
-100009ff:	03 45 d0             	add    eax,DWORD PTR [ebp-0x30]
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:127 (discriminator 1)
+10000a0c:	ff 75 1c             	push   DWORD PTR [ebp+0x1c]
+10000a0f:	ff 75 18             	push   DWORD PTR [ebp+0x18]
+10000a12:	53                   	push   ebx
+10000a13:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000a16:	e8 42 fe ff ff       	call   1000085d <prints>
+10000a1b:	83 c4 10             	add    esp,0x10
+10000a1e:	03 45 d0             	add    eax,DWORD PTR [ebp-0x30]
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:131 (discriminator 1)
 }
-10000a02:	8d 65 f4             	lea    esp,[ebp-0xc]
-10000a05:	5b                   	pop    ebx
-10000a06:	5e                   	pop    esi
-10000a07:	5f                   	pop    edi
-10000a08:	5d                   	pop    ebp
-10000a09:	c3                   	ret    
+10000a21:	8d 65 f4             	lea    esp,[ebp-0xc]
+10000a24:	5b                   	pop    ebx
+10000a25:	5e                   	pop    esi
+10000a26:	5f                   	pop    edi
+10000a27:	5d                   	pop    ebp
+10000a28:	c3                   	ret    
 
-10000a0a <print>:
+10000a29 <print>:
 print():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:130
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:134
 
 static int print(char **out, const char *format, va_list args )
 {
-10000a0a:	55                   	push   ebp
-10000a0b:	89 e5                	mov    ebp,esp
-10000a0d:	57                   	push   edi
-10000a0e:	56                   	push   esi
-10000a0f:	53                   	push   ebx
-10000a10:	83 ec 1c             	sub    esp,0x1c
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:132
+10000a29:	55                   	push   ebp
+10000a2a:	89 e5                	mov    ebp,esp
+10000a2c:	57                   	push   edi
+10000a2d:	56                   	push   esi
+10000a2e:	53                   	push   ebx
+10000a2f:	83 ec 1c             	sub    esp,0x1c
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:136
 	register int width, pad;
 	register int pc = 0;
-10000a13:	bb 00 00 00 00       	mov    ebx,0x0
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:135
+10000a32:	bb 00 00 00 00       	mov    ebx,0x0
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:139
 	char scr[2];
 
 	for (; *format != 0; ++format) {
-10000a18:	e9 da 01 00 00       	jmp    10000bf7 <print+0x1ed>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:136
-		if (*format == '%') {
-10000a1d:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000a20:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000a23:	3c 25                	cmp    al,0x25
-10000a25:	0f 85 ad 01 00 00    	jne    10000bd8 <print+0x1ce>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:137
-			++format;
-10000a2b:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:138
-			width = pad = 0;
-10000a2f:	bf 00 00 00 00       	mov    edi,0x0
-10000a34:	89 fe                	mov    esi,edi
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:139
-			if (*format == '\0') break;
-10000a36:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000a39:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000a3c:	84 c0                	test   al,al
-10000a3e:	0f 84 c3 01 00 00    	je     10000c07 <print+0x1fd>
+10000a37:	e9 da 01 00 00       	jmp    10000c16 <print+0x1ed>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:140
-			if (*format == '%') goto out;
-10000a44:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000a47:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000a4a:	3c 25                	cmp    al,0x25
-10000a4c:	0f 84 85 01 00 00    	je     10000bd7 <print+0x1cd>
+		if (*format == '%') {
+10000a3c:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000a3f:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000a42:	3c 25                	cmp    al,0x25
+10000a44:	0f 85 ad 01 00 00    	jne    10000bf7 <print+0x1ce>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:141
-			if (*format == '-') {
-10000a52:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000a55:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000a58:	3c 2d                	cmp    al,0x2d
-10000a5a:	75 12                	jne    10000a6e <print+0x64>
+			++format;
+10000a4a:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:142
-				++format;
-10000a5c:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
+			width = pad = 0;
+10000a4e:	bf 00 00 00 00       	mov    edi,0x0
+10000a53:	89 fe                	mov    esi,edi
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:143
-				pad = PAD_RIGHT;
-10000a60:	bf 01 00 00 00       	mov    edi,0x1
+			if (*format == '\0') break;
+10000a55:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000a58:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000a5b:	84 c0                	test   al,al
+10000a5d:	0f 84 c3 01 00 00    	je     10000c26 <print+0x1fd>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:144
+			if (*format == '%') goto out;
+10000a63:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000a66:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000a69:	3c 25                	cmp    al,0x25
+10000a6b:	0f 84 85 01 00 00    	je     10000bf6 <print+0x1cd>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:145
-			}
-			while (*format == '0') {
-10000a65:	eb 07                	jmp    10000a6e <print+0x64>
+			if (*format == '-') {
+10000a71:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000a74:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000a77:	3c 2d                	cmp    al,0x2d
+10000a79:	75 12                	jne    10000a8d <print+0x64>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:146
 				++format;
-10000a67:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
+10000a7b:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:147
+				pad = PAD_RIGHT;
+10000a7f:	bf 01 00 00 00       	mov    edi,0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:149
+			}
+			while (*format == '0') {
+10000a84:	eb 07                	jmp    10000a8d <print+0x64>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:150
+				++format;
+10000a86:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:151
 				pad |= PAD_ZERO;
-10000a6b:	83 cf 02             	or     edi,0x2
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:145
+10000a8a:	83 cf 02             	or     edi,0x2
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:149
 			if (*format == '%') goto out;
 			if (*format == '-') {
 				++format;
 				pad = PAD_RIGHT;
 			}
 			while (*format == '0') {
-10000a6e:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000a71:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000a74:	3c 30                	cmp    al,0x30
-10000a76:	74 ef                	je     10000a67 <print+0x5d>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:149
+10000a8d:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000a90:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000a93:	3c 30                	cmp    al,0x30
+10000a95:	74 ef                	je     10000a86 <print+0x5d>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:153
 				++format;
 				pad |= PAD_ZERO;
 			}
 			for ( ; *format >= '0' && *format <= '9'; ++format) {
-10000a78:	eb 1d                	jmp    10000a97 <print+0x8d>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:150 (discriminator 3)
+10000a97:	eb 1d                	jmp    10000ab6 <print+0x8d>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:154 (discriminator 3)
 				width *= 10;
-10000a7a:	89 f0                	mov    eax,esi
-10000a7c:	c1 e0 02             	shl    eax,0x2
-10000a7f:	01 f0                	add    eax,esi
-10000a81:	01 c0                	add    eax,eax
-10000a83:	89 c6                	mov    esi,eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:151 (discriminator 3)
+10000a99:	89 f0                	mov    eax,esi
+10000a9b:	c1 e0 02             	shl    eax,0x2
+10000a9e:	01 f0                	add    eax,esi
+10000aa0:	01 c0                	add    eax,eax
+10000aa2:	89 c6                	mov    esi,eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:155 (discriminator 3)
 				width += *format - '0';
-10000a85:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000a88:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000a8b:	0f be c0             	movsx  eax,al
-10000a8e:	83 e8 30             	sub    eax,0x30
-10000a91:	01 c6                	add    esi,eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:149 (discriminator 3)
+10000aa4:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000aa7:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000aaa:	0f be c0             	movsx  eax,al
+10000aad:	83 e8 30             	sub    eax,0x30
+10000ab0:	01 c6                	add    esi,eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:153 (discriminator 3)
 			}
 			while (*format == '0') {
 				++format;
 				pad |= PAD_ZERO;
 			}
 			for ( ; *format >= '0' && *format <= '9'; ++format) {
-10000a93:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:149 (discriminator 1)
-10000a97:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000a9a:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000a9d:	3c 2f                	cmp    al,0x2f
-10000a9f:	7e 0a                	jle    10000aab <print+0xa1>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:149 (discriminator 2)
-10000aa1:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000aa4:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000aa7:	3c 39                	cmp    al,0x39
-10000aa9:	7e cf                	jle    10000a7a <print+0x70>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:153
+10000ab2:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:153 (discriminator 1)
+10000ab6:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000ab9:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000abc:	3c 2f                	cmp    al,0x2f
+10000abe:	7e 0a                	jle    10000aca <print+0xa1>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:153 (discriminator 2)
+10000ac0:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000ac3:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000ac6:	3c 39                	cmp    al,0x39
+10000ac8:	7e cf                	jle    10000a99 <print+0x70>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:157
 				width *= 10;
 				width += *format - '0';
 			}
 			if( *format == 's' ) {
-10000aab:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000aae:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000ab1:	3c 73                	cmp    al,0x73
-10000ab3:	75 2b                	jne    10000ae0 <print+0xd6>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:154
-				register char *s = (char *)va_arg( args, int );
-10000ab5:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
-10000ab8:	8d 50 04             	lea    edx,[eax+0x4]
-10000abb:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
-10000abe:	8b 00                	mov    eax,DWORD PTR [eax]
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:155
-				pc += prints (out, s?s:"(null)", width, pad);
-10000ac0:	85 c0                	test   eax,eax
-10000ac2:	74 02                	je     10000ac6 <print+0xbc>
-10000ac4:	eb 05                	jmp    10000acb <print+0xc1>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:155 (discriminator 2)
-10000ac6:	b8 08 11 00 10       	mov    eax,0x10001108
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:155 (discriminator 4)
-10000acb:	57                   	push   edi
-10000acc:	56                   	push   esi
-10000acd:	50                   	push   eax
-10000ace:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000ad1:	e8 68 fd ff ff       	call   1000083e <prints>
-10000ad6:	83 c4 10             	add    esp,0x10
-10000ad9:	01 c3                	add    ebx,eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:156 (discriminator 4)
-				continue;
-10000adb:	e9 13 01 00 00       	jmp    10000bf3 <print+0x1e9>
+10000aca:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000acd:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000ad0:	3c 73                	cmp    al,0x73
+10000ad2:	75 2b                	jne    10000aff <print+0xd6>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:158
-			}
-			if( *format == 'd' ) {
-10000ae0:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000ae3:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000ae6:	3c 64                	cmp    al,0x64
-10000ae8:	75 29                	jne    10000b13 <print+0x109>
+				register char *s = (char *)va_arg( args, int );
+10000ad4:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
+10000ad7:	8d 50 04             	lea    edx,[eax+0x4]
+10000ada:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
+10000add:	8b 00                	mov    eax,DWORD PTR [eax]
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:159
-				pc += printi (out, va_arg( args, int ), 10, 1, width, pad, 'a');
-10000aea:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
-10000aed:	8d 50 04             	lea    edx,[eax+0x4]
-10000af0:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
-10000af3:	8b 00                	mov    eax,DWORD PTR [eax]
-10000af5:	83 ec 04             	sub    esp,0x4
-10000af8:	6a 61                	push   0x61
-10000afa:	57                   	push   edi
-10000afb:	56                   	push   esi
-10000afc:	6a 01                	push   0x1
-10000afe:	6a 0a                	push   0xa
-10000b00:	50                   	push   eax
-10000b01:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000b04:	e8 08 fe ff ff       	call   10000911 <printi>
-10000b09:	83 c4 20             	add    esp,0x20
-10000b0c:	01 c3                	add    ebx,eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:160
+				pc += prints (out, s?s:"(null)", width, pad);
+10000adf:	85 c0                	test   eax,eax
+10000ae1:	74 02                	je     10000ae5 <print+0xbc>
+10000ae3:	eb 05                	jmp    10000aea <print+0xc1>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:159 (discriminator 2)
+10000ae5:	b8 08 11 00 10       	mov    eax,0x10001108
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:159 (discriminator 4)
+10000aea:	57                   	push   edi
+10000aeb:	56                   	push   esi
+10000aec:	50                   	push   eax
+10000aed:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000af0:	e8 68 fd ff ff       	call   1000085d <prints>
+10000af5:	83 c4 10             	add    esp,0x10
+10000af8:	01 c3                	add    ebx,eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:160 (discriminator 4)
 				continue;
-10000b0e:	e9 e0 00 00 00       	jmp    10000bf3 <print+0x1e9>
+10000afa:	e9 13 01 00 00       	jmp    10000c12 <print+0x1e9>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:162
 			}
-			if( *format == 'x' ) {
-10000b13:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000b16:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000b19:	3c 78                	cmp    al,0x78
-10000b1b:	75 29                	jne    10000b46 <print+0x13c>
+			if( *format == 'd' ) {
+10000aff:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000b02:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000b05:	3c 64                	cmp    al,0x64
+10000b07:	75 29                	jne    10000b32 <print+0x109>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:163
-				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'a');
-10000b1d:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
-10000b20:	8d 50 04             	lea    edx,[eax+0x4]
-10000b23:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
-10000b26:	8b 00                	mov    eax,DWORD PTR [eax]
-10000b28:	83 ec 04             	sub    esp,0x4
-10000b2b:	6a 61                	push   0x61
-10000b2d:	57                   	push   edi
-10000b2e:	56                   	push   esi
-10000b2f:	6a 00                	push   0x0
-10000b31:	6a 10                	push   0x10
-10000b33:	50                   	push   eax
-10000b34:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000b37:	e8 d5 fd ff ff       	call   10000911 <printi>
-10000b3c:	83 c4 20             	add    esp,0x20
-10000b3f:	01 c3                	add    ebx,eax
+				pc += printi (out, va_arg( args, int ), 10, 1, width, pad, 'a');
+10000b09:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
+10000b0c:	8d 50 04             	lea    edx,[eax+0x4]
+10000b0f:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
+10000b12:	8b 00                	mov    eax,DWORD PTR [eax]
+10000b14:	83 ec 04             	sub    esp,0x4
+10000b17:	6a 61                	push   0x61
+10000b19:	57                   	push   edi
+10000b1a:	56                   	push   esi
+10000b1b:	6a 01                	push   0x1
+10000b1d:	6a 0a                	push   0xa
+10000b1f:	50                   	push   eax
+10000b20:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000b23:	e8 08 fe ff ff       	call   10000930 <printi>
+10000b28:	83 c4 20             	add    esp,0x20
+10000b2b:	01 c3                	add    ebx,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:164
 				continue;
-10000b41:	e9 ad 00 00 00       	jmp    10000bf3 <print+0x1e9>
+10000b2d:	e9 e0 00 00 00       	jmp    10000c12 <print+0x1e9>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:166
 			}
-			if( *format == 'X' ) {
-10000b46:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000b49:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000b4c:	3c 58                	cmp    al,0x58
-10000b4e:	75 26                	jne    10000b76 <print+0x16c>
+			if( *format == 'x' ) {
+10000b32:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000b35:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000b38:	3c 78                	cmp    al,0x78
+10000b3a:	75 29                	jne    10000b65 <print+0x13c>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:167
-				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'A');
-10000b50:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
-10000b53:	8d 50 04             	lea    edx,[eax+0x4]
-10000b56:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
-10000b59:	8b 00                	mov    eax,DWORD PTR [eax]
-10000b5b:	83 ec 04             	sub    esp,0x4
-10000b5e:	6a 41                	push   0x41
-10000b60:	57                   	push   edi
-10000b61:	56                   	push   esi
-10000b62:	6a 00                	push   0x0
-10000b64:	6a 10                	push   0x10
-10000b66:	50                   	push   eax
-10000b67:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000b6a:	e8 a2 fd ff ff       	call   10000911 <printi>
-10000b6f:	83 c4 20             	add    esp,0x20
-10000b72:	01 c3                	add    ebx,eax
+				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'a');
+10000b3c:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
+10000b3f:	8d 50 04             	lea    edx,[eax+0x4]
+10000b42:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
+10000b45:	8b 00                	mov    eax,DWORD PTR [eax]
+10000b47:	83 ec 04             	sub    esp,0x4
+10000b4a:	6a 61                	push   0x61
+10000b4c:	57                   	push   edi
+10000b4d:	56                   	push   esi
+10000b4e:	6a 00                	push   0x0
+10000b50:	6a 10                	push   0x10
+10000b52:	50                   	push   eax
+10000b53:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000b56:	e8 d5 fd ff ff       	call   10000930 <printi>
+10000b5b:	83 c4 20             	add    esp,0x20
+10000b5e:	01 c3                	add    ebx,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:168
 				continue;
-10000b74:	eb 7d                	jmp    10000bf3 <print+0x1e9>
+10000b60:	e9 ad 00 00 00       	jmp    10000c12 <print+0x1e9>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:170
 			}
-			if( *format == 'u' ) {
-10000b76:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000b79:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000b7c:	3c 75                	cmp    al,0x75
-10000b7e:	75 26                	jne    10000ba6 <print+0x19c>
+			if( *format == 'X' ) {
+10000b65:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000b68:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000b6b:	3c 58                	cmp    al,0x58
+10000b6d:	75 26                	jne    10000b95 <print+0x16c>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:171
-				pc += printi (out, va_arg( args, int ), 10, 0, width, pad, 'a');
-10000b80:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
-10000b83:	8d 50 04             	lea    edx,[eax+0x4]
-10000b86:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
-10000b89:	8b 00                	mov    eax,DWORD PTR [eax]
-10000b8b:	83 ec 04             	sub    esp,0x4
-10000b8e:	6a 61                	push   0x61
-10000b90:	57                   	push   edi
-10000b91:	56                   	push   esi
-10000b92:	6a 00                	push   0x0
-10000b94:	6a 0a                	push   0xa
-10000b96:	50                   	push   eax
-10000b97:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000b9a:	e8 72 fd ff ff       	call   10000911 <printi>
-10000b9f:	83 c4 20             	add    esp,0x20
-10000ba2:	01 c3                	add    ebx,eax
+				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'A');
+10000b6f:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
+10000b72:	8d 50 04             	lea    edx,[eax+0x4]
+10000b75:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
+10000b78:	8b 00                	mov    eax,DWORD PTR [eax]
+10000b7a:	83 ec 04             	sub    esp,0x4
+10000b7d:	6a 41                	push   0x41
+10000b7f:	57                   	push   edi
+10000b80:	56                   	push   esi
+10000b81:	6a 00                	push   0x0
+10000b83:	6a 10                	push   0x10
+10000b85:	50                   	push   eax
+10000b86:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000b89:	e8 a2 fd ff ff       	call   10000930 <printi>
+10000b8e:	83 c4 20             	add    esp,0x20
+10000b91:	01 c3                	add    ebx,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:172
 				continue;
-10000ba4:	eb 4d                	jmp    10000bf3 <print+0x1e9>
+10000b93:	eb 7d                	jmp    10000c12 <print+0x1e9>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:174
 			}
-			if( *format == 'c' ) {
-10000ba6:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000ba9:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000bac:	3c 63                	cmp    al,0x63
-10000bae:	75 43                	jne    10000bf3 <print+0x1e9>
+			if( *format == 'u' ) {
+10000b95:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000b98:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000b9b:	3c 75                	cmp    al,0x75
+10000b9d:	75 26                	jne    10000bc5 <print+0x19c>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:175
+				pc += printi (out, va_arg( args, int ), 10, 0, width, pad, 'a');
+10000b9f:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
+10000ba2:	8d 50 04             	lea    edx,[eax+0x4]
+10000ba5:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
+10000ba8:	8b 00                	mov    eax,DWORD PTR [eax]
+10000baa:	83 ec 04             	sub    esp,0x4
+10000bad:	6a 61                	push   0x61
+10000baf:	57                   	push   edi
+10000bb0:	56                   	push   esi
+10000bb1:	6a 00                	push   0x0
+10000bb3:	6a 0a                	push   0xa
+10000bb5:	50                   	push   eax
+10000bb6:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000bb9:	e8 72 fd ff ff       	call   10000930 <printi>
+10000bbe:	83 c4 20             	add    esp,0x20
+10000bc1:	01 c3                	add    ebx,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:176
+				continue;
+10000bc3:	eb 4d                	jmp    10000c12 <print+0x1e9>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:178
+			}
+			if( *format == 'c' ) {
+10000bc5:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000bc8:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000bcb:	3c 63                	cmp    al,0x63
+10000bcd:	75 43                	jne    10000c12 <print+0x1e9>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:180
 				/* char are converted to int then pushed on the stack */
 				scr[0] = (char)va_arg( args, int );
-10000bb0:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
-10000bb3:	8d 50 04             	lea    edx,[eax+0x4]
-10000bb6:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
-10000bb9:	8b 00                	mov    eax,DWORD PTR [eax]
-10000bbb:	88 45 e6             	mov    BYTE PTR [ebp-0x1a],al
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:177
+10000bcf:	8b 45 10             	mov    eax,DWORD PTR [ebp+0x10]
+10000bd2:	8d 50 04             	lea    edx,[eax+0x4]
+10000bd5:	89 55 10             	mov    DWORD PTR [ebp+0x10],edx
+10000bd8:	8b 00                	mov    eax,DWORD PTR [eax]
+10000bda:	88 45 e6             	mov    BYTE PTR [ebp-0x1a],al
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:181
 				scr[1] = '\0';
-10000bbe:	c6 45 e7 00          	mov    BYTE PTR [ebp-0x19],0x0
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:178
+10000bdd:	c6 45 e7 00          	mov    BYTE PTR [ebp-0x19],0x0
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:182
 				pc += prints (out, scr, width, pad);
-10000bc2:	57                   	push   edi
-10000bc3:	56                   	push   esi
-10000bc4:	8d 45 e6             	lea    eax,[ebp-0x1a]
-10000bc7:	50                   	push   eax
-10000bc8:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000bcb:	e8 6e fc ff ff       	call   1000083e <prints>
-10000bd0:	83 c4 10             	add    esp,0x10
-10000bd3:	01 c3                	add    ebx,eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:179
+10000be1:	57                   	push   edi
+10000be2:	56                   	push   esi
+10000be3:	8d 45 e6             	lea    eax,[ebp-0x1a]
+10000be6:	50                   	push   eax
+10000be7:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000bea:	e8 6e fc ff ff       	call   1000085d <prints>
+10000bef:	83 c4 10             	add    esp,0x10
+10000bf2:	01 c3                	add    ebx,eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:183
 				continue;
-10000bd5:	eb 1c                	jmp    10000bf3 <print+0x1e9>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:140
+10000bf4:	eb 1c                	jmp    10000c12 <print+0x1e9>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:144
 	for (; *format != 0; ++format) {
 		if (*format == '%') {
 			++format;
 			width = pad = 0;
 			if (*format == '\0') break;
 			if (*format == '%') goto out;
-10000bd7:	90                   	nop
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:184
+10000bf6:	90                   	nop
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:188
 				continue;
 			}
 		}
 		else {
 		out:
 			printchar (out, *format);
-10000bd8:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000bdb:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000bde:	0f be c0             	movsx  eax,al
-10000be1:	83 ec 08             	sub    esp,0x8
-10000be4:	50                   	push   eax
-10000be5:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000be8:	e8 17 fc ff ff       	call   10000804 <printchar>
-10000bed:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:185
+10000bf7:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000bfa:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000bfd:	0f be c0             	movsx  eax,al
+10000c00:	83 ec 08             	sub    esp,0x8
+10000c03:	50                   	push   eax
+10000c04:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000c07:	e8 17 fc ff ff       	call   10000823 <printchar>
+10000c0c:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:189
 			++pc;
-10000bf0:	83 c3 01             	add    ebx,0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:135
+10000c0f:	83 c3 01             	add    ebx,0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:139
 {
 	register int width, pad;
 	register int pc = 0;
 	char scr[2];
 
 	for (; *format != 0; ++format) {
-10000bf3:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:135 (discriminator 1)
-10000bf7:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000bfa:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000bfd:	84 c0                	test   al,al
-10000bff:	0f 85 18 fe ff ff    	jne    10000a1d <print+0x13>
-10000c05:	eb 01                	jmp    10000c08 <print+0x1fe>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:139
+10000c12:	83 45 0c 01          	add    DWORD PTR [ebp+0xc],0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:139 (discriminator 1)
+10000c16:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000c19:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000c1c:	84 c0                	test   al,al
+10000c1e:	0f 85 18 fe ff ff    	jne    10000a3c <print+0x13>
+10000c24:	eb 01                	jmp    10000c27 <print+0x1fe>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:143
 		if (*format == '%') {
 			++format;
 			width = pad = 0;
 			if (*format == '\0') break;
-10000c07:	90                   	nop
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:188
+10000c26:	90                   	nop
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:192
 		out:
 			printchar (out, *format);
 			++pc;
 		}
 	}
 	if (out) **out = '\0';
-10000c08:	83 7d 08 00          	cmp    DWORD PTR [ebp+0x8],0x0
-10000c0c:	74 08                	je     10000c16 <print+0x20c>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:188 (discriminator 1)
-10000c0e:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10000c11:	8b 00                	mov    eax,DWORD PTR [eax]
-10000c13:	c6 00 00             	mov    BYTE PTR [eax],0x0
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:190
+10000c27:	83 7d 08 00          	cmp    DWORD PTR [ebp+0x8],0x0
+10000c2b:	74 08                	je     10000c35 <print+0x20c>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:192 (discriminator 1)
+10000c2d:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10000c30:	8b 00                	mov    eax,DWORD PTR [eax]
+10000c32:	c6 00 00             	mov    BYTE PTR [eax],0x0
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:194
 	va_end( args );
 	return pc;
-10000c16:	89 d8                	mov    eax,ebx
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:191
+10000c35:	89 d8                	mov    eax,ebx
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:195
 }
-10000c18:	8d 65 f4             	lea    esp,[ebp-0xc]
-10000c1b:	5b                   	pop    ebx
-10000c1c:	5e                   	pop    esi
-10000c1d:	5f                   	pop    edi
-10000c1e:	5d                   	pop    ebp
-10000c1f:	c3                   	ret    
+10000c37:	8d 65 f4             	lea    esp,[ebp-0xc]
+10000c3a:	5b                   	pop    ebx
+10000c3b:	5e                   	pop    esi
+10000c3c:	5f                   	pop    edi
+10000c3d:	5d                   	pop    ebp
+10000c3e:	c3                   	ret    
 
-10000c20 <printk_valist>:
+10000c3f <printd_valist>:
+printd_valist():
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:198
+
+int printd_valist(const char *format, va_list args)
+{
+10000c3f:	55                   	push   ebp
+10000c40:	89 e5                	mov    ebp,esp
+10000c42:	83 ec 08             	sub    esp,0x8
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:199
+    return print(0, format, args);
+10000c45:	83 ec 04             	sub    esp,0x4
+10000c48:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
+10000c4b:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000c4e:	6a 00                	push   0x0
+10000c50:	e8 d4 fd ff ff       	call   10000a29 <print>
+10000c55:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:200
+}
+10000c58:	c9                   	leave  
+10000c59:	c3                   	ret    
+
+10000c5a <printp_valist>:
+printp_valist():
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:203
+
+int printp_valist(const char *format, va_list args)
+{
+10000c5a:	55                   	push   ebp
+10000c5b:	89 e5                	mov    ebp,esp
+10000c5d:	81 ec 18 04 00 00    	sub    esp,0x418
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:205
+    char inString[1024];
+    char* in=inString;
+10000c63:	8d 85 f4 fb ff ff    	lea    eax,[ebp-0x40c]
+10000c69:	89 85 f0 fb ff ff    	mov    DWORD PTR [ebp-0x410],eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:207
+
+    print(&in, format,args);
+10000c6f:	83 ec 04             	sub    esp,0x4
+10000c72:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
+10000c75:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000c78:	8d 85 f0 fb ff ff    	lea    eax,[ebp-0x410]
+10000c7e:	50                   	push   eax
+10000c7f:	e8 a5 fd ff ff       	call   10000a29 <print>
+10000c84:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:209
+    
+    for (int cnt=0;cnt<strlen(inString);cnt++)
+10000c87:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
+10000c8e:	eb 26                	jmp    10000cb6 <printp_valist+0x5c>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:211 (discriminator 3)
+    {
+            outb(0x3f8,inString[cnt]);
+10000c90:	8d 95 f4 fb ff ff    	lea    edx,[ebp-0x40c]
+10000c96:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+10000c99:	01 d0                	add    eax,edx
+10000c9b:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000c9e:	0f b6 c0             	movzx  eax,al
+10000ca1:	83 ec 08             	sub    esp,0x8
+10000ca4:	50                   	push   eax
+10000ca5:	68 f8 03 00 00       	push   0x3f8
+10000caa:	e8 55 fb ff ff       	call   10000804 <outb>
+10000caf:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:209 (discriminator 3)
+    char inString[1024];
+    char* in=inString;
+
+    print(&in, format,args);
+    
+    for (int cnt=0;cnt<strlen(inString);cnt++)
+10000cb2:	83 45 f4 01          	add    DWORD PTR [ebp-0xc],0x1
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:209 (discriminator 1)
+10000cb6:	83 ec 0c             	sub    esp,0xc
+10000cb9:	8d 85 f4 fb ff ff    	lea    eax,[ebp-0x40c]
+10000cbf:	50                   	push   eax
+10000cc0:	e8 cf 00 00 00       	call   10000d94 <strlen>
+10000cc5:	83 c4 10             	add    esp,0x10
+10000cc8:	3b 45 f4             	cmp    eax,DWORD PTR [ebp-0xc]
+10000ccb:	7f c3                	jg     10000c90 <printp_valist+0x36>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:214
+    {
+            outb(0x3f8,inString[cnt]);
+    }
+    
+}
+10000ccd:	90                   	nop
+10000cce:	c9                   	leave  
+10000ccf:	c3                   	ret    
+
+10000cd0 <printp>:
+printp():
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:217
+
+void printp(const char *format, ...)
+{
+10000cd0:	55                   	push   ebp
+10000cd1:	89 e5                	mov    ebp,esp
+10000cd3:	83 ec 10             	sub    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:219
+    va_list args;
+    va_start( args, format );
+10000cd6:	8d 45 0c             	lea    eax,[ebp+0xc]
+10000cd9:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:220
+}
+10000cdc:	90                   	nop
+10000cdd:	c9                   	leave  
+10000cde:	c3                   	ret    
+
+10000cdf <printk_valist>:
 printk_valist():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:194
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:223
 
 int printk_valist(const char *format, va_list args)
 {
-10000c20:	55                   	push   ebp
-10000c21:	89 e5                	mov    ebp,esp
-10000c23:	83 ec 08             	sub    esp,0x8
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:195
+10000cdf:	55                   	push   ebp
+10000ce0:	89 e5                	mov    ebp,esp
+10000ce2:	83 ec 08             	sub    esp,0x8
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:224
     return print(0, format, args);
-10000c26:	83 ec 04             	sub    esp,0x4
-10000c29:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
-10000c2c:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000c2f:	6a 00                	push   0x0
-10000c31:	e8 d4 fd ff ff       	call   10000a0a <print>
-10000c36:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:196
+10000ce5:	83 ec 04             	sub    esp,0x4
+10000ce8:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
+10000ceb:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000cee:	6a 00                	push   0x0
+10000cf0:	e8 34 fd ff ff       	call   10000a29 <print>
+10000cf5:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:225
 }
-10000c39:	c9                   	leave  
-10000c3a:	c3                   	ret    
+10000cf8:	c9                   	leave  
+10000cf9:	c3                   	ret    
 
-10000c3b <printk>:
+10000cfa <printk>:
 printk():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:199
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:228
 
 int printk(const char *format, ...)
 {
-10000c3b:	55                   	push   ebp
-10000c3c:	89 e5                	mov    ebp,esp
-10000c3e:	83 ec 18             	sub    esp,0x18
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:201
+10000cfa:	55                   	push   ebp
+10000cfb:	89 e5                	mov    ebp,esp
+10000cfd:	83 ec 18             	sub    esp,0x18
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:230
         va_list args;
         va_start( args, format );
-10000c41:	8d 45 0c             	lea    eax,[ebp+0xc]
-10000c44:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:202
+10000d00:	8d 45 0c             	lea    eax,[ebp+0xc]
+10000d03:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:231
         return printk_valist(format, args);
-10000c47:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-10000c4a:	83 ec 08             	sub    esp,0x8
-10000c4d:	50                   	push   eax
-10000c4e:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000c51:	e8 ca ff ff ff       	call   10000c20 <printk_valist>
-10000c56:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:203
+10000d06:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+10000d09:	83 ec 08             	sub    esp,0x8
+10000d0c:	50                   	push   eax
+10000d0d:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+10000d10:	e8 ca ff ff ff       	call   10000cdf <printk_valist>
+10000d15:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:232
 }
-10000c59:	c9                   	leave  
-10000c5a:	c3                   	ret    
+10000d18:	c9                   	leave  
+10000d19:	c3                   	ret    
 
-10000c5b <printd>:
+10000d1a <printd>:
 printd():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:209
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:238
 
 #ifdef DEBUG_NONE
 int printd() {}
 #else
 int printd(uint32_t DebugLevel, const char *format, ...)
 {
-10000c5b:	55                   	push   ebp
-10000c5c:	89 e5                	mov    ebp,esp
-10000c5e:	83 ec 18             	sub    esp,0x18
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:210
+10000d1a:	55                   	push   ebp
+10000d1b:	89 e5                	mov    ebp,esp
+10000d1d:	83 ec 18             	sub    esp,0x18
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:239
     if ((kDebugLevel & DebugLevel) == DebugLevel)    
-10000c61:	a1 78 98 12 00       	mov    eax,ds:0x129878
-10000c66:	23 45 08             	and    eax,DWORD PTR [ebp+0x8]
-10000c69:	3b 45 08             	cmp    eax,DWORD PTR [ebp+0x8]
-10000c6c:	75 1a                	jne    10000c88 <printd+0x2d>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:214
+10000d20:	a1 78 98 12 00       	mov    eax,ds:0x129878
+10000d25:	23 45 08             	and    eax,DWORD PTR [ebp+0x8]
+10000d28:	3b 45 08             	cmp    eax,DWORD PTR [ebp+0x8]
+10000d2b:	75 3c                	jne    10000d69 <printd+0x4f>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:243
     {
         va_list args;
 
         va_start( args, format );
-10000c6e:	8d 45 10             	lea    eax,[ebp+0x10]
-10000c71:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:220
-//        if (++printDLineCount==SYS_VGA_HEIGHT-1)
-//        {
-//            pauseDisplay(false);
-//            printDLineCount=0;
-//        }
-        return printk_valist(format, args);
-10000c74:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-10000c77:	83 ec 08             	sub    esp,0x8
-10000c7a:	50                   	push   eax
-10000c7b:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
-10000c7e:	e8 9d ff ff ff       	call   10000c20 <printk_valist>
-10000c83:	83 c4 10             	add    esp,0x10
-10000c86:	eb 05                	jmp    10000c8d <printd+0x32>
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:222
+10000d2d:	8d 45 10             	lea    eax,[ebp+0x10]
+10000d30:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:245
+        
+        if (kDebugLevel & DEBUG_PRINT_TO_PORT)
+10000d33:	a1 78 98 12 00       	mov    eax,ds:0x129878
+10000d38:	25 00 00 20 00       	and    eax,0x200000
+10000d3d:	85 c0                	test   eax,eax
+10000d3f:	74 14                	je     10000d55 <printd+0x3b>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:246
+            printp_valist(format,args);
+10000d41:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+10000d44:	83 ec 08             	sub    esp,0x8
+10000d47:	50                   	push   eax
+10000d48:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
+10000d4b:	e8 0a ff ff ff       	call   10000c5a <printp_valist>
+10000d50:	83 c4 10             	add    esp,0x10
+10000d53:	eb 14                	jmp    10000d69 <printd+0x4f>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:248
+        else
+            return printk_valist(format, args);
+10000d55:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+10000d58:	83 ec 08             	sub    esp,0x8
+10000d5b:	50                   	push   eax
+10000d5c:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
+10000d5f:	e8 7b ff ff ff       	call   10000cdf <printk_valist>
+10000d64:	83 c4 10             	add    esp,0x10
+10000d67:	eb 05                	jmp    10000d6e <printd+0x54>
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:250
     }
     return 0;
-10000c88:	b8 00 00 00 00       	mov    eax,0x0
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:223 (discriminator 1)
+10000d69:	b8 00 00 00 00       	mov    eax,0x0
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:251
 }
-10000c8d:	c9                   	leave  
-10000c8e:	c3                   	ret    
+10000d6e:	c9                   	leave  
+10000d6f:	c3                   	ret    
 
-10000c8f <sprintf>:
+10000d70 <sprintf>:
 sprintf():
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:227
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:255
 #endif
 
 int sprintf(char *out, const char *format, ...)
 {
-10000c8f:	55                   	push   ebp
-10000c90:	89 e5                	mov    ebp,esp
-10000c92:	83 ec 18             	sub    esp,0x18
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:230
+10000d70:	55                   	push   ebp
+10000d71:	89 e5                	mov    ebp,esp
+10000d73:	83 ec 18             	sub    esp,0x18
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:258
         va_list args;
         
         va_start( args, format );
-10000c95:	8d 45 10             	lea    eax,[ebp+0x10]
-10000c98:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:231
+10000d76:	8d 45 10             	lea    eax,[ebp+0x10]
+10000d79:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:259
         return print( &out, format, args );
-10000c9b:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-10000c9e:	83 ec 04             	sub    esp,0x4
-10000ca1:	50                   	push   eax
-10000ca2:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
-10000ca5:	8d 45 08             	lea    eax,[ebp+0x8]
-10000ca8:	50                   	push   eax
-10000ca9:	e8 5c fd ff ff       	call   10000a0a <print>
-10000cae:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:232
+10000d7c:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+10000d7f:	83 ec 04             	sub    esp,0x4
+10000d82:	50                   	push   eax
+10000d83:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
+10000d86:	8d 45 08             	lea    eax,[ebp+0x8]
+10000d89:	50                   	push   eax
+10000d8a:	e8 9a fc ff ff       	call   10000a29 <print>
+10000d8f:	83 c4 10             	add    esp,0x10
+/home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:260
 }
-10000cb1:	c9                   	leave  
-10000cb2:	c3                   	ret    
-10000cb3:	90                   	nop
+10000d92:	c9                   	leave  
+10000d93:	c3                   	ret    
 
-10000cb4 <strlen>:
+10000d94 <strlen>:
 strlen():
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/strings/strlen.c:3
 #include <stddef.h>
 
 size_t strlen(const char* str) {
-10000cb4:	55                   	push   ebp
-10000cb5:	89 e5                	mov    ebp,esp
-10000cb7:	83 ec 10             	sub    esp,0x10
+10000d94:	55                   	push   ebp
+10000d95:	89 e5                	mov    ebp,esp
+10000d97:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/strings/strlen.c:4
           size_t ret = 0;
-10000cba:	c7 45 fc 00 00 00 00 	mov    DWORD PTR [ebp-0x4],0x0
+10000d9a:	c7 45 fc 00 00 00 00 	mov    DWORD PTR [ebp-0x4],0x0
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/strings/strlen.c:5
         while ( str[ret] != 0 )
-10000cc1:	eb 04                	jmp    10000cc7 <strlen+0x13>
+10000da1:	eb 04                	jmp    10000da7 <strlen+0x13>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/strings/strlen.c:6
                 ret++;
-10000cc3:	83 45 fc 01          	add    DWORD PTR [ebp-0x4],0x1
+10000da3:	83 45 fc 01          	add    DWORD PTR [ebp-0x4],0x1
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/strings/strlen.c:5
 #include <stddef.h>
 
 size_t strlen(const char* str) {
           size_t ret = 0;
         while ( str[ret] != 0 )
-10000cc7:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
-10000cca:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
-10000ccd:	01 d0                	add    eax,edx
-10000ccf:	0f b6 00             	movzx  eax,BYTE PTR [eax]
-10000cd2:	84 c0                	test   al,al
-10000cd4:	75 ed                	jne    10000cc3 <strlen+0xf>
+10000da7:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
+10000daa:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
+10000dad:	01 d0                	add    eax,edx
+10000daf:	0f b6 00             	movzx  eax,BYTE PTR [eax]
+10000db2:	84 c0                	test   al,al
+10000db4:	75 ed                	jne    10000da3 <strlen+0xf>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/strings/strlen.c:7
                 ret++;
         return ret;
-10000cd6:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
+10000db6:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/strings/strlen.c:8
 }
-10000cd9:	c9                   	leave  
-10000cda:	c3                   	ret    
-10000cdb:	90                   	nop
+10000db9:	c9                   	leave  
+10000dba:	c3                   	ret    
+10000dbb:	90                   	nop
 
-10000cdc <main>:
+10000dbc <main>:
 main():
 /home/yogi/src/os/testMainProgramEntry/main.c:13
 #include "../chrisOS/include/kernelObjects.h"
@@ -2293,65 +2440,78 @@ main():
  * testMainProgramEntry
  */
 int main(int argc, char** argv) {
-10000cdc:	8d 4c 24 04          	lea    ecx,[esp+0x4]
-10000ce0:	83 e4 f0             	and    esp,0xfffffff0
-10000ce3:	ff 71 fc             	push   DWORD PTR [ecx-0x4]
-10000ce6:	55                   	push   ebp
-10000ce7:	89 e5                	mov    ebp,esp
-10000ce9:	53                   	push   ebx
-10000cea:	51                   	push   ecx
-10000ceb:	83 ec 10             	sub    esp,0x10
-10000cee:	89 cb                	mov    ebx,ecx
-/home/yogi/src/os/testMainProgramEntry/main.c:17
-    register int *esp __asm__("esp");
+10000dbc:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10000dc0:	83 e4 f0             	and    esp,0xfffffff0
+10000dc3:	ff 71 fc             	push   DWORD PTR [ecx-0x4]
+10000dc6:	55                   	push   ebp
+10000dc7:	89 e5                	mov    ebp,esp
+10000dc9:	53                   	push   ebx
+10000dca:	51                   	push   ecx
+10000dcb:	83 ec 10             	sub    esp,0x10
+10000dce:	89 cb                	mov    ebx,ecx
+/home/yogi/src/os/testMainProgramEntry/main.c:16
+    uint64_t temp;
     //printk("Hello from testmainprogramentry!!!");
-    //__asm__("cld\nint 0x80\n");
+    __asm__("mov eax,0\ncld\nint 0x80\n");
+10000dd0:	b8 00 00 00 00       	mov    eax,0x0
+10000dd5:	fc                   	cld    
+10000dd6:	cd 80                	int    0x80
+/home/yogi/src/os/testMainProgramEntry/main.c:17
     int a=argc;
-10000cf0:	8b 03                	mov    eax,DWORD PTR [ebx]
-10000cf2:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
+10000dd8:	8b 03                	mov    eax,DWORD PTR [ebx]
+10000dda:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/main.c:18
     printk("Param count=%u\n",argc);
-10000cf5:	83 ec 08             	sub    esp,0x8
-10000cf8:	ff 33                	push   DWORD PTR [ebx]
-10000cfa:	68 ea 11 00 10       	push   0x100011ea
-10000cff:	e8 37 ff ff ff       	call   10000c3b <printk>
-10000d04:	83 c4 10             	add    esp,0x10
+10000ddd:	83 ec 08             	sub    esp,0x8
+10000de0:	ff 33                	push   DWORD PTR [ebx]
+10000de2:	68 ea 11 00 10       	push   0x100011ea
+10000de7:	e8 0e ff ff ff       	call   10000cfa <printk>
+10000dec:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/main.c:19
     char** b=argv;
-10000d07:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
-10000d0a:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
+10000def:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
+10000df2:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
 /home/yogi/src/os/testMainProgramEntry/main.c:20
-    for (int cnt=0;cnt<6;cnt++)
-10000d0d:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
-10000d14:	eb 29                	jmp    10000d3f <main+0x63>
+    for (int cnt=0;cnt<argc;cnt++)
+10000df5:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
+10000dfc:	eb 29                	jmp    10000e27 <main+0x6b>
 /home/yogi/src/os/testMainProgramEntry/main.c:22 (discriminator 3)
     {
         printk("Param %u=%s\n",cnt,argv[cnt]);
-10000d16:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-10000d19:	8d 14 85 00 00 00 00 	lea    edx,[eax*4+0x0]
-10000d20:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
-10000d23:	01 d0                	add    eax,edx
-10000d25:	8b 00                	mov    eax,DWORD PTR [eax]
-10000d27:	83 ec 04             	sub    esp,0x4
-10000d2a:	50                   	push   eax
-10000d2b:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
-10000d2e:	68 fa 11 00 10       	push   0x100011fa
-10000d33:	e8 03 ff ff ff       	call   10000c3b <printk>
-10000d38:	83 c4 10             	add    esp,0x10
+10000dfe:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+10000e01:	8d 14 85 00 00 00 00 	lea    edx,[eax*4+0x0]
+10000e08:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
+10000e0b:	01 d0                	add    eax,edx
+10000e0d:	8b 00                	mov    eax,DWORD PTR [eax]
+10000e0f:	83 ec 04             	sub    esp,0x4
+10000e12:	50                   	push   eax
+10000e13:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
+10000e16:	68 fa 11 00 10       	push   0x100011fa
+10000e1b:	e8 da fe ff ff       	call   10000cfa <printk>
+10000e20:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/main.c:20 (discriminator 3)
     //printk("Hello from testmainprogramentry!!!");
-    //__asm__("cld\nint 0x80\n");
+    __asm__("mov eax,0\ncld\nint 0x80\n");
     int a=argc;
     printk("Param count=%u\n",argc);
     char** b=argv;
-    for (int cnt=0;cnt<6;cnt++)
-10000d3b:	83 45 f4 01          	add    DWORD PTR [ebp-0xc],0x1
+    for (int cnt=0;cnt<argc;cnt++)
+10000e23:	83 45 f4 01          	add    DWORD PTR [ebp-0xc],0x1
 /home/yogi/src/os/testMainProgramEntry/main.c:20 (discriminator 1)
-10000d3f:	83 7d f4 05          	cmp    DWORD PTR [ebp-0xc],0x5
-10000d43:	7e d1                	jle    10000d16 <main+0x3a>
-/home/yogi/src/os/testMainProgramEntry/main.c:24 (discriminator 1)
+10000e27:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+10000e2a:	3b 03                	cmp    eax,DWORD PTR [ebx]
+10000e2c:	7c d0                	jl     10000dfe <main+0x42>
+/home/yogi/src/os/testMainProgramEntry/main.c:24
     {
         printk("Param %u=%s\n",cnt,argv[cnt]);
     }
-    jmp3: goto jmp3;
-10000d45:	eb fe                	jmp    10000d45 <main+0x69>
+    return 0x1234;
+10000e2e:	b8 34 12 00 00       	mov    eax,0x1234
+/home/yogi/src/os/testMainProgramEntry/main.c:25
+}
+10000e33:	8d 65 f8             	lea    esp,[ebp-0x8]
+10000e36:	59                   	pop    ecx
+10000e37:	5b                   	pop    ebx
+10000e38:	5d                   	pop    ebp
+10000e39:	8d 61 fc             	lea    esp,[ecx-0x4]
+10000e3c:	c3                   	ret    

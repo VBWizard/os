@@ -17,7 +17,7 @@
 extern elfInfo_t* kExecLoadInfo;
 extern int kExecLoadCount;
 extern void submitNewTask(task_t* task);
-
+void processWrapup();
 bool taskRegInitialized=false;
 
 void destroyProcess(process_t* process)
@@ -47,9 +47,12 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
 
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
     printk("************task ESP=0x%08X************\n",process->task->tss->ESP);
-    memcpy(process->task->tss->ESP+4,&argc,4);
-    memcpy(process->task->tss->ESP+8,&argv,4);
-    
+    void* var=&processWrapup;
+    memcpy((void*)process->task->tss->ESP+12,&argc,4);
+    memcpy((void*)process->task->tss->ESP+16,&argv,4);
+    //Set the return point since the task will simply ret to exit
+    memcpy((void*)process->task->tss->ESP+8,&var,4);
+    printd(DEBUG_PROCESS,"Return point for process is 0x%08X",&processWrapup);
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
  
     uint32_t tssFlags=ACS_TSS;
@@ -73,5 +76,11 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
         taskRegInitialized=true;
     }
     submitNewTask(process->task);
-    printk("Submitted process 0x%04X to be run",process->task->taskNum);
+    printk("Submitted process 0x%04X to be run\n",process->task->taskNum);
+    return process;
 }
+
+void processWrapup()
+{
+    __asm__("mov ebx,eax\nmov eax,0x1\nint 0x80\n");
+ }

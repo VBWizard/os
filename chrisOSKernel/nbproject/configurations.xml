@@ -75,6 +75,7 @@
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
       <itemPath>src/exceptions.c</itemPath>
       <itemPath>../chrisOS/src/cpu/gdt.c</itemPath>
+      <itemPath>../chrisOS/src/iodugging.c</itemPath>
       <itemPath>src/kIRQHandlers.c</itemPath>
       <itemPath>/home/yogi/src/os/chrisOSKernel/src/kInit.c</itemPath>
       <itemPath>src/kernel.c</itemPath>
@@ -130,12 +131,13 @@
       </toolsSet>
       <compileType>
         <cTool>
+          <architecture>1</architecture>
           <standard>3</standard>
           <incDir>
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
-          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel -ggdb</commandLine>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>
@@ -254,6 +256,8 @@
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -495,6 +499,8 @@
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>

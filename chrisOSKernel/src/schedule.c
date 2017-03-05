@@ -15,13 +15,21 @@ static task_t *kTaskList5;
 static task_t *kTaskList[6];
 
 extern uint32_t* kTicksSinceStart;
-void* NO_TASK=(void*)0xFFFFFFFF;
+uint32_t kTaskSwitchCount;
+uint32_t NO_TASK=0xFFFFFFFF;
+void* NO_PREV=(void*)0xFFFFFFFF, *NO_NEXT=(void*)0xFFFFFFFF;
 
-#define TICKS_PER_SCHEDULE TICKS_PER_SECOND * 1
 uint32_t nextScheduleTicks;
 
 const char* TASK_STATE_NAMES[] = {"Zombie","Stopped","Running","Runnable","Uninterruptable Sleep","Interruptable Sleep"};
 extern bool schedulerTaskSwitched;
+extern task_t* kKernelTask;
+
+task_t* submitNewTask(task_t* task);
+task_t* changeTaskState(task_t* task, eTaskState newState);
+task_t* findRunningTaskToReplace();
+task_t* findFirstTaskInList(eTaskState state);
+
 
 void initSched()
 {
@@ -34,134 +42,225 @@ void initSched()
     kTaskList4=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
     kTaskList5=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
 
-    kTaskList0->prev=NO_TASK;
-
-    kTaskList1->prev=NO_TASK;
-
-    kTaskList2->prev=NO_TASK;
-
-    kTaskList3->prev=NO_TASK;
-
-    kTaskList4->prev=NO_TASK;
-
-    kTaskList5->prev=NO_TASK;
-
+    kTaskList0->prev=NO_PREV;
+    ((task_t*)kTaskList0+(TSS_TABLE_RECORD_COUNT-1))->next=NO_NEXT;      //-1 because our array is 0 based
+    kTaskList1->prev=NO_PREV;
+    ((task_t*)kTaskList1+(TSS_TABLE_RECORD_COUNT-1))->next=NO_NEXT;
+    kTaskList2->prev=NO_PREV;
+    ((task_t*)kTaskList2+(TSS_TABLE_RECORD_COUNT-1))->next=NO_NEXT;
+    kTaskList3->prev=NO_PREV;
+    ((task_t*)kTaskList3+(TSS_TABLE_RECORD_COUNT-1))->next=NO_NEXT;
+    kTaskList4->prev=NO_PREV;
+    ((task_t*)kTaskList4+(TSS_TABLE_RECORD_COUNT-1))->next=NO_NEXT;
+    kTaskList5->prev=NO_PREV;
+    ((task_t*)kTaskList5+(TSS_TABLE_RECORD_COUNT-1))->next=NO_NEXT;
     kTaskList[0]=kTaskList0;
     kTaskList[1]=kTaskList1;
     kTaskList[2]=kTaskList2;
     kTaskList[3]=kTaskList3;
     kTaskList[4]=kTaskList4;
     kTaskList[5]=kTaskList5;
-}
-
-
-void copyTaskInternals(task_t* srcTask,task_t* destTask)
-{
-    srcTask->next=destTask->next;
-    srcTask->prev=destTask->prev;
-    memcpy(destTask,srcTask,sizeof(task_t));                               
-}
-
-void setTaskNextAndPrev(task_t* task)
-{
-    task_t* prev;
-    task_t* next;
-
-    if (task->prev!=NO_TASK)
-    {
-        prev=((task_t*)task->prev);
-        if (!prev->taskNum && prev->taskNum!=(int)NO_TASK) //If it isn't really a task (i.e.)
-            prev=task+1;                    //Go to the next task in the list following the one we just created
-        prev->next=task;                    //Set the prev of the found slot
-        task->prev=prev;
-    }
     
-    if (task->next!=NO_TASK)
-    {
-        next=((task_t*)task->next);         //Get the next task in the chain
-        if (!next->taskNum && next->taskNum!=(int)NO_TASK) //If it isn't really a task (i.e.)
-            next=task+1;                    //Go to the next task in the list following the one we just created
-        next->prev=task;                    //Set the prev of the found slot
-        task->next=next;
-    }
-
+    //Put the current (kernel) task in the running queue, as it IS running!
+    kTaskSwitchCount=0;
+    kKernelTask=submitNewTask(kKernelTask);
+    changeTaskState(kKernelTask,TASK_RUNNING);
+}
+//Set up the new task in the Destination list, and clears the Source list entry
+void moveTask(task_t* destTask, task_t* srcTask)
+{
+    void* next=NULL, *prev=NULL;
+    
+    //If ->next denotes this is the last, keep track of that fact
+    if (destTask->next==NO_NEXT)
+        next=NO_NEXT;
+    //If ->prev denotes this is the first, keep track of that fact
+    if (destTask->prev==NO_PREV)
+        prev=NO_PREV;
+    memcpy(destTask,srcTask,sizeof(task_t));    
+    destTask->next=next;                        //Will either = NULL (0) or NO_NEXT
+    destTask->prev=prev;                        //Will either = NULL (0) or NO_PREV
 }
 
+void setTaskNextAndPrev(task_t* taskList,eTaskState state)
+{
+    //NOTE: Won't set next/prev for any task if we're the only task running
+    task_t* taskToLinkTo=kTaskList[state];
+    
+    //Have to go forward through the list till we find a task with an empty prev
+    while (taskList->prev!=0            //If it has a prev, there is a task in the slot
+            && taskList->next!=NO_NEXT  //If next is NO_EXT we've reached the end of the list
+            && taskList->next!=0        //If next is 0, we're at the last task in the linked list
+            && taskList->taskNum!=taskToLinkTo->taskNum)    //We may run into our own task
+    {taskToLinkTo=taskToLinkTo->next;}  
+    if (taskList->taskNum==taskToLinkTo->taskNum)
+        return;
+    if (taskList->prev!=NO_PREV)
+        taskList->prev=taskToLinkTo;
+    if (taskList->next!=NO_NEXT)
+        taskToLinkTo->next=taskList;
+
+    
+    /*NOTE: this function will not set a next/previous if the next/previous entry is the first/last in the list (those aren't used) */
+}
+
+task_t* findFreeTaskSlot(task_t* taskList)
+{
+    while ((taskList->taskNum)!=0 && taskList->next!=NO_NEXT)    //Find an empty task in the list
+    {taskList++;}
+    if (taskList->taskNum!=0)
+        panic("Cannot find a free task in list %u\n");
+    return taskList;                                                    //NOTE: May return NO_TASK slot
+}
 //Submit a new task, which will put it in the TASK_RUNNABLE list
 //Copy the task into 
-void submitNewTask(task_t* task)
+task_t* submitNewTask(task_t* task)
 {
-    
-    task_t* destTaskList=kTaskList[TASK_RUNNABLE];
+    task_t* destTaskList;
 
-    task->taskState=TASK_RUNNABLE;
-    
-    while (destTaskList->taskNum && destTaskList->taskNum!=(int)NO_TASK)    //Find an empty task in the list
-    {
-        destTaskList=destTaskList->next;                                        //Move to the next task in the list
-    }    
-    
-    if (destTaskList->taskNum==(int)NO_TASK)
-            panic("submitNewTask: Cannot find a task slot in TASK_RUNNABLE to place the new task\n");
-    
-    copyTaskInternals(task,destTaskList);                                   //Found one, copy our task to it
+    destTaskList=findFreeTaskSlot(kTaskList[TASK_RUNNABLE]);
+
+    moveTask(destTaskList,task);                                   //Found one, copy our task to it
     //free(task);
-    setTaskNextAndPrev(destTaskList);
-    printd(DEBUG_PROCESS,"Added task 0x%04X to runnable list\n",task->taskNum);
+
+    destTaskList->taskState=TASK_RUNNABLE;
+
+    setTaskNextAndPrev(destTaskList,destTaskList->taskState);
+    return destTaskList;
+    printd(DEBUG_PROCESS,"submitNewTask: Added task 0x%04X to runnable list at slot %u\n",destTaskList->taskNum,(destTaskList-kTaskList[TASK_RUNNABLE])/sizeof(task_t));
 }
-task_t* changeTaskState(task_t* task, eTaskState newState)
+task_t* changeTaskState(task_t* taskToStateChange, eTaskState newState)
 {
-    task_t* destTaskList=kTaskList[newState],
-            *srcTaskList=kTaskList[task->taskState];
+    task_t* destTaskList,
+            *srcTaskList=kTaskList[taskToStateChange->taskState];
+    
+    if (newState==TASK_EXITED)
+    {}
+    else
+        destTaskList=kTaskList[newState];
+            
+    //First find the head of the list
+    srcTaskList=findFirstTaskInList(taskToStateChange->taskState);
+    //Find the task passed in
+    while (srcTaskList->next!=NO_NEXT && srcTaskList->taskNum!=taskToStateChange->taskNum) {srcTaskList=srcTaskList->next;}
+    if (srcTaskList->taskNum!=taskToStateChange->taskNum)
+    {
+        panic("changeTaskState: Could not find task 0x%04X\n",taskToStateChange->taskNum);
+    }
     
     //Find an open task in the new task state's list
-    while (destTaskList->next) {destTaskList++;} //Find the end of the list
-    if (destTaskList->next)
-        panic("changeTaskState: Could not find a free slot in list %s\n",TASK_STATE_NAMES[newState]);
+    if (newState!=TASK_EXITED)
+    {
+        while (destTaskList->taskNum) {destTaskList++;} //Find the end of the destination list
+            if (destTaskList->next)
+                panic("changeTaskState: Could not find a free slot in list %s\n",TASK_STATE_NAMES[newState]);
+    }
     
-    //Find the task passed in
-    while (srcTaskList->next && srcTaskList->taskNum!=task->taskNum) {srcTaskList++;}
-    if (srcTaskList->taskNum!=task->taskNum)
-        panic("changeTaskState: Could not find task 0x%04X\n",task->taskNum);
+    //Remove from source list, relinking the prev to the next in both directions
+    task_t* prev=NULL;
+    task_t* next=NULL;
+    if (srcTaskList->prev!=NO_PREV)                             //Make sure we aren't at the beginning of the list.  Don't want to set Prev if we are
+        prev=(task_t*)srcTaskList->prev;                        //Make sure we aren't at the end of the list.  Don't want to set Prev if we are
     
+    if (srcTaskList->next!=NO_NEXT)
+        next=(task_t*)srcTaskList->next;
+    
+    if (next!=NULL && prev!=NULL)
+    {
+        next->prev=prev;     //Re-link the next task's prev to the previous task
+        prev->next=next;     //Re-link the previous task's NEXT to the next task
+    }
+    if (next!=NULL && prev==NULL)
+        next->prev=0;
+    if (prev!=NULL && next==NULL)
+        prev->next=0;
     //Move the task into place
-    copyTaskInternals(task,destTaskList);
-    setTaskNextAndPrev(destTaskList);
-
-    //Remove from source list
-    srcTaskList->prev=srcTaskList->next;
-    srcTaskList->taskNum=0;
-    srcTaskList->taskState=TASK_NONE;
-
+    if (newState!=TASK_EXITED)
+    {
+        moveTask(destTaskList,srcTaskList);
+        setTaskNextAndPrev(destTaskList,newState);
+    }
+    //Wipe out the memory from the source task list
+    task_t tempTask = {0};                //Interesting side note, internally gcc uses memset when you init ={0}
+    //NOTE: Use CopyTask with a "blank" task instead of just using memset to preserve next & last, incase its the first or last slot
+    moveTask(srcTaskList,&tempTask);
+    
     //Change the task's status
     destTaskList->taskState=newState;
     
     //Clear the ticks since last interrupted
-    if (newState >= TASK_STOPPED)
+    switch (newState)
     {
-        destTaskList->ticksSinceLastInterrupted=0;
+        case TASK_STOPPED:
+            destTaskList->ticksSinceLastInterrupted=0;
+            break;
+        case TASK_RUNNABLE:
+            destTaskList->ticksSincePutInRunnable=0;
+            break;
+        default:
+            break;
     }
     return destTaskList;
+    STOPHERE2
+}
+
+task_t* findTaskByTaskNum(uint32_t taskNum,int *listNum)
+{
+    task_t* taskList;
+    for (int cnt=0;cnt<6;cnt++)
+    {
+        *listNum=cnt;
+        taskList=kTaskList[cnt];
+        do
+        {
+            if (taskList->taskNum==taskNum)
+                break;
+            taskList=taskList->next;
+        } while (taskList->next && taskList->next!=NO_NEXT);
+        
+        if (taskList->taskNum==taskNum)
+            break;
+    }
+        
+    return taskList;
+}
+
+void markTaskEnded(uint32_t taskNum)
+{
+    int listNum=0;
+    task_t* taskList=findTaskByTaskNum(taskNum,&listNum);
+
+    __asm__("cli;");
+    if (taskList->taskNum!=taskNum)
+        printd("endTaskByTaskNum: Could not find task 0x%04X to end\n");
+    else
+    {
+        taskList->exited=true;
+        //If the task being ended is running, trigger a schedule on the next tick to get rid of it
+        if (listNum==TASK_RUNNING)
+            nextScheduleTicks=*kTicksSinceStart;
+    }
+    __asm__("sti;");
 }
 
 task_t* findRunningTaskToReplace()
 {
-    int32_t mostTicks=0;
+    int32_t mostTicks=-1;
     task_t* targetTask={0};
     task_t* currTask=kTaskList[TASK_RUNNING];
     do
     {
-        if (!currTask->taskNum) //No running tasks, so bail
+        if (currTask->taskNum==0) //No running tasks, so bail
             break;
         if (currTask->ticksSinceLastInterrupted>mostTicks)
         {
             mostTicks=currTask->ticksSinceLastInterrupted;
             targetTask=currTask;
-            currTask++;
         }
+        currTask=currTask->next;
     }  while (currTask->next);
     
-    if (targetTask->taskNum==0)
+    if (!targetTask->taskNum)
     {
         printd(DEBUG_PROCESS,"findRunningTaskToReplace: Could not find a RUNNING task\n");
         return NULL;   //Return null pointer
@@ -188,7 +287,6 @@ void storeISRSavedRegs(task_t* task)
     task->tss->SS=isrSavedSS;
     task->tss->CS=isrSavedCS;
     task->tss->CR3=isrSavedCR3;
-    
 }
 
 void loadISRSavedRegs(task_t* task)
@@ -212,55 +310,90 @@ void loadISRSavedRegs(task_t* task)
     isrSavedCR3=task->tss->CR3;
 }
 
+task_t* findFirstTaskInList(eTaskState state)
+{
+    task_t* taskList=kTaskList[state];
+    
+    while (1==1)
+    {
+    //Find the first task in the chain.  It will have a taskNum > 0 and a prev of 0 
+        if (taskList->taskNum>0 && taskList->prev==0)
+            break;
+        taskList++;
+        if (taskList->next==NO_NEXT)
+            break;
+    }
+    
+    //If we didn't find a task, see if there is one in the first slot (NO_PREV)
+    if (taskList->taskNum==0 || taskList->prev!=0)
+        if (kTaskList[state]->taskNum>0)
+            taskList=kTaskList[state];
+    
+    //If we don't have a task now, bail
+    if (taskList->taskNum==0)
+        return NULL;
+    
+    return taskList;
+}
+
 void scheduler()
 {
     int32_t mostIdleTicks=-1;
-    task_t* targetTask = {0};
-    task_t* oldTask = {0};
-    task_t* currTask=kTaskList[TASK_RUNNABLE];
+    task_t* taskToRun = {0};
+    task_t* taskToStop = {0};
+    task_t* tempTask=kTaskList[TASK_RUNNABLE];
     
     if (*kTicksSinceStart<nextScheduleTicks)
         return;
-
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULE;
+
     
     printd(DEBUG_PROCESS,"Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
     //Only scheduling on CPU 0 for now
-    do      //Loop through "runnable" processes
-    {
-        if (!currTask->taskNum) //Not a task, so skip to the comparison at the end of the loop
+    tempTask=findFirstTaskInList(TASK_RUNNABLE);
+    if (tempTask!=NULL)
+        while (tempTask->taskNum!=0)                                //Loop through "runnable" processes
         {
-            if (currTask->taskNum==(int)NO_TASK)                    //This means we hit the end of the list
+            //Using fairness doctrine
+            if (tempTask->ticksSincePutInRunnable>mostIdleTicks)
+            {
+                mostIdleTicks=tempTask->ticksSincePutInRunnable;
+                taskToRun=tempTask;
+            }
+            if (tempTask->next==NO_NEXT || tempTask->next==0)        //Before we go to next, check it
                 break;
-            currTask=currTask->next;
-            continue;
+            tempTask=tempTask->next;
         }
-        if (currTask->ticksSincePutInRunnable>mostIdleTicks)
-        {
-            mostIdleTicks=currTask->ticksSincePutInRunnable;
-            targetTask=currTask;
-        }
-        currTask=currTask->next ;
-    } while (currTask->next);
     
-    if (targetTask->taskNum && targetTask->taskNum!=currTask->taskNum) //If =0 then no runnable tasks, so do not switch tasks
+    if (taskToRun->taskNum) //If =0 then no runnable tasks, so do not switch tasks
     {
-        printd(DEBUG_PROCESS,"Found one (0x%04X), moving it to the CPU\n",targetTask->taskNum);
+        printd(DEBUG_PROCESS,"Found one (0x%04X)!\n",taskToRun->taskNum);
         
-        oldTask=findRunningTaskToReplace();
-        if (oldTask!=NULL)                                             //There might not be a prior task if this is the first time through the routine
+        taskToStop=findRunningTaskToReplace();
+        if (taskToStop!=NULL)                                             //There might not be a prior task if this is the first time through the routine
         {
+            printd(DEBUG_PROCESS,"Found process (0x%04X) to replace, moving it off the CPU.\n",taskToStop->taskNum);
             //save old task's state
-            changeTaskState(oldTask,TASK_RUNNABLE);                     //This will move the old task to the runnable list
-            storeISRSavedRegs(currTask);
+            if (taskToStop->exited)
+                taskToStop=changeTaskState(taskToStop,TASK_EXITED);
+            else
+                taskToStop=changeTaskState(taskToStop,TASK_RUNNABLE);                     //This will move the old task to the runnable list
+            storeISRSavedRegs(taskToStop);
         }
+        else if (taskToStop==NULL)
+            panic("scheduler: Could not find the task that is running on the CPU in the running list\n");
+        else if (taskToStop->taskNum==taskToRun->taskNum)
+            panic("scheduler: Trying to replace running task (0x04X) with the same task from the runnable queue!\n");
         //Move the new task onto the CPU
-        targetTask=changeTaskState(targetTask,TASK_RUNNING);
-        loadISRSavedRegs(targetTask);
-        printd(DEBUG_PROCESS,"Restarting CPU with new process (0x%04X)\n",targetTask->taskNum);
+        taskToRun=changeTaskState(taskToRun,TASK_RUNNING);
+        loadISRSavedRegs(taskToRun);
+        printd(DEBUG_PROCESS,"Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08X\n",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
         schedulerTaskSwitched=true;
+//        kTaskSwitchCount++;
         //For each task in the runnable list, increment its ticksSinceLastInterrupted 
     }
     else
         printd(DEBUG_PROCESS,"No new process to run, continuing with the current one\n");
+        //if (oldTask->taskNum==0xa)
+            //STOPHERE2;
 }

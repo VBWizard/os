@@ -29,6 +29,7 @@ typedef struct sprocess
     sGDT* gdtEntry;
     elfInfo_t* elf;
     char* path;
+    uint32_t retVal;
 } process_t;
 
     

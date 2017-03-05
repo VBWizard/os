@@ -12,10 +12,12 @@
 *  than twiddling with the GDT ;) */
 void idt_set_gate(struct idt_entry *idt, unsigned short sel, uint32_t base, unsigned char flags)
 {
+//    __asm__("cli\n");
   idt->base_lo = base & 0xFFFF;
   idt->sel = sel;
   idt->flags = flags | 0x80;
   idt->base_hi = (base >> 16) & 0xFFFF;}
+//    __asm__("sti\n");
 
 /* Installs the IDT */
 void idt_install()

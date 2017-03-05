@@ -4,7 +4,7 @@
 .align   4
 .code32
 
-.extern activateDebugger
+.extern activateDebugger, kStopDebugging
 .extern irq0_handler
 .extern	kbd_handler
 .extern call_gate_proc
@@ -57,6 +57,7 @@ _isr_03_wrapper:                #remapped to 0x0b
         mov     ebp, esp
         mov     ax, 0x3                  # save exception number
 */
+        #NOTE: This just sets the trap flag, next IRQ 1 gets called (IRQ 31 for us
         orw [esp+8],0x100
         pusha
         call activateDebugger
@@ -456,10 +457,20 @@ cli
 
     mov esi, debugSavedESP
     mov edi, debugSavedStack
-    mov cx, 30
+    mov ecx, 30
     cld
     rep movsd
     call debugStep
+    mov al,kStopDebugging
+    cmp al,1
+    jnz overStopDebugging
+    call activateDebugger
+    #reset the trap flag in the flags register.  20 bytes forward for the POPA and then 8 bytes for the CS/EIP
+    andw [esp+0x28],0xFEFF
+    mov eax,0
+    mov kStopDebugging,eax
+
+overStopDebugging:
     popa
     sti
     iretd

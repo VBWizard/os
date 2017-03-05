@@ -91,9 +91,9 @@ void mmMapKernelIntoTask(task_t* task)
     //Map the kernel interrupt table into the process so that it can execute 0x80 to return to the kernel
     pagingMapPageCount(task->tss->CR3,IDT_TABLE_ADDRESS,IDT_TABLE_ADDRESS,10,0x7);
     
-    //Map the first 0x100000 (minus 0x0) into the process, where the OS loader is, so that ISRs can run
-    printd(DEBUG_TASK,"Map OS loader into user process: 0x%08X to 0x%08X r/o\n",0xC0001000,0x1000+(0x100*0x1000));
-    pagingMapPageCount(task->tss->CR3,0x00001000,0x1000,0x100,0x5);
+    //Map the first 1Mb (minus 0x0) into the process, where the OS loader is, so that ISRs can run
+    printd(DEBUG_TASK,"Map OS loader into user process: 0x%08X to 0x%08X r/o\n",0x1000,0x1000+(0x100*0x1000));
+    pagingMapPageRange(task->tss->CR3,0x1000,0xffffff,0x1000,0x5);
     kDebugLevel=oldDebugLevel;
 
     printd(DEBUG_TASK,"Map screen buffer into user process at 0xB8000\n");
@@ -149,11 +149,15 @@ task_t* createTask(bool kernelTSS)
     task->tss->ESP+=0x15000;
     
     
+    //set task's IOPL
     task->tss->EFLAGS=0x200046;
+    task->tss->EFLAGS |= 0x3000; //Set bits 12 & 13 to IOPL=3
     task->tss->LINK=0x0; //need an old TSS entry (garbage) to "store" the old variables to on LTR
     //If it is a kernel task
     task->kernel=kernelTSS;
     task->tss->IOPB=sizeof(tss_t);
+    
+    
     return task;
 }
 

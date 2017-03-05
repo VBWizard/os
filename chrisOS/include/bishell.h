@@ -52,6 +52,7 @@ void HIGH_CODE_SECTION attach(char* cmdline);
 void HIGH_CODE_SECTION listDir(char* cmdline);
 void HIGH_CODE_SECTION execCommand(char* cmdline);
 void HIGH_CODE_SECTION displayGDTTable(char *cmdline);
+void HIGH_CODE_SECTION displayIDTTable(char *cmdline);
 void HIGH_CODE_SECTION displayTSSEntry(char *cmdline);
 
 command_table_t cmds[] = { 
@@ -66,6 +67,7 @@ command_table_t cmds[] = {
         {"e820","Print E820 Memory Map",printE820Map,0},
         {"exec","Execute a program from disk",execCommand,1},
         {"gdt","Display the GDT table",displayGDTTable,1},
+        {"idt","Display the IDT table",displayIDTTable,1},
         {"inb","Get a byte from a port",inPortB,1},
         {"inw","Get a word from a port",inPortW,1},
         {"ind","Get a dword from a port",inPortD,1},

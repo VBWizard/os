@@ -346,6 +346,25 @@ void dumpGDTTable()
     }
 }
 
+void dumpIDTTable()
+{
+    struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
+    
+    printk("Listing the IDT Table\n");
+    printk("Entry\tSel\tBase\t\t\tFlags\n");
+    for (int cnt=0;cnt<255;cnt++)
+    {
+        if (idtTable->sel>0)
+        {
+            printk ("0x%02X\t0x%04X\t0x%08X\t0x%02X\n",
+                    cnt,
+                    idtTable->sel,
+                    idtTable->base_hi<<16|idtTable->base_lo,idtTable->flags);
+        }
+        idtTable++;
+    }
+}
+
 void displayTSS(int tssAddress)
 {
     tss_t* tss=(tss_t*)tssAddress;

@@ -32,7 +32,11 @@
 
 #include <stdarg.h>
 #include "chrisos.h"
+#include "printf.h"
 #include <stdint.h>
+#include "io.h"
+#include "time_os.h"
+
 //extern bool pauseDisplay(bool offerToQuit);
 extern uint32_t kDebugLevel;
 uint8_t printDLineCount;
@@ -190,6 +194,31 @@ static int print(char **out, const char *format, va_list args )
 	return pc;
 }
 
+int printd_valist(const char *format, va_list args)
+{
+    return print(0, format, args);
+}
+
+int printp_valist(const char *format, va_list args)
+{
+    char inString[1024];
+    char* in=inString;
+
+    print(&in, format,args);
+    
+    for (int cnt=0;cnt<strlen(inString);cnt++)
+    {
+            outb(0x3f8,inString[cnt]);
+    }
+    
+}
+
+void printp(const char *format, ...)
+{
+    va_list args;
+    va_start( args, format );
+}
+
 int printk_valist(const char *format, va_list args)
 {
     return print(0, format, args);
@@ -212,12 +241,11 @@ int printd(uint32_t DebugLevel, const char *format, ...)
         va_list args;
 
         va_start( args, format );
-//        if (++printDLineCount==SYS_VGA_HEIGHT-1)
-//        {
-//            pauseDisplay(false);
-//            printDLineCount=0;
-//        }
-        return printk_valist(format, args);
+        
+        if (kDebugLevel & DEBUG_PRINT_TO_PORT)
+            printp_valist(format,args);
+        else
+            return printk_valist(format, args);
     }
     return 0;
 }

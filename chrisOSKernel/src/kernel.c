@@ -21,6 +21,7 @@
 #include "../include/sysloader.h"
 #include "../../chrisOS/src/fat/fat_access.h"
 #include "../include/task.h"
+#include "io.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -30,7 +31,10 @@ bool schedulerTaskSwitched=0;
 task_t* kKernelTask;
 uint32_t saveESP;
 
+
+
 int main(int argc, char** argv) {
+    init_serial();
     printk("\nkernel loaded ... \n");
 /*    printk("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
@@ -40,6 +44,7 @@ int main(int argc, char** argv) {
         //    break;
     }
 */
+    printp("Hello kernel world!!!\n");
     schedulerEnabled=false;
     schedulerTaskSwitched=false;
     printk("Initializing memory management ...\n");
@@ -61,14 +66,18 @@ int main(int argc, char** argv) {
     strcpy(test[0],"hello");
     strcpy(test[1],"there");
     char* testp[2];
-    testp[0]=&test[0];
-    testp[1]=&test[1];
+    testp[0]=test[0];
+    testp[1]=test[1];
     /*************************************/
+extern void vector32();
+struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
+    idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
     process_t* process = createProcess(program,2,&testp,false);
     printk("Loading and executing %s again\n",program);
 //    process_t* process = createProcess(program,1,"hello!",false);
     //sysExec(process,1,"");
     schedulerEnabled=true;
+    printk("Installing new IRQ0 handler\n");
     return (0xbad);
 }
 

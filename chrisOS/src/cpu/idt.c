@@ -35,11 +35,11 @@ void idt_init(struct idt_ptr* idtp, int remap_offset)
 /* setting up the exception handlers and timer, keyboard ISRs */
     struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
     idt_set_gate (&idtTable[0], 0x08, (int)&_isr_00_wrapper, ACS_INT); //Move this out of the way of the exception handlers
-    idt_set_gate (&idtTable[0+remap_offset], 0x08, (int)&_irq0_handler, ACS_INT); //Move this out of the way of the exception handlers
-    idt_set_gate (&idtTable[1+remap_offset], 0x08, (int)&_isr_01_wrapper, ACS_INT); //move this out of the way of the exception handlers
-    idt_set_gate (&idtTable[1], 0x08, (int)&_isr_31_wrapper, ACS_INT); //move this out of the way of the exception handlers
-    idt_set_gate (&idtTable[2], 0x08, (int)&_isr_02_wrapper, ACS_INT);
-    idt_set_gate (&idtTable[3], 0x08, (int)&_isr_03_wrapper, ACS_INT);
+    idt_set_gate (&idtTable[0+remap_offset], 0x08, (int)&_irq0_handler, ACS_INT); //This is the IRQ0 handler, notice it is remapped
+    idt_set_gate (&idtTable[1+remap_offset], 0x08, (int)&_isr_01_wrapper, ACS_INT); //Keyboard IRQ
+    idt_set_gate (&idtTable[1], 0x08, (int)&_isr_31_wrapper, ACS_INT); //this is the debug exception, triggered when TF=1 (I set TF=1 with INT03)
+    idt_set_gate (&idtTable[2], 0x08, (int)&_isr_02_wrapper, ACS_INT); 
+    idt_set_gate (&idtTable[3], 0x08, (int)&_isr_03_wrapper, ACS_INT | ACS_DPL_3); //this is the breakpoint exception.  Called with INT03.  Has to be CPL=3
     idt_set_gate (&idtTable[4], 0x08, (int)&_isr_04_wrapper, ACS_INT);
     idt_set_gate (&idtTable[5], 0x08, (int)&_isr_05_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0x6], 0x08, (int)&_isr_06_wrapper, ACS_INT);    //Invalid Opcode
@@ -67,12 +67,9 @@ void idt_init(struct idt_ptr* idtp, int remap_offset)
     idt_set_gate (&idtTable[0x1c], 0x08, (int)&_isr_28_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0x1d], 0x08, (int)&_isr_29_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0x1e], 0x08, (int)&_isr_30_wrapper, ACS_INT);
-    idt_set_gate (&idtTable[0x1f], 0x08, (int)&_isr_31_wrapper, ACS_INT);
-    idt_set_gate (&idtTable[0x20+remap_offset], 0x08, (int)&_isr_32_wrapper, ACS_INT);               //
-    idt_set_gate (&idtTable[0x21+remap_offset], 0x08, (int)&_isr_32_wrapper, ACS_INT);               //
-
-    for (int cnt=0x22;cnt<0xff;cnt++)
-        idt_set_gate (&idtTable[cnt], 0x08, (int)&_isr_32_wrapper, ACS_INT);
+     
+//    for (int cnt=0x24+remap_offset;cnt<0x90;cnt++)
+//        idt_set_gate (&idtTable[cnt+remap_offset], 0x3b, (int)&_isr_32_wrapper, ACS_INT);
     idt_install(idtp);
 
 }

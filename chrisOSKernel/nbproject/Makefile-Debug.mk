@@ -54,6 +54,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/f336e79e/ata_disk.o \
 	${OBJECTDIR}/_ext/f336e79e/kpaging.o \
 	${OBJECTDIR}/_ext/f336e79e/utility.o \
+	${OBJECTDIR}/_ext/9e02dec1/iodugging.o \
 	${OBJECTDIR}/_ext/9e02dec1/memcpy.o \
 	${OBJECTDIR}/_ext/9e02dec1/panic.o \
 	${OBJECTDIR}/_ext/9e02dec1/printf.o \
@@ -84,7 +85,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-pipe -ffreestanding -Wall -Wextra -masm=intel
+CFLAGS=-m32 -pipe -ffreestanding -Wall -Wextra -masm=intel -ggdb
 
 # CC Compiler Flags
 CCFLAGS=
@@ -200,6 +201,11 @@ ${OBJECTDIR}/_ext/f336e79e/utility.o: ../chrisOS/src/init/utility.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/f336e79e
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/f336e79e/utility.o ../chrisOS/src/init/utility.c
+
+${OBJECTDIR}/_ext/9e02dec1/iodugging.o: ../chrisOS/src/iodugging.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/iodugging.o ../chrisOS/src/iodugging.c
 
 ${OBJECTDIR}/_ext/9e02dec1/memcpy.o: ../chrisOS/src/memcpy.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1

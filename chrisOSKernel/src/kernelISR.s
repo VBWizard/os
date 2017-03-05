@@ -8,6 +8,7 @@
 .extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, isrSavedTR
 .extern kIRQ0_handler
 .extern schedulerTaskSwitched
+.extern kTaskSwitchCount
 
 isrNumber: .word 0,0
 
@@ -52,6 +53,16 @@ _irq0_handler:                #remapped to 0x08
 alltraps:
     cli
     mov isrSavedEAX,eax
+
+//mov eax,timesPastThisPoint
+//inc eax
+//mov timesPastThisPoint,eax
+//cmp eax,1
+//jne overDebug
+//j1:
+//jmp j1
+//overDebug:
+
     mov eax,[esp]
     mov isrNumber,eax         #second vector push was ISR #
     mov eax,esp
@@ -61,6 +72,8 @@ alltraps:
     mov eax,isrSavedEAX
     mov ebp,esp
     add ebp,8
+    mov eax,ss
+    mov isrSavedSS,eax
     pushad                          # other regs because its an ISR
 
     #Save segment registers
@@ -73,8 +86,15 @@ alltraps:
     mov isrSavedFS,eax
     mov eax,gs
     mov isrSavedGS,eax
-    mov eax,ss
-    mov isrSavedSS,eax
+
+    mov eax,0x10
+    mov ds,ax
+    mov es,ax
+    mov fs,ax
+    mov gs,ax
+
+    mov eax,0x28
+    mov ss,eax
 
     #Save the task register
     str isrSavedTR
@@ -126,13 +146,13 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
-    mov eax,isrNumber
-    cmp eax,0x20
-    je overSaveTheStack
+#    mov eax,isrNumber
+#    cmp eax,0x20
+#    je overSaveTheStack
     mov esi, isrSavedESP
 //        add esi, 16 #drop the 4 dwords that are passed to the proc
     mov edi, isrSavedStack
-    mov cx, 30
+    mov ecx, 40       #NOTE: This can cause an exception if the target's esp is within 40 bytes of non-mapped memory
     cld
     rep movsd
 overSaveTheStack:
@@ -156,14 +176,6 @@ onTheWayOut:
     out 0x20,al
 theWayOut:
     popad                           # restoring the regs - only EBX and ESP modified after this point
-    mov esp, isrSavedESP
-#        add esp, 4 #get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. 
-    mov ebx,isrNumber
-    mov bl,[_isr_has_errorCode+ebx]
-    cmp bl,1
-    jnz overCorrection
-    add esp, 4 #get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. 
-overCorrection:
     #dont' need to release vector parameters because we did when we saved the ESP
     #add esp,8                   #release the vector parameters from the stack
     mov bx, isrSavedDS
@@ -175,80 +187,98 @@ overCorrection:
     mov bx, isrSavedGS
     mov gs, bx
     mov ebp,isrSavedEBP
-    mov ebx,isrSavedEBX
-    mov eax,isrNumber
-    cmp eax,0x20
-    mov eax, isrSavedEAX
-    je irq0_special_handling
-isrCommonExit:
-    sti
-    iretd
-
-irq0_special_handling:
-    #Stack is already where it was when we started the ISR
     mov al,schedulerTaskSwitched
     cmp al,0
     jnz loadNewTask
     mov eax, isrSavedEAX
-    jz  isrCommonExit
+isrCommonExit:
+    mov esp, isrSavedESP
+#        add esp, 4 #get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. 
+    mov ebx,isrNumber
+    mov bl,[_isr_has_errorCode+ebx]
+    cmp bl,1
+    jnz overCorrection
+    add esp, 4 #get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. 
+overCorrection:
+    mov ebx,isrSavedEBX
+    sti
+    iretd
 
 loadNewTask:
+    #Stack is already where it was when we started the ISR
     #reset the task switched indicator
     mov eax,0
     mov schedulerTaskSwitched,eax
+    mov eax,kTaskSwitchCount
+    inc eax
+    mov kTaskSwitchCount,eax
+
     #set up registers for new task
     #eax/ebx set up below
-    mov ecx, isrSavedECX
+    #mov ecx, isrSavedECX set up below
     mov edx, isrSavedEDX
     #mov ebp, isrSavedEBP #already did this
     mov esi, isrSavedESI
     mov edi, isrSavedEDI
     #esp pushed onto stack
     #ds/es/fs/gs already set
+
     #Need to get the RPL from the CS to determine if we need to push SS/ESP
     mov eax,isrSavedCS
-    and eax,3
-    jz samePrivLvlJmp
+    and al,3
+    jnz diffPrivLvl
 
-    #Diff priv lvl, push SS/ESP for IRET
-    mov eax,isrSavedSS
-    push eax
-    mov eax,isrSavedESP
-    push eax
-    jmp overRestoreSSESP
-
-samePrivLvlJmp:
     #Same priv lvl, restore SS/ESP
     mov eax,isrSavedSS
     mov ss,eax
     mov esp,isrSavedESP
+    jmp commonPushCSEIP
 
-overRestoreSSESP:
-    #push iretJumpsHere so that we can retf after iret instead of iret directly to the process
+diffPrivLvl:
+    #Diff priv lvl, push SS/ESP for IRET
+    #Push CS/EIP for the RETF
+    mov ebp,isrSavedESP
+    mov eax,isrSavedEIP
+    mov [ebp],eax
+    mov eax,isrSavedCS
+    mov [ebp+4],eax
+
+    #Pushes for the IRET
+    mov eax,isrSavedSS
+    push eax
+    mov eax,isrSavedESP
+    push eax
+commonPushCSEIP:
+    #push Flags/CS/EIP for the IRET (not for the RETF)
     mov eax,isrSavedFlags
+    or eax,0x200                          #enable interrupts
     push eax
     mov eax,isrSavedCS
     push eax
     lea eax,iretJumpsHere
     push eax
     
+    #Restore the CR3 if it differs from the current one
+restoreCR3:
     mov eax,isrSavedCR3
     mov ebx,cr3
     cmp eax,ebx
     jz  overSetCR3
     mov CR3, eax
+
 overSetCR3:
+    mov ebp, isrSavedEBP
     mov eax, isrSavedEAX            #Restore EAX before we IRET
     mov ebx, isrSavedEBX            #already did this
-    sti
+    mov ecx, isrSavedECX
+    jz iretJumpsHere
     iret
+.globl iretJumpsHere
 iretJumpsHere:
-    #pushes for all IRETs
-    mov eax,isrSavedCS
-    push eax
-    mov eax,isrSavedEIP
-    push eax
     retf
+
+timesPastThisPoint: .word  0x0,0x0
+
 .globl alltraps
 .globl vector0
 vector0:

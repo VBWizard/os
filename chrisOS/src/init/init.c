@@ -52,7 +52,6 @@ extern int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_
 bool ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char* cmdToFind, int paramCount);
 
 char kBootParams[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-char kBootCmd[150];
 int kBootParamCount;
 struct gdt_ptr lGDT;
 
@@ -226,7 +225,8 @@ void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/
 char currTime[150];
 struct tm theDateTime;
     //Zero out all of the memory we will be using as rebooting a computer doesn't necessarily clear memory
-    //memset(0x200000,0,0x1000000);
+    memset(KERNEL_OBJECT_BASE_ADDRESS,0,0x2000000);
+    kBootCmd[0]=0x0;
 __asm__("cli\nsgdt [eax]\n"::"a" (&kernelGDT));
 gdt_init();
     kTicksPerSecond=TICKS_PER_SECOND;
@@ -354,7 +354,7 @@ gdt_init();
     doHDSetup();
     __asm__("mov eax,0x28\nmov ss,eax\n":::"eax");
 kInitDone = true;
-    goto overStuff; /*******************************************/
+goto overStuff; /*******************************************/
     
     bool lRetVal=parseMBR(&kATADeviceInfo[4], (struct mbr_t*)&kMBR[0]);
     if (!lRetVal)

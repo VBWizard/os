@@ -74,6 +74,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/init/init.o \
 	${OBJECTDIR}/src/init/initPaging.o \
 	${OBJECTDIR}/src/init/utility.o \
+	${OBJECTDIR}/src/iodugging.o \
 	${OBJECTDIR}/src/memcpy.o \
 	${OBJECTDIR}/src/newloader.o \
 	${OBJECTDIR}/src/panic.o \
@@ -303,6 +304,11 @@ ${OBJECTDIR}/src/init/utility.o: src/init/utility.c
 	${MKDIR} -p ${OBJECTDIR}/src/init
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/init/utility.o src/init/utility.c
+
+${OBJECTDIR}/src/iodugging.o: src/iodugging.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/iodugging.o src/iodugging.c
 
 ${OBJECTDIR}/src/memcpy.o: src/memcpy.c 
 	${MKDIR} -p ${OBJECTDIR}/src

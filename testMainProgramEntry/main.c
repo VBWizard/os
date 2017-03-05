@@ -11,9 +11,9 @@
  * testMainProgramEntry
  */
 int main(int argc, char** argv) {
-    register int *esp __asm__("esp");
+    uint64_t temp;
     //printk("Hello from testmainprogramentry!!!");
-    //__asm__("cld\nint 0x80\n");
+    __asm__("mov eax,0\ncld\nint 0x80\n");
     int a=argc;
     printk("Param count=%u\n",argc);
     char** b=argv;
@@ -21,8 +21,5 @@ int main(int argc, char** argv) {
     {
         printk("Param %u=%s\n",cnt,argv[cnt]);
     }
-jumpPoint:
-    __asm__("int 0x80\n");
-    goto jumpPoint;
     return 0x1234;
 }

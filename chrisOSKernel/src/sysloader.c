@@ -510,13 +510,46 @@ int sysExec(process_t* process,int argc,char** argv)
     return lsysExecRetVal;
 }
 
+extern void markTaskEnded(uint32_t taskNum);
+
 void _sysCall()
 {
-    int a=0;
-    printk("In _sysCall\n");
-    __asm__("sti\n");
-    gohere:
- //               printk("User process current count=%u\n",a++);
-    __asm__("hlt\n");
-    goto gohere;
+    uint32_t callNum=0;
+    uint32_t param1;
+    uint32_t processID, cr3=KERNEL_PAGE_DIR_ADDRESS;
+
+    __asm__("cli\npushad\nmov %[callNum],eax\nmov %[param1],ebx\n":[callNum] "=r" (callNum),[param1] "=r" (param1)::"eax","ebx");
+    printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
+
+    if (callNum==0)         //faking out the system while working on task switching
+        callNum=1;
+    
+    switch (callNum)
+    {
+        case 0x0:
+            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, returning\n",callNum);
+            break;
+        case 0x1:       //exit
+             __asm__("mov ebx,cs;":"=b" (processID));
+             //Get back home
+             __asm__("mov eax,0x28\npush eax\n"   //push ss
+                     "mov eax,esp\nadd eax,12\npush eax\n"  //push esp
+                     "pushf\n"                   //push flags
+                     "mov eax,0x20\npush eax\n"   //push cs
+                     "mov eax,syscallJump\npush eax\n" //push eip
+                     "iretd\n\nsyscallJump:":::"eax");
+             __asm__("mov eax,%[cr3]\nmov cr3,eax\n"::[cr3] "r" (cr3):"eax");
+         //    __asm__("jmp 0x20:syscallJump\nsyscallJump:\nmov eax,%[cr3]\nmov cr3,eax\n"::[cr3] "r" (cr3));
+             printd(DEBUG_PROCESS,"syscall: Ending process 0x%04X\n",processID);
+             markTaskEnded(processID);
+             //****DESTROY STUFF HERE****
+             //When a task is ended, the scheduler is will deal with it on the next tick, so lets wait for that to happen
+             __asm__("sysCallIdleLoop: sti;hlt;jmp sysCallIdleLoop");
+             panic("_syscall: exit call, continued after halt!");
+             __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\ncli\nhlt\n");               //We should never get here
+            break;
+        default:
+            panic("_syscall: Invalid call number 0x%04X\n",callNum);
+    }
+    __asm__("popad; leave; sti; iret"); /* BLACK MAGIC! */
 }

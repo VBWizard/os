@@ -27,6 +27,7 @@ extern int kTicksPerSecond;
 extern time_t kSystemCurrentTime;
 extern uint32_t exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR3, exceptionCR4;
 extern bool kPagingInitDone;
+extern bool kKbdHandlerActivateDebugger;
 extern volatile char* kKbdBuffCurrTop;
 
 #define KEYB_DATA_PORT 0x60
@@ -165,7 +166,8 @@ void kbd_handler()
                  //Debug
                  if (kKeyStatus[INDEX_ALT] && translatedKeypress==0x6A)
                  {
-                     __asm("int 0x3");
+                     //__asm("int 0x3");
+                     kKbdHandlerActivateDebugger=true;
                  }
             if (kKeyStatus[INDEX_ALT] && kKeyStatus[INDEX_CTRL] && translatedKeypress==0xE0)
             {

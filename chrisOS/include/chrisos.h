@@ -12,7 +12,8 @@
 #include "memory.h"
 #include "../../chrisOSKernel/include/task.h"
 
-#define TICKS_PER_SECOND 100
+#define TICKS_PER_SECOND 25
+#define TICKS_PER_SCHEDULE TICKS_PER_SECOND * 3
 
 //kernelDataLoadAddress is defined in kernelData2.ld.  It is the address of kernelData
 extern char* kernelDataLoadAddress;
@@ -43,7 +44,7 @@ extern char* kernelDataLoadAddress;
 #define KERNEL_PAGE_DIR_SIZE 0x10000 //64GB max memory (0x1000000000) max
 #define KERNEL_PAGE_TABLE_INITIAL_SIZE 0x400000 + 0x200000      //4GB + map 0xC0000000-0xDFFFFFFF to 0x00000000-0x3FFFFFFF
 #define SAVED_STACK_FOR_EXCEPTIONS_SIZE 0x1000
-#define TSS_TABLE_RECORD_COUNT 16384
+#define TSS_TABLE_RECORD_COUNT 1024                             //This is effectively the max number of processes
 #define TSS_TABLE_SIZE (0x68*TSS_TABLE_RECORD_COUNT)
 #define TASK_TABLE_SIZE (((TSS_TABLE_RECORD_COUNT)/sizeof(uint32_t))*sizeof(task_t))          //need task_t size
 
@@ -114,8 +115,9 @@ extern char* kernelDataLoadAddress;
 #define DEBUG_PROCESS 1<<18
 #define DEBUG_MALLOC 1<<19
 #define DEBUG_KEYBOARD_DRIVER 1<<20
+#define DEBUG_PRINT_TO_PORT 1<<21
 #define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PROCESS
+#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT | DEBUG_PROCESS | DEBUG_TASK | DEBUG_MALLOC | DEBUG_ELF_LOADER
 
 #define SCREEN_SPACES_PER_TAB 5
 

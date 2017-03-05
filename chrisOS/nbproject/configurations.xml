@@ -97,6 +97,7 @@
       <itemPath>src/cpu/idt.c</itemPath>
       <itemPath>src/init/init.c</itemPath>
       <itemPath>src/init/initPaging.c</itemPath>
+      <itemPath>src/iodugging.c</itemPath>
       <itemPath>src/cpu/irqHandlers.c</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/asm/isr.s</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/src/char/keyboard.c</itemPath>
@@ -416,6 +417,8 @@
       <item path="src/init/initPaging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/init/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -745,6 +748,8 @@
       </item>
       <item path="src/init/utility.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/iodugging.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/newloader.c" ex="false" tool="0" flavor2="0">
@@ -1073,6 +1078,8 @@
       <item path="src/init/initPaging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/init/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>

@@ -29,7 +29,8 @@ extern "C" {
 
     void initSched();
     void scheduler();
-    void submitNewTask(task_t* task);
+    task_t* submitNewTask(task_t* task);
+    void markTaskEnded(uint32_t taskNum);
     
 #ifdef __cplusplus
 }
