@@ -1,6 +1,7 @@
 #include "i386/cpu.h"
 #include "memory.h"
 #include "chrisos.h"
+#include "i386/gdt.h"
 
 //extern void idt_load();//Defined in CPU.h
 
@@ -31,8 +32,8 @@ void idt_install(struct idt_ptr* idtp)
 
 void idt_init(struct idt_ptr* idtp, int remap_offset)
 {
-    //CLR 05/02/2016 - Left off here, ITD stuff isn't working, have an endless loop in cpuFunc.s idt_load
 /* setting up the exception handlers and timer, keyboard ISRs */
+    
     struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
     idt_set_gate (&idtTable[0], 0x08, (int)&_isr_00_wrapper, ACS_INT); //Move this out of the way of the exception handlers
     idt_set_gate (&idtTable[0+remap_offset], 0x08, (int)&_irq0_handler, ACS_INT); //This is the IRQ0 handler, notice it is remapped
@@ -49,8 +50,8 @@ void idt_init(struct idt_ptr* idtp, int remap_offset)
     idt_set_gate (&idtTable[0xa], 0x08, (int)&_isr_10_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0xb], 0x08, (int)&_isr_11_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0xc], 0x08, (int)&_isr_12_wrapper, ACS_INT);
-    idt_set_gate (&idtTable[0xd/*+remap_offset*/], 0x08, (int)&_isr_13_wrapper, ACS_INT);
-    idt_set_gate (&idtTable[0xe/*+remap_offset*/], 0x08, (int)&_isr_14_wrapper, ACS_INT);   //paging exception
+    idt_set_gate (&idtTable[0xd/*+remap_offset*/], 0x08, (int)&_isr_13_wrapper, ACS_INT | ACS_DPL_3);
+    idt_set_gate (&idtTable[0xe/*+remap_offset*/], 0x08, (int)&_isr_14_wrapper, ACS_INT | ACS_DPL_3);   //paging exception
     idt_set_gate (&idtTable[0xf], 0x08, (int)&_isr_15_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0x10], 0x08, (int)&_isr_16_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0x11], 0x08, (int)&_isr_17_wrapper, ACS_INT);

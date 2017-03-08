@@ -34,7 +34,7 @@ void initializeKernelPaging()
                 ptrT += 0x400;
         }
         uint32_t pageDirEntrySize = 0x400000;
-        ptr2=(void*)KERNEL_PAGE_DIR_ADDRESS + (KERNEL_PAGED_BASE_ADDRESS / 0x400000)*4; //(((uint32_t)KERNEL_PAGED_BASE_ADDRESS / (uint32_t)0x400000) * 4);
+        ptr2=(void*)KERNEL_CR3 + (KERNEL_PAGED_BASE_ADDRESS / 0x400000)*4; //(((uint32_t)KERNEL_PAGED_BASE_ADDRESS / (uint32_t)0x400000) * 4);
         kKernelPageTables=(uint32_t*)KERNEL_PAGE_TABLE_BASE_ADDRESS;
         //Initialize Kernel Page Directory
         printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: Kernel page dir at 0x%08X, table at 0x%08x\n", ptr2, kKernelPageTables);
@@ -61,7 +61,7 @@ void initializeKernelPaging()
             }
             ptrT += 0x400;
 */
-            __asm__("mov cr3,%0\n":: "a" (KERNEL_PAGE_DIR_ADDRESS));
+            __asm__("mov cr3,%0\n":: "a" (KERNEL_CR3));
        __asm__("mov eax,cr0\n or eax,0x80000000\n mov cr0,eax\n");
         /*NOTE: Interrupts have been disabled so that we can update the IDT bases before non-presenting the temporary low page table entries*/
         //Update the base of GDT entry 0x08 (Code) and 0x10 (data) to our kernel base

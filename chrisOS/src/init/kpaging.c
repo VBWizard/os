@@ -31,7 +31,7 @@ uint32_t kPagingGet4kPDEntryValueCR3(uintptr_t PageDirAddress, uint32_t address)
 
 uint32_t kPagingGet4kPDEntryValue(uint32_t address)
 {
-    return kPagingGet4kPDEntryValueCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+    return kPagingGet4kPDEntryValueCR3(KERNEL_CR3,address);
 }
 
 uint32_t kPagingGet4kPDEntryAddressCR3(uintptr_t PageDirAddress, uint32_t address)
@@ -47,7 +47,7 @@ uint32_t kPagingGet4kPDEntryAddressCR3(uintptr_t PageDirAddress, uint32_t addres
 
 uint32_t kPagingGet4kPDEntryAddress(uint32_t address)
 {
-    return kPagingGet4kPDEntryAddressCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+    return kPagingGet4kPDEntryAddressCR3(KERNEL_CR3,address);
 }
 
 uint32_t kPagingGet4kPTEntryAddressCR3(uintptr_t pageDirAddress, uint32_t address)
@@ -59,7 +59,7 @@ uint32_t kPagingGet4kPTEntryAddressCR3(uintptr_t pageDirAddress, uint32_t addres
 
 uint32_t kPagingGet4kPTEntryAddress(uint32_t address)
 {
-    return kPagingGet4kPTEntryAddressCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+    return kPagingGet4kPTEntryAddressCR3(KERNEL_CR3,address);
 }
 
 uint32_t kPagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address)
@@ -75,7 +75,7 @@ uint32_t kPagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address)
 
 uint32_t kPagingGet4kPTEntryValue(uint32_t address)
 {
-    return kPagingGet4kPTEntryValueCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+    return kPagingGet4kPTEntryValueCR3(KERNEL_CR3,address);
 }
 
 

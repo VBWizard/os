@@ -129,7 +129,7 @@ void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
     pagingMapPageCount(cr3,virtualAddress,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",virtualAddress,phys);
     //Zero out the memory
-    pagingMapPageCount(KERNEL_PAGE_DIR_ADDRESS,virtualAddress | 0xC0000000,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    pagingMapPageCount(KERNEL_CR3,virtualAddress | 0xC0000000,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Zeroing out page(s) at 0x%08X for 0x%08X\n",phys,newSize);
     memset(virtualAddress,0,newSize);
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Returning address 0x%08X\n",phys);

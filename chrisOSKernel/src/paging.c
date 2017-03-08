@@ -52,7 +52,7 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
             dir=(uint32_t*)pageDirAddress;
             *dir=(uint32_t)allocPages(PAGE_SIZE);
             pagingMapPage(pageDirAddress,*dir,*dir,0x07);
-            pagingMapPage(KERNEL_PAGE_DIR_ADDRESS,*dir | KERNEL_PAGED_BASE_ADDRESS,*dir,0x03);
+            pagingMapPage(KERNEL_CR3,*dir | KERNEL_PAGED_BASE_ADDRESS,*dir,0x03);
             *dir &= 0xFFFFF000;
             *dir |= 0x7;
             dirEntryNumber=0;
@@ -143,7 +143,7 @@ uint32_t pagingGet4kPDEntryValueCR3(uintptr_t PageDirAddress, uint32_t address)
 
 uint32_t pagingGet4kPDEntryValue(uint32_t address)
 {
-    return pagingGet4kPDEntryValueCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+    return pagingGet4kPDEntryValueCR3(KERNEL_CR3,address);
 }
 
 uint32_t pagingGet4kPDEntryAddressCR3(uintptr_t PageDirAddress, uint32_t address)
@@ -159,7 +159,7 @@ uint32_t pagingGet4kPDEntryAddressCR3(uintptr_t PageDirAddress, uint32_t address
 
 uint32_t pagingGet4kPDEntryAddress(uint32_t address)
 {
-    return pagingGet4kPDEntryAddressCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+    return pagingGet4kPDEntryAddressCR3(KERNEL_CR3,address);
 }
 
 uint32_t pagingGet4kPTEntryAddressCR3(uintptr_t pageDirAddress, uint32_t address)
@@ -171,7 +171,7 @@ uint32_t pagingGet4kPTEntryAddressCR3(uintptr_t pageDirAddress, uint32_t address
 
 uint32_t pagingGet4kPTEntryAddress(uint32_t address)
 {
-    return pagingGet4kPTEntryAddressCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+    return pagingGet4kPTEntryAddressCR3(KERNEL_CR3,address);
 }
 
 uint32_t pagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address)
@@ -187,7 +187,7 @@ uint32_t pagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address)
 
 uint32_t pagingGet4kPTEntryValue(uint32_t address)
 {
-    return pagingGet4kPTEntryValueCR3(KERNEL_PAGE_DIR_ADDRESS,address);
+    return pagingGet4kPTEntryValueCR3(KERNEL_CR3,address);
 }
 
 void pagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
@@ -297,7 +297,7 @@ void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uint
 bool pagingMapPageIntoKernel(uintptr_t processCR3, uintptr_t virtualAddress, uint8_t flags)
 {
     
-    pagingMapPage(KERNEL_PAGE_DIR_ADDRESS, virtualAddress, pagingGet4kPTEntryValueCR3(processCR3,virtualAddress), flags);
+    pagingMapPage(KERNEL_CR3, virtualAddress, pagingGet4kPTEntryValueCR3(processCR3,virtualAddress), flags);
 }
 
 bool isPageMapped(uintptr_t pageDirAddress, uintptr_t Address)

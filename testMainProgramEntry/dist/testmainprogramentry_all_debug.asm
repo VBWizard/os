@@ -2441,77 +2441,20 @@ main():
  */
 int main(int argc, char** argv) {
 10000dbc:	8d 4c 24 04          	lea    ecx,[esp+0x4]
-10000dc0:	83 e4 f0             	and    esp,0xfffffff0
+10000dc0:	83 e4 f8             	and    esp,0xfffffff8
 10000dc3:	ff 71 fc             	push   DWORD PTR [ecx-0x4]
 10000dc6:	55                   	push   ebp
 10000dc7:	89 e5                	mov    ebp,esp
-10000dc9:	53                   	push   ebx
-10000dca:	51                   	push   ecx
-10000dcb:	83 ec 10             	sub    esp,0x10
-10000dce:	89 cb                	mov    ebx,ecx
-/home/yogi/src/os/testMainProgramEntry/main.c:16
+10000dc9:	51                   	push   ecx
+10000dca:	83 ec 14             	sub    esp,0x14
+/home/yogi/src/os/testMainProgramEntry/main.c:17 (discriminator 1)
     uint64_t temp;
     //printk("Hello from testmainprogramentry!!!");
-    __asm__("mov eax,0\ncld\nint 0x80\n");
-10000dd0:	b8 00 00 00 00       	mov    eax,0x0
-10000dd5:	fc                   	cld    
-10000dd6:	cd 80                	int    0x80
-/home/yogi/src/os/testMainProgramEntry/main.c:17
-    int a=argc;
-10000dd8:	8b 03                	mov    eax,DWORD PTR [ebx]
-10000dda:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
-/home/yogi/src/os/testMainProgramEntry/main.c:18
-    printk("Param count=%u\n",argc);
-10000ddd:	83 ec 08             	sub    esp,0x8
-10000de0:	ff 33                	push   DWORD PTR [ebx]
-10000de2:	68 ea 11 00 10       	push   0x100011ea
-10000de7:	e8 0e ff ff ff       	call   10000cfa <printk>
-10000dec:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/main.c:19
-    char** b=argv;
-10000def:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
-10000df2:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
-/home/yogi/src/os/testMainProgramEntry/main.c:20
-    for (int cnt=0;cnt<argc;cnt++)
-10000df5:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
-10000dfc:	eb 29                	jmp    10000e27 <main+0x6b>
-/home/yogi/src/os/testMainProgramEntry/main.c:22 (discriminator 3)
-    {
-        printk("Param %u=%s\n",cnt,argv[cnt]);
-10000dfe:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-10000e01:	8d 14 85 00 00 00 00 	lea    edx,[eax*4+0x0]
-10000e08:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
-10000e0b:	01 d0                	add    eax,edx
-10000e0d:	8b 00                	mov    eax,DWORD PTR [eax]
-10000e0f:	83 ec 04             	sub    esp,0x4
-10000e12:	50                   	push   eax
-10000e13:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
-10000e16:	68 fa 11 00 10       	push   0x100011fa
-10000e1b:	e8 da fe ff ff       	call   10000cfa <printk>
-10000e20:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/main.c:20 (discriminator 3)
-    //printk("Hello from testmainprogramentry!!!");
-    __asm__("mov eax,0\ncld\nint 0x80\n");
-    int a=argc;
-    printk("Param count=%u\n",argc);
-    char** b=argv;
-    for (int cnt=0;cnt<argc;cnt++)
-10000e23:	83 45 f4 01          	add    DWORD PTR [ebp-0xc],0x1
-/home/yogi/src/os/testMainProgramEntry/main.c:20 (discriminator 1)
-10000e27:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-10000e2a:	3b 03                	cmp    eax,DWORD PTR [ebx]
-10000e2c:	7c d0                	jl     10000dfe <main+0x42>
-/home/yogi/src/os/testMainProgramEntry/main.c:24
-    {
-        printk("Param %u=%s\n",cnt,argv[cnt]);
-    }
-    return 0x1234;
-10000e2e:	b8 34 12 00 00       	mov    eax,0x1234
-/home/yogi/src/os/testMainProgramEntry/main.c:25
-}
-10000e33:	8d 65 f8             	lea    esp,[ebp-0x8]
-10000e36:	59                   	pop    ecx
-10000e37:	5b                   	pop    ebx
-10000e38:	5d                   	pop    ebp
-10000e39:	8d 61 fc             	lea    esp,[ecx-0x4]
-10000e3c:	c3                   	ret    
+    jumpHere:
+    temp++;
+10000dcd:	83 45 f0 01          	add    DWORD PTR [ebp-0x10],0x1
+10000dd1:	83 55 f4 00          	adc    DWORD PTR [ebp-0xc],0x0
+/home/yogi/src/os/testMainProgramEntry/main.c:19 (discriminator 1)
+//    printd(DEBUG_PROCESS,"JumpHere iteration %u\n",temp);
+    goto jumpHere;
+10000dd5:	eb f6                	jmp    10000dcd <main+0x11>

@@ -323,7 +323,7 @@ _isr_19_wrapper:
         mov     ebp, esp
         mov     ax, 0x13                  # save exception number
         jmp isr_My_Common
-.global _isr_20_wrapper        #8 based exception 0x14
+.global _isr_20_wrapper        
 _isr_20_wrapper:
         mov exceptionSavedESP, esp
         mov exceptionAX,eax

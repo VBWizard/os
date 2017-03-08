@@ -12,6 +12,9 @@
 
 isrNumber: .word 0,0
 
+irq0_dedicated_stack: .word
+.skip 1000
+
 .global _irq0_handler
 _irq0_handler:                #remapped to 0x08
     push    ebp
@@ -52,6 +55,13 @@ _irq0_handler:                #remapped to 0x08
 .type alltraps, @function
 alltraps:
     cli
+    push eax
+    push ds
+    mov eax,0x10
+    mov ds,eax
+    pop eax
+    mov isrSavedDS,eax
+    pop eax
     mov isrSavedEAX,eax
 
 //mov eax,timesPastThisPoint
@@ -78,8 +88,6 @@ alltraps:
 
     #Save segment registers
     mov eax,0
-    mov eax,ds
-    mov isrSavedDS,eax
     mov eax,es
     mov isrSavedES,eax
     mov eax,fs
@@ -228,11 +236,14 @@ loadNewTask:
     and al,3
     jnz diffPrivLvl
 
+.globl samePrivLvl
+samePrivLvl:
+
     #Same priv lvl, restore SS/ESP
     mov eax,isrSavedSS
     mov ss,eax
-    mov esp,isrSavedESP
-    jmp commonPushCSEIP
+    mov esp,isrSavedESP    
+//    jmp commonPushCSEIP
 
 diffPrivLvl:
     #Diff priv lvl, push SS/ESP for IRET
@@ -261,9 +272,9 @@ commonPushCSEIP:
     #Restore the CR3 if it differs from the current one
 restoreCR3:
     mov eax,isrSavedCR3
-    mov ebx,cr3
-    cmp eax,ebx
-    jz  overSetCR3
+//    mov ebx,cr3
+//    cmp eax,ebx
+//    jz  overSetCR3
     mov CR3, eax
 
 overSetCR3:
@@ -271,7 +282,6 @@ overSetCR3:
     mov eax, isrSavedEAX            #Restore EAX before we IRET
     mov ebx, isrSavedEBX            #already did this
     mov ecx, isrSavedECX
-    jz iretJumpsHere
     iret
 .globl iretJumpsHere
 iretJumpsHere:

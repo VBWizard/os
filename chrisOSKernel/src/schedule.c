@@ -270,6 +270,7 @@ task_t* findRunningTaskToReplace()
 
 void storeISRSavedRegs(task_t* task)
 {
+    printd(DEBUG_PROCESS,"Saved values: ");
     task->tss->EAX=isrSavedEAX;
     task->tss->EBX=isrSavedEBX;
     task->tss->ECX=isrSavedECX;
@@ -277,20 +278,24 @@ void storeISRSavedRegs(task_t* task)
     task->tss->ESI=isrSavedESI;
     task->tss->EDI=isrSavedEDI;
     task->tss->ESP=isrSavedESP;
+    printd(DEBUG_PROCESS,"ESP=0x%08X,",task->tss->ESP);
     task->tss->EBP=isrSavedEBP;
     task->tss->EIP=isrSavedEIP;
+    printd(DEBUG_PROCESS,"EIP=0x%08X,",task->tss->EIP);
     task->tss->EFLAGS=isrSavedFlags;
     task->tss->DS=isrSavedDS;
     task->tss->ES=isrSavedES;
     task->tss->FS=isrSavedFS;
     task->tss->GS=isrSavedGS;
     task->tss->SS=isrSavedSS;
+    printd(DEBUG_PROCESS,"SS=0x%08X\n",task->tss->SS);
     task->tss->CS=isrSavedCS;
     task->tss->CR3=isrSavedCR3;
 }
 
 void loadISRSavedRegs(task_t* task)
 {
+    printd(DEBUG_PROCESS,"Loaded values: ");
     isrSavedEAX=task->tss->EAX;
     isrSavedEBX=task->tss->EBX;
     isrSavedECX=task->tss->ECX;
@@ -298,14 +303,17 @@ void loadISRSavedRegs(task_t* task)
     isrSavedESI=task->tss->ESI;
     isrSavedEDI=task->tss->EDI;
     isrSavedESP=task->tss->ESP;
+    printd(DEBUG_PROCESS,"ESP=0x%08X,",task->tss->ESP);
     isrSavedEBP=task->tss->EBP;
     isrSavedEIP=task->tss->EIP;
+    printd(DEBUG_PROCESS,"EIP=0x%08X,",task->tss->EIP);
     isrSavedFlags=task->tss->EFLAGS;
     isrSavedDS=task->tss->DS;
     isrSavedES=task->tss->ES;
     isrSavedFS=task->tss->FS;
     isrSavedGS=task->tss->GS;
     isrSavedSS=task->tss->SS;
+    printd(DEBUG_PROCESS,"SS=0x%08X\n",task->tss->SS);
     isrSavedCS=task->tss->CS;
     isrSavedCR3=task->tss->CR3;
 }
@@ -342,12 +350,12 @@ void scheduler()
     task_t* taskToRun = {0};
     task_t* taskToStop = {0};
     task_t* tempTask=kTaskList[TASK_RUNNABLE];
-    
     if (*kTicksSinceStart<nextScheduleTicks)
         return;
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULE;
 
-    
+    __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (KERNEL_CR3));
+    printd(DEBUG_PROCESS,"\n****************************** TASK SWITCH ******************************\n");
     printd(DEBUG_PROCESS,"Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
     //Only scheduling on CPU 0 for now
     tempTask=findFirstTaskInList(TASK_RUNNABLE);
@@ -372,7 +380,7 @@ void scheduler()
         taskToStop=findRunningTaskToReplace();
         if (taskToStop!=NULL)                                             //There might not be a prior task if this is the first time through the routine
         {
-            printd(DEBUG_PROCESS,"Found process (0x%04X) to replace, moving it off the CPU.\n",taskToStop->taskNum);
+            printd(DEBUG_PROCESS,"Found process (0x%04X) to replace @0x%04X:0x%08X.\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP);
             //save old task's state
             if (taskToStop->exited)
                 taskToStop=changeTaskState(taskToStop,TASK_EXITED);
@@ -396,4 +404,5 @@ void scheduler()
         printd(DEBUG_PROCESS,"No new process to run, continuing with the current one\n");
         //if (oldTask->taskNum==0xa)
             //STOPHERE2;
+    return;
 }

@@ -516,7 +516,7 @@ void _sysCall()
 {
     uint32_t callNum=0;
     uint32_t param1;
-    uint32_t processID, cr3=KERNEL_PAGE_DIR_ADDRESS;
+    uint32_t processID, cr3=KERNEL_CR3;
 
     __asm__("cli\npushad\nmov %[callNum],eax\nmov %[param1],ebx\n":[callNum] "=r" (callNum),[param1] "=r" (param1)::"eax","ebx");
     printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);

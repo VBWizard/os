@@ -15,7 +15,7 @@ qemu-system-i386 							\
 	-boot order=d							\
 	-drive file=./myos.iso,if=none,id=sata-cd-0 			\
 	-drive file=~/qemu-test-disk.img,if=none,id=sata-disk-0 	\
-        -drive file=/dev/disk/by-id/ata-ST31000528AS_5VP8R4ME,index=4,format=raw,if=none,cache=none,id=sata-disk-1 \
+        -drive file=/dev/disk/by-id/ata-ST31000528AS_5VP8R4ME,index=4,format=raw,cache=none,if=none,id=sata-disk-1 \
         -drive file=~/qemu-test-disk3.img,if=none,id=sata-disk-2 	\
 	-device ich9-ahci,id=ahci0 					\
 	-device ich9-ahci,id=ahci1 					\
