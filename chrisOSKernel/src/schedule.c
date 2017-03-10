@@ -270,33 +270,33 @@ task_t* findRunningTaskToReplace()
 
 void storeISRSavedRegs(task_t* task)
 {
-    printd(DEBUG_PROCESS,"Save: ");
+    printd(DEBUG_DETAILED,"Save: ");
     task->tss->CS=isrSavedCS;
-    printd(DEBUG_PROCESS,"CS=0x%04X,",task->tss->CS);
+    printd(DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
     task->tss->EIP=isrSavedEIP;
-    printd(DEBUG_PROCESS,"EIP=0x%08X,",task->tss->EIP);
+    printd(DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
     task->tss->SS=isrSavedSS;
-    printd(DEBUG_PROCESS,"SS=0x%08X,",task->tss->SS);
+    printd(DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
     task->tss->DS=isrSavedDS;
-    printd(DEBUG_PROCESS,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
     task->tss->EAX=isrSavedEAX;
-    printd(DEBUG_PROCESS,"EAX=0x%08X,",task->tss->EAX);
+    printd(DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
     task->tss->EBX=isrSavedEBX;
-    printd(DEBUG_PROCESS,"DBX=0x%08X,",task->tss->EBX);
+    printd(DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
     task->tss->ECX=isrSavedECX;
-    printd(DEBUG_PROCESS,"ECX=0x%08X,",task->tss->ECX);
+    printd(DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
     task->tss->EDX=isrSavedEDX;
-    printd(DEBUG_PROCESS,"EDX=0x%08X,",task->tss->EDX);
+    printd(DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
     task->tss->ESI=isrSavedESI;
-    printd(DEBUG_PROCESS,"ESI=0x%08X,",task->tss->ESI);
+    printd(DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
     task->tss->EDI=isrSavedEDI;
-    printd(DEBUG_PROCESS,"EDI=0x%08X,",task->tss->EDI);
+    printd(DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
     task->tss->ESP=isrSavedESP;
-    printd(DEBUG_PROCESS,"ESP=0x%08X,",task->tss->ESP);
+    printd(DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
     task->tss->EBP=isrSavedEBP;
-    printd(DEBUG_PROCESS,"EBP=0x%08X,",task->tss->EBP);
+    printd(DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
     task->tss->EFLAGS=isrSavedFlags;
-    printd(DEBUG_PROCESS,"FLAGS=0x%08X\n",task->tss->EFLAGS);
+    printd(DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
     task->tss->ES=isrSavedES;
     task->tss->FS=isrSavedFS;
     task->tss->GS=isrSavedGS;
@@ -305,35 +305,35 @@ void storeISRSavedRegs(task_t* task)
 
 void loadISRSavedRegs(task_t* task)
 {
-    printd(DEBUG_PROCESS,"Load: ");
+    printd(DEBUG_DETAILED,"Load: ");
 
 
     isrSavedCS=task->tss->CS;
-    printd(DEBUG_PROCESS,"CS=0x%04X,",task->tss->CS);
+    printd(DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
     isrSavedEIP=task->tss->EIP;
-    printd(DEBUG_PROCESS,"EIP=0x%08X,",task->tss->EIP);
+    printd(DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
     isrSavedSS=task->tss->SS;
-    printd(DEBUG_PROCESS,"SS=0x%08X,",task->tss->SS);
+    printd(DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
     isrSavedDS=task->tss->DS;
-    printd(DEBUG_PROCESS,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
     isrSavedEAX=task->tss->EAX;
-    printd(DEBUG_PROCESS,"EAX=0x%08X,",task->tss->EAX);
+    printd(DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
     isrSavedEBX=task->tss->EBX;
-    printd(DEBUG_PROCESS,"EBX=0x%08X,",task->tss->EBX);
+    printd(DEBUG_DETAILED,"EBX=0x%08X,",task->tss->EBX);
     isrSavedECX=task->tss->ECX;
-    printd(DEBUG_PROCESS,"ECX=0x%08X,",task->tss->ECX);
+    printd(DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
     isrSavedEDX=task->tss->EDX;
-    printd(DEBUG_PROCESS,"EDX=0x%08X,",task->tss->EDX);
+    printd(DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
     isrSavedESI=task->tss->ESI;
-    printd(DEBUG_PROCESS,"ESI=0x%08X,",task->tss->ESI);
+    printd(DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
     isrSavedEDI=task->tss->EDI;
-    printd(DEBUG_PROCESS,"EDI=0x%08X,",task->tss->EDI);
+    printd(DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
     isrSavedESP=task->tss->ESP;
-    printd(DEBUG_PROCESS,"ESP=0x%08X,",task->tss->ESP);
+    printd(DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
     isrSavedEBP=task->tss->EBP;
-    printd(DEBUG_PROCESS,"EBP=0x%08X,",task->tss->EBP);
+    printd(DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
     isrSavedFlags=task->tss->EFLAGS;
-    printd(DEBUG_PROCESS,"FLAGS=0x%08X\n",task->tss->EFLAGS);
+    printd(DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
     isrSavedES=task->tss->ES;
     isrSavedFS=task->tss->FS;
     isrSavedGS=task->tss->GS;

@@ -51,11 +51,12 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     memcpy((void*)process->task->tss->ESP,&process->task->tss->EIP,8);
     memcpy((void*)process->task->tss->ESP+4,&process->task->tss->CS,8);
     memcpy((void*)process->task->tss->ESP+8,&process->task->tss->EFLAGS,8);
-    memcpy((void*)process->task->tss->ESP+12,&process->task->tss->ESP,8);
+    uint32_t tempESP=process->task->tss->ESP-0x100;
+    memcpy((void*)process->task->tss->ESP+12,&tempESP,8);
     memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,8);
     
-    //memcpy((void*)process->task->tss->ESP+12,&argc,4);
-    //memcpy((void*)process->task->tss->ESP+16,&argv,4);
+    memcpy((void*)process->task->tss->ESP-0xfc,&argc,4);
+    memcpy((void*)process->task->tss->ESP-0xf8,argv,4);
     //Set the return point since the task will simply ret to exit
     //memcpy((void*)process->task->tss->ESP+8,&var,4);
     printd(DEBUG_PROCESS,"Return point for process is 0x%08X",&processWrapup);
