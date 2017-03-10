@@ -195,10 +195,6 @@ theWayOut:
     mov bx, isrSavedGS
     mov gs, bx
     mov ebp,isrSavedEBP
-    mov al,schedulerTaskSwitched
-    cmp al,0
-    jnz loadNewTask
-    mov eax, isrSavedEAX
 isrCommonExit:
     mov esp, isrSavedESP
 #        add esp, 4 #get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. 
@@ -208,8 +204,11 @@ isrCommonExit:
     jnz overCorrection
     add esp, 4 #get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. 
 overCorrection:
+    mov al,schedulerTaskSwitched
+    cmp al,0
+    mov eax, isrSavedEAX
     mov ebx,isrSavedEBX
-    sti
+    jnz loadNewTask
     iretd
 
 loadNewTask:
@@ -220,55 +219,6 @@ loadNewTask:
     mov eax,kTaskSwitchCount
     inc eax
     mov kTaskSwitchCount,eax
-
-    #set up registers for new task
-    #eax/ebx set up below
-    #mov ecx, isrSavedECX set up below
-    mov edx, isrSavedEDX
-    #mov ebp, isrSavedEBP #already did this
-    mov esi, isrSavedESI
-    mov edi, isrSavedEDI
-    #esp pushed onto stack
-    #ds/es/fs/gs already set
-
-    #Need to get the RPL from the CS to determine if we need to push SS/ESP
-    mov eax,isrSavedCS
-    and al,3
-    jnz diffPrivLvl
-
-.globl samePrivLvl
-samePrivLvl:
-
-    #Same priv lvl, restore SS/ESP
-    mov eax,isrSavedSS
-    mov ss,eax
-    mov esp,isrSavedESP    
-//    jmp commonPushCSEIP
-
-diffPrivLvl:
-    #Diff priv lvl, push SS/ESP for IRET
-    #Push CS/EIP for the RETF
-    mov ebp,isrSavedESP
-    mov eax,isrSavedEIP
-    mov [ebp],eax
-    mov eax,isrSavedCS
-    mov [ebp+4],eax
-
-    #Pushes for the IRET
-    mov eax,isrSavedSS
-    push eax
-    mov eax,isrSavedESP
-    push eax
-commonPushCSEIP:
-    #push Flags/CS/EIP for the IRET (not for the RETF)
-    mov eax,isrSavedFlags
-    or eax,0x200                          #enable interrupts
-    push eax
-    mov eax,isrSavedCS
-    push eax
-    lea eax,iretJumpsHere
-    push eax
-    
     #Restore the CR3 if it differs from the current one
 restoreCR3:
     mov eax,isrSavedCR3
@@ -278,14 +228,8 @@ restoreCR3:
     mov CR3, eax
 
 overSetCR3:
-    mov ebp, isrSavedEBP
-    mov eax, isrSavedEAX            #Restore EAX before we IRET
-    mov ebx, isrSavedEBX            #already did this
-    mov ecx, isrSavedECX
+    mov eax, isrSavedEAX
     iret
-.globl iretJumpsHere
-iretJumpsHere:
-    retf
 
 timesPastThisPoint: .word  0x0,0x0
 

@@ -39,7 +39,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/9e02dec1/memcpy.o \
 	${OBJECTDIR}/_ext/9e02dec1/printf.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strlen.o \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/time.o
 
 
 # C Compiler Flags
@@ -90,6 +91,11 @@ ${OBJECTDIR}/main.o: main.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+
+${OBJECTDIR}/time.o: time.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/time.o time.c
 
 # Subprojects
 .build-subprojects:

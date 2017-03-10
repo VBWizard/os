@@ -13,7 +13,8 @@
 #include "../../chrisOSKernel/include/task.h"
 
 #define TICKS_PER_SECOND 25
-#define TICKS_PER_SCHEDULE TICKS_PER_SECOND * 3
+#define TICKS_PER_SCHEDULE TICKS_PER_SECOND 
+//* 3
 
 //kernelDataLoadAddress is defined in kernelData2.ld.  It is the address of kernelData
 extern char* kernelDataLoadAddress;

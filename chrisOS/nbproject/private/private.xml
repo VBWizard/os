@@ -9,6 +9,7 @@
         <group>
             <file>file:/home/yogi/src/os/chrisOS/asm/isr.s</file>
             <file>file:/home/yogi/src/os/chrisOS/src/cpu/idt.c</file>
+            <file>file:/home/yogi/src/os/chrisOS/src/init/utility.c</file>
             <file>file:/home/yogi/src/os/chrisOS/src/init/init.c</file>
         </group>
     </open-files>

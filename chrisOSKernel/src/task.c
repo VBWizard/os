@@ -94,7 +94,7 @@ void mmMapKernelIntoTask(task_t* task)
     
     //Map the first 1Mb (except page at 0x0) into the process, where the OS loader is, so that ISRs can run
     printd(DEBUG_TASK,"Map OS loader into user process: 0x%08X to 0x%08X r/o\n",0x1000,0xffffff+1);
-    pagingMapPageRange(task->tss->CR3,0x1000,0xffffff,0x1000,0x5);
+    pagingMapPageRange(task->tss->CR3,0x1000,0xffffff,0x1000,0x7);
     pagingMapPageRange(task->tss->CR3,0x1000 | KERNEL_PAGED_BASE_ADDRESS,0xffffff | KERNEL_PAGED_BASE_ADDRESS,0x1000,0x7);
 
     printd(DEBUG_TASK,"Map screen buffer into user process at 0xB8000, 4 pages (r/w)\n");
@@ -167,7 +167,7 @@ task_t* createTask(bool kernelTSS)
     
     //set task's IOPL
     task->tss->EFLAGS=0x200046;
-    task->tss->EFLAGS |= 0x3000; //Set bits 12 & 13 to IOPL=3
+    task->tss->EFLAGS |= 0x200; //Flags on!
     task->tss->LINK=0x0; //need an old TSS entry (garbage) to "store" the old variables to on LTR
     //If it is a kernel task
     task->kernel=kernelTSS;

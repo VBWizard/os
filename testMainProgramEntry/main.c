@@ -14,10 +14,8 @@ int main(int argc, char** argv) {
     uint64_t temp;
     //printk("Hello from testmainprogramentry!!!");
     jumpHere:
-    temp++;
-//    printd(DEBUG_PROCESS,"JumpHere iteration %u\n",temp);
+        //printd("\tStill in the loop, %u iterations\n",temp++);
     goto jumpHere;
-    STOPHERE2
     __asm__("mov eax,0\ncld\nint 0x80\n");
     int a=argc;
     printk("Param count=%u\n",argc);
