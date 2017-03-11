@@ -2501,7 +2501,7 @@ int main(int argc, char** argv) {
         printk("Param %u=%s\n",cnt,argv[cnt]);
     }
     jumpHere:
-        //printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp++);
+//        //printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp++);
     goto jumpHere;
 10000e26:	eb fe                	jmp    10000e26 <main+0x6a>
 

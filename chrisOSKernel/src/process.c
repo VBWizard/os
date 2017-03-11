@@ -46,7 +46,6 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     process->task->tss->EIP=process->elf->hdr.e_entry;
 
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
-    printk("************task ESP=0x%08X************\n",process->task->tss->ESP);
     void* var=&processWrapup;
     memcpy((void*)process->task->tss->ESP,&process->task->tss->EIP,8);
     memcpy((void*)process->task->tss->ESP+4,&process->task->tss->CS,8);
@@ -55,8 +54,11 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     memcpy((void*)process->task->tss->ESP+12,&tempESP,8);
     memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,8);
     
+    //Per the above, the stack will start at -0x100 from where we write the CS/EIP/FLAGS/SS/ESP, so put our params around there
+    tempESP=&processWrapup;
+    memcpy((void*)process->task->tss->ESP-0x100,&tempESP,4);
     memcpy((void*)process->task->tss->ESP-0xfc,&argc,4);
-    memcpy((void*)process->task->tss->ESP-0xf8,argv,4);
+    memcpy((void*)process->task->tss->ESP-0xf8,&argv,4);
     //Set the return point since the task will simply ret to exit
     //memcpy((void*)process->task->tss->ESP+8,&var,4);
     printd(DEBUG_PROCESS,"Return point for process is 0x%08X",&processWrapup);
@@ -89,5 +91,5 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
 
 void processWrapup()
 {
-    __asm__("mov ebx,eax\nmov eax,0x1\nint 0x80\n");
+    __asm__("mov ebx,eax\nmov eax,0x1\nmov ecx,cs\nint 0x80\n");
  }

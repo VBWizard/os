@@ -119,11 +119,11 @@ void *memset(void *d1, int val, size_t len)
     
     if ((len%4)==0)
     while (len-=4) {
-        *d++ = fVal;
+        *f++ = fVal;        //CLR 03/11/2017: Changed pointer from d to f
     }
     else if (((len%2)==0))
     while (len-=2) {
-        *d++ = eVal;
+        *e++ = eVal;        //CLR 03/11/2017: Changed pointer from d to e
     }
     else
     while (len--) {

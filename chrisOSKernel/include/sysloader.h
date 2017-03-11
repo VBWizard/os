@@ -9,6 +9,8 @@
 #define	SYSLOADER_H
 #include "process.h"
 #include "elf.h"
+#include "task.h"
+
 int sysExec(process_t* process,int argc,char** argv);
 uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isLibrary);
 #endif	/* SYSLOADER_H */

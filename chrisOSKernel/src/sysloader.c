@@ -517,9 +517,13 @@ void _sysCall()
     uint32_t callNum=0;
     uint32_t param1;
     uint32_t processID, cr3=KERNEL_CR3;
-
-    __asm__("cli\npushad\nmov %[callNum],eax\nmov %[param1],ebx\n":[callNum] "=r" (callNum),[param1] "=r" (param1)::"eax","ebx");
-    printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
+    uintptr_t localStack[100]={0};
+    
+    __asm__("cli\npushad\nmov %[callNum],eax\nmov %[param1],ebx\nstr ecx\n\n"
+        :[callNum] "=r" (callNum)
+        ,[param1] "=r" (param1)
+        ,[processID] "=c" (processID)::"eax","ebx");
+    //printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
 
     if (callNum==0)         //faking out the system while working on task switching
         callNum=1;
@@ -527,19 +531,12 @@ void _sysCall()
     switch (callNum)
     {
         case 0x0:
-            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, returning\n",callNum);
+            //printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, returning\n",callNum);
             break;
         case 0x1:       //exit
-             __asm__("mov ebx,cs;":"=b" (processID));
              //Get back home
-             __asm__("mov eax,0x28\npush eax\n"   //push ss
-                     "mov eax,esp\nadd eax,12\npush eax\n"  //push esp
-                     "pushf\n"                   //push flags
-                     "mov eax,0x20\npush eax\n"   //push cs
-                     "mov eax,syscallJump\npush eax\n" //push eip
-                     "iretd\n\nsyscallJump:":::"eax");
-             __asm__("mov eax,%[cr3]\nmov cr3,eax\n"::[cr3] "r" (cr3):"eax");
-         //    __asm__("jmp 0x20:syscallJump\nsyscallJump:\nmov eax,%[cr3]\nmov cr3,eax\n"::[cr3] "r" (cr3));
+             __asm__("cli\nmov eax,%[cr3]\nmov cr3,eax\n"::[cr3] "r" (cr3):"eax");
+             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
              printd(DEBUG_PROCESS,"syscall: Ending process 0x%04X\n",processID);
              markTaskEnded(processID);
              //****DESTROY STUFF HERE****

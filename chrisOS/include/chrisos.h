@@ -13,7 +13,8 @@
 #include "../../chrisOSKernel/include/task.h"
 
 #define TICKS_PER_SECOND 100
-#define TICKS_PER_SCHEDULE 2
+#define TICKS_PER_SCHEDULE 10
+//2
 //* 3
 
 //kernelDataLoadAddress is defined in kernelData2.ld.  It is the address of kernelData
@@ -119,7 +120,7 @@ extern char* kernelDataLoadAddress;
 #define DEBUG_PRINT_TO_PORT 1<<21
 #define DEBUG_DETAILED 1<<22
 #define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT
+#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT | DEBUG_PROCESS
 
 #define SCREEN_SPACES_PER_TAB 5
 
@@ -136,6 +137,8 @@ extern char* kernelDataLoadAddress;
 #define STOPHERE2 \
         __asm__("cli\n hlt\n");
 #define BREAKPOINT __asm__("int 0x3\n");
+
+#define PAUSEHERE {bool test=false;while(!test){}}
 
 #define CLI \
 __asm__("cli\n");

@@ -108,12 +108,13 @@ alltraps:
     str isrSavedTR
 
     #Save control registers
-    mov eax, cr0
-    mov isrSavedCR0, eax
-    mov eax, cr3
-    mov isrSavedCR3, eax
-    mov eax, cr4
-    mov isrSavedCR4, eax
+    #mov eax, cr0
+    #mov isrSavedCR0, eax
+    #Don't think we should ever save the CR3
+    #mov eax, cr3
+    #mov isrSavedCR3, eax
+    #mov eax, cr4
+    #mov isrSavedCR4, eax
 
     #Save general registers
     #no need to do this, they are already on the stack! (pushad)
@@ -146,9 +147,9 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
-    mov eax,isrNumber
-    cmp eax,0x20
-    je overSaveTheStack
+#    mov eax,isrNumber
+#    cmp eax,0x20
+#    je overSaveTheStack
     mov esi, isrSavedESP
 //        add esi, 16 #drop the 4 dwords that are passed to the proc
     mov edi, isrSavedStack
@@ -214,9 +215,9 @@ loadNewTask:
     #Restore the CR3 if it differs from the current one
 restoreCR3:
     mov eax,isrSavedCR3
-    mov ebx,cr3
-    cmp eax,ebx
-    jz  overSetCR3
+//    mov ebx,cr3
+//    cmp eax,ebx
+//    jz  overSetCR3
     mov CR3, eax
 
 overSetCR3:

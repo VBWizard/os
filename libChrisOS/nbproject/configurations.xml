@@ -36,6 +36,10 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}</output>
+          <commandLine>-T linker.ld</commandLine>
+        </linkerTool>
       </compileType>
       <item path="src/input.c" ex="false" tool="0" flavor2="0">
       </item>

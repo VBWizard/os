@@ -9,8 +9,8 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=cross-Linux
 CND_ARTIFACT_DIR_Debug=dist/Debug/cross-Linux
-CND_ARTIFACT_NAME_Debug=liblibChrisOS.so
-CND_ARTIFACT_PATH_Debug=dist/Debug/cross-Linux/liblibChrisOS.so
+CND_ARTIFACT_NAME_Debug=libc.so
+CND_ARTIFACT_PATH_Debug=dist/Debug/cross-Linux/libc.so
 CND_PACKAGE_DIR_Debug=dist/Debug/cross-Linux/package
 CND_PACKAGE_NAME_Debug=liblibChrisOS.so.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/cross-Linux/package/liblibChrisOS.so.tar
