@@ -45,7 +45,7 @@ uintptr_t oldCR3=0,newCR3;
                       __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
                       cr3Val;})
 
-void _sysCall();
+void _sysCall(uint32_t CallNum, uint32_t param1, uint32_t param2, uint32_t param3);
 
 
 char* strTabEntry(elfInfo_t* elf, int index)
@@ -512,41 +512,33 @@ int sysExec(process_t* process,int argc,char** argv)
 
 extern void markTaskEnded(uint32_t taskNum);
 
-void _sysCall()
+void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
 {
-    uint32_t callNum=0;
-    uint32_t param1;
-    uint32_t processID, cr3=KERNEL_CR3;
-    uintptr_t localStack[100]={0};
+    uint32_t processID, processCR3;
     
-    __asm__("cli\npushad\nmov %[callNum],eax\nmov %[param1],ebx\nstr ecx\n\n"
-        :[callNum] "=r" (callNum)
-        ,[param1] "=r" (param1)
-        ,[processID] "=c" (processID)::"eax","ebx");
-    //printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
+    __asm__("str ecx\nmov %[cr3],cr3":[processID] "=c" (processID),[cr3] "=a" (processCR3));
+    printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
 
-    if (callNum==0)         //faking out the system while working on task switching
-        callNum=1;
-    
     switch (callNum)
     {
         case 0x0:
-            //printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, returning\n",callNum);
+            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, invalid call number.\n",callNum);
             break;
         case 0x1:       //exit
              //Get back home
-             __asm__("cli\nmov eax,%[cr3]\nmov cr3,eax\n"::[cr3] "r" (cr3):"eax");
              __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
-             printd(DEBUG_PROCESS,"syscall: Ending process 0x%04X\n",processID);
-             markTaskEnded(processID);
+             __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
+             printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08X\n",processCR3);
+             markTaskEnded(processCR3);
+             printd(DEBUG_PROCESS,"syscall: The process is dead, long live the process!\n",processID);
              //****DESTROY STUFF HERE****
              //When a task is ended, the scheduler is will deal with it on the next tick, so lets wait for that to happen
              __asm__("sysCallIdleLoop: sti;hlt;jmp sysCallIdleLoop");
              panic("_syscall: exit call, continued after halt!");
-             __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\ncli\nhlt\n");               //We should never get here
+             __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
             break;
         default:
             panic("_syscall: Invalid call number 0x%04X\n",callNum);
     }
-    __asm__("popad; leave; sti; iret"); /* BLACK MAGIC! */
+    __asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
 }

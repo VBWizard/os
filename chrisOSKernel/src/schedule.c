@@ -52,7 +52,7 @@ const char* taskListName(task_t* list)
 
 void initSched()
 {
-    nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULE;
+    nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
     //Malloc zeroes out memory, so no need to initialize each list
     kTaskList0=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
     kTaskList1=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
@@ -119,7 +119,8 @@ task_t* findTaskInList(task_t* taskList, uint32_t taskNum)
             return task;
         task++;
     }
-    panic("couldn't find taks in the list");
+    panic("couldn't find task in the list");
+    return NULL;
 }
 
 void removeTaskFromList(task_t* taskList)
@@ -247,7 +248,7 @@ task_t* findFreeTaskSlot(task_t* taskList)
 //Copy the task into 
 task_t* submitNewTask(task_t* task)
 {
-    printd(DEBUG_PROCESS,"***Submitting new task %u***\n");
+    printd(DEBUG_PROCESS,"***Submitting new task 0x%04X***\n",task->taskNum);
     task_t* destTaskList;
 
     destTaskList=findFreeTaskSlot(kTaskList[TASK_RUNNABLE]);
@@ -314,6 +315,30 @@ task_t* changeTaskState(task_t* taskToStateChange, eTaskState newState)
     return destTaskList;
 }
 
+task_t* findTaskByCR3(uint32_t cr3, int *listNum)
+{
+    task_t* taskList;
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Finding task with CR3=0x%04X\n",cr3);
+    for (int cnt=0;cnt<6;cnt++)
+    {
+        *listNum=cnt;
+        taskList=kTaskList[cnt];
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Searching list %u starting at 0x%08X\n",cnt,taskList);
+        do
+        {
+            if (taskList->tss->CR3==cr3)
+                break;
+            taskList=taskList->next;
+        } while (taskList->next && taskList->next!=NO_NEXT);
+        
+        if (taskList->tss->CR3==cr3)
+            break;
+    }
+        
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Found task @ 0x%08X\n",taskList);
+    return taskList;
+}
+
 //Find a task by only task number when we don't know which list it is in
 task_t* findTaskByTaskNum(uint32_t taskNum,int *listNum)
 {
@@ -339,14 +364,13 @@ task_t* findTaskByTaskNum(uint32_t taskNum,int *listNum)
     return taskList;
 }
 
-void markTaskEnded(uint32_t taskNum)
+void markTaskEnded(uint32_t cr3)
 {
     int listNum=0;
-    taskNum >>=3;   //taskNum=Task Register task number, so shift it right to get our task #
-    task_t* taskList=findTaskByTaskNum(taskNum,&listNum);
+    task_t* taskList=findTaskByCR3(cr3,&listNum);
 
-    if (taskList->taskNum!=taskNum)
-        printd("endTaskByTaskNum: Could not find task 0x%04X to end\n");
+    if (taskList->tss->CR3!=cr3)
+        printd(DEBUG_PROCESS,"endTaskByTaskNum: Could not find task for CR3=0x%08X to end\n");
     else
     {
         taskList->exited=true;
@@ -388,33 +412,33 @@ task_t* findRunningTaskToReplace()
 
 void storeISRSavedRegs(task_t* task)
 {
-    printd(DEBUG_DETAILED,"Save: ");
+    printd(DEBUG_PROCESS,"Save: ");
     task->tss->CS=isrSavedCS;
-    printd(DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
+    printd(DEBUG_PROCESS,"CS=0x%04X,",task->tss->CS);
     task->tss->EIP=isrSavedEIP;
-    printd(DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
+    printd(DEBUG_PROCESS,"EIP=0x%08X,",task->tss->EIP);
     task->tss->SS=isrSavedSS;
-    printd(DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
+    printd(DEBUG_PROCESS,"SS=0x%08X,",task->tss->SS);
     task->tss->DS=isrSavedDS;
-    printd(DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_PROCESS,"DS=0x%08X,",task->tss->DS);
     task->tss->EAX=isrSavedEAX;
-    printd(DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
+    printd(DEBUG_PROCESS,"EAX=0x%08X,",task->tss->EAX);
     task->tss->EBX=isrSavedEBX;
-    printd(DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
+    printd(DEBUG_PROCESS,"DBX=0x%08X,",task->tss->EBX);
     task->tss->ECX=isrSavedECX;
-    printd(DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
+    printd(DEBUG_PROCESS,"ECX=0x%08X,",task->tss->ECX);
     task->tss->EDX=isrSavedEDX;
-    printd(DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
+    printd(DEBUG_PROCESS,"EDX=0x%08X,",task->tss->EDX);
     task->tss->ESI=isrSavedESI;
-    printd(DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
+    printd(DEBUG_PROCESS,"ESI=0x%08X,",task->tss->ESI);
     task->tss->EDI=isrSavedEDI;
-    printd(DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
+    printd(DEBUG_PROCESS,"EDI=0x%08X,",task->tss->EDI);
     task->tss->ESP=isrSavedESP;
-    printd(DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
+    printd(DEBUG_PROCESS,"ESP=0x%08X,",task->tss->ESP);
     task->tss->EBP=isrSavedEBP;
-    printd(DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
+    printd(DEBUG_PROCESS,"EBP=0x%08X,",task->tss->EBP);
     task->tss->EFLAGS=isrSavedFlags;
-    printd(DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
+    printd(DEBUG_PROCESS,"FLAGS=0x%08X\n",task->tss->EFLAGS);
     task->tss->ES=isrSavedES;
     task->tss->FS=isrSavedFS;
     task->tss->GS=isrSavedGS;
@@ -422,40 +446,40 @@ void storeISRSavedRegs(task_t* task)
 
 void loadISRSavedRegs(task_t* task)
 {
-    printd(DEBUG_DETAILED,"Load: ");
+    printd(DEBUG_PROCESS,"Load: ");
 
 
     isrSavedCS=task->tss->CS;
-    printd(DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
+    printd(DEBUG_PROCESS,"CS=0x%04X,",task->tss->CS);
     isrSavedEIP=task->tss->EIP;
-    printd(DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
+    printd(DEBUG_PROCESS,"EIP=0x%08X,",task->tss->EIP);
     isrSavedSS=task->tss->SS;
-    printd(DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
+    printd(DEBUG_PROCESS,"SS=0x%08X,",task->tss->SS);
     isrSavedDS=task->tss->DS;
-    printd(DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_PROCESS,"DS=0x%08X,",task->tss->DS);
     isrSavedEAX=task->tss->EAX;
-    printd(DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
+    printd(DEBUG_PROCESS,"EAX=0x%08X,",task->tss->EAX);
     isrSavedEBX=task->tss->EBX;
-    printd(DEBUG_DETAILED,"EBX=0x%08X,",task->tss->EBX);
+    printd(DEBUG_PROCESS,"EBX=0x%08X,",task->tss->EBX);
     isrSavedECX=task->tss->ECX;
-    printd(DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
+    printd(DEBUG_PROCESS,"ECX=0x%08X,",task->tss->ECX);
     isrSavedEDX=task->tss->EDX;
-    printd(DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
+    printd(DEBUG_PROCESS,"EDX=0x%08X,",task->tss->EDX);
     isrSavedESI=task->tss->ESI;
-    printd(DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
+    printd(DEBUG_PROCESS,"ESI=0x%08X,",task->tss->ESI);
     isrSavedEDI=task->tss->EDI;
-    printd(DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
+    printd(DEBUG_PROCESS,"EDI=0x%08X,",task->tss->EDI);
     isrSavedESP=task->tss->ESP;
-    printd(DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
+    printd(DEBUG_PROCESS,"ESP=0x%08X,",task->tss->ESP);
     isrSavedEBP=task->tss->EBP;
-    printd(DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
+    printd(DEBUG_PROCESS,"EBP=0x%08X,",task->tss->EBP);
     isrSavedFlags=task->tss->EFLAGS;
-    printd(DEBUG_DETAILED,"FLAGS=0x%08X,",task->tss->EFLAGS);
+    printd(DEBUG_PROCESS,"FLAGS=0x%08X,",task->tss->EFLAGS);
     isrSavedES=task->tss->ES;
     isrSavedFS=task->tss->FS;
     isrSavedGS=task->tss->GS;
     isrSavedCR3=task->tss->CR3;
-    printd(DEBUG_DETAILED,"CR3=0x%08X\n",task->tss->CR3);
+    printd(DEBUG_PROCESS,"CR3=0x%08X\n",task->tss->CR3);
 }
 
 task_t* findFirstActiveTaskInListL(task_t* taskList)
@@ -501,11 +525,12 @@ void scheduler()
     task_t* taskToStop = {0};
     task_t* tempTask=kTaskList[TASK_RUNNABLE];
     uint32_t oldCR3;
-    if (*kTicksSinceStart<nextScheduleTicks)
-        return;
-    nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULE;
 
-    __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
+    //NOTE: When this method is entered, it is time to reschedule.  The check for whether it is time is in kIRQ0_handler()
+    
+    nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
+
+    __asm__("mov ebx,cr3\nmov cr3,%[cr3Val]\n"
             :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
     printd(DEBUG_PROCESS,"\n****************************** TASK SWITCH ******************************\n");
     printd(DEBUG_PROCESS,"*Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
@@ -536,7 +561,7 @@ void scheduler()
             //save old task's state
             if (taskToStop->exited)
             {
-            printd(DEBUG_PROCESS,"*Task (0x%04X) stopped, removing it.\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
+            printd(DEBUG_PROCESS,"*Task (0x%04X) ended, removing it from all lists.\n",taskToStop->taskNum);
                 taskToStop=changeTaskState(taskToStop,TASK_EXITED);
             }
             else

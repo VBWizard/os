@@ -240,11 +240,11 @@ getExceptionDetailsWithError:
      mov exceptionErrorCode, bx
 
 saveTheStack:
-jmp overSaveTheStack
+#jmp overSaveTheStack
         mov esi, exceptionSavedESP
 //        add esi, 16 #drop the 4 dwords that are passed to the proc
         mov edi, exceptionSavedStack
-        mov cx, 30
+        mov cx, 40
         cld
         rep movsd
 

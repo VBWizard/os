@@ -7,7 +7,7 @@
 #include "kIRQHandlers.h"
 
 bool schedulerEnabled=false;
-
+extern uint32_t nextScheduleTicks;
 
 void kIRQ0_handler()
 {
@@ -18,7 +18,7 @@ static struct tm theDateTime;
     *kTicksSinceStart=*kTicksSinceStart+1;
     if (*kTicksSinceStart % kTicksPerSecond == 0)
         kSystemCurrentTime++;
-    if (schedulerEnabled)
+    if (schedulerEnabled && (*kTicksSinceStart>nextScheduleTicks))
         scheduler();
 #ifndef DEBUG_EXPANDED_TICK
         if ((kDebugLevel & DEBUG_EXPANDED_TICK) == DEBUG_EXPANDED_TICK)

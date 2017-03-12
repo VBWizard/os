@@ -21,8 +21,11 @@ int main(int argc, char** argv) {
         printk("Param %u=%s\n",cnt,argv[cnt]);
     }
     jumpHere:
-//        //printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp++);
+/*    if (temp%1000000==0)
+        printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp);
+    temp++;
     goto jumpHere;
-//    __asm__("mov eax,0\ncld\nint 0x80\n");
+*/    __asm__("mov eax,0\ncld\nint 0x80\n");
+//    goto jumpHere;
     return 0x1234;
 }

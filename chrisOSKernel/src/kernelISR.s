@@ -1,60 +1,25 @@
 .intel_syntax noprefix
 .section .text
-#.globl   _isrSaved_wrapper
 .align   4
 .code32
 
 .extern isrSavedCS, isrSavedEIP, isrSavedErrorCode, isrSavedEAX, isrSavedEBX, isrSavedECX, isrSavedEDX, isrSavedESI, isrSavedEDI, isrSavedEBP, isrSavedCR0, isrSavedCR1, isrSavedCR4, isrSavedDS, isrSavedES, isrSavedFS, isrSavedGS, isrSavedSS, isrSavedNumber, isrSavedCR2, isrSavedESP, isrSavedFlags, isrSavedStack
 .extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, isrSavedTR
 .extern kIRQ0_handler
+.extern _sysCall
 .extern schedulerTaskSwitched
 .extern kTaskSwitchCount
+.extern kDebugLevel
+.extern kTicksSinceStart
+.extern nextScheduleTicks
+.extern kKernelCR3
 
 isrNumber: .word 0,0
-
-irq0_dedicated_stack: .word
-.skip 1000
-
-.global _irq0_handler
-_irq0_handler:                #remapped to 0x08
-    push    ebp
-    pushf
-    mov     ebp, esp
-    add ebp,4
-    push eax
-    mov ax,0xFFFF
-    cld
-    #cld #C code following the sysV ABI requires DF to be clear on function entry
-    push    ebx
-    mov ebx, [ebp+12]
-    mov exceptionFlags, ebx
-    mov bx, [ebp+8]
-    mov exceptionCS, bx
-    mov ebx, [ebp+4]
-    mov exceptionEIP, ebx
-    pop ebx
-    pushad                          # other regs because its an ISR
-     mov     bx, 0x10
-    mov     ds, bx
-    mov     es, bx                  # load ds and es with valid selector
-    mov     gs, bx
-    call    kIRQ0_handler          # call actual ISR code
-    popad  
-    mov al,0x20
-    out 0x20,al
-    //mov eax,0
-    //mov [0xa000B0],eax
-    pop eax
-    popf
-    pop ebp                         # restoring the regs
-    sti
-    iretd
-
 
 .globl alltraps
 .type alltraps, @function
 alltraps:
-    cli
+    #NOTE: CLI not necessary, Interrupt Gate
     push eax
     push ds
     mov eax,0x10
@@ -63,66 +28,49 @@ alltraps:
     mov isrSavedDS,eax
     pop eax
     mov isrSavedEAX,eax
-
-//mov eax,timesPastThisPoint
-//inc eax
-//mov timesPastThisPoint,eax
-//cmp eax,1
-//jne overDebug
-//j1:
-//jmp j1
-//overDebug:
-
     mov eax,[esp]
     mov isrNumber,eax         #second vector push was ISR #
     mov eax,esp
     add eax,8                 #Get rid of the vector parameters in the saved esp
     mov isrSavedESP,eax
     mov isrSavedEBP, ebp
-    mov eax,isrSavedEAX
     mov ebp,esp
     add ebp,8
     mov eax,ss
     mov isrSavedSS,eax
+    mov eax,isrSavedEAX
     pushad                          # other regs because its an ISR
+    mov isrSavedEBX,ebx
+    mov isrSavedECX,ecx
 
-    #Save segment registers
-    mov eax,0
+    mov eax,kDebugLevel
+    and  eax,0x800000
+    jz  overCPUDebug
+    mov isrSavedEDX,edx
+    mov isrSavedESI,esi
+    mov isrSavedEDI,edi
     mov eax,es
     mov isrSavedES,eax
     mov eax,fs
     mov isrSavedFS,eax
     mov eax,gs
     mov isrSavedGS,eax
+    #Save the task register
+    str isrSavedTR
+overCPUDebug:
+    #Save segment registers
 
     mov eax,0x10
     mov ds,ax
     mov es,ax
     mov fs,ax
     mov gs,ax
-
     mov eax,0x28
     mov ss,eax
-
-    #Save the task register
-    str isrSavedTR
-
     #Save control registers
-    #mov eax, cr0
-    #mov isrSavedCR0, eax
-    #Don't think we should ever save the CR3
-    #mov eax, cr3
-    #mov isrSavedCR3, eax
-    #mov eax, cr4
-    #mov isrSavedCR4, eax
-
+    #No need to do this as they won't change
     #Save general registers
     #no need to do this, they are already on the stack! (pushad)
-    mov bx, 0x10
-    mov ds, bx
-    mov es, bx                  # load ds and es with valid selector
-    mov gs, bx
-
     mov ebx,isrNumber
     mov bl,[_isr_has_errorCode+ebx]
     cmp bl,1
@@ -147,9 +95,9 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
-#    mov eax,isrNumber
-#    cmp eax,0x20
-#    je overSaveTheStack
+    mov eax,isrNumber
+    cmp eax,0x20
+    je overSaveTheStack
     mov esi, isrSavedESP
 //        add esi, 16 #drop the 4 dwords that are passed to the proc
     mov edi, isrSavedStack
@@ -161,21 +109,36 @@ overSaveTheStack:
     cmp eax,0x20
     jne notIRQ0Handler
     call kIRQ0_handler
-    jmp onTheWayOut
+    jmp ckeckForIRQResponse
 notIRQ0Handler:
     cmp eax,0xe
     jne notPagingHandler
     call pagingExceptionHandler
-    jmp onTheWayOut
+    jmp ckeckForIRQResponse
 notPagingHandler:
+    cmp eax,0x80
+    jne notSysCallHandler
+    mov eax,cr3
+    push eax
+    mov eax,kKernelCR3
+    pushd isrSavedEDX
+    pushd isrSavedECX
+    pushd isrSavedEBX
+    pushd isrSavedEAX
+    call _sysCall
+    add esp,16                      #get rid of the registers we pushed on the stack before calling sysCall
+    pop eax                         #pop cr3
+    mov cr3,eax
+    jmp noIRQResponseRequired
+notSysCallHandler:
     call defaultISRHandler
-onTheWayOut:
+ckeckForIRQResponse:
     mov eax,isrNumber
     cmp eax,0x20                    #If this is the IRQ0 exception, respond to the PIC
-    jne theWayOut
+    jne noIRQResponseRequired
     mov al,0x20
     out 0x20,al
-theWayOut:
+noIRQResponseRequired:
     popad                           # restoring the regs - only EBX and ESP modified after this point
     #dont' need to release vector parameters because we did when we saved the ESP
     #add esp,8                   #release the vector parameters from the stack
@@ -188,9 +151,8 @@ theWayOut:
     mov bx, isrSavedGS
     mov gs, bx
     mov ebp,isrSavedEBP
-isrCommonExit:
+    #Adjust the stack if the exception had an error code (get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. )
     mov esp, isrSavedESP
-#        add esp, 4 #get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. 
     mov ebx,isrNumber
     mov bl,[_isr_has_errorCode+ebx]
     cmp bl,1
@@ -201,10 +163,10 @@ overCorrection:
     cmp al,0
     mov eax, isrSavedEAX
     mov ebx,isrSavedEBX
-    jnz loadNewTask
+    jnz newTaskLoaded
     iretd
 
-loadNewTask:
+newTaskLoaded:
     #Stack is already where it was when we started the ISR
     #reset the task switched indicator
     mov eax,0
@@ -215,15 +177,15 @@ loadNewTask:
     #Restore the CR3 if it differs from the current one
 restoreCR3:
     mov eax,isrSavedCR3
-//    mov ebx,cr3
-//    cmp eax,ebx
-//    jz  overSetCR3
+    mov ebx,cr3
+    cmp eax,ebx
+    jz  overSetCR3
     mov CR3, eax
 
 overSetCR3:
     mov eax, isrSavedEAX
     mov ebx, isrSavedEAX
-    iret
+    iretd
 
 timesPastThisPoint: .word  0x0,0x0
 
@@ -1764,5 +1726,18 @@ vectors:
   .long vector255
 
 _isr_has_errorCode:  .byte      0,0,0,0,0,0,0,0, 1,0,1,1,1,1,1,0
-                     .byte      0,1,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0
-
+                     .byte      0,1,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+                     .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0

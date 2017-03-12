@@ -2496,16 +2496,32 @@ int main(int argc, char** argv) {
 10000e1f:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
 10000e22:	3b 03                	cmp    eax,DWORD PTR [ebx]
 10000e24:	7c d0                	jl     10000df6 <main+0x3a>
-/home/yogi/src/os/testMainProgramEntry/main.c:25 (discriminator 1)
-    {
-        printk("Param %u=%s\n",cnt,argv[cnt]);
-    }
+/home/yogi/src/os/testMainProgramEntry/main.c:28
     jumpHere:
-//        //printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp++);
+/*    if (temp%1000000==0)
+        printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp);
+    temp++;
     goto jumpHere;
-10000e26:	eb fe                	jmp    10000e26 <main+0x6a>
+*/    __asm__("mov eax,0\ncld\nint 0x80\n");
+10000e26:	b8 00 00 00 00       	mov    eax,0x0
+10000e2b:	fc                   	cld    
+10000e2c:	cd 80                	int    0x80
+/home/yogi/src/os/testMainProgramEntry/main.c:30
+//    goto jumpHere;
+    return 0x1234;
+10000e2e:	b8 34 12 00 00       	mov    eax,0x1234
+/home/yogi/src/os/testMainProgramEntry/main.c:31
+}
+10000e33:	8d 65 f8             	lea    esp,[ebp-0x8]
+10000e36:	59                   	pop    ecx
+10000e37:	5b                   	pop    ebx
+10000e38:	5d                   	pop    ebp
+10000e39:	8d 61 fc             	lea    esp,[ecx-0x4]
+10000e3c:	c3                   	ret    
+10000e3d:	66 90                	xchg   ax,ax
+10000e3f:	90                   	nop
 
-10000e28 <time>:
+10000e40 <time>:
 time():
 /home/yogi/src/os/testMainProgramEntry/time.c:83
   {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
@@ -2514,178 +2530,178 @@ time():
 extern time_t kSystemCurrentTime;
 time_t time(time_t* arg)
 {
-10000e28:	55                   	push   ebp
-10000e29:	89 e5                	mov    ebp,esp
+10000e40:	55                   	push   ebp
+10000e41:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/time.c:84
     *arg = kSystemCurrentTime;
-10000e2b:	8b 15 cc 97 12 00    	mov    edx,DWORD PTR ds:0x1297cc
-10000e31:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10000e34:	89 10                	mov    DWORD PTR [eax],edx
+10000e43:	8b 15 cc 97 12 00    	mov    edx,DWORD PTR ds:0x1297cc
+10000e49:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10000e4c:	89 10                	mov    DWORD PTR [eax],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:85
     return kSystemCurrentTime;
-10000e36:	a1 cc 97 12 00       	mov    eax,ds:0x1297cc
+10000e4e:	a1 cc 97 12 00       	mov    eax,ds:0x1297cc
 /home/yogi/src/os/testMainProgramEntry/time.c:86
 }
-10000e3b:	5d                   	pop    ebp
-10000e3c:	c3                   	ret    
+10000e53:	5d                   	pop    ebp
+10000e54:	c3                   	ret    
 
-10000e3d <gmtime_r>:
+10000e55 <gmtime_r>:
 gmtime_r():
 /home/yogi/src/os/testMainProgramEntry/time.c:88
 
 struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
-10000e3d:	55                   	push   ebp
-10000e3e:	89 e5                	mov    ebp,esp
-10000e40:	83 ec 10             	sub    esp,0x10
+10000e55:	55                   	push   ebp
+10000e56:	89 e5                	mov    ebp,esp
+10000e58:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/time.c:89
   time_t time = *timer;
-10000e43:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10000e46:	8b 00                	mov    eax,DWORD PTR [eax]
-10000e48:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+10000e5b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10000e5e:	8b 00                	mov    eax,DWORD PTR [eax]
+10000e60:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:91
   unsigned long dayclock, dayno;
   int year = EPOCH_YR;
-10000e4b:	c7 45 f8 b2 07 00 00 	mov    DWORD PTR [ebp-0x8],0x7b2
+10000e63:	c7 45 f8 b2 07 00 00 	mov    DWORD PTR [ebp-0x8],0x7b2
 /home/yogi/src/os/testMainProgramEntry/time.c:93
 
   dayclock = (unsigned long) time % SECS_DAY;
-10000e52:	8b 4d f4             	mov    ecx,DWORD PTR [ebp-0xc]
-10000e55:	ba 07 45 2e c2       	mov    edx,0xc22e4507
-10000e5a:	89 c8                	mov    eax,ecx
-10000e5c:	f7 e2                	mul    edx
-10000e5e:	89 d0                	mov    eax,edx
-10000e60:	c1 e8 10             	shr    eax,0x10
-10000e63:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
-10000e66:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
-10000e69:	69 c0 80 51 01 00    	imul   eax,eax,0x15180
-10000e6f:	29 c1                	sub    ecx,eax
-10000e71:	89 c8                	mov    eax,ecx
-10000e73:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
+10000e6a:	8b 4d f4             	mov    ecx,DWORD PTR [ebp-0xc]
+10000e6d:	ba 07 45 2e c2       	mov    edx,0xc22e4507
+10000e72:	89 c8                	mov    eax,ecx
+10000e74:	f7 e2                	mul    edx
+10000e76:	89 d0                	mov    eax,edx
+10000e78:	c1 e8 10             	shr    eax,0x10
+10000e7b:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
+10000e7e:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
+10000e81:	69 c0 80 51 01 00    	imul   eax,eax,0x15180
+10000e87:	29 c1                	sub    ecx,eax
+10000e89:	89 c8                	mov    eax,ecx
+10000e8b:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:94
   dayno = (unsigned long) time / SECS_DAY;
-10000e76:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-10000e79:	ba 07 45 2e c2       	mov    edx,0xc22e4507
-10000e7e:	f7 e2                	mul    edx
-10000e80:	89 d0                	mov    eax,edx
-10000e82:	c1 e8 10             	shr    eax,0x10
-10000e85:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
+10000e8e:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+10000e91:	ba 07 45 2e c2       	mov    edx,0xc22e4507
+10000e96:	f7 e2                	mul    edx
+10000e98:	89 d0                	mov    eax,edx
+10000e9a:	c1 e8 10             	shr    eax,0x10
+10000e9d:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:96
 
   tmbuf->tm_sec = dayclock % 60;
-10000e88:	8b 4d f0             	mov    ecx,DWORD PTR [ebp-0x10]
-10000e8b:	ba 89 88 88 88       	mov    edx,0x88888889
-10000e90:	89 c8                	mov    eax,ecx
-10000e92:	f7 e2                	mul    edx
-10000e94:	89 d0                	mov    eax,edx
-10000e96:	c1 e8 05             	shr    eax,0x5
-10000e99:	89 c2                	mov    edx,eax
-10000e9b:	8d 04 95 00 00 00 00 	lea    eax,[edx*4+0x0]
-10000ea2:	89 c2                	mov    edx,eax
-10000ea4:	89 d0                	mov    eax,edx
-10000ea6:	c1 e0 04             	shl    eax,0x4
-10000ea9:	29 d0                	sub    eax,edx
-10000eab:	29 c1                	sub    ecx,eax
-10000ead:	89 c8                	mov    eax,ecx
-10000eaf:	89 c2                	mov    edx,eax
-10000eb1:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000eb4:	89 10                	mov    DWORD PTR [eax],edx
+10000ea0:	8b 4d f0             	mov    ecx,DWORD PTR [ebp-0x10]
+10000ea3:	ba 89 88 88 88       	mov    edx,0x88888889
+10000ea8:	89 c8                	mov    eax,ecx
+10000eaa:	f7 e2                	mul    edx
+10000eac:	89 d0                	mov    eax,edx
+10000eae:	c1 e8 05             	shr    eax,0x5
+10000eb1:	89 c2                	mov    edx,eax
+10000eb3:	8d 04 95 00 00 00 00 	lea    eax,[edx*4+0x0]
+10000eba:	89 c2                	mov    edx,eax
+10000ebc:	89 d0                	mov    eax,edx
+10000ebe:	c1 e0 04             	shl    eax,0x4
+10000ec1:	29 d0                	sub    eax,edx
+10000ec3:	29 c1                	sub    ecx,eax
+10000ec5:	89 c8                	mov    eax,ecx
+10000ec7:	89 c2                	mov    edx,eax
+10000ec9:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000ecc:	89 10                	mov    DWORD PTR [eax],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:97
   tmbuf->tm_min = (dayclock % 3600) / 60;
-10000eb6:	8b 4d f0             	mov    ecx,DWORD PTR [ebp-0x10]
-10000eb9:	ba c5 b3 a2 91       	mov    edx,0x91a2b3c5
-10000ebe:	89 c8                	mov    eax,ecx
-10000ec0:	f7 e2                	mul    edx
-10000ec2:	89 d0                	mov    eax,edx
-10000ec4:	c1 e8 0b             	shr    eax,0xb
-10000ec7:	69 c0 10 0e 00 00    	imul   eax,eax,0xe10
-10000ecd:	29 c1                	sub    ecx,eax
-10000ecf:	89 c8                	mov    eax,ecx
-10000ed1:	ba 89 88 88 88       	mov    edx,0x88888889
-10000ed6:	f7 e2                	mul    edx
-10000ed8:	89 d0                	mov    eax,edx
-10000eda:	c1 e8 05             	shr    eax,0x5
-10000edd:	89 c2                	mov    edx,eax
-10000edf:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000ee2:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
+10000ece:	8b 4d f0             	mov    ecx,DWORD PTR [ebp-0x10]
+10000ed1:	ba c5 b3 a2 91       	mov    edx,0x91a2b3c5
+10000ed6:	89 c8                	mov    eax,ecx
+10000ed8:	f7 e2                	mul    edx
+10000eda:	89 d0                	mov    eax,edx
+10000edc:	c1 e8 0b             	shr    eax,0xb
+10000edf:	69 c0 10 0e 00 00    	imul   eax,eax,0xe10
+10000ee5:	29 c1                	sub    ecx,eax
+10000ee7:	89 c8                	mov    eax,ecx
+10000ee9:	ba 89 88 88 88       	mov    edx,0x88888889
+10000eee:	f7 e2                	mul    edx
+10000ef0:	89 d0                	mov    eax,edx
+10000ef2:	c1 e8 05             	shr    eax,0x5
+10000ef5:	89 c2                	mov    edx,eax
+10000ef7:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000efa:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:98
   tmbuf->tm_hour = dayclock / 3600;
-10000ee5:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
-10000ee8:	ba c5 b3 a2 91       	mov    edx,0x91a2b3c5
-10000eed:	f7 e2                	mul    edx
-10000eef:	89 d0                	mov    eax,edx
-10000ef1:	c1 e8 0b             	shr    eax,0xb
-10000ef4:	89 c2                	mov    edx,eax
-10000ef6:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000ef9:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
+10000efd:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
+10000f00:	ba c5 b3 a2 91       	mov    edx,0x91a2b3c5
+10000f05:	f7 e2                	mul    edx
+10000f07:	89 d0                	mov    eax,edx
+10000f09:	c1 e8 0b             	shr    eax,0xb
+10000f0c:	89 c2                	mov    edx,eax
+10000f0e:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000f11:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:99
   tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
-10000efc:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
-10000eff:	8d 48 04             	lea    ecx,[eax+0x4]
-10000f02:	ba 25 49 92 24       	mov    edx,0x24924925
-10000f07:	89 c8                	mov    eax,ecx
-10000f09:	f7 e2                	mul    edx
-10000f0b:	89 c8                	mov    eax,ecx
-10000f0d:	29 d0                	sub    eax,edx
-10000f0f:	d1 e8                	shr    eax,1
-10000f11:	01 d0                	add    eax,edx
-10000f13:	c1 e8 02             	shr    eax,0x2
-10000f16:	89 c2                	mov    edx,eax
-10000f18:	c1 e2 03             	shl    edx,0x3
-10000f1b:	29 c2                	sub    edx,eax
-10000f1d:	89 c8                	mov    eax,ecx
-10000f1f:	29 d0                	sub    eax,edx
-10000f21:	89 c2                	mov    edx,eax
-10000f23:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10000f26:	89 50 18             	mov    DWORD PTR [eax+0x18],edx
+10000f14:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
+10000f17:	8d 48 04             	lea    ecx,[eax+0x4]
+10000f1a:	ba 25 49 92 24       	mov    edx,0x24924925
+10000f1f:	89 c8                	mov    eax,ecx
+10000f21:	f7 e2                	mul    edx
+10000f23:	89 c8                	mov    eax,ecx
+10000f25:	29 d0                	sub    eax,edx
+10000f27:	d1 e8                	shr    eax,1
+10000f29:	01 d0                	add    eax,edx
+10000f2b:	c1 e8 02             	shr    eax,0x2
+10000f2e:	89 c2                	mov    edx,eax
+10000f30:	c1 e2 03             	shl    edx,0x3
+10000f33:	29 c2                	sub    edx,eax
+10000f35:	89 c8                	mov    eax,ecx
+10000f37:	29 d0                	sub    eax,edx
+10000f39:	89 c2                	mov    edx,eax
+10000f3b:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10000f3e:	89 50 18             	mov    DWORD PTR [eax+0x18],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:100
   while (dayno >= (unsigned long) YEARSIZE(year)) {
-10000f29:	eb 66                	jmp    10000f91 <gmtime_r+0x154>
+10000f41:	eb 66                	jmp    10000fa9 <gmtime_r+0x154>
 /home/yogi/src/os/testMainProgramEntry/time.c:101
     dayno -= YEARSIZE(year);
-10000f2b:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
-10000f2e:	83 e0 03             	and    eax,0x3
-10000f31:	85 c0                	test   eax,eax
-10000f33:	75 50                	jne    10000f85 <gmtime_r+0x148>
+10000f43:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
+10000f46:	83 e0 03             	and    eax,0x3
+10000f49:	85 c0                	test   eax,eax
+10000f4b:	75 50                	jne    10000f9d <gmtime_r+0x148>
 /home/yogi/src/os/testMainProgramEntry/time.c:101 (discriminator 1)
-10000f35:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
-10000f38:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10000f3d:	89 c8                	mov    eax,ecx
-10000f3f:	f7 ea                	imul   edx
-10000f41:	c1 fa 05             	sar    edx,0x5
-10000f44:	89 c8                	mov    eax,ecx
-10000f46:	c1 f8 1f             	sar    eax,0x1f
-10000f49:	29 c2                	sub    edx,eax
-10000f4b:	89 d0                	mov    eax,edx
-10000f4d:	6b c0 64             	imul   eax,eax,0x64
-10000f50:	29 c1                	sub    ecx,eax
-10000f52:	89 c8                	mov    eax,ecx
-10000f54:	85 c0                	test   eax,eax
-10000f56:	75 26                	jne    10000f7e <gmtime_r+0x141>
+10000f4d:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
+10000f50:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+10000f55:	89 c8                	mov    eax,ecx
+10000f57:	f7 ea                	imul   edx
+10000f59:	c1 fa 05             	sar    edx,0x5
+10000f5c:	89 c8                	mov    eax,ecx
+10000f5e:	c1 f8 1f             	sar    eax,0x1f
+10000f61:	29 c2                	sub    edx,eax
+10000f63:	89 d0                	mov    eax,edx
+10000f65:	6b c0 64             	imul   eax,eax,0x64
+10000f68:	29 c1                	sub    ecx,eax
+10000f6a:	89 c8                	mov    eax,ecx
+10000f6c:	85 c0                	test   eax,eax
+10000f6e:	75 26                	jne    10000f96 <gmtime_r+0x141>
 /home/yogi/src/os/testMainProgramEntry/time.c:101 (discriminator 4)
-10000f58:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
-10000f5b:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10000f60:	89 c8                	mov    eax,ecx
-10000f62:	f7 ea                	imul   edx
-10000f64:	c1 fa 07             	sar    edx,0x7
-10000f67:	89 c8                	mov    eax,ecx
-10000f69:	c1 f8 1f             	sar    eax,0x1f
-10000f6c:	29 c2                	sub    edx,eax
-10000f6e:	89 d0                	mov    eax,edx
-10000f70:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-10000f76:	29 c1                	sub    ecx,eax
+10000f70:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
+10000f73:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 10000f78:	89 c8                	mov    eax,ecx
-10000f7a:	85 c0                	test   eax,eax
-10000f7c:	75 07                	jne    10000f85 <gmtime_r+0x148>
+10000f7a:	f7 ea                	imul   edx
+10000f7c:	c1 fa 07             	sar    edx,0x7
+10000f7f:	89 c8                	mov    eax,ecx
+10000f81:	c1 f8 1f             	sar    eax,0x1f
+10000f84:	29 c2                	sub    edx,eax
+10000f86:	89 d0                	mov    eax,edx
+10000f88:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+10000f8e:	29 c1                	sub    ecx,eax
+10000f90:	89 c8                	mov    eax,ecx
+10000f92:	85 c0                	test   eax,eax
+10000f94:	75 07                	jne    10000f9d <gmtime_r+0x148>
 /home/yogi/src/os/testMainProgramEntry/time.c:101 (discriminator 5)
-10000f7e:	b8 6e 01 00 00       	mov    eax,0x16e
-10000f83:	eb 05                	jmp    10000f8a <gmtime_r+0x14d>
+10000f96:	b8 6e 01 00 00       	mov    eax,0x16e
+10000f9b:	eb 05                	jmp    10000fa2 <gmtime_r+0x14d>
 /home/yogi/src/os/testMainProgramEntry/time.c:101 (discriminator 6)
-10000f85:	b8 6d 01 00 00       	mov    eax,0x16d
+10000f9d:	b8 6d 01 00 00       	mov    eax,0x16d
 /home/yogi/src/os/testMainProgramEntry/time.c:101 (discriminator 8)
-10000f8a:	29 45 fc             	sub    DWORD PTR [ebp-0x4],eax
+10000fa2:	29 45 fc             	sub    DWORD PTR [ebp-0x4],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:102 (discriminator 8)
     year++;
-10000f8d:	83 45 f8 01          	add    DWORD PTR [ebp-0x8],0x1
+10000fa5:	83 45 f8 01          	add    DWORD PTR [ebp-0x8],0x1
 /home/yogi/src/os/testMainProgramEntry/time.c:100
 
   tmbuf->tm_sec = dayclock % 60;
@@ -2693,127 +2709,127 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_hour = dayclock / 3600;
   tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
   while (dayno >= (unsigned long) YEARSIZE(year)) {
-10000f91:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
-10000f94:	83 e0 03             	and    eax,0x3
-10000f97:	85 c0                	test   eax,eax
-10000f99:	75 50                	jne    10000feb <gmtime_r+0x1ae>
+10000fa9:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
+10000fac:	83 e0 03             	and    eax,0x3
+10000faf:	85 c0                	test   eax,eax
+10000fb1:	75 50                	jne    10001003 <gmtime_r+0x1ae>
 /home/yogi/src/os/testMainProgramEntry/time.c:100 (discriminator 1)
-10000f9b:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
-10000f9e:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10000fa3:	89 c8                	mov    eax,ecx
-10000fa5:	f7 ea                	imul   edx
-10000fa7:	c1 fa 05             	sar    edx,0x5
-10000faa:	89 c8                	mov    eax,ecx
-10000fac:	c1 f8 1f             	sar    eax,0x1f
-10000faf:	29 c2                	sub    edx,eax
-10000fb1:	89 d0                	mov    eax,edx
-10000fb3:	6b c0 64             	imul   eax,eax,0x64
-10000fb6:	29 c1                	sub    ecx,eax
-10000fb8:	89 c8                	mov    eax,ecx
-10000fba:	85 c0                	test   eax,eax
-10000fbc:	75 26                	jne    10000fe4 <gmtime_r+0x1a7>
+10000fb3:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
+10000fb6:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+10000fbb:	89 c8                	mov    eax,ecx
+10000fbd:	f7 ea                	imul   edx
+10000fbf:	c1 fa 05             	sar    edx,0x5
+10000fc2:	89 c8                	mov    eax,ecx
+10000fc4:	c1 f8 1f             	sar    eax,0x1f
+10000fc7:	29 c2                	sub    edx,eax
+10000fc9:	89 d0                	mov    eax,edx
+10000fcb:	6b c0 64             	imul   eax,eax,0x64
+10000fce:	29 c1                	sub    ecx,eax
+10000fd0:	89 c8                	mov    eax,ecx
+10000fd2:	85 c0                	test   eax,eax
+10000fd4:	75 26                	jne    10000ffc <gmtime_r+0x1a7>
 /home/yogi/src/os/testMainProgramEntry/time.c:100 (discriminator 4)
-10000fbe:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
-10000fc1:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10000fc6:	89 c8                	mov    eax,ecx
-10000fc8:	f7 ea                	imul   edx
-10000fca:	c1 fa 07             	sar    edx,0x7
-10000fcd:	89 c8                	mov    eax,ecx
-10000fcf:	c1 f8 1f             	sar    eax,0x1f
-10000fd2:	29 c2                	sub    edx,eax
-10000fd4:	89 d0                	mov    eax,edx
-10000fd6:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-10000fdc:	29 c1                	sub    ecx,eax
+10000fd6:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
+10000fd9:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 10000fde:	89 c8                	mov    eax,ecx
-10000fe0:	85 c0                	test   eax,eax
-10000fe2:	75 07                	jne    10000feb <gmtime_r+0x1ae>
+10000fe0:	f7 ea                	imul   edx
+10000fe2:	c1 fa 07             	sar    edx,0x7
+10000fe5:	89 c8                	mov    eax,ecx
+10000fe7:	c1 f8 1f             	sar    eax,0x1f
+10000fea:	29 c2                	sub    edx,eax
+10000fec:	89 d0                	mov    eax,edx
+10000fee:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+10000ff4:	29 c1                	sub    ecx,eax
+10000ff6:	89 c8                	mov    eax,ecx
+10000ff8:	85 c0                	test   eax,eax
+10000ffa:	75 07                	jne    10001003 <gmtime_r+0x1ae>
 /home/yogi/src/os/testMainProgramEntry/time.c:100 (discriminator 5)
-10000fe4:	b8 6e 01 00 00       	mov    eax,0x16e
-10000fe9:	eb 05                	jmp    10000ff0 <gmtime_r+0x1b3>
+10000ffc:	b8 6e 01 00 00       	mov    eax,0x16e
+10001001:	eb 05                	jmp    10001008 <gmtime_r+0x1b3>
 /home/yogi/src/os/testMainProgramEntry/time.c:100 (discriminator 6)
-10000feb:	b8 6d 01 00 00       	mov    eax,0x16d
+10001003:	b8 6d 01 00 00       	mov    eax,0x16d
 /home/yogi/src/os/testMainProgramEntry/time.c:100 (discriminator 8)
-10000ff0:	3b 45 fc             	cmp    eax,DWORD PTR [ebp-0x4]
-10000ff3:	0f 86 32 ff ff ff    	jbe    10000f2b <gmtime_r+0xee>
+10001008:	3b 45 fc             	cmp    eax,DWORD PTR [ebp-0x4]
+1000100b:	0f 86 32 ff ff ff    	jbe    10000f43 <gmtime_r+0xee>
 /home/yogi/src/os/testMainProgramEntry/time.c:104
     dayno -= YEARSIZE(year);
     year++;
   }
   tmbuf->tm_year = year - YEAR0;
-10000ff9:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
-10000ffc:	8d 90 94 f8 ff ff    	lea    edx,[eax-0x76c]
-10001002:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10001005:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
+10001011:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
+10001014:	8d 90 94 f8 ff ff    	lea    edx,[eax-0x76c]
+1000101a:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+1000101d:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:105
   tmbuf->tm_yday = dayno;
-10001008:	8b 55 fc             	mov    edx,DWORD PTR [ebp-0x4]
-1000100b:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-1000100e:	89 50 1c             	mov    DWORD PTR [eax+0x1c],edx
+10001020:	8b 55 fc             	mov    edx,DWORD PTR [ebp-0x4]
+10001023:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10001026:	89 50 1c             	mov    DWORD PTR [eax+0x1c],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:106
   tmbuf->tm_mon = 0;
-10001011:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10001014:	c7 40 10 00 00 00 00 	mov    DWORD PTR [eax+0x10],0x0
+10001029:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+1000102c:	c7 40 10 00 00 00 00 	mov    DWORD PTR [eax+0x10],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:107
   while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) {
-1000101b:	e9 89 00 00 00       	jmp    100010a9 <gmtime_r+0x26c>
+10001033:	e9 89 00 00 00       	jmp    100010c1 <gmtime_r+0x26c>
 /home/yogi/src/os/testMainProgramEntry/time.c:108
     dayno -= _ytab[LEAPYEAR(year)][tmbuf->tm_mon];
-10001020:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
-10001023:	83 e0 03             	and    eax,0x3
-10001026:	85 c0                	test   eax,eax
-10001028:	75 50                	jne    1000107a <gmtime_r+0x23d>
+10001038:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
+1000103b:	83 e0 03             	and    eax,0x3
+1000103e:	85 c0                	test   eax,eax
+10001040:	75 50                	jne    10001092 <gmtime_r+0x23d>
 /home/yogi/src/os/testMainProgramEntry/time.c:108 (discriminator 1)
-1000102a:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
-1000102d:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10001032:	89 c8                	mov    eax,ecx
-10001034:	f7 ea                	imul   edx
-10001036:	c1 fa 05             	sar    edx,0x5
-10001039:	89 c8                	mov    eax,ecx
-1000103b:	c1 f8 1f             	sar    eax,0x1f
-1000103e:	29 c2                	sub    edx,eax
-10001040:	89 d0                	mov    eax,edx
-10001042:	6b c0 64             	imul   eax,eax,0x64
-10001045:	29 c1                	sub    ecx,eax
-10001047:	89 c8                	mov    eax,ecx
-10001049:	85 c0                	test   eax,eax
-1000104b:	75 26                	jne    10001073 <gmtime_r+0x236>
+10001042:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
+10001045:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+1000104a:	89 c8                	mov    eax,ecx
+1000104c:	f7 ea                	imul   edx
+1000104e:	c1 fa 05             	sar    edx,0x5
+10001051:	89 c8                	mov    eax,ecx
+10001053:	c1 f8 1f             	sar    eax,0x1f
+10001056:	29 c2                	sub    edx,eax
+10001058:	89 d0                	mov    eax,edx
+1000105a:	6b c0 64             	imul   eax,eax,0x64
+1000105d:	29 c1                	sub    ecx,eax
+1000105f:	89 c8                	mov    eax,ecx
+10001061:	85 c0                	test   eax,eax
+10001063:	75 26                	jne    1000108b <gmtime_r+0x236>
 /home/yogi/src/os/testMainProgramEntry/time.c:108 (discriminator 4)
-1000104d:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
-10001050:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10001055:	89 c8                	mov    eax,ecx
-10001057:	f7 ea                	imul   edx
-10001059:	c1 fa 07             	sar    edx,0x7
-1000105c:	89 c8                	mov    eax,ecx
-1000105e:	c1 f8 1f             	sar    eax,0x1f
-10001061:	29 c2                	sub    edx,eax
-10001063:	89 d0                	mov    eax,edx
-10001065:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-1000106b:	29 c1                	sub    ecx,eax
+10001065:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
+10001068:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 1000106d:	89 c8                	mov    eax,ecx
-1000106f:	85 c0                	test   eax,eax
-10001071:	75 07                	jne    1000107a <gmtime_r+0x23d>
+1000106f:	f7 ea                	imul   edx
+10001071:	c1 fa 07             	sar    edx,0x7
+10001074:	89 c8                	mov    eax,ecx
+10001076:	c1 f8 1f             	sar    eax,0x1f
+10001079:	29 c2                	sub    edx,eax
+1000107b:	89 d0                	mov    eax,edx
+1000107d:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+10001083:	29 c1                	sub    ecx,eax
+10001085:	89 c8                	mov    eax,ecx
+10001087:	85 c0                	test   eax,eax
+10001089:	75 07                	jne    10001092 <gmtime_r+0x23d>
 /home/yogi/src/os/testMainProgramEntry/time.c:108 (discriminator 5)
-10001073:	ba 01 00 00 00       	mov    edx,0x1
-10001078:	eb 05                	jmp    1000107f <gmtime_r+0x242>
+1000108b:	ba 01 00 00 00       	mov    edx,0x1
+10001090:	eb 05                	jmp    10001097 <gmtime_r+0x242>
 /home/yogi/src/os/testMainProgramEntry/time.c:108 (discriminator 6)
-1000107a:	ba 00 00 00 00       	mov    edx,0x0
+10001092:	ba 00 00 00 00       	mov    edx,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:108 (discriminator 8)
-1000107f:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10001082:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
-10001085:	89 d0                	mov    eax,edx
-10001087:	01 c0                	add    eax,eax
-10001089:	01 d0                	add    eax,edx
-1000108b:	c1 e0 02             	shl    eax,0x2
-1000108e:	01 c8                	add    eax,ecx
-10001090:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
-10001097:	29 45 fc             	sub    DWORD PTR [ebp-0x4],eax
+10001097:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+1000109a:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
+1000109d:	89 d0                	mov    eax,edx
+1000109f:	01 c0                	add    eax,eax
+100010a1:	01 d0                	add    eax,edx
+100010a3:	c1 e0 02             	shl    eax,0x2
+100010a6:	01 c8                	add    eax,ecx
+100010a8:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+100010af:	29 45 fc             	sub    DWORD PTR [ebp-0x4],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:109 (discriminator 8)
     tmbuf->tm_mon++;
-1000109a:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-1000109d:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
-100010a0:	8d 50 01             	lea    edx,[eax+0x1]
-100010a3:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-100010a6:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
+100010b2:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+100010b5:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
+100010b8:	8d 50 01             	lea    edx,[eax+0x1]
+100010bb:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+100010be:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:107
     year++;
   }
@@ -2821,150 +2837,150 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   tmbuf->tm_yday = dayno;
   tmbuf->tm_mon = 0;
   while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) {
-100010a9:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
-100010ac:	83 e0 03             	and    eax,0x3
-100010af:	85 c0                	test   eax,eax
-100010b1:	75 50                	jne    10001103 <gmtime_r+0x2c6>
+100010c1:	8b 45 f8             	mov    eax,DWORD PTR [ebp-0x8]
+100010c4:	83 e0 03             	and    eax,0x3
+100010c7:	85 c0                	test   eax,eax
+100010c9:	75 50                	jne    1000111b <gmtime_r+0x2c6>
 /home/yogi/src/os/testMainProgramEntry/time.c:107 (discriminator 1)
-100010b3:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
-100010b6:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-100010bb:	89 c8                	mov    eax,ecx
-100010bd:	f7 ea                	imul   edx
-100010bf:	c1 fa 05             	sar    edx,0x5
-100010c2:	89 c8                	mov    eax,ecx
-100010c4:	c1 f8 1f             	sar    eax,0x1f
-100010c7:	29 c2                	sub    edx,eax
-100010c9:	89 d0                	mov    eax,edx
-100010cb:	6b c0 64             	imul   eax,eax,0x64
-100010ce:	29 c1                	sub    ecx,eax
-100010d0:	89 c8                	mov    eax,ecx
-100010d2:	85 c0                	test   eax,eax
-100010d4:	75 26                	jne    100010fc <gmtime_r+0x2bf>
+100010cb:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
+100010ce:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+100010d3:	89 c8                	mov    eax,ecx
+100010d5:	f7 ea                	imul   edx
+100010d7:	c1 fa 05             	sar    edx,0x5
+100010da:	89 c8                	mov    eax,ecx
+100010dc:	c1 f8 1f             	sar    eax,0x1f
+100010df:	29 c2                	sub    edx,eax
+100010e1:	89 d0                	mov    eax,edx
+100010e3:	6b c0 64             	imul   eax,eax,0x64
+100010e6:	29 c1                	sub    ecx,eax
+100010e8:	89 c8                	mov    eax,ecx
+100010ea:	85 c0                	test   eax,eax
+100010ec:	75 26                	jne    10001114 <gmtime_r+0x2bf>
 /home/yogi/src/os/testMainProgramEntry/time.c:107 (discriminator 4)
-100010d6:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
-100010d9:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-100010de:	89 c8                	mov    eax,ecx
-100010e0:	f7 ea                	imul   edx
-100010e2:	c1 fa 07             	sar    edx,0x7
-100010e5:	89 c8                	mov    eax,ecx
-100010e7:	c1 f8 1f             	sar    eax,0x1f
-100010ea:	29 c2                	sub    edx,eax
-100010ec:	89 d0                	mov    eax,edx
-100010ee:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-100010f4:	29 c1                	sub    ecx,eax
+100010ee:	8b 4d f8             	mov    ecx,DWORD PTR [ebp-0x8]
+100010f1:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 100010f6:	89 c8                	mov    eax,ecx
-100010f8:	85 c0                	test   eax,eax
-100010fa:	75 07                	jne    10001103 <gmtime_r+0x2c6>
+100010f8:	f7 ea                	imul   edx
+100010fa:	c1 fa 07             	sar    edx,0x7
+100010fd:	89 c8                	mov    eax,ecx
+100010ff:	c1 f8 1f             	sar    eax,0x1f
+10001102:	29 c2                	sub    edx,eax
+10001104:	89 d0                	mov    eax,edx
+10001106:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+1000110c:	29 c1                	sub    ecx,eax
+1000110e:	89 c8                	mov    eax,ecx
+10001110:	85 c0                	test   eax,eax
+10001112:	75 07                	jne    1000111b <gmtime_r+0x2c6>
 /home/yogi/src/os/testMainProgramEntry/time.c:107 (discriminator 5)
-100010fc:	ba 01 00 00 00       	mov    edx,0x1
-10001101:	eb 05                	jmp    10001108 <gmtime_r+0x2cb>
+10001114:	ba 01 00 00 00       	mov    edx,0x1
+10001119:	eb 05                	jmp    10001120 <gmtime_r+0x2cb>
 /home/yogi/src/os/testMainProgramEntry/time.c:107 (discriminator 6)
-10001103:	ba 00 00 00 00       	mov    edx,0x0
+1000111b:	ba 00 00 00 00       	mov    edx,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:107 (discriminator 8)
-10001108:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-1000110b:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
-1000110e:	89 d0                	mov    eax,edx
-10001110:	01 c0                	add    eax,eax
-10001112:	01 d0                	add    eax,edx
-10001114:	c1 e0 02             	shl    eax,0x2
-10001117:	01 c8                	add    eax,ecx
-10001119:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
-10001120:	3b 45 fc             	cmp    eax,DWORD PTR [ebp-0x4]
-10001123:	0f 86 f7 fe ff ff    	jbe    10001020 <gmtime_r+0x1e3>
+10001120:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10001123:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
+10001126:	89 d0                	mov    eax,edx
+10001128:	01 c0                	add    eax,eax
+1000112a:	01 d0                	add    eax,edx
+1000112c:	c1 e0 02             	shl    eax,0x2
+1000112f:	01 c8                	add    eax,ecx
+10001131:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+10001138:	3b 45 fc             	cmp    eax,DWORD PTR [ebp-0x4]
+1000113b:	0f 86 f7 fe ff ff    	jbe    10001038 <gmtime_r+0x1e3>
 /home/yogi/src/os/testMainProgramEntry/time.c:111
     dayno -= _ytab[LEAPYEAR(year)][tmbuf->tm_mon];
     tmbuf->tm_mon++;
   }
   tmbuf->tm_mday = dayno + 1;
-10001129:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
-1000112c:	83 c0 01             	add    eax,0x1
-1000112f:	89 c2                	mov    edx,eax
-10001131:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10001134:	89 50 0c             	mov    DWORD PTR [eax+0xc],edx
+10001141:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
+10001144:	83 c0 01             	add    eax,0x1
+10001147:	89 c2                	mov    edx,eax
+10001149:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+1000114c:	89 50 0c             	mov    DWORD PTR [eax+0xc],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:112
   tmbuf->tm_isdst = 0;
-10001137:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-1000113a:	c7 40 20 00 00 00 00 	mov    DWORD PTR [eax+0x20],0x0
+1000114f:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10001152:	c7 40 20 00 00 00 00 	mov    DWORD PTR [eax+0x20],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:113
   return tmbuf;
-10001141:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10001159:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
 /home/yogi/src/os/testMainProgramEntry/time.c:114
 }
-10001144:	c9                   	leave  
-10001145:	c3                   	ret    
+1000115c:	c9                   	leave  
+1000115d:	c3                   	ret    
 
-10001146 <localtime>:
+1000115e <localtime>:
 localtime():
 /home/yogi/src/os/testMainProgramEntry/time.c:116
 
 struct tm *localtime(const time_t *timer) {
-10001146:	55                   	push   ebp
-10001147:	89 e5                	mov    ebp,esp
-10001149:	83 ec 30             	sub    esp,0x30
+1000115e:	55                   	push   ebp
+1000115f:	89 e5                	mov    ebp,esp
+10001161:	83 ec 30             	sub    esp,0x30
 /home/yogi/src/os/testMainProgramEntry/time.c:120
   time_t t;
   struct tm tmbuf;
   
   t = *timer - kTimeZone;
-1000114c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000114f:	8b 10                	mov    edx,DWORD PTR [eax]
-10001151:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
-10001156:	29 c2                	sub    edx,eax
-10001158:	89 d0                	mov    eax,edx
-1000115a:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
+10001164:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001167:	8b 10                	mov    edx,DWORD PTR [eax]
+10001169:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+1000116e:	29 c2                	sub    edx,eax
+10001170:	89 d0                	mov    eax,edx
+10001172:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:121
   return gmtime_r(&t, &tmbuf);
-1000115d:	8d 45 d0             	lea    eax,[ebp-0x30]
-10001160:	50                   	push   eax
-10001161:	8d 45 fc             	lea    eax,[ebp-0x4]
-10001164:	50                   	push   eax
-10001165:	e8 d3 fc ff ff       	call   10000e3d <gmtime_r>
-1000116a:	83 c4 08             	add    esp,0x8
+10001175:	8d 45 d0             	lea    eax,[ebp-0x30]
+10001178:	50                   	push   eax
+10001179:	8d 45 fc             	lea    eax,[ebp-0x4]
+1000117c:	50                   	push   eax
+1000117d:	e8 d3 fc ff ff       	call   10000e55 <gmtime_r>
+10001182:	83 c4 08             	add    esp,0x8
 /home/yogi/src/os/testMainProgramEntry/time.c:122
 }
-1000116d:	c9                   	leave  
-1000116e:	c3                   	ret    
+10001185:	c9                   	leave  
+10001186:	c3                   	ret    
 
-1000116f <localtime_r>:
+10001187 <localtime_r>:
 localtime_r():
 /home/yogi/src/os/testMainProgramEntry/time.c:124
 
 struct tm *localtime_r(const time_t *timer, struct tm *tmbuf) {
-1000116f:	55                   	push   ebp
-10001170:	89 e5                	mov    ebp,esp
-10001172:	83 ec 10             	sub    esp,0x10
+10001187:	55                   	push   ebp
+10001188:	89 e5                	mov    ebp,esp
+1000118a:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/time.c:127
   time_t t;
 
   t = *timer - kTimeZone;
-10001175:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001178:	8b 10                	mov    edx,DWORD PTR [eax]
-1000117a:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
-1000117f:	29 c2                	sub    edx,eax
-10001181:	89 d0                	mov    eax,edx
-10001183:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
+1000118d:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001190:	8b 10                	mov    edx,DWORD PTR [eax]
+10001192:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001197:	29 c2                	sub    edx,eax
+10001199:	89 d0                	mov    eax,edx
+1000119b:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:128
   return gmtime_r(&t, tmbuf);
-10001186:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
-10001189:	8d 45 fc             	lea    eax,[ebp-0x4]
-1000118c:	50                   	push   eax
-1000118d:	e8 ab fc ff ff       	call   10000e3d <gmtime_r>
-10001192:	83 c4 08             	add    esp,0x8
+1000119e:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
+100011a1:	8d 45 fc             	lea    eax,[ebp-0x4]
+100011a4:	50                   	push   eax
+100011a5:	e8 ab fc ff ff       	call   10000e55 <gmtime_r>
+100011aa:	83 c4 08             	add    esp,0x8
 /home/yogi/src/os/testMainProgramEntry/time.c:129
 }
-10001195:	c9                   	leave  
-10001196:	c3                   	ret    
+100011ad:	c9                   	leave  
+100011ae:	c3                   	ret    
 
-10001197 <mktime>:
+100011af <mktime>:
 mktime():
 /home/yogi/src/os/testMainProgramEntry/time.c:131
 
 time_t mktime(struct tm *tmbuf) {
-10001197:	55                   	push   ebp
-10001198:	89 e5                	mov    ebp,esp
-1000119a:	56                   	push   esi
-1000119b:	53                   	push   ebx
-1000119c:	83 ec 20             	sub    esp,0x20
+100011af:	55                   	push   ebp
+100011b0:	89 e5                	mov    ebp,esp
+100011b2:	56                   	push   esi
+100011b3:	53                   	push   ebx
+100011b4:	83 ec 20             	sub    esp,0x20
 /home/yogi/src/os/testMainProgramEntry/time.c:139
   int yday, month;
   /*unsigned*/ long seconds;
@@ -2972,326 +2988,326 @@ time_t mktime(struct tm *tmbuf) {
   long dst;
 
   tmbuf->tm_min += tmbuf->tm_sec / 60;
-1000119f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100011a2:	8b 58 04             	mov    ebx,DWORD PTR [eax+0x4]
-100011a5:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100011a8:	8b 08                	mov    ecx,DWORD PTR [eax]
-100011aa:	ba 89 88 88 88       	mov    edx,0x88888889
-100011af:	89 c8                	mov    eax,ecx
-100011b1:	f7 ea                	imul   edx
-100011b3:	8d 04 0a             	lea    eax,[edx+ecx*1]
-100011b6:	c1 f8 05             	sar    eax,0x5
-100011b9:	89 c2                	mov    edx,eax
-100011bb:	89 c8                	mov    eax,ecx
-100011bd:	c1 f8 1f             	sar    eax,0x1f
-100011c0:	29 c2                	sub    edx,eax
-100011c2:	89 d0                	mov    eax,edx
-100011c4:	8d 14 03             	lea    edx,[ebx+eax*1]
-100011c7:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100011ca:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
+100011b7:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100011ba:	8b 58 04             	mov    ebx,DWORD PTR [eax+0x4]
+100011bd:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100011c0:	8b 08                	mov    ecx,DWORD PTR [eax]
+100011c2:	ba 89 88 88 88       	mov    edx,0x88888889
+100011c7:	89 c8                	mov    eax,ecx
+100011c9:	f7 ea                	imul   edx
+100011cb:	8d 04 0a             	lea    eax,[edx+ecx*1]
+100011ce:	c1 f8 05             	sar    eax,0x5
+100011d1:	89 c2                	mov    edx,eax
+100011d3:	89 c8                	mov    eax,ecx
+100011d5:	c1 f8 1f             	sar    eax,0x1f
+100011d8:	29 c2                	sub    edx,eax
+100011da:	89 d0                	mov    eax,edx
+100011dc:	8d 14 03             	lea    edx,[ebx+eax*1]
+100011df:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100011e2:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:140
   tmbuf->tm_sec %= 60;
-100011cd:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100011d0:	8b 08                	mov    ecx,DWORD PTR [eax]
-100011d2:	ba 89 88 88 88       	mov    edx,0x88888889
-100011d7:	89 c8                	mov    eax,ecx
-100011d9:	f7 ea                	imul   edx
-100011db:	8d 04 0a             	lea    eax,[edx+ecx*1]
-100011de:	c1 f8 05             	sar    eax,0x5
-100011e1:	89 c2                	mov    edx,eax
-100011e3:	89 c8                	mov    eax,ecx
-100011e5:	c1 f8 1f             	sar    eax,0x1f
-100011e8:	29 c2                	sub    edx,eax
-100011ea:	89 d0                	mov    eax,edx
-100011ec:	89 c2                	mov    edx,eax
-100011ee:	8d 04 95 00 00 00 00 	lea    eax,[edx*4+0x0]
-100011f5:	89 c2                	mov    edx,eax
-100011f7:	89 d0                	mov    eax,edx
-100011f9:	c1 e0 04             	shl    eax,0x4
-100011fc:	29 d0                	sub    eax,edx
-100011fe:	29 c1                	sub    ecx,eax
-10001200:	89 c8                	mov    eax,ecx
-10001202:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
-10001205:	89 02                	mov    DWORD PTR [edx],eax
+100011e5:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100011e8:	8b 08                	mov    ecx,DWORD PTR [eax]
+100011ea:	ba 89 88 88 88       	mov    edx,0x88888889
+100011ef:	89 c8                	mov    eax,ecx
+100011f1:	f7 ea                	imul   edx
+100011f3:	8d 04 0a             	lea    eax,[edx+ecx*1]
+100011f6:	c1 f8 05             	sar    eax,0x5
+100011f9:	89 c2                	mov    edx,eax
+100011fb:	89 c8                	mov    eax,ecx
+100011fd:	c1 f8 1f             	sar    eax,0x1f
+10001200:	29 c2                	sub    edx,eax
+10001202:	89 d0                	mov    eax,edx
+10001204:	89 c2                	mov    edx,eax
+10001206:	8d 04 95 00 00 00 00 	lea    eax,[edx*4+0x0]
+1000120d:	89 c2                	mov    edx,eax
+1000120f:	89 d0                	mov    eax,edx
+10001211:	c1 e0 04             	shl    eax,0x4
+10001214:	29 d0                	sub    eax,edx
+10001216:	29 c1                	sub    ecx,eax
+10001218:	89 c8                	mov    eax,ecx
+1000121a:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
+1000121d:	89 02                	mov    DWORD PTR [edx],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:141
   if (tmbuf->tm_sec < 0) {
-10001207:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000120a:	8b 00                	mov    eax,DWORD PTR [eax]
-1000120c:	85 c0                	test   eax,eax
-1000120e:	79 1c                	jns    1000122c <mktime+0x95>
+1000121f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001222:	8b 00                	mov    eax,DWORD PTR [eax]
+10001224:	85 c0                	test   eax,eax
+10001226:	79 1c                	jns    10001244 <mktime+0x95>
 /home/yogi/src/os/testMainProgramEntry/time.c:142
     tmbuf->tm_sec += 60;
-10001210:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001213:	8b 00                	mov    eax,DWORD PTR [eax]
-10001215:	8d 50 3c             	lea    edx,[eax+0x3c]
-10001218:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000121b:	89 10                	mov    DWORD PTR [eax],edx
+10001228:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000122b:	8b 00                	mov    eax,DWORD PTR [eax]
+1000122d:	8d 50 3c             	lea    edx,[eax+0x3c]
+10001230:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001233:	89 10                	mov    DWORD PTR [eax],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:143
     tmbuf->tm_min--;
-1000121d:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001220:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
-10001223:	8d 50 ff             	lea    edx,[eax-0x1]
-10001226:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001229:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
+10001235:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001238:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
+1000123b:	8d 50 ff             	lea    edx,[eax-0x1]
+1000123e:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001241:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:145
   }
   tmbuf->tm_hour += tmbuf->tm_min / 60;
-1000122c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000122f:	8b 58 08             	mov    ebx,DWORD PTR [eax+0x8]
-10001232:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001235:	8b 48 04             	mov    ecx,DWORD PTR [eax+0x4]
-10001238:	ba 89 88 88 88       	mov    edx,0x88888889
-1000123d:	89 c8                	mov    eax,ecx
-1000123f:	f7 ea                	imul   edx
-10001241:	8d 04 0a             	lea    eax,[edx+ecx*1]
-10001244:	c1 f8 05             	sar    eax,0x5
-10001247:	89 c2                	mov    edx,eax
-10001249:	89 c8                	mov    eax,ecx
-1000124b:	c1 f8 1f             	sar    eax,0x1f
-1000124e:	29 c2                	sub    edx,eax
-10001250:	89 d0                	mov    eax,edx
-10001252:	8d 14 03             	lea    edx,[ebx+eax*1]
-10001255:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001258:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
+10001244:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001247:	8b 58 08             	mov    ebx,DWORD PTR [eax+0x8]
+1000124a:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000124d:	8b 48 04             	mov    ecx,DWORD PTR [eax+0x4]
+10001250:	ba 89 88 88 88       	mov    edx,0x88888889
+10001255:	89 c8                	mov    eax,ecx
+10001257:	f7 ea                	imul   edx
+10001259:	8d 04 0a             	lea    eax,[edx+ecx*1]
+1000125c:	c1 f8 05             	sar    eax,0x5
+1000125f:	89 c2                	mov    edx,eax
+10001261:	89 c8                	mov    eax,ecx
+10001263:	c1 f8 1f             	sar    eax,0x1f
+10001266:	29 c2                	sub    edx,eax
+10001268:	89 d0                	mov    eax,edx
+1000126a:	8d 14 03             	lea    edx,[ebx+eax*1]
+1000126d:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001270:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:146
   tmbuf->tm_min = tmbuf->tm_min % 60;
-1000125b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000125e:	8b 48 04             	mov    ecx,DWORD PTR [eax+0x4]
-10001261:	ba 89 88 88 88       	mov    edx,0x88888889
-10001266:	89 c8                	mov    eax,ecx
-10001268:	f7 ea                	imul   edx
-1000126a:	8d 04 0a             	lea    eax,[edx+ecx*1]
-1000126d:	c1 f8 05             	sar    eax,0x5
-10001270:	89 c2                	mov    edx,eax
-10001272:	89 c8                	mov    eax,ecx
-10001274:	c1 f8 1f             	sar    eax,0x1f
-10001277:	29 c2                	sub    edx,eax
-10001279:	89 d0                	mov    eax,edx
-1000127b:	89 c2                	mov    edx,eax
-1000127d:	8d 04 95 00 00 00 00 	lea    eax,[edx*4+0x0]
-10001284:	89 c2                	mov    edx,eax
-10001286:	89 d0                	mov    eax,edx
-10001288:	c1 e0 04             	shl    eax,0x4
-1000128b:	29 d0                	sub    eax,edx
-1000128d:	29 c1                	sub    ecx,eax
-1000128f:	89 c8                	mov    eax,ecx
-10001291:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
-10001294:	89 42 04             	mov    DWORD PTR [edx+0x4],eax
+10001273:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001276:	8b 48 04             	mov    ecx,DWORD PTR [eax+0x4]
+10001279:	ba 89 88 88 88       	mov    edx,0x88888889
+1000127e:	89 c8                	mov    eax,ecx
+10001280:	f7 ea                	imul   edx
+10001282:	8d 04 0a             	lea    eax,[edx+ecx*1]
+10001285:	c1 f8 05             	sar    eax,0x5
+10001288:	89 c2                	mov    edx,eax
+1000128a:	89 c8                	mov    eax,ecx
+1000128c:	c1 f8 1f             	sar    eax,0x1f
+1000128f:	29 c2                	sub    edx,eax
+10001291:	89 d0                	mov    eax,edx
+10001293:	89 c2                	mov    edx,eax
+10001295:	8d 04 95 00 00 00 00 	lea    eax,[edx*4+0x0]
+1000129c:	89 c2                	mov    edx,eax
+1000129e:	89 d0                	mov    eax,edx
+100012a0:	c1 e0 04             	shl    eax,0x4
+100012a3:	29 d0                	sub    eax,edx
+100012a5:	29 c1                	sub    ecx,eax
+100012a7:	89 c8                	mov    eax,ecx
+100012a9:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
+100012ac:	89 42 04             	mov    DWORD PTR [edx+0x4],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:147
   if (tmbuf->tm_min < 0) {
-10001297:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000129a:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
-1000129d:	85 c0                	test   eax,eax
-1000129f:	79 1e                	jns    100012bf <mktime+0x128>
+100012af:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100012b2:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
+100012b5:	85 c0                	test   eax,eax
+100012b7:	79 1e                	jns    100012d7 <mktime+0x128>
 /home/yogi/src/os/testMainProgramEntry/time.c:148
     tmbuf->tm_min += 60;
-100012a1:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100012a4:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
-100012a7:	8d 50 3c             	lea    edx,[eax+0x3c]
-100012aa:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100012ad:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
+100012b9:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100012bc:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
+100012bf:	8d 50 3c             	lea    edx,[eax+0x3c]
+100012c2:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100012c5:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:149
     tmbuf->tm_hour--;
-100012b0:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100012b3:	8b 40 08             	mov    eax,DWORD PTR [eax+0x8]
-100012b6:	8d 50 ff             	lea    edx,[eax-0x1]
-100012b9:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100012bc:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
+100012c8:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100012cb:	8b 40 08             	mov    eax,DWORD PTR [eax+0x8]
+100012ce:	8d 50 ff             	lea    edx,[eax-0x1]
+100012d1:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100012d4:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:151
   }
   day = tmbuf->tm_hour / 24;
-100012bf:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100012c2:	8b 48 08             	mov    ecx,DWORD PTR [eax+0x8]
-100012c5:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
-100012ca:	89 c8                	mov    eax,ecx
-100012cc:	f7 ea                	imul   edx
-100012ce:	c1 fa 02             	sar    edx,0x2
-100012d1:	89 c8                	mov    eax,ecx
-100012d3:	c1 f8 1f             	sar    eax,0x1f
-100012d6:	29 c2                	sub    edx,eax
-100012d8:	89 d0                	mov    eax,edx
-100012da:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+100012d7:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100012da:	8b 48 08             	mov    ecx,DWORD PTR [eax+0x8]
+100012dd:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
+100012e2:	89 c8                	mov    eax,ecx
+100012e4:	f7 ea                	imul   edx
+100012e6:	c1 fa 02             	sar    edx,0x2
+100012e9:	89 c8                	mov    eax,ecx
+100012eb:	c1 f8 1f             	sar    eax,0x1f
+100012ee:	29 c2                	sub    edx,eax
+100012f0:	89 d0                	mov    eax,edx
+100012f2:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:152
   tmbuf->tm_hour= tmbuf->tm_hour % 24;
-100012dd:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100012e0:	8b 48 08             	mov    ecx,DWORD PTR [eax+0x8]
-100012e3:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
-100012e8:	89 c8                	mov    eax,ecx
-100012ea:	f7 ea                	imul   edx
-100012ec:	c1 fa 02             	sar    edx,0x2
-100012ef:	89 c8                	mov    eax,ecx
-100012f1:	c1 f8 1f             	sar    eax,0x1f
-100012f4:	29 c2                	sub    edx,eax
-100012f6:	89 d0                	mov    eax,edx
-100012f8:	01 c0                	add    eax,eax
-100012fa:	01 d0                	add    eax,edx
-100012fc:	c1 e0 03             	shl    eax,0x3
-100012ff:	29 c1                	sub    ecx,eax
-10001301:	89 ca                	mov    edx,ecx
-10001303:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001306:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
+100012f5:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100012f8:	8b 48 08             	mov    ecx,DWORD PTR [eax+0x8]
+100012fb:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
+10001300:	89 c8                	mov    eax,ecx
+10001302:	f7 ea                	imul   edx
+10001304:	c1 fa 02             	sar    edx,0x2
+10001307:	89 c8                	mov    eax,ecx
+10001309:	c1 f8 1f             	sar    eax,0x1f
+1000130c:	29 c2                	sub    edx,eax
+1000130e:	89 d0                	mov    eax,edx
+10001310:	01 c0                	add    eax,eax
+10001312:	01 d0                	add    eax,edx
+10001314:	c1 e0 03             	shl    eax,0x3
+10001317:	29 c1                	sub    ecx,eax
+10001319:	89 ca                	mov    edx,ecx
+1000131b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000131e:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:153
   if (tmbuf->tm_hour < 0) {
-10001309:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000130c:	8b 40 08             	mov    eax,DWORD PTR [eax+0x8]
-1000130f:	85 c0                	test   eax,eax
-10001311:	79 13                	jns    10001326 <mktime+0x18f>
+10001321:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001324:	8b 40 08             	mov    eax,DWORD PTR [eax+0x8]
+10001327:	85 c0                	test   eax,eax
+10001329:	79 13                	jns    1000133e <mktime+0x18f>
 /home/yogi/src/os/testMainProgramEntry/time.c:154
     tmbuf->tm_hour += 24;
-10001313:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001316:	8b 40 08             	mov    eax,DWORD PTR [eax+0x8]
-10001319:	8d 50 18             	lea    edx,[eax+0x18]
-1000131c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000131f:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
+1000132b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000132e:	8b 40 08             	mov    eax,DWORD PTR [eax+0x8]
+10001331:	8d 50 18             	lea    edx,[eax+0x18]
+10001334:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001337:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:155
     day--;
-10001322:	83 6d f4 01          	sub    DWORD PTR [ebp-0xc],0x1
+1000133a:	83 6d f4 01          	sub    DWORD PTR [ebp-0xc],0x1
 /home/yogi/src/os/testMainProgramEntry/time.c:157
   }
   tmbuf->tm_year += tmbuf->tm_mon / 12;
-10001326:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001329:	8b 58 14             	mov    ebx,DWORD PTR [eax+0x14]
-1000132c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000132f:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
-10001332:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
-10001337:	89 c8                	mov    eax,ecx
-10001339:	f7 ea                	imul   edx
-1000133b:	d1 fa                	sar    edx,1
-1000133d:	89 c8                	mov    eax,ecx
-1000133f:	c1 f8 1f             	sar    eax,0x1f
-10001342:	29 c2                	sub    edx,eax
-10001344:	89 d0                	mov    eax,edx
-10001346:	8d 14 03             	lea    edx,[ebx+eax*1]
-10001349:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000134c:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
+1000133e:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001341:	8b 58 14             	mov    ebx,DWORD PTR [eax+0x14]
+10001344:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001347:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
+1000134a:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
+1000134f:	89 c8                	mov    eax,ecx
+10001351:	f7 ea                	imul   edx
+10001353:	d1 fa                	sar    edx,1
+10001355:	89 c8                	mov    eax,ecx
+10001357:	c1 f8 1f             	sar    eax,0x1f
+1000135a:	29 c2                	sub    edx,eax
+1000135c:	89 d0                	mov    eax,edx
+1000135e:	8d 14 03             	lea    edx,[ebx+eax*1]
+10001361:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001364:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:158
   tmbuf->tm_mon %= 12;
-1000134f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001352:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
-10001355:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
-1000135a:	89 c8                	mov    eax,ecx
-1000135c:	f7 ea                	imul   edx
-1000135e:	d1 fa                	sar    edx,1
-10001360:	89 c8                	mov    eax,ecx
-10001362:	c1 f8 1f             	sar    eax,0x1f
-10001365:	29 c2                	sub    edx,eax
-10001367:	89 d0                	mov    eax,edx
-10001369:	01 c0                	add    eax,eax
-1000136b:	01 d0                	add    eax,edx
-1000136d:	c1 e0 02             	shl    eax,0x2
-10001370:	29 c1                	sub    ecx,eax
-10001372:	89 ca                	mov    edx,ecx
-10001374:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001377:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
+10001367:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000136a:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
+1000136d:	ba ab aa aa 2a       	mov    edx,0x2aaaaaab
+10001372:	89 c8                	mov    eax,ecx
+10001374:	f7 ea                	imul   edx
+10001376:	d1 fa                	sar    edx,1
+10001378:	89 c8                	mov    eax,ecx
+1000137a:	c1 f8 1f             	sar    eax,0x1f
+1000137d:	29 c2                	sub    edx,eax
+1000137f:	89 d0                	mov    eax,edx
+10001381:	01 c0                	add    eax,eax
+10001383:	01 d0                	add    eax,edx
+10001385:	c1 e0 02             	shl    eax,0x2
+10001388:	29 c1                	sub    ecx,eax
+1000138a:	89 ca                	mov    edx,ecx
+1000138c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000138f:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:159
   if (tmbuf->tm_mon < 0) {
-1000137a:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000137d:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
-10001380:	85 c0                	test   eax,eax
-10001382:	79 1e                	jns    100013a2 <mktime+0x20b>
+10001392:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001395:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
+10001398:	85 c0                	test   eax,eax
+1000139a:	79 1e                	jns    100013ba <mktime+0x20b>
 /home/yogi/src/os/testMainProgramEntry/time.c:160
     tmbuf->tm_mon += 12;
-10001384:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001387:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
-1000138a:	8d 50 0c             	lea    edx,[eax+0xc]
-1000138d:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001390:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
+1000139c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000139f:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
+100013a2:	8d 50 0c             	lea    edx,[eax+0xc]
+100013a5:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013a8:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:161
     tmbuf->tm_year--;
-10001393:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001396:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-10001399:	8d 50 ff             	lea    edx,[eax-0x1]
-1000139c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000139f:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
+100013ab:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013ae:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+100013b1:	8d 50 ff             	lea    edx,[eax-0x1]
+100013b4:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013b7:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:163
   }
   day += (tmbuf->tm_mday - 1);
-100013a2:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013a5:	8b 40 0c             	mov    eax,DWORD PTR [eax+0xc]
-100013a8:	83 e8 01             	sub    eax,0x1
-100013ab:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
+100013ba:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013bd:	8b 40 0c             	mov    eax,DWORD PTR [eax+0xc]
+100013c0:	83 e8 01             	sub    eax,0x1
+100013c3:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:164
   while (day < 0) {
-100013ae:	e9 c1 00 00 00       	jmp    10001474 <mktime+0x2dd>
+100013c6:	e9 c1 00 00 00       	jmp    1000148c <mktime+0x2dd>
 /home/yogi/src/os/testMainProgramEntry/time.c:165
     if(--tmbuf->tm_mon < 0) {
-100013b3:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013b6:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
-100013b9:	8d 50 ff             	lea    edx,[eax-0x1]
-100013bc:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013bf:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
-100013c2:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013c5:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
-100013c8:	85 c0                	test   eax,eax
-100013ca:	79 19                	jns    100013e5 <mktime+0x24e>
+100013cb:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013ce:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
+100013d1:	8d 50 ff             	lea    edx,[eax-0x1]
+100013d4:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013d7:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
+100013da:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013dd:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
+100013e0:	85 c0                	test   eax,eax
+100013e2:	79 19                	jns    100013fd <mktime+0x24e>
 /home/yogi/src/os/testMainProgramEntry/time.c:166
       tmbuf->tm_year--;
-100013cc:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013cf:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-100013d2:	8d 50 ff             	lea    edx,[eax-0x1]
-100013d5:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013d8:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
+100013e4:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013e7:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+100013ea:	8d 50 ff             	lea    edx,[eax-0x1]
+100013ed:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013f0:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:167
       tmbuf->tm_mon = 11;
-100013db:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013de:	c7 40 10 0b 00 00 00 	mov    DWORD PTR [eax+0x10],0xb
+100013f3:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100013f6:	c7 40 10 0b 00 00 00 	mov    DWORD PTR [eax+0x10],0xb
 /home/yogi/src/os/testMainProgramEntry/time.c:169
     }
     day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
-100013e5:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013e8:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-100013eb:	83 e0 03             	and    eax,0x3
-100013ee:	85 c0                	test   eax,eax
-100013f0:	75 62                	jne    10001454 <mktime+0x2bd>
+100013fd:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001400:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+10001403:	83 e0 03             	and    eax,0x3
+10001406:	85 c0                	test   eax,eax
+10001408:	75 62                	jne    1000146c <mktime+0x2bd>
 /home/yogi/src/os/testMainProgramEntry/time.c:169 (discriminator 1)
-100013f2:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100013f5:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-100013f8:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
-100013fe:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10001403:	89 c8                	mov    eax,ecx
-10001405:	f7 ea                	imul   edx
-10001407:	c1 fa 05             	sar    edx,0x5
-1000140a:	89 c8                	mov    eax,ecx
-1000140c:	c1 f8 1f             	sar    eax,0x1f
-1000140f:	29 c2                	sub    edx,eax
-10001411:	89 d0                	mov    eax,edx
-10001413:	6b c0 64             	imul   eax,eax,0x64
-10001416:	29 c1                	sub    ecx,eax
-10001418:	89 c8                	mov    eax,ecx
-1000141a:	85 c0                	test   eax,eax
-1000141c:	75 2f                	jne    1000144d <mktime+0x2b6>
+1000140a:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000140d:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+10001410:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
+10001416:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+1000141b:	89 c8                	mov    eax,ecx
+1000141d:	f7 ea                	imul   edx
+1000141f:	c1 fa 05             	sar    edx,0x5
+10001422:	89 c8                	mov    eax,ecx
+10001424:	c1 f8 1f             	sar    eax,0x1f
+10001427:	29 c2                	sub    edx,eax
+10001429:	89 d0                	mov    eax,edx
+1000142b:	6b c0 64             	imul   eax,eax,0x64
+1000142e:	29 c1                	sub    ecx,eax
+10001430:	89 c8                	mov    eax,ecx
+10001432:	85 c0                	test   eax,eax
+10001434:	75 2f                	jne    10001465 <mktime+0x2b6>
 /home/yogi/src/os/testMainProgramEntry/time.c:169 (discriminator 4)
-1000141e:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001421:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-10001424:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
-1000142a:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-1000142f:	89 c8                	mov    eax,ecx
-10001431:	f7 ea                	imul   edx
-10001433:	c1 fa 07             	sar    edx,0x7
-10001436:	89 c8                	mov    eax,ecx
-10001438:	c1 f8 1f             	sar    eax,0x1f
-1000143b:	29 c2                	sub    edx,eax
-1000143d:	89 d0                	mov    eax,edx
-1000143f:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-10001445:	29 c1                	sub    ecx,eax
+10001436:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001439:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+1000143c:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
+10001442:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 10001447:	89 c8                	mov    eax,ecx
-10001449:	85 c0                	test   eax,eax
-1000144b:	75 07                	jne    10001454 <mktime+0x2bd>
+10001449:	f7 ea                	imul   edx
+1000144b:	c1 fa 07             	sar    edx,0x7
+1000144e:	89 c8                	mov    eax,ecx
+10001450:	c1 f8 1f             	sar    eax,0x1f
+10001453:	29 c2                	sub    edx,eax
+10001455:	89 d0                	mov    eax,edx
+10001457:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+1000145d:	29 c1                	sub    ecx,eax
+1000145f:	89 c8                	mov    eax,ecx
+10001461:	85 c0                	test   eax,eax
+10001463:	75 07                	jne    1000146c <mktime+0x2bd>
 /home/yogi/src/os/testMainProgramEntry/time.c:169 (discriminator 5)
-1000144d:	ba 01 00 00 00       	mov    edx,0x1
-10001452:	eb 05                	jmp    10001459 <mktime+0x2c2>
+10001465:	ba 01 00 00 00       	mov    edx,0x1
+1000146a:	eb 05                	jmp    10001471 <mktime+0x2c2>
 /home/yogi/src/os/testMainProgramEntry/time.c:169 (discriminator 6)
-10001454:	ba 00 00 00 00       	mov    edx,0x0
+1000146c:	ba 00 00 00 00       	mov    edx,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:169 (discriminator 8)
-10001459:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000145c:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
-1000145f:	89 d0                	mov    eax,edx
-10001461:	01 c0                	add    eax,eax
-10001463:	01 d0                	add    eax,edx
-10001465:	c1 e0 02             	shl    eax,0x2
-10001468:	01 c8                	add    eax,ecx
-1000146a:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
-10001471:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
+10001471:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001474:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
+10001477:	89 d0                	mov    eax,edx
+10001479:	01 c0                	add    eax,eax
+1000147b:	01 d0                	add    eax,edx
+1000147d:	c1 e0 02             	shl    eax,0x2
+10001480:	01 c8                	add    eax,ecx
+10001482:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+10001489:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:164
   if (tmbuf->tm_mon < 0) {
     tmbuf->tm_mon += 12;
@@ -3299,8 +3315,8 @@ time_t mktime(struct tm *tmbuf) {
   }
   day += (tmbuf->tm_mday - 1);
   while (day < 0) {
-10001474:	83 7d f4 00          	cmp    DWORD PTR [ebp-0xc],0x0
-10001478:	0f 88 35 ff ff ff    	js     100013b3 <mktime+0x21c>
+1000148c:	83 7d f4 00          	cmp    DWORD PTR [ebp-0xc],0x0
+10001490:	0f 88 35 ff ff ff    	js     100013cb <mktime+0x21c>
 /home/yogi/src/os/testMainProgramEntry/time.c:171
       tmbuf->tm_year--;
       tmbuf->tm_mon = 11;
@@ -3308,85 +3324,85 @@ time_t mktime(struct tm *tmbuf) {
     day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
   }
   while (day >= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon]) {
-1000147e:	e9 c2 00 00 00       	jmp    10001545 <mktime+0x3ae>
+10001496:	e9 c2 00 00 00       	jmp    1000155d <mktime+0x3ae>
 /home/yogi/src/os/testMainProgramEntry/time.c:172
     day -= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
-10001483:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001486:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-10001489:	83 e0 03             	and    eax,0x3
-1000148c:	85 c0                	test   eax,eax
-1000148e:	75 62                	jne    100014f2 <mktime+0x35b>
+1000149b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000149e:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+100014a1:	83 e0 03             	and    eax,0x3
+100014a4:	85 c0                	test   eax,eax
+100014a6:	75 62                	jne    1000150a <mktime+0x35b>
 /home/yogi/src/os/testMainProgramEntry/time.c:172 (discriminator 1)
-10001490:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001493:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-10001496:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
-1000149c:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-100014a1:	89 c8                	mov    eax,ecx
-100014a3:	f7 ea                	imul   edx
-100014a5:	c1 fa 05             	sar    edx,0x5
-100014a8:	89 c8                	mov    eax,ecx
-100014aa:	c1 f8 1f             	sar    eax,0x1f
-100014ad:	29 c2                	sub    edx,eax
-100014af:	89 d0                	mov    eax,edx
-100014b1:	6b c0 64             	imul   eax,eax,0x64
-100014b4:	29 c1                	sub    ecx,eax
-100014b6:	89 c8                	mov    eax,ecx
-100014b8:	85 c0                	test   eax,eax
-100014ba:	75 2f                	jne    100014eb <mktime+0x354>
+100014a8:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100014ab:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+100014ae:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
+100014b4:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+100014b9:	89 c8                	mov    eax,ecx
+100014bb:	f7 ea                	imul   edx
+100014bd:	c1 fa 05             	sar    edx,0x5
+100014c0:	89 c8                	mov    eax,ecx
+100014c2:	c1 f8 1f             	sar    eax,0x1f
+100014c5:	29 c2                	sub    edx,eax
+100014c7:	89 d0                	mov    eax,edx
+100014c9:	6b c0 64             	imul   eax,eax,0x64
+100014cc:	29 c1                	sub    ecx,eax
+100014ce:	89 c8                	mov    eax,ecx
+100014d0:	85 c0                	test   eax,eax
+100014d2:	75 2f                	jne    10001503 <mktime+0x354>
 /home/yogi/src/os/testMainProgramEntry/time.c:172 (discriminator 4)
-100014bc:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100014bf:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-100014c2:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
-100014c8:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-100014cd:	89 c8                	mov    eax,ecx
-100014cf:	f7 ea                	imul   edx
-100014d1:	c1 fa 07             	sar    edx,0x7
-100014d4:	89 c8                	mov    eax,ecx
-100014d6:	c1 f8 1f             	sar    eax,0x1f
-100014d9:	29 c2                	sub    edx,eax
-100014db:	89 d0                	mov    eax,edx
-100014dd:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-100014e3:	29 c1                	sub    ecx,eax
+100014d4:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100014d7:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+100014da:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
+100014e0:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 100014e5:	89 c8                	mov    eax,ecx
-100014e7:	85 c0                	test   eax,eax
-100014e9:	75 07                	jne    100014f2 <mktime+0x35b>
+100014e7:	f7 ea                	imul   edx
+100014e9:	c1 fa 07             	sar    edx,0x7
+100014ec:	89 c8                	mov    eax,ecx
+100014ee:	c1 f8 1f             	sar    eax,0x1f
+100014f1:	29 c2                	sub    edx,eax
+100014f3:	89 d0                	mov    eax,edx
+100014f5:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+100014fb:	29 c1                	sub    ecx,eax
+100014fd:	89 c8                	mov    eax,ecx
+100014ff:	85 c0                	test   eax,eax
+10001501:	75 07                	jne    1000150a <mktime+0x35b>
 /home/yogi/src/os/testMainProgramEntry/time.c:172 (discriminator 5)
-100014eb:	ba 01 00 00 00       	mov    edx,0x1
-100014f0:	eb 05                	jmp    100014f7 <mktime+0x360>
+10001503:	ba 01 00 00 00       	mov    edx,0x1
+10001508:	eb 05                	jmp    1000150f <mktime+0x360>
 /home/yogi/src/os/testMainProgramEntry/time.c:172 (discriminator 6)
-100014f2:	ba 00 00 00 00       	mov    edx,0x0
+1000150a:	ba 00 00 00 00       	mov    edx,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:172 (discriminator 8)
-100014f7:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100014fa:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
-100014fd:	89 d0                	mov    eax,edx
-100014ff:	01 c0                	add    eax,eax
-10001501:	01 d0                	add    eax,edx
-10001503:	c1 e0 02             	shl    eax,0x2
-10001506:	01 c8                	add    eax,ecx
-10001508:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
-1000150f:	29 45 f4             	sub    DWORD PTR [ebp-0xc],eax
+1000150f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001512:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
+10001515:	89 d0                	mov    eax,edx
+10001517:	01 c0                	add    eax,eax
+10001519:	01 d0                	add    eax,edx
+1000151b:	c1 e0 02             	shl    eax,0x2
+1000151e:	01 c8                	add    eax,ecx
+10001520:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+10001527:	29 45 f4             	sub    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:173 (discriminator 8)
     if (++(tmbuf->tm_mon) == 12) {
-10001512:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001515:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
-10001518:	8d 50 01             	lea    edx,[eax+0x1]
-1000151b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000151e:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
-10001521:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001524:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
-10001527:	83 f8 0c             	cmp    eax,0xc
-1000152a:	75 19                	jne    10001545 <mktime+0x3ae>
+1000152a:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000152d:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
+10001530:	8d 50 01             	lea    edx,[eax+0x1]
+10001533:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001536:	89 50 10             	mov    DWORD PTR [eax+0x10],edx
+10001539:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000153c:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
+1000153f:	83 f8 0c             	cmp    eax,0xc
+10001542:	75 19                	jne    1000155d <mktime+0x3ae>
 /home/yogi/src/os/testMainProgramEntry/time.c:174
       tmbuf->tm_mon = 0;
-1000152c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000152f:	c7 40 10 00 00 00 00 	mov    DWORD PTR [eax+0x10],0x0
+10001544:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001547:	c7 40 10 00 00 00 00 	mov    DWORD PTR [eax+0x10],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:175
       tmbuf->tm_year++;
-10001536:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001539:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-1000153c:	8d 50 01             	lea    edx,[eax+0x1]
-1000153f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001542:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
+1000154e:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001551:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+10001554:	8d 50 01             	lea    edx,[eax+0x1]
+10001557:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000155a:	89 50 14             	mov    DWORD PTR [eax+0x14],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:171
       tmbuf->tm_year--;
       tmbuf->tm_mon = 11;
@@ -3394,61 +3410,61 @@ time_t mktime(struct tm *tmbuf) {
     day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
   }
   while (day >= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon]) {
-10001545:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001548:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-1000154b:	83 e0 03             	and    eax,0x3
-1000154e:	85 c0                	test   eax,eax
-10001550:	75 62                	jne    100015b4 <mktime+0x41d>
+1000155d:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001560:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+10001563:	83 e0 03             	and    eax,0x3
+10001566:	85 c0                	test   eax,eax
+10001568:	75 62                	jne    100015cc <mktime+0x41d>
 /home/yogi/src/os/testMainProgramEntry/time.c:171 (discriminator 1)
-10001552:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001555:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-10001558:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
-1000155e:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10001563:	89 c8                	mov    eax,ecx
-10001565:	f7 ea                	imul   edx
-10001567:	c1 fa 05             	sar    edx,0x5
-1000156a:	89 c8                	mov    eax,ecx
-1000156c:	c1 f8 1f             	sar    eax,0x1f
-1000156f:	29 c2                	sub    edx,eax
-10001571:	89 d0                	mov    eax,edx
-10001573:	6b c0 64             	imul   eax,eax,0x64
-10001576:	29 c1                	sub    ecx,eax
-10001578:	89 c8                	mov    eax,ecx
-1000157a:	85 c0                	test   eax,eax
-1000157c:	75 2f                	jne    100015ad <mktime+0x416>
+1000156a:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000156d:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+10001570:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
+10001576:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+1000157b:	89 c8                	mov    eax,ecx
+1000157d:	f7 ea                	imul   edx
+1000157f:	c1 fa 05             	sar    edx,0x5
+10001582:	89 c8                	mov    eax,ecx
+10001584:	c1 f8 1f             	sar    eax,0x1f
+10001587:	29 c2                	sub    edx,eax
+10001589:	89 d0                	mov    eax,edx
+1000158b:	6b c0 64             	imul   eax,eax,0x64
+1000158e:	29 c1                	sub    ecx,eax
+10001590:	89 c8                	mov    eax,ecx
+10001592:	85 c0                	test   eax,eax
+10001594:	75 2f                	jne    100015c5 <mktime+0x416>
 /home/yogi/src/os/testMainProgramEntry/time.c:171 (discriminator 4)
-1000157e:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001581:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-10001584:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
-1000158a:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-1000158f:	89 c8                	mov    eax,ecx
-10001591:	f7 ea                	imul   edx
-10001593:	c1 fa 07             	sar    edx,0x7
-10001596:	89 c8                	mov    eax,ecx
-10001598:	c1 f8 1f             	sar    eax,0x1f
-1000159b:	29 c2                	sub    edx,eax
-1000159d:	89 d0                	mov    eax,edx
-1000159f:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-100015a5:	29 c1                	sub    ecx,eax
+10001596:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001599:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+1000159c:	8d 88 6c 07 00 00    	lea    ecx,[eax+0x76c]
+100015a2:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 100015a7:	89 c8                	mov    eax,ecx
-100015a9:	85 c0                	test   eax,eax
-100015ab:	75 07                	jne    100015b4 <mktime+0x41d>
+100015a9:	f7 ea                	imul   edx
+100015ab:	c1 fa 07             	sar    edx,0x7
+100015ae:	89 c8                	mov    eax,ecx
+100015b0:	c1 f8 1f             	sar    eax,0x1f
+100015b3:	29 c2                	sub    edx,eax
+100015b5:	89 d0                	mov    eax,edx
+100015b7:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+100015bd:	29 c1                	sub    ecx,eax
+100015bf:	89 c8                	mov    eax,ecx
+100015c1:	85 c0                	test   eax,eax
+100015c3:	75 07                	jne    100015cc <mktime+0x41d>
 /home/yogi/src/os/testMainProgramEntry/time.c:171 (discriminator 5)
-100015ad:	ba 01 00 00 00       	mov    edx,0x1
-100015b2:	eb 05                	jmp    100015b9 <mktime+0x422>
+100015c5:	ba 01 00 00 00       	mov    edx,0x1
+100015ca:	eb 05                	jmp    100015d1 <mktime+0x422>
 /home/yogi/src/os/testMainProgramEntry/time.c:171 (discriminator 6)
-100015b4:	ba 00 00 00 00       	mov    edx,0x0
+100015cc:	ba 00 00 00 00       	mov    edx,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:171 (discriminator 8)
-100015b9:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100015bc:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
-100015bf:	89 d0                	mov    eax,edx
-100015c1:	01 c0                	add    eax,eax
-100015c3:	01 d0                	add    eax,edx
-100015c5:	c1 e0 02             	shl    eax,0x2
-100015c8:	01 c8                	add    eax,ecx
-100015ca:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
-100015d1:	3b 45 f4             	cmp    eax,DWORD PTR [ebp-0xc]
-100015d4:	0f 8e a9 fe ff ff    	jle    10001483 <mktime+0x2ec>
+100015d1:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100015d4:	8b 48 10             	mov    ecx,DWORD PTR [eax+0x10]
+100015d7:	89 d0                	mov    eax,edx
+100015d9:	01 c0                	add    eax,eax
+100015db:	01 d0                	add    eax,edx
+100015dd:	c1 e0 02             	shl    eax,0x2
+100015e0:	01 c8                	add    eax,ecx
+100015e2:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+100015e9:	3b 45 f4             	cmp    eax,DWORD PTR [ebp-0xc]
+100015ec:	0f 8e a9 fe ff ff    	jle    1000149b <mktime+0x2ec>
 /home/yogi/src/os/testMainProgramEntry/time.c:178
     if (++(tmbuf->tm_mon) == 12) {
       tmbuf->tm_mon = 0;
@@ -3456,33 +3472,33 @@ time_t mktime(struct tm *tmbuf) {
     }
   }
   tmbuf->tm_mday = day + 1;
-100015da:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-100015dd:	8d 50 01             	lea    edx,[eax+0x1]
-100015e0:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100015e3:	89 50 0c             	mov    DWORD PTR [eax+0xc],edx
+100015f2:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+100015f5:	8d 50 01             	lea    edx,[eax+0x1]
+100015f8:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100015fb:	89 50 0c             	mov    DWORD PTR [eax+0xc],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:179
   year = EPOCH_YR;
-100015e6:	c7 45 e0 b2 07 00 00 	mov    DWORD PTR [ebp-0x20],0x7b2
+100015fe:	c7 45 e0 b2 07 00 00 	mov    DWORD PTR [ebp-0x20],0x7b2
 /home/yogi/src/os/testMainProgramEntry/time.c:180
   if (tmbuf->tm_year < year - YEAR0) return (time_t) -999;
-100015ed:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100015f0:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-100015f3:	8b 55 e0             	mov    edx,DWORD PTR [ebp-0x20]
-100015f6:	81 ea 6c 07 00 00    	sub    edx,0x76c
-100015fc:	39 d0                	cmp    eax,edx
-100015fe:	7d 0a                	jge    1000160a <mktime+0x473>
+10001605:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001608:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+1000160b:	8b 55 e0             	mov    edx,DWORD PTR [ebp-0x20]
+1000160e:	81 ea 6c 07 00 00    	sub    edx,0x76c
+10001614:	39 d0                	cmp    eax,edx
+10001616:	7d 0a                	jge    10001622 <mktime+0x473>
 /home/yogi/src/os/testMainProgramEntry/time.c:180 (discriminator 1)
-10001600:	b8 19 fc ff ff       	mov    eax,0xfffffc19
-10001605:	e9 c0 03 00 00       	jmp    100019ca <mktime+0x833>
+10001618:	b8 19 fc ff ff       	mov    eax,0xfffffc19
+1000161d:	e9 c0 03 00 00       	jmp    100019e2 <mktime+0x833>
 /home/yogi/src/os/testMainProgramEntry/time.c:181
   seconds = 0;
-1000160a:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
+10001622:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:182
   day = 0;                      // Means days since day 0 now
-10001611:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
+10001629:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:183
   overflow = 0;
-10001618:	c7 45 e8 00 00 00 00 	mov    DWORD PTR [ebp-0x18],0x0
+10001630:	c7 45 e8 00 00 00 00 	mov    DWORD PTR [ebp-0x18],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:190
   // Assume that when day becomes negative, there will certainly
   // be overflow on seconds.
@@ -3490,264 +3506,264 @@ time_t mktime(struct tm *tmbuf) {
   // divisible by 400.
   // The code only works when year (1970) is not a leapyear.
   tm_year = tmbuf->tm_year + YEAR0;
-1000161f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001622:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
-10001625:	05 6c 07 00 00       	add    eax,0x76c
-1000162a:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
+10001637:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000163a:	8b 40 14             	mov    eax,DWORD PTR [eax+0x14]
+1000163d:	05 6c 07 00 00       	add    eax,0x76c
+10001642:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:192
 
   if (TIME_MAX / 365 < tm_year - year) overflow=1;
-1000162d:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-10001630:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
-10001633:	3d 7c c6 59 00       	cmp    eax,0x59c67c
-10001638:	7e 07                	jle    10001641 <mktime+0x4aa>
+10001645:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+10001648:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
+1000164b:	3d 7c c6 59 00       	cmp    eax,0x59c67c
+10001650:	7e 07                	jle    10001659 <mktime+0x4aa>
 /home/yogi/src/os/testMainProgramEntry/time.c:192 (discriminator 1)
-1000163a:	c7 45 e8 01 00 00 00 	mov    DWORD PTR [ebp-0x18],0x1
+10001652:	c7 45 e8 01 00 00 00 	mov    DWORD PTR [ebp-0x18],0x1
 /home/yogi/src/os/testMainProgramEntry/time.c:193
   day = (tm_year - year) * 365;
-10001641:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-10001644:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
-10001647:	69 c0 6d 01 00 00    	imul   eax,eax,0x16d
-1000164d:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+10001659:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+1000165c:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
+1000165f:	69 c0 6d 01 00 00    	imul   eax,eax,0x16d
+10001665:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:194
   if (TIME_MAX - day < (tm_year - year) / 4 + 1) overflow|=2;
-10001650:	b8 ff ff ff 7f       	mov    eax,0x7fffffff
-10001655:	2b 45 f4             	sub    eax,DWORD PTR [ebp-0xc]
-10001658:	89 c2                	mov    edx,eax
-1000165a:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-1000165d:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
-10001660:	8d 48 03             	lea    ecx,[eax+0x3]
-10001663:	85 c0                	test   eax,eax
-10001665:	0f 48 c1             	cmovs  eax,ecx
-10001668:	c1 f8 02             	sar    eax,0x2
-1000166b:	83 c0 01             	add    eax,0x1
-1000166e:	39 c2                	cmp    edx,eax
-10001670:	7d 04                	jge    10001676 <mktime+0x4df>
+10001668:	b8 ff ff ff 7f       	mov    eax,0x7fffffff
+1000166d:	2b 45 f4             	sub    eax,DWORD PTR [ebp-0xc]
+10001670:	89 c2                	mov    edx,eax
+10001672:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+10001675:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
+10001678:	8d 48 03             	lea    ecx,[eax+0x3]
+1000167b:	85 c0                	test   eax,eax
+1000167d:	0f 48 c1             	cmovs  eax,ecx
+10001680:	c1 f8 02             	sar    eax,0x2
+10001683:	83 c0 01             	add    eax,0x1
+10001686:	39 c2                	cmp    edx,eax
+10001688:	7d 04                	jge    1000168e <mktime+0x4df>
 /home/yogi/src/os/testMainProgramEntry/time.c:194 (discriminator 1)
-10001672:	83 4d e8 02          	or     DWORD PTR [ebp-0x18],0x2
+1000168a:	83 4d e8 02          	or     DWORD PTR [ebp-0x18],0x2
 /home/yogi/src/os/testMainProgramEntry/time.c:195
   day += (tm_year - year) / 4 + ((tm_year % 4) && tm_year % 4 < year % 4);
-10001676:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-10001679:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
-1000167c:	8d 50 03             	lea    edx,[eax+0x3]
-1000167f:	85 c0                	test   eax,eax
-10001681:	0f 48 c2             	cmovs  eax,edx
-10001684:	c1 f8 02             	sar    eax,0x2
-10001687:	89 c1                	mov    ecx,eax
-10001689:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-1000168c:	83 e0 03             	and    eax,0x3
-1000168f:	85 c0                	test   eax,eax
-10001691:	74 29                	je     100016bc <mktime+0x525>
+1000168e:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+10001691:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
+10001694:	8d 50 03             	lea    edx,[eax+0x3]
+10001697:	85 c0                	test   eax,eax
+10001699:	0f 48 c2             	cmovs  eax,edx
+1000169c:	c1 f8 02             	sar    eax,0x2
+1000169f:	89 c1                	mov    ecx,eax
+100016a1:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+100016a4:	83 e0 03             	and    eax,0x3
+100016a7:	85 c0                	test   eax,eax
+100016a9:	74 29                	je     100016d4 <mktime+0x525>
 /home/yogi/src/os/testMainProgramEntry/time.c:195 (discriminator 1)
-10001693:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-10001696:	99                   	cdq    
-10001697:	c1 ea 1e             	shr    edx,0x1e
-1000169a:	01 d0                	add    eax,edx
-1000169c:	83 e0 03             	and    eax,0x3
-1000169f:	29 d0                	sub    eax,edx
-100016a1:	89 c3                	mov    ebx,eax
-100016a3:	8b 45 e0             	mov    eax,DWORD PTR [ebp-0x20]
-100016a6:	99                   	cdq    
-100016a7:	c1 ea 1e             	shr    edx,0x1e
-100016aa:	01 d0                	add    eax,edx
-100016ac:	83 e0 03             	and    eax,0x3
-100016af:	29 d0                	sub    eax,edx
-100016b1:	39 c3                	cmp    ebx,eax
-100016b3:	7d 07                	jge    100016bc <mktime+0x525>
+100016ab:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+100016ae:	99                   	cdq    
+100016af:	c1 ea 1e             	shr    edx,0x1e
+100016b2:	01 d0                	add    eax,edx
+100016b4:	83 e0 03             	and    eax,0x3
+100016b7:	29 d0                	sub    eax,edx
+100016b9:	89 c3                	mov    ebx,eax
+100016bb:	8b 45 e0             	mov    eax,DWORD PTR [ebp-0x20]
+100016be:	99                   	cdq    
+100016bf:	c1 ea 1e             	shr    edx,0x1e
+100016c2:	01 d0                	add    eax,edx
+100016c4:	83 e0 03             	and    eax,0x3
+100016c7:	29 d0                	sub    eax,edx
+100016c9:	39 c3                	cmp    ebx,eax
+100016cb:	7d 07                	jge    100016d4 <mktime+0x525>
 /home/yogi/src/os/testMainProgramEntry/time.c:195 (discriminator 3)
-100016b5:	b8 01 00 00 00       	mov    eax,0x1
-100016ba:	eb 05                	jmp    100016c1 <mktime+0x52a>
+100016cd:	b8 01 00 00 00       	mov    eax,0x1
+100016d2:	eb 05                	jmp    100016d9 <mktime+0x52a>
 /home/yogi/src/os/testMainProgramEntry/time.c:195 (discriminator 4)
-100016bc:	b8 00 00 00 00       	mov    eax,0x0
+100016d4:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:195 (discriminator 6)
-100016c1:	01 c8                	add    eax,ecx
-100016c3:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
+100016d9:	01 c8                	add    eax,ecx
+100016db:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:196 (discriminator 6)
   day -= (tm_year - year) / 100 + ((tm_year % 100) && tm_year % 100 < year % 100);
-100016c6:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-100016c9:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
-100016cc:	89 c1                	mov    ecx,eax
-100016ce:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-100016d3:	89 c8                	mov    eax,ecx
-100016d5:	f7 ea                	imul   edx
-100016d7:	c1 fa 05             	sar    edx,0x5
-100016da:	89 c8                	mov    eax,ecx
-100016dc:	c1 f8 1f             	sar    eax,0x1f
-100016df:	89 d6                	mov    esi,edx
-100016e1:	29 c6                	sub    esi,eax
-100016e3:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
+100016de:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+100016e1:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
+100016e4:	89 c1                	mov    ecx,eax
 100016e6:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 100016eb:	89 c8                	mov    eax,ecx
 100016ed:	f7 ea                	imul   edx
 100016ef:	c1 fa 05             	sar    edx,0x5
 100016f2:	89 c8                	mov    eax,ecx
 100016f4:	c1 f8 1f             	sar    eax,0x1f
-100016f7:	29 c2                	sub    edx,eax
-100016f9:	89 d0                	mov    eax,edx
-100016fb:	6b c0 64             	imul   eax,eax,0x64
-100016fe:	29 c1                	sub    ecx,eax
-10001700:	89 c8                	mov    eax,ecx
-10001702:	85 c0                	test   eax,eax
-10001704:	74 49                	je     1000174f <mktime+0x5b8>
+100016f7:	89 d6                	mov    esi,edx
+100016f9:	29 c6                	sub    esi,eax
+100016fb:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
+100016fe:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+10001703:	89 c8                	mov    eax,ecx
+10001705:	f7 ea                	imul   edx
+10001707:	c1 fa 05             	sar    edx,0x5
+1000170a:	89 c8                	mov    eax,ecx
+1000170c:	c1 f8 1f             	sar    eax,0x1f
+1000170f:	29 c2                	sub    edx,eax
+10001711:	89 d0                	mov    eax,edx
+10001713:	6b c0 64             	imul   eax,eax,0x64
+10001716:	29 c1                	sub    ecx,eax
+10001718:	89 c8                	mov    eax,ecx
+1000171a:	85 c0                	test   eax,eax
+1000171c:	74 49                	je     10001767 <mktime+0x5b8>
 /home/yogi/src/os/testMainProgramEntry/time.c:196 (discriminator 1)
-10001706:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
-10001709:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-1000170e:	89 c8                	mov    eax,ecx
-10001710:	f7 ea                	imul   edx
-10001712:	c1 fa 05             	sar    edx,0x5
-10001715:	89 c8                	mov    eax,ecx
-10001717:	c1 f8 1f             	sar    eax,0x1f
-1000171a:	89 d3                	mov    ebx,edx
-1000171c:	29 c3                	sub    ebx,eax
-1000171e:	6b c3 64             	imul   eax,ebx,0x64
-10001721:	89 cb                	mov    ebx,ecx
-10001723:	29 c3                	sub    ebx,eax
-10001725:	8b 4d e0             	mov    ecx,DWORD PTR [ebp-0x20]
-10001728:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+1000171e:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
+10001721:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+10001726:	89 c8                	mov    eax,ecx
+10001728:	f7 ea                	imul   edx
+1000172a:	c1 fa 05             	sar    edx,0x5
 1000172d:	89 c8                	mov    eax,ecx
-1000172f:	f7 ea                	imul   edx
-10001731:	c1 fa 05             	sar    edx,0x5
-10001734:	89 c8                	mov    eax,ecx
-10001736:	c1 f8 1f             	sar    eax,0x1f
-10001739:	29 c2                	sub    edx,eax
-1000173b:	89 d0                	mov    eax,edx
-1000173d:	6b c0 64             	imul   eax,eax,0x64
-10001740:	29 c1                	sub    ecx,eax
-10001742:	89 c8                	mov    eax,ecx
-10001744:	39 c3                	cmp    ebx,eax
-10001746:	7d 07                	jge    1000174f <mktime+0x5b8>
+1000172f:	c1 f8 1f             	sar    eax,0x1f
+10001732:	89 d3                	mov    ebx,edx
+10001734:	29 c3                	sub    ebx,eax
+10001736:	6b c3 64             	imul   eax,ebx,0x64
+10001739:	89 cb                	mov    ebx,ecx
+1000173b:	29 c3                	sub    ebx,eax
+1000173d:	8b 4d e0             	mov    ecx,DWORD PTR [ebp-0x20]
+10001740:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+10001745:	89 c8                	mov    eax,ecx
+10001747:	f7 ea                	imul   edx
+10001749:	c1 fa 05             	sar    edx,0x5
+1000174c:	89 c8                	mov    eax,ecx
+1000174e:	c1 f8 1f             	sar    eax,0x1f
+10001751:	29 c2                	sub    edx,eax
+10001753:	89 d0                	mov    eax,edx
+10001755:	6b c0 64             	imul   eax,eax,0x64
+10001758:	29 c1                	sub    ecx,eax
+1000175a:	89 c8                	mov    eax,ecx
+1000175c:	39 c3                	cmp    ebx,eax
+1000175e:	7d 07                	jge    10001767 <mktime+0x5b8>
 /home/yogi/src/os/testMainProgramEntry/time.c:196 (discriminator 3)
-10001748:	b8 01 00 00 00       	mov    eax,0x1
-1000174d:	eb 05                	jmp    10001754 <mktime+0x5bd>
+10001760:	b8 01 00 00 00       	mov    eax,0x1
+10001765:	eb 05                	jmp    1000176c <mktime+0x5bd>
 /home/yogi/src/os/testMainProgramEntry/time.c:196 (discriminator 4)
-1000174f:	b8 00 00 00 00       	mov    eax,0x0
+10001767:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:196 (discriminator 6)
-10001754:	01 f0                	add    eax,esi
-10001756:	29 45 f4             	sub    DWORD PTR [ebp-0xc],eax
+1000176c:	01 f0                	add    eax,esi
+1000176e:	29 45 f4             	sub    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:197 (discriminator 6)
   day += (tm_year - year) / 400 + ((tm_year % 400) && tm_year % 400 < year % 400);
-10001759:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-1000175c:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
-1000175f:	89 c1                	mov    ecx,eax
-10001761:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10001766:	89 c8                	mov    eax,ecx
-10001768:	f7 ea                	imul   edx
-1000176a:	c1 fa 07             	sar    edx,0x7
-1000176d:	89 c8                	mov    eax,ecx
-1000176f:	c1 f8 1f             	sar    eax,0x1f
-10001772:	89 d6                	mov    esi,edx
-10001774:	29 c6                	sub    esi,eax
-10001776:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
+10001771:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+10001774:	2b 45 e0             	sub    eax,DWORD PTR [ebp-0x20]
+10001777:	89 c1                	mov    ecx,eax
 10001779:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 1000177e:	89 c8                	mov    eax,ecx
 10001780:	f7 ea                	imul   edx
 10001782:	c1 fa 07             	sar    edx,0x7
 10001785:	89 c8                	mov    eax,ecx
 10001787:	c1 f8 1f             	sar    eax,0x1f
-1000178a:	29 c2                	sub    edx,eax
-1000178c:	89 d0                	mov    eax,edx
-1000178e:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-10001794:	29 c1                	sub    ecx,eax
+1000178a:	89 d6                	mov    esi,edx
+1000178c:	29 c6                	sub    esi,eax
+1000178e:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
+10001791:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 10001796:	89 c8                	mov    eax,ecx
-10001798:	85 c0                	test   eax,eax
-1000179a:	74 4f                	je     100017eb <mktime+0x654>
+10001798:	f7 ea                	imul   edx
+1000179a:	c1 fa 07             	sar    edx,0x7
+1000179d:	89 c8                	mov    eax,ecx
+1000179f:	c1 f8 1f             	sar    eax,0x1f
+100017a2:	29 c2                	sub    edx,eax
+100017a4:	89 d0                	mov    eax,edx
+100017a6:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+100017ac:	29 c1                	sub    ecx,eax
+100017ae:	89 c8                	mov    eax,ecx
+100017b0:	85 c0                	test   eax,eax
+100017b2:	74 4f                	je     10001803 <mktime+0x654>
 /home/yogi/src/os/testMainProgramEntry/time.c:197 (discriminator 1)
-1000179c:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
-1000179f:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-100017a4:	89 c8                	mov    eax,ecx
-100017a6:	f7 ea                	imul   edx
-100017a8:	c1 fa 07             	sar    edx,0x7
-100017ab:	89 c8                	mov    eax,ecx
-100017ad:	c1 f8 1f             	sar    eax,0x1f
-100017b0:	89 d3                	mov    ebx,edx
-100017b2:	29 c3                	sub    ebx,eax
-100017b4:	69 c3 90 01 00 00    	imul   eax,ebx,0x190
-100017ba:	89 cb                	mov    ebx,ecx
-100017bc:	29 c3                	sub    ebx,eax
-100017be:	8b 4d e0             	mov    ecx,DWORD PTR [ebp-0x20]
-100017c1:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-100017c6:	89 c8                	mov    eax,ecx
-100017c8:	f7 ea                	imul   edx
-100017ca:	c1 fa 07             	sar    edx,0x7
-100017cd:	89 c8                	mov    eax,ecx
-100017cf:	c1 f8 1f             	sar    eax,0x1f
-100017d2:	29 c2                	sub    edx,eax
-100017d4:	89 d0                	mov    eax,edx
-100017d6:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-100017dc:	29 c1                	sub    ecx,eax
+100017b4:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
+100017b7:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+100017bc:	89 c8                	mov    eax,ecx
+100017be:	f7 ea                	imul   edx
+100017c0:	c1 fa 07             	sar    edx,0x7
+100017c3:	89 c8                	mov    eax,ecx
+100017c5:	c1 f8 1f             	sar    eax,0x1f
+100017c8:	89 d3                	mov    ebx,edx
+100017ca:	29 c3                	sub    ebx,eax
+100017cc:	69 c3 90 01 00 00    	imul   eax,ebx,0x190
+100017d2:	89 cb                	mov    ebx,ecx
+100017d4:	29 c3                	sub    ebx,eax
+100017d6:	8b 4d e0             	mov    ecx,DWORD PTR [ebp-0x20]
+100017d9:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 100017de:	89 c8                	mov    eax,ecx
-100017e0:	39 c3                	cmp    ebx,eax
-100017e2:	7d 07                	jge    100017eb <mktime+0x654>
+100017e0:	f7 ea                	imul   edx
+100017e2:	c1 fa 07             	sar    edx,0x7
+100017e5:	89 c8                	mov    eax,ecx
+100017e7:	c1 f8 1f             	sar    eax,0x1f
+100017ea:	29 c2                	sub    edx,eax
+100017ec:	89 d0                	mov    eax,edx
+100017ee:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+100017f4:	29 c1                	sub    ecx,eax
+100017f6:	89 c8                	mov    eax,ecx
+100017f8:	39 c3                	cmp    ebx,eax
+100017fa:	7d 07                	jge    10001803 <mktime+0x654>
 /home/yogi/src/os/testMainProgramEntry/time.c:197 (discriminator 3)
-100017e4:	b8 01 00 00 00       	mov    eax,0x1
-100017e9:	eb 05                	jmp    100017f0 <mktime+0x659>
+100017fc:	b8 01 00 00 00       	mov    eax,0x1
+10001801:	eb 05                	jmp    10001808 <mktime+0x659>
 /home/yogi/src/os/testMainProgramEntry/time.c:197 (discriminator 4)
-100017eb:	b8 00 00 00 00       	mov    eax,0x0
+10001803:	b8 00 00 00 00       	mov    eax,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:197 (discriminator 6)
-100017f0:	01 f0                	add    eax,esi
-100017f2:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
+10001808:	01 f0                	add    eax,esi
+1000180a:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:199 (discriminator 6)
 
   yday = month = 0;
-100017f5:	c7 45 ec 00 00 00 00 	mov    DWORD PTR [ebp-0x14],0x0
-100017fc:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
-100017ff:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
+1000180d:	c7 45 ec 00 00 00 00 	mov    DWORD PTR [ebp-0x14],0x0
+10001814:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
+10001817:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:200 (discriminator 6)
   while (month < tmbuf->tm_mon) {
-10001802:	eb 7b                	jmp    1000187f <mktime+0x6e8>
+1000181a:	eb 7b                	jmp    10001897 <mktime+0x6e8>
 /home/yogi/src/os/testMainProgramEntry/time.c:201
     yday += _ytab[LEAPYEAR(tm_year)][month];
-10001804:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
-10001807:	83 e0 03             	and    eax,0x3
-1000180a:	85 c0                	test   eax,eax
-1000180c:	75 50                	jne    1000185e <mktime+0x6c7>
+1000181c:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
+1000181f:	83 e0 03             	and    eax,0x3
+10001822:	85 c0                	test   eax,eax
+10001824:	75 50                	jne    10001876 <mktime+0x6c7>
 /home/yogi/src/os/testMainProgramEntry/time.c:201 (discriminator 1)
-1000180e:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
-10001811:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10001816:	89 c8                	mov    eax,ecx
-10001818:	f7 ea                	imul   edx
-1000181a:	c1 fa 05             	sar    edx,0x5
-1000181d:	89 c8                	mov    eax,ecx
-1000181f:	c1 f8 1f             	sar    eax,0x1f
-10001822:	29 c2                	sub    edx,eax
-10001824:	89 d0                	mov    eax,edx
-10001826:	6b c0 64             	imul   eax,eax,0x64
-10001829:	29 c1                	sub    ecx,eax
-1000182b:	89 c8                	mov    eax,ecx
-1000182d:	85 c0                	test   eax,eax
-1000182f:	75 26                	jne    10001857 <mktime+0x6c0>
+10001826:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
+10001829:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
+1000182e:	89 c8                	mov    eax,ecx
+10001830:	f7 ea                	imul   edx
+10001832:	c1 fa 05             	sar    edx,0x5
+10001835:	89 c8                	mov    eax,ecx
+10001837:	c1 f8 1f             	sar    eax,0x1f
+1000183a:	29 c2                	sub    edx,eax
+1000183c:	89 d0                	mov    eax,edx
+1000183e:	6b c0 64             	imul   eax,eax,0x64
+10001841:	29 c1                	sub    ecx,eax
+10001843:	89 c8                	mov    eax,ecx
+10001845:	85 c0                	test   eax,eax
+10001847:	75 26                	jne    1000186f <mktime+0x6c0>
 /home/yogi/src/os/testMainProgramEntry/time.c:201 (discriminator 4)
-10001831:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
-10001834:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
-10001839:	89 c8                	mov    eax,ecx
-1000183b:	f7 ea                	imul   edx
-1000183d:	c1 fa 07             	sar    edx,0x7
-10001840:	89 c8                	mov    eax,ecx
-10001842:	c1 f8 1f             	sar    eax,0x1f
-10001845:	29 c2                	sub    edx,eax
-10001847:	89 d0                	mov    eax,edx
-10001849:	69 c0 90 01 00 00    	imul   eax,eax,0x190
-1000184f:	29 c1                	sub    ecx,eax
+10001849:	8b 4d d8             	mov    ecx,DWORD PTR [ebp-0x28]
+1000184c:	ba 1f 85 eb 51       	mov    edx,0x51eb851f
 10001851:	89 c8                	mov    eax,ecx
-10001853:	85 c0                	test   eax,eax
-10001855:	75 07                	jne    1000185e <mktime+0x6c7>
+10001853:	f7 ea                	imul   edx
+10001855:	c1 fa 07             	sar    edx,0x7
+10001858:	89 c8                	mov    eax,ecx
+1000185a:	c1 f8 1f             	sar    eax,0x1f
+1000185d:	29 c2                	sub    edx,eax
+1000185f:	89 d0                	mov    eax,edx
+10001861:	69 c0 90 01 00 00    	imul   eax,eax,0x190
+10001867:	29 c1                	sub    ecx,eax
+10001869:	89 c8                	mov    eax,ecx
+1000186b:	85 c0                	test   eax,eax
+1000186d:	75 07                	jne    10001876 <mktime+0x6c7>
 /home/yogi/src/os/testMainProgramEntry/time.c:201 (discriminator 5)
-10001857:	ba 01 00 00 00       	mov    edx,0x1
-1000185c:	eb 05                	jmp    10001863 <mktime+0x6cc>
+1000186f:	ba 01 00 00 00       	mov    edx,0x1
+10001874:	eb 05                	jmp    1000187b <mktime+0x6cc>
 /home/yogi/src/os/testMainProgramEntry/time.c:201 (discriminator 6)
-1000185e:	ba 00 00 00 00       	mov    edx,0x0
+10001876:	ba 00 00 00 00       	mov    edx,0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:201 (discriminator 8)
-10001863:	89 d0                	mov    eax,edx
-10001865:	01 c0                	add    eax,eax
-10001867:	01 d0                	add    eax,edx
-10001869:	c1 e0 02             	shl    eax,0x2
-1000186c:	8b 55 ec             	mov    edx,DWORD PTR [ebp-0x14]
-1000186f:	01 d0                	add    eax,edx
-10001871:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
-10001878:	01 45 f0             	add    DWORD PTR [ebp-0x10],eax
+1000187b:	89 d0                	mov    eax,edx
+1000187d:	01 c0                	add    eax,eax
+1000187f:	01 d0                	add    eax,edx
+10001881:	c1 e0 02             	shl    eax,0x2
+10001884:	8b 55 ec             	mov    edx,DWORD PTR [ebp-0x14]
+10001887:	01 d0                	add    eax,edx
+10001889:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+10001890:	01 45 f0             	add    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:202 (discriminator 8)
     month++;
-1000187b:	83 45 ec 01          	add    DWORD PTR [ebp-0x14],0x1
+10001893:	83 45 ec 01          	add    DWORD PTR [ebp-0x14],0x1
 /home/yogi/src/os/testMainProgramEntry/time.c:200
   day += (tm_year - year) / 4 + ((tm_year % 4) && tm_year % 4 < year % 4);
   day -= (tm_year - year) / 100 + ((tm_year % 100) && tm_year % 100 < year % 100);
@@ -3755,121 +3771,121 @@ time_t mktime(struct tm *tmbuf) {
 
   yday = month = 0;
   while (month < tmbuf->tm_mon) {
-1000187f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001882:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
-10001885:	3b 45 ec             	cmp    eax,DWORD PTR [ebp-0x14]
-10001888:	0f 8f 76 ff ff ff    	jg     10001804 <mktime+0x66d>
+10001897:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+1000189a:	8b 40 10             	mov    eax,DWORD PTR [eax+0x10]
+1000189d:	3b 45 ec             	cmp    eax,DWORD PTR [ebp-0x14]
+100018a0:	0f 8f 76 ff ff ff    	jg     1000181c <mktime+0x66d>
 /home/yogi/src/os/testMainProgramEntry/time.c:204
     yday += _ytab[LEAPYEAR(tm_year)][month];
     month++;
   }
   yday += (tmbuf->tm_mday - 1);
-1000188e:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001891:	8b 40 0c             	mov    eax,DWORD PTR [eax+0xc]
-10001894:	83 e8 01             	sub    eax,0x1
-10001897:	01 45 f0             	add    DWORD PTR [ebp-0x10],eax
+100018a6:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100018a9:	8b 40 0c             	mov    eax,DWORD PTR [eax+0xc]
+100018ac:	83 e8 01             	sub    eax,0x1
+100018af:	01 45 f0             	add    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:205
   if (day + yday < 0) overflow|=4;
-1000189a:	8b 55 f4             	mov    edx,DWORD PTR [ebp-0xc]
-1000189d:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
-100018a0:	01 d0                	add    eax,edx
-100018a2:	85 c0                	test   eax,eax
-100018a4:	79 04                	jns    100018aa <mktime+0x713>
+100018b2:	8b 55 f4             	mov    edx,DWORD PTR [ebp-0xc]
+100018b5:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
+100018b8:	01 d0                	add    eax,edx
+100018ba:	85 c0                	test   eax,eax
+100018bc:	79 04                	jns    100018c2 <mktime+0x713>
 /home/yogi/src/os/testMainProgramEntry/time.c:205 (discriminator 1)
-100018a6:	83 4d e8 04          	or     DWORD PTR [ebp-0x18],0x4
+100018be:	83 4d e8 04          	or     DWORD PTR [ebp-0x18],0x4
 /home/yogi/src/os/testMainProgramEntry/time.c:206
   day += yday;
-100018aa:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
-100018ad:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
+100018c2:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
+100018c5:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:208
 
   tmbuf->tm_yday = yday;
-100018b0:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100018b3:	8b 55 f0             	mov    edx,DWORD PTR [ebp-0x10]
-100018b6:	89 50 1c             	mov    DWORD PTR [eax+0x1c],edx
+100018c8:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100018cb:	8b 55 f0             	mov    edx,DWORD PTR [ebp-0x10]
+100018ce:	89 50 1c             	mov    DWORD PTR [eax+0x1c],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:209
   tmbuf->tm_wday = (day + 4) % 7;               // Day 0 was thursday (4)
-100018b9:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-100018bc:	8d 48 04             	lea    ecx,[eax+0x4]
-100018bf:	ba 93 24 49 92       	mov    edx,0x92492493
-100018c4:	89 c8                	mov    eax,ecx
-100018c6:	f7 ea                	imul   edx
-100018c8:	8d 04 0a             	lea    eax,[edx+ecx*1]
-100018cb:	c1 f8 02             	sar    eax,0x2
-100018ce:	89 c2                	mov    edx,eax
-100018d0:	89 c8                	mov    eax,ecx
-100018d2:	c1 f8 1f             	sar    eax,0x1f
-100018d5:	29 c2                	sub    edx,eax
-100018d7:	89 d0                	mov    eax,edx
-100018d9:	89 c2                	mov    edx,eax
-100018db:	c1 e2 03             	shl    edx,0x3
-100018de:	29 c2                	sub    edx,eax
-100018e0:	89 c8                	mov    eax,ecx
-100018e2:	29 d0                	sub    eax,edx
-100018e4:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
-100018e7:	89 42 18             	mov    DWORD PTR [edx+0x18],eax
+100018d1:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+100018d4:	8d 48 04             	lea    ecx,[eax+0x4]
+100018d7:	ba 93 24 49 92       	mov    edx,0x92492493
+100018dc:	89 c8                	mov    eax,ecx
+100018de:	f7 ea                	imul   edx
+100018e0:	8d 04 0a             	lea    eax,[edx+ecx*1]
+100018e3:	c1 f8 02             	sar    eax,0x2
+100018e6:	89 c2                	mov    edx,eax
+100018e8:	89 c8                	mov    eax,ecx
+100018ea:	c1 f8 1f             	sar    eax,0x1f
+100018ed:	29 c2                	sub    edx,eax
+100018ef:	89 d0                	mov    eax,edx
+100018f1:	89 c2                	mov    edx,eax
+100018f3:	c1 e2 03             	shl    edx,0x3
+100018f6:	29 c2                	sub    edx,eax
+100018f8:	89 c8                	mov    eax,ecx
+100018fa:	29 d0                	sub    eax,edx
+100018fc:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
+100018ff:	89 42 18             	mov    DWORD PTR [edx+0x18],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:211
 
   seconds = ((tmbuf->tm_hour * 60L) + tmbuf->tm_min) * 60L + tmbuf->tm_sec;
-100018ea:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100018ed:	8b 40 08             	mov    eax,DWORD PTR [eax+0x8]
-100018f0:	c1 e0 02             	shl    eax,0x2
-100018f3:	89 c2                	mov    edx,eax
-100018f5:	c1 e2 04             	shl    edx,0x4
-100018f8:	29 c2                	sub    edx,eax
-100018fa:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-100018fd:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
-10001900:	01 d0                	add    eax,edx
-10001902:	c1 e0 02             	shl    eax,0x2
-10001905:	89 c2                	mov    edx,eax
-10001907:	c1 e2 04             	shl    edx,0x4
-1000190a:	29 c2                	sub    edx,eax
-1000190c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000190f:	8b 00                	mov    eax,DWORD PTR [eax]
-10001911:	01 d0                	add    eax,edx
-10001913:	89 45 dc             	mov    DWORD PTR [ebp-0x24],eax
+10001902:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001905:	8b 40 08             	mov    eax,DWORD PTR [eax+0x8]
+10001908:	c1 e0 02             	shl    eax,0x2
+1000190b:	89 c2                	mov    edx,eax
+1000190d:	c1 e2 04             	shl    edx,0x4
+10001910:	29 c2                	sub    edx,eax
+10001912:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001915:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
+10001918:	01 d0                	add    eax,edx
+1000191a:	c1 e0 02             	shl    eax,0x2
+1000191d:	89 c2                	mov    edx,eax
+1000191f:	c1 e2 04             	shl    edx,0x4
+10001922:	29 c2                	sub    edx,eax
+10001924:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001927:	8b 00                	mov    eax,DWORD PTR [eax]
+10001929:	01 d0                	add    eax,edx
+1000192b:	89 45 dc             	mov    DWORD PTR [ebp-0x24],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:213
 
   if ((TIME_MAX - seconds) / SECS_DAY < day) overflow|=8;
-10001916:	b8 ff ff ff 7f       	mov    eax,0x7fffffff
-1000191b:	2b 45 dc             	sub    eax,DWORD PTR [ebp-0x24]
-1000191e:	89 c1                	mov    ecx,eax
-10001920:	ba 07 45 2e c2       	mov    edx,0xc22e4507
-10001925:	89 c8                	mov    eax,ecx
-10001927:	f7 ea                	imul   edx
-10001929:	8d 04 0a             	lea    eax,[edx+ecx*1]
-1000192c:	c1 f8 10             	sar    eax,0x10
-1000192f:	89 c2                	mov    edx,eax
-10001931:	89 c8                	mov    eax,ecx
-10001933:	c1 f8 1f             	sar    eax,0x1f
-10001936:	29 c2                	sub    edx,eax
-10001938:	89 d0                	mov    eax,edx
-1000193a:	3b 45 f4             	cmp    eax,DWORD PTR [ebp-0xc]
-1000193d:	7d 04                	jge    10001943 <mktime+0x7ac>
+1000192e:	b8 ff ff ff 7f       	mov    eax,0x7fffffff
+10001933:	2b 45 dc             	sub    eax,DWORD PTR [ebp-0x24]
+10001936:	89 c1                	mov    ecx,eax
+10001938:	ba 07 45 2e c2       	mov    edx,0xc22e4507
+1000193d:	89 c8                	mov    eax,ecx
+1000193f:	f7 ea                	imul   edx
+10001941:	8d 04 0a             	lea    eax,[edx+ecx*1]
+10001944:	c1 f8 10             	sar    eax,0x10
+10001947:	89 c2                	mov    edx,eax
+10001949:	89 c8                	mov    eax,ecx
+1000194b:	c1 f8 1f             	sar    eax,0x1f
+1000194e:	29 c2                	sub    edx,eax
+10001950:	89 d0                	mov    eax,edx
+10001952:	3b 45 f4             	cmp    eax,DWORD PTR [ebp-0xc]
+10001955:	7d 04                	jge    1000195b <mktime+0x7ac>
 /home/yogi/src/os/testMainProgramEntry/time.c:213 (discriminator 1)
-1000193f:	83 4d e8 08          	or     DWORD PTR [ebp-0x18],0x8
+10001957:	83 4d e8 08          	or     DWORD PTR [ebp-0x18],0x8
 /home/yogi/src/os/testMainProgramEntry/time.c:214
   seconds += day * SECS_DAY;
-10001943:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
-10001946:	69 c0 80 51 01 00    	imul   eax,eax,0x15180
-1000194c:	01 45 dc             	add    DWORD PTR [ebp-0x24],eax
+1000195b:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+1000195e:	69 c0 80 51 01 00    	imul   eax,eax,0x15180
+10001964:	01 45 dc             	add    DWORD PTR [ebp-0x24],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:217
 
   // Now adjust according to timezone and daylight saving time
   if (((kTimeZone > 0) && (TIME_MAX - kTimeZone < seconds)) || 
-1000194f:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
-10001954:	85 c0                	test   eax,eax
-10001956:	7e 13                	jle    1000196b <mktime+0x7d4>
+10001967:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+1000196c:	85 c0                	test   eax,eax
+1000196e:	7e 13                	jle    10001983 <mktime+0x7d4>
 /home/yogi/src/os/testMainProgramEntry/time.c:217 (discriminator 1)
-10001958:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
-1000195d:	ba ff ff ff 7f       	mov    edx,0x7fffffff
-10001962:	29 c2                	sub    edx,eax
-10001964:	89 d0                	mov    eax,edx
-10001966:	3b 45 dc             	cmp    eax,DWORD PTR [ebp-0x24]
-10001969:	7c 15                	jl     10001980 <mktime+0x7e9>
+10001970:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001975:	ba ff ff ff 7f       	mov    edx,0x7fffffff
+1000197a:	29 c2                	sub    edx,eax
+1000197c:	89 d0                	mov    eax,edx
+1000197e:	3b 45 dc             	cmp    eax,DWORD PTR [ebp-0x24]
+10001981:	7c 15                	jl     10001998 <mktime+0x7e9>
 /home/yogi/src/os/testMainProgramEntry/time.c:218 (discriminator 3)
       ((kTimeZone < 0) && (seconds < -kTimeZone))) {
-1000196b:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001983:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
 /home/yogi/src/os/testMainProgramEntry/time.c:217 (discriminator 3)
 
   if ((TIME_MAX - seconds) / SECS_DAY < day) overflow|=8;
@@ -3877,74 +3893,74 @@ time_t mktime(struct tm *tmbuf) {
 
   // Now adjust according to timezone and daylight saving time
   if (((kTimeZone > 0) && (TIME_MAX - kTimeZone < seconds)) || 
-10001970:	85 c0                	test   eax,eax
-10001972:	79 10                	jns    10001984 <mktime+0x7ed>
+10001988:	85 c0                	test   eax,eax
+1000198a:	79 10                	jns    1000199c <mktime+0x7ed>
 /home/yogi/src/os/testMainProgramEntry/time.c:218
       ((kTimeZone < 0) && (seconds < -kTimeZone))) {
-10001974:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
-10001979:	f7 d8                	neg    eax
-1000197b:	3b 45 dc             	cmp    eax,DWORD PTR [ebp-0x24]
-1000197e:	7e 04                	jle    10001984 <mktime+0x7ed>
+1000198c:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001991:	f7 d8                	neg    eax
+10001993:	3b 45 dc             	cmp    eax,DWORD PTR [ebp-0x24]
+10001996:	7e 04                	jle    1000199c <mktime+0x7ed>
 /home/yogi/src/os/testMainProgramEntry/time.c:219
           overflow|=16;
-10001980:	83 4d e8 10          	or     DWORD PTR [ebp-0x18],0x10
+10001998:	83 4d e8 10          	or     DWORD PTR [ebp-0x18],0x10
 /home/yogi/src/os/testMainProgramEntry/time.c:221
   }
   seconds += kTimeZone;
-10001984:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
-10001989:	01 45 dc             	add    DWORD PTR [ebp-0x24],eax
+1000199c:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+100019a1:	01 45 dc             	add    DWORD PTR [ebp-0x24],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:223
 
   if (tmbuf->tm_isdst) {
-1000198c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-1000198f:	8b 40 20             	mov    eax,DWORD PTR [eax+0x20]
-10001992:	85 c0                	test   eax,eax
-10001994:	74 0a                	je     100019a0 <mktime+0x809>
+100019a4:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100019a7:	8b 40 20             	mov    eax,DWORD PTR [eax+0x20]
+100019aa:	85 c0                	test   eax,eax
+100019ac:	74 0a                	je     100019b8 <mktime+0x809>
 /home/yogi/src/os/testMainProgramEntry/time.c:224
     dst = _dstbias;
-10001996:	a1 68 99 12 00       	mov    eax,ds:0x129968
-1000199b:	89 45 e4             	mov    DWORD PTR [ebp-0x1c],eax
-1000199e:	eb 07                	jmp    100019a7 <mktime+0x810>
+100019ae:	a1 68 99 12 00       	mov    eax,ds:0x129968
+100019b3:	89 45 e4             	mov    DWORD PTR [ebp-0x1c],eax
+100019b6:	eb 07                	jmp    100019bf <mktime+0x810>
 /home/yogi/src/os/testMainProgramEntry/time.c:226
   } else {
     dst = 0;
-100019a0:	c7 45 e4 00 00 00 00 	mov    DWORD PTR [ebp-0x1c],0x0
+100019b8:	c7 45 e4 00 00 00 00 	mov    DWORD PTR [ebp-0x1c],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:229
   }
 
   if (dst > seconds) overflow|=32;        // dst is always non-negative
-100019a7:	8b 45 e4             	mov    eax,DWORD PTR [ebp-0x1c]
-100019aa:	3b 45 dc             	cmp    eax,DWORD PTR [ebp-0x24]
-100019ad:	7e 04                	jle    100019b3 <mktime+0x81c>
+100019bf:	8b 45 e4             	mov    eax,DWORD PTR [ebp-0x1c]
+100019c2:	3b 45 dc             	cmp    eax,DWORD PTR [ebp-0x24]
+100019c5:	7e 04                	jle    100019cb <mktime+0x81c>
 /home/yogi/src/os/testMainProgramEntry/time.c:229 (discriminator 1)
-100019af:	83 4d e8 20          	or     DWORD PTR [ebp-0x18],0x20
+100019c7:	83 4d e8 20          	or     DWORD PTR [ebp-0x18],0x20
 /home/yogi/src/os/testMainProgramEntry/time.c:230
   seconds -= dst;
-100019b3:	8b 45 e4             	mov    eax,DWORD PTR [ebp-0x1c]
-100019b6:	29 45 dc             	sub    DWORD PTR [ebp-0x24],eax
+100019cb:	8b 45 e4             	mov    eax,DWORD PTR [ebp-0x1c]
+100019ce:	29 45 dc             	sub    DWORD PTR [ebp-0x24],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:232
 
   if (overflow) return (time_t) overflow-2;
-100019b9:	83 7d e8 00          	cmp    DWORD PTR [ebp-0x18],0x0
-100019bd:	74 08                	je     100019c7 <mktime+0x830>
+100019d1:	83 7d e8 00          	cmp    DWORD PTR [ebp-0x18],0x0
+100019d5:	74 08                	je     100019df <mktime+0x830>
 /home/yogi/src/os/testMainProgramEntry/time.c:232 (discriminator 1)
-100019bf:	8b 45 e8             	mov    eax,DWORD PTR [ebp-0x18]
-100019c2:	83 e8 02             	sub    eax,0x2
-100019c5:	eb 03                	jmp    100019ca <mktime+0x833>
+100019d7:	8b 45 e8             	mov    eax,DWORD PTR [ebp-0x18]
+100019da:	83 e8 02             	sub    eax,0x2
+100019dd:	eb 03                	jmp    100019e2 <mktime+0x833>
 /home/yogi/src/os/testMainProgramEntry/time.c:235
 
   if ((time_t) seconds != seconds) return (time_t) -1;
   return (time_t) seconds;
-100019c7:	8b 45 dc             	mov    eax,DWORD PTR [ebp-0x24]
+100019df:	8b 45 dc             	mov    eax,DWORD PTR [ebp-0x24]
 /home/yogi/src/os/testMainProgramEntry/time.c:236
 }
-100019ca:	83 c4 20             	add    esp,0x20
-100019cd:	5b                   	pop    ebx
-100019ce:	5e                   	pop    esi
-100019cf:	5d                   	pop    ebp
-100019d0:	c3                   	ret    
+100019e2:	83 c4 20             	add    esp,0x20
+100019e5:	5b                   	pop    ebx
+100019e6:	5e                   	pop    esi
+100019e7:	5d                   	pop    ebp
+100019e8:	c3                   	ret    
 
-100019d1 <_strdate>:
+100019e9 <_strdate>:
 _strdate():
 /home/yogi/src/os/testMainProgramEntry/time.c:241
 
@@ -3952,85 +3968,85 @@ _strdate():
 
 
 char *_strdate(char *s) {
-100019d1:	55                   	push   ebp
-100019d2:	89 e5                	mov    ebp,esp
-100019d4:	83 ec 10             	sub    esp,0x10
+100019e9:	55                   	push   ebp
+100019ea:	89 e5                	mov    ebp,esp
+100019ec:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/time.c:244
   time_t now;
 
   time(&now);
-100019d7:	8d 45 fc             	lea    eax,[ebp-0x4]
-100019da:	50                   	push   eax
-100019db:	e8 48 f4 ff ff       	call   10000e28 <time>
-100019e0:	83 c4 04             	add    esp,0x4
+100019ef:	8d 45 fc             	lea    eax,[ebp-0x4]
+100019f2:	50                   	push   eax
+100019f3:	e8 48 f4 ff ff       	call   10000e40 <time>
+100019f8:	83 c4 04             	add    esp,0x4
 /home/yogi/src/os/testMainProgramEntry/time.c:247
   //fix me!
   //  strftime(s, 9, "%D", localtime(&now));
   return s;
-100019e3:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+100019fb:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
 /home/yogi/src/os/testMainProgramEntry/time.c:248
 }
-100019e6:	c9                   	leave  
-100019e7:	c3                   	ret    
+100019fe:	c9                   	leave  
+100019ff:	c3                   	ret    
 
-100019e8 <_strtime>:
+10001a00 <_strtime>:
 _strtime():
 /home/yogi/src/os/testMainProgramEntry/time.c:250
 
 char *_strtime(char *s) {
-100019e8:	55                   	push   ebp
-100019e9:	89 e5                	mov    ebp,esp
-100019eb:	83 ec 10             	sub    esp,0x10
+10001a00:	55                   	push   ebp
+10001a01:	89 e5                	mov    ebp,esp
+10001a03:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/time.c:253
   time_t now;
 
   time(&now);
-100019ee:	8d 45 fc             	lea    eax,[ebp-0x4]
-100019f1:	50                   	push   eax
-100019f2:	e8 31 f4 ff ff       	call   10000e28 <time>
-100019f7:	83 c4 04             	add    esp,0x4
+10001a06:	8d 45 fc             	lea    eax,[ebp-0x4]
+10001a09:	50                   	push   eax
+10001a0a:	e8 31 f4 ff ff       	call   10000e40 <time>
+10001a0f:	83 c4 04             	add    esp,0x4
 /home/yogi/src/os/testMainProgramEntry/time.c:256
   //fix me
   //  strftime(s, 9, "%T", localtime(&now));
   return s;
-100019fa:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001a12:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
 /home/yogi/src/os/testMainProgramEntry/time.c:257
 }
-100019fd:	c9                   	leave  
-100019fe:	c3                   	ret    
+10001a15:	c9                   	leave  
+10001a16:	c3                   	ret    
 
-100019ff <waitTicks>:
+10001a17 <waitTicks>:
 waitTicks():
 /home/yogi/src/os/testMainProgramEntry/time.c:260
 
 void __attribute__((noinline))waitTicks(int TicksToWait)
 {
-100019ff:	55                   	push   ebp
-10001a00:	89 e5                	mov    ebp,esp
+10001a17:	55                   	push   ebp
+10001a18:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/time.c:262
     //printf("ttw=%u",ttw);
     if (TicksToWait==0)
-10001a02:	83 7d 08 00          	cmp    DWORD PTR [ebp+0x8],0x0
-10001a06:	74 0f                	je     10001a17 <waitTicks+0x18>
+10001a1a:	83 7d 08 00          	cmp    DWORD PTR [ebp+0x8],0x0
+10001a1e:	74 0f                	je     10001a2f <waitTicks+0x18>
 /home/yogi/src/os/testMainProgramEntry/time.c:267 (discriminator 1)
         return;
     //printd(DEBUG_TIMER,"ttw=%08X", TicksToWait);
     do
     {
         __asm("sti\nhlt\n");
-10001a08:	fb                   	sti    
-10001a09:	f4                   	hlt    
+10001a20:	fb                   	sti    
+10001a21:	f4                   	hlt    
 /home/yogi/src/os/testMainProgramEntry/time.c:268 (discriminator 1)
         TicksToWait--;
-10001a0a:	83 6d 08 01          	sub    DWORD PTR [ebp+0x8],0x1
+10001a22:	83 6d 08 01          	sub    DWORD PTR [ebp+0x8],0x1
 /home/yogi/src/os/testMainProgramEntry/time.c:269 (discriminator 1)
     } while (TicksToWait>0);
-10001a0e:	83 7d 08 00          	cmp    DWORD PTR [ebp+0x8],0x0
-10001a12:	7f f4                	jg     10001a08 <waitTicks+0x9>
+10001a26:	83 7d 08 00          	cmp    DWORD PTR [ebp+0x8],0x0
+10001a2a:	7f f4                	jg     10001a20 <waitTicks+0x9>
 /home/yogi/src/os/testMainProgramEntry/time.c:270 (discriminator 2)
     return;
-10001a14:	90                   	nop
-10001a15:	eb 01                	jmp    10001a18 <waitTicks+0x19>
+10001a2c:	90                   	nop
+10001a2d:	eb 01                	jmp    10001a30 <waitTicks+0x19>
 /home/yogi/src/os/testMainProgramEntry/time.c:263
 
 void __attribute__((noinline))waitTicks(int TicksToWait)
@@ -4038,7 +4054,7 @@ void __attribute__((noinline))waitTicks(int TicksToWait)
     //printf("ttw=%u",ttw);
     if (TicksToWait==0)
         return;
-10001a17:	90                   	nop
+10001a2f:	90                   	nop
 /home/yogi/src/os/testMainProgramEntry/time.c:271
     {
         __asm("sti\nhlt\n");
@@ -4046,79 +4062,79 @@ void __attribute__((noinline))waitTicks(int TicksToWait)
     } while (TicksToWait>0);
     return;
 }
-10001a18:	5d                   	pop    ebp
-10001a19:	c3                   	ret    
+10001a30:	5d                   	pop    ebp
+10001a31:	c3                   	ret    
 
-10001a1a <wait>:
+10001a32 <wait>:
 wait():
 /home/yogi/src/os/testMainProgramEntry/time.c:274
 
 void /*__attribute__((noinline))*/wait(int msToWait)
 {
-10001a1a:	55                   	push   ebp
-10001a1b:	89 e5                	mov    ebp,esp
+10001a32:	55                   	push   ebp
+10001a33:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/time.c:277
     //printk("msToWait=%u, ticksperms=%u, ticksToWait=%u",msToWait, kTicksPerMS, msToWait*kTicksPerMS);
     //STOPHERE2
     waitTicks(msToWait/kTicksPerMS);
-10001a1d:	8b 0d c4 97 12 00    	mov    ecx,DWORD PTR ds:0x1297c4
-10001a23:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001a26:	99                   	cdq    
-10001a27:	f7 f9                	idiv   ecx
-10001a29:	50                   	push   eax
-10001a2a:	e8 d0 ff ff ff       	call   100019ff <waitTicks>
-10001a2f:	83 c4 04             	add    esp,0x4
+10001a35:	8b 0d c4 97 12 00    	mov    ecx,DWORD PTR ds:0x1297c4
+10001a3b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001a3e:	99                   	cdq    
+10001a3f:	f7 f9                	idiv   ecx
+10001a41:	50                   	push   eax
+10001a42:	e8 d0 ff ff ff       	call   10001a17 <waitTicks>
+10001a47:	83 c4 04             	add    esp,0x4
 /home/yogi/src/os/testMainProgramEntry/time.c:278
 }
-10001a32:	90                   	nop
-10001a33:	c9                   	leave  
-10001a34:	c3                   	ret    
+10001a4a:	90                   	nop
+10001a4b:	c9                   	leave  
+10001a4c:	c3                   	ret    
 
-10001a35 <wait3>:
+10001a4d <wait3>:
 wait3():
 /home/yogi/src/os/testMainProgramEntry/time.c:281
 
 void wait3(double msToWait)
 {
-10001a35:	55                   	push   ebp
-10001a36:	89 e5                	mov    ebp,esp
-10001a38:	83 ec 28             	sub    esp,0x28
-10001a3b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001a3e:	89 45 e8             	mov    DWORD PTR [ebp-0x18],eax
-10001a41:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
-10001a44:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
+10001a4d:	55                   	push   ebp
+10001a4e:	89 e5                	mov    ebp,esp
+10001a50:	83 ec 28             	sub    esp,0x28
+10001a53:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001a56:	89 45 e8             	mov    DWORD PTR [ebp-0x18],eax
+10001a59:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+10001a5c:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:282
 volatile double endTicks = (double)*kTicksSinceStart + msToWait/ (1000/kTicksPerSecond);
-10001a47:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
-10001a4c:	8b 00                	mov    eax,DWORD PTR [eax]
-10001a4e:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
-10001a51:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
-10001a58:	df 6d d8             	fild   QWORD PTR [ebp-0x28]
-10001a5b:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
-10001a5e:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
-10001a61:	dd 45 e8             	fld    QWORD PTR [ebp-0x18]
-10001a64:	8b 0d c0 97 12 00    	mov    ecx,DWORD PTR ds:0x1297c0
-10001a6a:	b8 e8 03 00 00       	mov    eax,0x3e8
-10001a6f:	ba 00 00 00 00       	mov    edx,0x0
-10001a74:	f7 f1                	div    ecx
-10001a76:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
-10001a79:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
-10001a80:	df 6d d8             	fild   QWORD PTR [ebp-0x28]
-10001a83:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
-10001a86:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
-10001a89:	de f9                	fdivp  st(1),st
-10001a8b:	de c1                	faddp  st(1),st
-10001a8d:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
-10001a90:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
-10001a93:	dd 5d f8             	fstp   QWORD PTR [ebp-0x8]
+10001a5f:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001a64:	8b 00                	mov    eax,DWORD PTR [eax]
+10001a66:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
+10001a69:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
+10001a70:	df 6d d8             	fild   QWORD PTR [ebp-0x28]
+10001a73:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
+10001a76:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
+10001a79:	dd 45 e8             	fld    QWORD PTR [ebp-0x18]
+10001a7c:	8b 0d c0 97 12 00    	mov    ecx,DWORD PTR ds:0x1297c0
+10001a82:	b8 e8 03 00 00       	mov    eax,0x3e8
+10001a87:	ba 00 00 00 00       	mov    edx,0x0
+10001a8c:	f7 f1                	div    ecx
+10001a8e:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
+10001a91:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
+10001a98:	df 6d d8             	fild   QWORD PTR [ebp-0x28]
+10001a9b:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
+10001a9e:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
+10001aa1:	de f9                	fdivp  st(1),st
+10001aa3:	de c1                	faddp  st(1),st
+10001aa5:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
+10001aa8:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
+10001aab:	dd 5d f8             	fstp   QWORD PTR [ebp-0x8]
 /home/yogi/src/os/testMainProgramEntry/time.c:284
 
 while (endTicks > (double)*kTicksSinceStart)
-10001a96:	eb 02                	jmp    10001a9a <wait3+0x65>
+10001aae:	eb 02                	jmp    10001ab2 <wait3+0x65>
 /home/yogi/src/os/testMainProgramEntry/time.c:285
     {__asm__("sti\n hlt\n");}
-10001a98:	fb                   	sti    
-10001a99:	f4                   	hlt    
+10001ab0:	fb                   	sti    
+10001ab1:	f4                   	hlt    
 /home/yogi/src/os/testMainProgramEntry/time.c:284
 
 void wait3(double msToWait)
@@ -4126,77 +4142,77 @@ void wait3(double msToWait)
 volatile double endTicks = (double)*kTicksSinceStart + msToWait/ (1000/kTicksPerSecond);
 
 while (endTicks > (double)*kTicksSinceStart)
-10001a9a:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
-10001a9f:	8b 00                	mov    eax,DWORD PTR [eax]
-10001aa1:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
-10001aa4:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
-10001aab:	df 6d d8             	fild   QWORD PTR [ebp-0x28]
-10001aae:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
-10001ab1:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
-10001ab4:	dd 45 f8             	fld    QWORD PTR [ebp-0x8]
-10001ab7:	df e9                	fucomip st,st(1)
-10001ab9:	dd d8                	fstp   st(0)
-10001abb:	77 db                	ja     10001a98 <wait3+0x63>
+10001ab2:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001ab7:	8b 00                	mov    eax,DWORD PTR [eax]
+10001ab9:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
+10001abc:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
+10001ac3:	df 6d d8             	fild   QWORD PTR [ebp-0x28]
+10001ac6:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
+10001ac9:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
+10001acc:	dd 45 f8             	fld    QWORD PTR [ebp-0x8]
+10001acf:	df e9                	fucomip st,st(1)
+10001ad1:	dd d8                	fstp   st(0)
+10001ad3:	77 db                	ja     10001ab0 <wait3+0x63>
 /home/yogi/src/os/testMainProgramEntry/time.c:287
     {__asm__("sti\n hlt\n");}
     
 }
-10001abd:	90                   	nop
-10001abe:	c9                   	leave  
-10001abf:	c3                   	ret    
+10001ad5:	90                   	nop
+10001ad6:	c9                   	leave  
+10001ad7:	c3                   	ret    
 
-10001ac0 <wait2>:
+10001ad8 <wait2>:
 wait2():
 /home/yogi/src/os/testMainProgramEntry/time.c:290
 
 void wait2(unsigned msToWait)
 {
-10001ac0:	55                   	push   ebp
-10001ac1:	89 e5                	mov    ebp,esp
-10001ac3:	53                   	push   ebx
-10001ac4:	83 ec 24             	sub    esp,0x24
+10001ad8:	55                   	push   ebp
+10001ad9:	89 e5                	mov    ebp,esp
+10001adb:	53                   	push   ebx
+10001adc:	83 ec 24             	sub    esp,0x24
 /home/yogi/src/os/testMainProgramEntry/time.c:291
     uint64_t startTicks = *kTicksSinceStart;             //25
-10001ac7:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
-10001acc:	8b 00                	mov    eax,DWORD PTR [eax]
-10001ace:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
-10001ad1:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
+10001adf:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001ae4:	8b 00                	mov    eax,DWORD PTR [eax]
+10001ae6:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
+10001ae9:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:292
     unsigned msPerTick = 1000 / kTicksPerSecond;         //18
-10001ad8:	8b 1d c0 97 12 00    	mov    ebx,DWORD PTR ds:0x1297c0
-10001ade:	b8 e8 03 00 00       	mov    eax,0x3e8
-10001ae3:	ba 00 00 00 00       	mov    edx,0x0
-10001ae8:	f7 f3                	div    ebx
-10001aea:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
+10001af0:	8b 1d c0 97 12 00    	mov    ebx,DWORD PTR ds:0x1297c0
+10001af6:	b8 e8 03 00 00       	mov    eax,0x3e8
+10001afb:	ba 00 00 00 00       	mov    edx,0x0
+10001b00:	f7 f3                	div    ebx
+10001b02:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:293
     uint64_t totalTicksToWait = msToWait/msPerTick;     //4321/18
-10001aed:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
-10001af0:	ba 00 00 00 00       	mov    edx,0x0
-10001af5:	f7 75 ec             	div    DWORD PTR [ebp-0x14]
-10001af8:	89 45 e0             	mov    DWORD PTR [ebp-0x20],eax
-10001afb:	c7 45 e4 00 00 00 00 	mov    DWORD PTR [ebp-0x1c],0x0
+10001b05:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+10001b08:	ba 00 00 00 00       	mov    edx,0x0
+10001b0d:	f7 75 ec             	div    DWORD PTR [ebp-0x14]
+10001b10:	89 45 e0             	mov    DWORD PTR [ebp-0x20],eax
+10001b13:	c7 45 e4 00 00 00 00 	mov    DWORD PTR [ebp-0x1c],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:294
     uint64_t endTicks = startTicks + totalTicksToWait;
-10001b02:	8b 4d f0             	mov    ecx,DWORD PTR [ebp-0x10]
-10001b05:	8b 5d f4             	mov    ebx,DWORD PTR [ebp-0xc]
-10001b08:	8b 45 e0             	mov    eax,DWORD PTR [ebp-0x20]
-10001b0b:	8b 55 e4             	mov    edx,DWORD PTR [ebp-0x1c]
-10001b0e:	01 c8                	add    eax,ecx
-10001b10:	11 da                	adc    edx,ebx
-10001b12:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
-10001b15:	89 55 dc             	mov    DWORD PTR [ebp-0x24],edx
+10001b1a:	8b 4d f0             	mov    ecx,DWORD PTR [ebp-0x10]
+10001b1d:	8b 5d f4             	mov    ebx,DWORD PTR [ebp-0xc]
+10001b20:	8b 45 e0             	mov    eax,DWORD PTR [ebp-0x20]
+10001b23:	8b 55 e4             	mov    edx,DWORD PTR [ebp-0x1c]
+10001b26:	01 c8                	add    eax,ecx
+10001b28:	11 da                	adc    edx,ebx
+10001b2a:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
+10001b2d:	89 55 dc             	mov    DWORD PTR [ebp-0x24],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:296
 
     if (endTicks < *kTicksSinceStart)
-10001b18:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
-10001b1d:	8b 00                	mov    eax,DWORD PTR [eax]
-10001b1f:	ba 00 00 00 00       	mov    edx,0x0
-10001b24:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
-10001b27:	72 0d                	jb     10001b36 <wait2+0x76>
-10001b29:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
-10001b2c:	77 25                	ja     10001b53 <wait2+0x93>
-10001b2e:	3b 45 d8             	cmp    eax,DWORD PTR [ebp-0x28]
-10001b31:	77 20                	ja     10001b53 <wait2+0x93>
+10001b30:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001b35:	8b 00                	mov    eax,DWORD PTR [eax]
+10001b37:	ba 00 00 00 00       	mov    edx,0x0
+10001b3c:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
+10001b3f:	72 0d                	jb     10001b4e <wait2+0x76>
+10001b41:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
+10001b44:	77 25                	ja     10001b6b <wait2+0x93>
+10001b46:	3b 45 d8             	cmp    eax,DWORD PTR [ebp-0x28]
+10001b49:	77 20                	ja     10001b6b <wait2+0x93>
 /home/yogi/src/os/testMainProgramEntry/time.c:304
     //waitTicks(totalTicksToWait);
     //return;
@@ -4204,10 +4220,10 @@ void wait2(unsigned msToWait)
     //printf ("startTicks=%u, msPerTick=%u, totalTicksToWait=%u, endTicks=%u, kTicksSinceStart=%u", startTicks, msPerTick, totalTicksToWait, endTicks, kTicksSinceStart);
     //printf("\nStart waiting ... endTicks=%u, kTicksSinceStart=%u\n",endTicks, kTicksSinceStart);
     while (endTicks > *kTicksSinceStart)
-10001b33:	eb 01                	jmp    10001b36 <wait2+0x76>
+10001b4b:	eb 01                	jmp    10001b4e <wait2+0x76>
 /home/yogi/src/os/testMainProgramEntry/time.c:305
     {__asm__("hlt\n");}
-10001b35:	f4                   	hlt    
+10001b4d:	f4                   	hlt    
 /home/yogi/src/os/testMainProgramEntry/time.c:304
     //waitTicks(totalTicksToWait);
     //return;
@@ -4215,16 +4231,16 @@ void wait2(unsigned msToWait)
     //printf ("startTicks=%u, msPerTick=%u, totalTicksToWait=%u, endTicks=%u, kTicksSinceStart=%u", startTicks, msPerTick, totalTicksToWait, endTicks, kTicksSinceStart);
     //printf("\nStart waiting ... endTicks=%u, kTicksSinceStart=%u\n",endTicks, kTicksSinceStart);
     while (endTicks > *kTicksSinceStart)
-10001b36:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
-10001b3b:	8b 00                	mov    eax,DWORD PTR [eax]
-10001b3d:	ba 00 00 00 00       	mov    edx,0x0
-10001b42:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
-10001b45:	72 ee                	jb     10001b35 <wait2+0x75>
-10001b47:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
-10001b4a:	77 08                	ja     10001b54 <wait2+0x94>
-10001b4c:	3b 45 d8             	cmp    eax,DWORD PTR [ebp-0x28]
-10001b4f:	72 e4                	jb     10001b35 <wait2+0x75>
-10001b51:	eb 01                	jmp    10001b54 <wait2+0x94>
+10001b4e:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001b53:	8b 00                	mov    eax,DWORD PTR [eax]
+10001b55:	ba 00 00 00 00       	mov    edx,0x0
+10001b5a:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
+10001b5d:	72 ee                	jb     10001b4d <wait2+0x75>
+10001b5f:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
+10001b62:	77 08                	ja     10001b6c <wait2+0x94>
+10001b64:	3b 45 d8             	cmp    eax,DWORD PTR [ebp-0x28]
+10001b67:	72 e4                	jb     10001b4d <wait2+0x75>
+10001b69:	eb 01                	jmp    10001b6c <wait2+0x94>
 /home/yogi/src/os/testMainProgramEntry/time.c:297
     unsigned msPerTick = 1000 / kTicksPerSecond;         //18
     uint64_t totalTicksToWait = msToWait/msPerTick;     //4321/18
@@ -4232,7 +4248,7 @@ void wait2(unsigned msToWait)
 
     if (endTicks < *kTicksSinceStart)
         return;
-10001b53:	90                   	nop
+10001b6b:	90                   	nop
 /home/yogi/src/os/testMainProgramEntry/time.c:307
     //printf ("startTicks=%u, msPerTick=%u, totalTicksToWait=%u, endTicks=%u, kTicksSinceStart=%u", startTicks, msPerTick, totalTicksToWait, endTicks, kTicksSinceStart);
     //printf("\nStart waiting ... endTicks=%u, kTicksSinceStart=%u\n",endTicks, kTicksSinceStart);
@@ -4240,7 +4256,7 @@ void wait2(unsigned msToWait)
     {__asm__("hlt\n");}
     //printf("done waiting!\n");
 }
-10001b54:	83 c4 24             	add    esp,0x24
-10001b57:	5b                   	pop    ebx
-10001b58:	5d                   	pop    ebp
-10001b59:	c3                   	ret    
+10001b6c:	83 c4 24             	add    esp,0x24
+10001b6f:	5b                   	pop    ebx
+10001b70:	5d                   	pop    ebp
+10001b71:	c3                   	ret    

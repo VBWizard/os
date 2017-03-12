@@ -30,7 +30,7 @@ bool schedulerTaskSwitched=0;
 
 task_t* kKernelTask;
 uint32_t saveESP;
-
+uint32_t kKernelCR3=KERNEL_CR3;
 
 
 int main(int argc, char** argv) {

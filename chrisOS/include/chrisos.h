@@ -13,7 +13,7 @@
 #include "../../chrisOSKernel/include/task.h"
 
 #define TICKS_PER_SECOND 100
-#define TICKS_PER_SCHEDULE 10
+#define TICKS_PER_SCHEDULER_RUN 10
 //2
 //* 3
 
@@ -119,6 +119,7 @@ extern char* kernelDataLoadAddress;
 #define DEBUG_KEYBOARD_DRIVER 1<<20
 #define DEBUG_PRINT_TO_PORT 1<<21
 #define DEBUG_DETAILED 1<<22
+#define DEBUG_CPU 1<<23
 #define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
 #define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT | DEBUG_PROCESS
 

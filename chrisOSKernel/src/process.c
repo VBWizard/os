@@ -55,12 +55,10 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,8);
     
     //Per the above, the stack will start at -0x100 from where we write the CS/EIP/FLAGS/SS/ESP, so put our params around there
-    tempESP=&processWrapup;
-    memcpy((void*)process->task->tss->ESP-0x100,&tempESP,4);
+    memcpy((void*)process->task->tss->ESP-0x100,&var,4);
     memcpy((void*)process->task->tss->ESP-0xfc,&argc,4);
     memcpy((void*)process->task->tss->ESP-0xf8,&argv,4);
     //Set the return point since the task will simply ret to exit
-    //memcpy((void*)process->task->tss->ESP+8,&var,4);
     printd(DEBUG_PROCESS,"Return point for process is 0x%08X",&processWrapup);
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
  
