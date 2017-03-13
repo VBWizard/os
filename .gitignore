@@ -55,3 +55,6 @@ build_num.h
 /libChrisOS/build/
 /libChrisOS/dist/
 core
+/sysEnter/build/
+/sysEnter/dist/
+gdb_history
