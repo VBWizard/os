@@ -65,7 +65,7 @@ overCPUDebug:
     mov es,ax
     mov fs,ax
     mov gs,ax
-    mov eax,0x28
+    mov eax,0x18
     mov ss,eax
     #Save control registers
     #No need to do this as they won't change
@@ -187,9 +187,6 @@ overSetCR3:
     mov ebx, isrSavedEAX
     iretd
 
-timesPastThisPoint: .word  0x0,0x0
-
-.globl alltraps
 .globl vector0
 vector0:
   pushd 0

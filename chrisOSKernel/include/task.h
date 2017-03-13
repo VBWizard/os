@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include "tss.h"
 
-#define RESERVED_TASKS 10
+#define RESERVED_TASKS 20
 
 typedef enum etaskstate
 {

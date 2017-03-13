@@ -37,6 +37,7 @@
       <itemPath>include/alloc.h</itemPath>
       <itemPath>../chrisOS/include/i386/bits/bits.h</itemPath>
       <itemPath>../chrisOS/include/chrisos.h</itemPath>
+      <itemPath>../chrisOS/include/i386/cpu.h</itemPath>
       <itemPath>include/drv_genKeyboard.h</itemPath>
       <itemPath>../chrisOS/include/filesystem.h</itemPath>
       <itemPath>include/kIRQHandlers.h</itemPath>
@@ -85,6 +86,7 @@
       <itemPath>src/mm/malloc.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
       <itemPath>src/mm/mm.c</itemPath>
+      <itemPath>../chrisOS/src/cpu/msr.c</itemPath>
       <itemPath>src/paging.c</itemPath>
       <itemPath>../chrisOS/src/panic.c</itemPath>
       <itemPath>../chrisOS/src/block/pci.c</itemPath>
@@ -137,7 +139,7 @@
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
-          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel -ggdb</commandLine>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -ggdb</commandLine>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>
@@ -160,6 +162,8 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="../chrisOS/include/i386/cpu.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/i386/kPaging.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -190,6 +194,8 @@
       <item path="../chrisOS/src/cpu/bits.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/cpu/gdt.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/cpu/msr.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/fat/API.txt" ex="false" tool="3" flavor2="0">
       </item>
@@ -404,6 +410,8 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="../chrisOS/include/i386/cpu.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../chrisOS/include/i386/kPaging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/kernelObjects.h" ex="false" tool="3" flavor2="0">
@@ -433,6 +441,8 @@
       <item path="../chrisOS/src/cpu/bits.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/cpu/gdt.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/cpu/msr.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/fat/API.txt" ex="false" tool="3" flavor2="0">
       </item>

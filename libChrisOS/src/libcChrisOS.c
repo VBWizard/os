@@ -4,7 +4,10 @@
  * and open the template in the editor.
  */
 
+extern void sysEnter_Vector();
+
 void libc_init()
 {
-    
+    asm("mov eax,0\ncld\ncall sysEnter_Vector\n");
+
 }

@@ -43,6 +43,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/f33415e4/keyboard.o \
 	${OBJECTDIR}/_ext/101a755a/bits.o \
 	${OBJECTDIR}/_ext/101a755a/gdt.o \
+	${OBJECTDIR}/_ext/101a755a/msr.o \
 	${OBJECTDIR}/_ext/101a7ecb/fat_access.o \
 	${OBJECTDIR}/_ext/101a7ecb/fat_cache.o \
 	${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o \
@@ -85,7 +86,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-m32 -pipe -ffreestanding -Wall -Wextra -masm=intel -ggdb
+CFLAGS=-m32 -ffreestanding -Wall -Wextra -masm=intel -ggdb
 
 # CC Compiler Flags
 CCFLAGS=
@@ -146,6 +147,11 @@ ${OBJECTDIR}/_ext/101a755a/gdt.o: ../chrisOS/src/cpu/gdt.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a755a/gdt.o ../chrisOS/src/cpu/gdt.c
+
+${OBJECTDIR}/_ext/101a755a/msr.o: ../chrisOS/src/cpu/msr.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a755a/msr.o ../chrisOS/src/cpu/msr.c
 
 ${OBJECTDIR}/_ext/101a7ecb/fat_access.o: ../chrisOS/src/fat/fat_access.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb

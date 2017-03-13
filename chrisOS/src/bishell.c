@@ -260,7 +260,7 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
     memset(lTempS,0,MAX_PARAM_WIDTH);
     for (int cnt=0;cnt<=paramCount;cnt++)
     {
-        printk("Processing parameter %u, value='%s'\n",cnt,params[cnt]);
+        //printk("Processing parameter %u, value='%s'\n",cnt,params[cnt]);
         if (params[cnt][0]=='v')
         {
             //printk("Address is virtual parameter found\n");
@@ -329,6 +329,7 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
     else
         printk("P");
     printk(": Dumping %u %c (%c) from 0x%08X\n", lCount, lCharSize , lCharType, lAddress);
+    __asm__("mov eax,0x90\nmov ds,eax\n":::"eax");
     uint8_t* mem=(uint8_t*)lAddress;
     uint16_t* memw=(uint16_t*)lAddress;
     uint32_t* memd=(uint32_t*)lAddress;
@@ -417,6 +418,7 @@ void HIGH_CODE_SECTION dumpP(char* cmdline)
         SWITCH_TO_KERNEL_DATA_AND_STACK
         __asm__("sti\n");
     }
+    __asm__("mov eax,0x18\nmov ds,eax\n":::"eax");
 }
 
 void HIGH_CODE_SECTION dumpV(char* cmdline)
@@ -688,7 +690,7 @@ void HIGH_CODE_SECTION execInternalCommand(char lCommand[256])
 void HIGH_CODE_SECTION biShell()
 {
     char lCommand[256];
-    unsigned lCurrKey=0;
+    uint8_t lCurrKey=0;
     int lCurrKeyCount=0;
     char commands[50][50];
     int commandsPtr=0;
@@ -725,7 +727,7 @@ getAKey:
             lCurrKey=waitForKeyboardKey();
         }
         //printk("key='%08X'",lCurrKey);
-        if(lCurrKey==0xc8) //up
+        if((byte)lCurrKey==0xc8) //up
         {
             if (commandBuffPtr>=0)
             {
@@ -733,7 +735,7 @@ getAKey:
                 strcpy(lCommand,commands[--commandBuffPtr]);
                 commandWasFromThisBufferPtr=commandBuffPtr;
                 cursorMoveTo(4,lTemp);
-                printk("%s                                                                                ",lCommand);
+                printk("%s                     ",lCommand);
                 lCurrKeyCount=strlen(lCommand);
                 cursorMoveTo(4+lCurrKeyCount,lTemp);
                 goto getAKey;
@@ -810,10 +812,10 @@ doneGettingKeys:
             //printk("Executing command # %u (%s)\n", i, cmds[i].name);
             if (commandWasFromThisBufferPtr)
             {
-                for (int cnt=commandWasFromThisBufferPtr;cnt<=commandsPtr;cnt++)
-                    strcpy(commands[cnt],commands[cnt+1]);
-                commandWasFromThisBufferPtr=0;
-                commandsPtr--;
+//                for (int cnt=commandWasFromThisBufferPtr;cnt<=commandsPtr;cnt++)
+//                    strcpy(commands[cnt],commands[cnt+1]);
+//                commandWasFromThisBufferPtr=0;
+//                commandsPtr--;
             }
             strcpy(commands[commandsPtr++],lCommand);
             commandBuffPtr=commandsPtr;

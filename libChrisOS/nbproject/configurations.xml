@@ -36,9 +36,12 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <cTool>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+        </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}</output>
-          <commandLine>-T linker.ld</commandLine>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
       <item path="src/input.c" ex="false" tool="0" flavor2="0">
@@ -55,6 +58,7 @@
       <compileType>
         <cTool>
           <developmentMode>5</developmentMode>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
@@ -65,6 +69,9 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+        <linkerTool>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
+        </linkerTool>
       </compileType>
       <item path="src/input.c" ex="false" tool="0" flavor2="0">
       </item>

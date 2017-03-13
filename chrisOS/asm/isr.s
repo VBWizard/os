@@ -244,7 +244,7 @@ saveTheStack:
         mov esi, exceptionSavedESP
 //        add esi, 16 #drop the 4 dwords that are passed to the proc
         mov edi, exceptionSavedStack
-        mov cx, 40
+        mov ecx, 40
         cld
         rep movsd
 

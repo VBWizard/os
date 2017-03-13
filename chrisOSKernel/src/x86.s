@@ -1,6 +1,55 @@
 .intel_syntax noprefix
+
+.section .systemData, "xa"
+.globl sysEnter_Vector
+.type sysEnter_Vector, @function
+sysEnter_Vector:
+    push ecx
+    push edx
+    push ebp
+    mov ebp,esp
+    call sysEnterReturn
+    add esp,4
+    pop ebp
+    pop edx
+    pop ecx
+    ret
+sysEnterReturn:
+    mov ebp,esp
+    sysenter
+.globl sysEnter_Vector
+
+.org 0x100
+.section .systemData
+.globl _sysEnter
+.type _sysEnter, @function
+_sysEnter:
+#    sti
+    push ebp
+    pusha
+    pushfd
+    push edx
+    push ecx
+    push ebx
+    push eax
+    call _sysCall
+    pop eax
+    pop eax
+    pop eax
+    pop eax
+    popfd
+    popa
+    pop ebp
+    mov edx,[ebp]
+    mov ecx,ebp
+    sysexit
+.globl _sysEnter
+
+.section .text
 .globl set_gdt
 .type set_gdt, @function
+idtPtrToLoad: .word 0,0
+
 set_gdt:
 .code32
 push eax
@@ -45,7 +94,4 @@ idt_load:
     pop eax
     pop ebp
     ret
-
-    .globl idtPtrToLoad
-    .type idtPtrToLoad, @common
-    idtPtrToLoad: .word 0,0,0,0
+.globl idt_load

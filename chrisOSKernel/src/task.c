@@ -16,6 +16,7 @@ extern uint32_t kDebugLevel;
 extern char* kernelDataLoadAddress, *kernelLoadAddress, *kernelLoadEnd;
 extern uint32_t getESP();
 extern task_t* kKernelTask;
+extern uint32_t* sysEnter_Vector;
 
 void taskInit()
 {
@@ -94,11 +95,15 @@ void mmMapKernelIntoTask(task_t* task)
     
     //Map the first 1Mb (except page at 0x0) into the process, where the OS loader is, so that ISRs can run
     printd(DEBUG_TASK,"Map OS loader into user process: 0x%08X to 0x%08X r/o\n",0x1000,0xffffff+1);
-    pagingMapPageRange(task->tss->CR3,0x1000,0xffffff,0x1000,0x7);
+    //pagingMapPageRange(task->tss->CR3,0x1000,0xffffff,0x1000,0x7);
+    pagingMapPageCount(task->tss->CR3,0x1000,0x1000,0xFFF,0x7);
     pagingMapPageRange(task->tss->CR3,0x1000 | KERNEL_PAGED_BASE_ADDRESS,0xffffff | KERNEL_PAGED_BASE_ADDRESS,0x1000,0x7);
 
     printd(DEBUG_TASK,"Map screen buffer into user process at 0xB8000, 4 pages (r/w)\n");
     pagingMapPageCount(task->tss->CR3,0xB0000,0xB0000,4,0x7);
+
+    printk("Mapping sysEnter_Vector page (0x%08X) to process, r/o\n",&sysEnter_Vector);
+    pagingMapPage(task->tss->CR3,&sysEnter_Vector,&sysEnter_Vector,0x5);
 
     kDebugLevel=oldDebugLevel;
 }
@@ -133,18 +138,18 @@ task_t* createTask(bool kernelTSS)
     //Initialize task registers
     task->tss->EAX=0;
     task->tss->EBX=task->tss->ECX=task->tss->EDX=task->tss->ESI=task->tss->EDI=task->tss->EBP=0;
-    task->tss->SS0=0x28;
+    task->tss->SS0=0x18;
     if (kernelTSS)
     {
-        task->tss->SS=0x28;
-        task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x18;
-        task->tss->CS=0x10<<3;
+        task->tss->SS=0x18;
+        task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x28;
+        task->tss->CS=0x10;
     }
     else
     {
         task->tss->SS=0x43;
         task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x33;
-        task->tss->CS=(0x7<<3)|3;
+        task->tss->CS=(0x3b);
     }
     //Allocate space for the stack
     task->tss->ESP0=(uint32_t)allocPages(0x16000);
@@ -163,6 +168,9 @@ task_t* createTask(bool kernelTSS)
     //Set the pointer so that we don't go off the pages
     task->tss->ESP+=0x15000;
     printd(DEBUG_TASK,"ESP set to 0x%08X\n", task->tss->ESP);
+    //Mapping sysEnter (kKernelTask::ESP1) stack into process
+    pagingMapPageCount(task->tss->CR3,kKernelTask->tss->ESP1-0x15000,kKernelTask->tss->ESP1-0x15000,0x16,0x7);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
+    printd(DEBUG_TASK,"Mapping sysEnter (kKernelTask::ESP1=0x%08X) stack into process, 16 pages\n",kKernelTask->tss->ESP1-0x15000);
     
     
     //set task's IOPL

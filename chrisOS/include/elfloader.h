@@ -19,10 +19,10 @@ extern uint32_t kDebugLevel;
 typedef struct sElfDynamicInfo
 {
     char neededName[10][256];
-    int neededPtr;
+    int neededPtr, strTableAddressCount;
     int neededExecLoadNum[10];
-    int jmpRelSz, relATableSize, relAEntrySize, strTableSize, symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
-    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress, strTableFilePtr, symTableAddress, relATableAddress, initFunctionAddress, termFunctionAddress, relTableAddress;
+    int jmpRelSz, relATableSize, relAEntrySize, strTableName[5], strTableSize[5], symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
+    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[5], strTableFilePtr[5], symTableAddress, relATableAddress, initFunctionAddress, termFunctionAddress, relTableAddress;
     
 } elfDynamic_t;
 
@@ -36,6 +36,7 @@ typedef struct sElfInfo
     elfDynamic_t dynamicInfo;
     uintptr_t libLoadAddress;
     bool loadCompleted;
+    uintptr_t sectionNameStringTable;
 } elfInfo_t;
 
 void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);

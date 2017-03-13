@@ -1,0 +1,6 @@
+cat /home/yogi/src/os/chrisOS/kernelData1.ld > kernelData.ld
+cat ./kernelData_local.ld >> kernelData.ld
+cat /home/yogi/src/os/chrisOS/kernelData2.ld >> kernelData.ld 
+cat /home/yogi/src/os/chrisOS/kernelData3.ld >> kernelData.ld
+cat ./kernelData_local2.ld >> kernelData.ld
+cat /home/yogi/src/os/chrisOS/kernelData4.ld >> kernelData.ld

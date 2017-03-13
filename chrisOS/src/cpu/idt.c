@@ -49,8 +49,8 @@ void idt_init(struct idt_ptr* idtp, int remap_offset)
     idt_set_gate (&idtTable[0xa], 0x08, (int)&_isr_10_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0xb], 0x08, (int)&_isr_11_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0xc], 0x08, (int)&_isr_12_wrapper, ACS_INT);
-    idt_set_gate (&idtTable[0xd/*+remap_offset*/], 0x08, (int)&_isr_13_wrapper, ACS_INT | ACS_DPL_3);
-    idt_set_gate (&idtTable[0xe/*+remap_offset*/], 0x08, (int)&_isr_14_wrapper, ACS_INT | ACS_DPL_3);   //paging exception
+    idt_set_gate (&idtTable[0xd/*+remap_offset*/], 0x08, (int)&_isr_13_wrapper, ACS_INT);
+    idt_set_gate (&idtTable[0xe/*+remap_offset*/], 0x08, (int)&_isr_14_wrapper, ACS_INT);   //paging exception
     idt_set_gate (&idtTable[0xf], 0x08, (int)&_isr_15_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0x10], 0x08, (int)&_isr_16_wrapper, ACS_INT);
     idt_set_gate (&idtTable[0x11], 0x08, (int)&_isr_17_wrapper, ACS_INT);

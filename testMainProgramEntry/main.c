@@ -6,13 +6,12 @@
  */
 
 #include "../chrisOS/include/kernelObjects.h"
-
+extern uint32_t* sysEnter_Vector;
 /*
  * testMainProgramEntry
  */
 int main(int argc, char** argv) {
     uint64_t temp;
-    //printk("Hello from testmainprogramentry!!!");
     int a=argc;
     printk("Param count=%u\n",argc);
     char** b=argv;
@@ -25,7 +24,9 @@ int main(int argc, char** argv) {
         printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp);
     temp++;
     goto jumpHere;
-*/    __asm__("mov eax,0\ncld\nint 0x80\n");
+    __asm__("mov eax,0\ncld\nint 0x80\n");
+*/
+    __asm__("mov eax,0\ncld\ncall sysEnter_Vector\n");
 //    goto jumpHere;
     return 0x1234;
 }

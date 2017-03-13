@@ -59,25 +59,25 @@ int main(int argc, char** argv) {
     initSched();
     printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
-    char program[40]="/testmainprogramentry";
-    printk("Loading and executing %s\n",program);
+//    char program[40]="/testmainprogramentry";
+//    printk("Loading and executing %s\n",program);
     /*NOTE: This is how to create argv!!!*/
-    char test[2][50];
-    strcpy(test[0],"hello");
-    strcpy(test[1],"there");
-    char* testp[2];
-    testp[0]=test[0];
-    testp[1]=test[1];
+//    char test[2][50];
+//    strcpy(test[0],"hello");
+//    strcpy(test[1],"there");
+//    char* testp[2];
+//    testp[0]=test[0];
+//    testp[1]=test[1];
     /*************************************/
-extern void vector32();
-struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
-    idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
-    process_t* process = createProcess(program,2,&testp,false);
-    printk("Loading and executing %s again\n",program);
-//    process_t* process = createProcess(program,1,"hello!",false);
-    //sysExec(process,1,"");
+//    process_t* process = createProcess(program,2,&testp,false);
+//    printk("Loading and executing %s again\n",program);
+//    strcpy(test[0],"hello2");
+//    strcpy(test[1],"there2");
+//    printk("Loading and executing %s again\n",program);
+//    process_t* process2 = createProcess(program,2,&testp,false);
+    char path[40]="/libc.so";
+    sysLoadElf(path,NULL,KERNEL_CR3,false);
     schedulerEnabled=true;
-    printk("Installing new IRQ0 handler\n");
     return (0xbad);
 }
 

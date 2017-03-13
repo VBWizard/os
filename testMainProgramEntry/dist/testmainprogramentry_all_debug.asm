@@ -2435,7 +2435,7 @@ size_t strlen(const char* str) {
 main():
 /home/yogi/src/os/testMainProgramEntry/main.c:13
 #include "../chrisOS/include/kernelObjects.h"
-
+extern uint32_t* sysEnter_Vector;
 /*
  * testMainProgramEntry
  */
@@ -2449,28 +2449,27 @@ int main(int argc, char** argv) {
 10000dca:	51                   	push   ecx
 10000dcb:	83 ec 10             	sub    esp,0x10
 10000dce:	89 cb                	mov    ebx,ecx
-/home/yogi/src/os/testMainProgramEntry/main.c:16
+/home/yogi/src/os/testMainProgramEntry/main.c:15
     uint64_t temp;
-    //printk("Hello from testmainprogramentry!!!");
     int a=argc;
 10000dd0:	8b 03                	mov    eax,DWORD PTR [ebx]
 10000dd2:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
-/home/yogi/src/os/testMainProgramEntry/main.c:17
+/home/yogi/src/os/testMainProgramEntry/main.c:16
     printk("Param count=%u\n",argc);
 10000dd5:	83 ec 08             	sub    esp,0x8
 10000dd8:	ff 33                	push   DWORD PTR [ebx]
 10000dda:	68 ea 21 00 10       	push   0x100021ea
 10000ddf:	e8 16 ff ff ff       	call   10000cfa <printk>
 10000de4:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/main.c:18
+/home/yogi/src/os/testMainProgramEntry/main.c:17
     char** b=argv;
 10000de7:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
 10000dea:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
-/home/yogi/src/os/testMainProgramEntry/main.c:19
+/home/yogi/src/os/testMainProgramEntry/main.c:18
     for (int cnt=0;cnt<argc;cnt++)
 10000ded:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
 10000df4:	eb 29                	jmp    10000e1f <main+0x63>
-/home/yogi/src/os/testMainProgramEntry/main.c:21 (discriminator 3)
+/home/yogi/src/os/testMainProgramEntry/main.c:20 (discriminator 3)
     {
         printk("Param %u=%s\n",cnt,argv[cnt]);
 10000df6:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
@@ -2484,42 +2483,40 @@ int main(int argc, char** argv) {
 10000e0e:	68 fa 21 00 10       	push   0x100021fa
 10000e13:	e8 e2 fe ff ff       	call   10000cfa <printk>
 10000e18:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/main.c:19 (discriminator 3)
+/home/yogi/src/os/testMainProgramEntry/main.c:18 (discriminator 3)
+int main(int argc, char** argv) {
     uint64_t temp;
-    //printk("Hello from testmainprogramentry!!!");
     int a=argc;
     printk("Param count=%u\n",argc);
     char** b=argv;
     for (int cnt=0;cnt<argc;cnt++)
 10000e1b:	83 45 f4 01          	add    DWORD PTR [ebp-0xc],0x1
-/home/yogi/src/os/testMainProgramEntry/main.c:19 (discriminator 1)
+/home/yogi/src/os/testMainProgramEntry/main.c:18 (discriminator 1)
 10000e1f:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
 10000e22:	3b 03                	cmp    eax,DWORD PTR [ebx]
 10000e24:	7c d0                	jl     10000df6 <main+0x3a>
-/home/yogi/src/os/testMainProgramEntry/main.c:28
-    jumpHere:
-/*    if (temp%1000000==0)
+/home/yogi/src/os/testMainProgramEntry/main.c:29
         printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp);
     temp++;
     goto jumpHere;
-*/    __asm__("mov eax,0\ncld\nint 0x80\n");
+    __asm__("mov eax,0\ncld\nint 0x80\n");
+*/
+    __asm__("mov eax,0\ncld\ncall sysEnter_Vector\n");
 10000e26:	b8 00 00 00 00       	mov    eax,0x0
 10000e2b:	fc                   	cld    
-10000e2c:	cd 80                	int    0x80
-/home/yogi/src/os/testMainProgramEntry/main.c:30
+10000e2c:	e8 cf f1 12 f0       	call   130000 <sysEnter_Vector>
+/home/yogi/src/os/testMainProgramEntry/main.c:31
 //    goto jumpHere;
     return 0x1234;
-10000e2e:	b8 34 12 00 00       	mov    eax,0x1234
-/home/yogi/src/os/testMainProgramEntry/main.c:31
+10000e31:	b8 34 12 00 00       	mov    eax,0x1234
+/home/yogi/src/os/testMainProgramEntry/main.c:32
 }
-10000e33:	8d 65 f8             	lea    esp,[ebp-0x8]
-10000e36:	59                   	pop    ecx
-10000e37:	5b                   	pop    ebx
-10000e38:	5d                   	pop    ebp
-10000e39:	8d 61 fc             	lea    esp,[ecx-0x4]
-10000e3c:	c3                   	ret    
-10000e3d:	66 90                	xchg   ax,ax
-10000e3f:	90                   	nop
+10000e36:	8d 65 f8             	lea    esp,[ebp-0x8]
+10000e39:	59                   	pop    ecx
+10000e3a:	5b                   	pop    ebx
+10000e3b:	5d                   	pop    ebp
+10000e3c:	8d 61 fc             	lea    esp,[ecx-0x4]
+10000e3f:	c3                   	ret    
 
 10000e40 <time>:
 time():

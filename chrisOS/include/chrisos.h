@@ -22,10 +22,10 @@ extern char* kernelDataLoadAddress;
 //KERNEL_DATA_LOAD_ADDRESS is used by our loader to skip loading of kernel data by programs which are loaded.
 #define PAGE_SIZE 0x1000
 #define KERNEL_DATA_LOAD_ADDRESS kernelDataLoadAddress         //Change this if the kernelData1.ld kernelData load address changes
-#define KERNEL_PHYSICAL_EXEC_ADDRESS 0x01000000
 #define KERNEL_DATA_NAME "kernelData"
 //#define KERNEL_DATA_NAME ".data"
 #define KERNEL_DATA_SECTION __attribute__ ((section(KERNEL_DATA_NAME)))
+#define SYSENTER_SECTION __attribute__ ((section("SystemData")))
 #define HIGH_CODE_NAME ".text"
 //#define HIGH_CODE_NAME "hiCode"
 #define HIGH_CODE_SECTION __attribute__ ((section(HIGH_CODE_NAME)))
@@ -121,7 +121,7 @@ extern char* kernelDataLoadAddress;
 #define DEBUG_DETAILED 1<<22
 #define DEBUG_CPU 1<<23
 #define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT | DEBUG_PROCESS
+#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT | DEBUG_PROCESS | DEBUG_ELF_LOADER | DEBUG_TASK
 
 #define SCREEN_SPACES_PER_TAB 5
 
