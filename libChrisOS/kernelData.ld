@@ -133,3 +133,8 @@ kernelDataLoadAddress = .;
 	_months_abbrev = 0x9a20;
     *(kernelData);
 }
+. = 0xFF000000;
+	systemData (NOLOAD) : ALIGN(8K)
+{
+        sysEnter_Vector = 0x0000;
+}
