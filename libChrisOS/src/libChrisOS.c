@@ -6,7 +6,7 @@
 
 extern void sysEnter_Vector();
 
-void libc_init()
+void libc_init(void)
 {
     asm("mov eax,0\ncld\ncall sysEnter_Vector\n");
 

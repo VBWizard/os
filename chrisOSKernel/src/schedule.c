@@ -6,6 +6,8 @@
 
 #include "schedule.h"
 #include "kernelVariables.h"
+#include "alloc.h"
+#include "paging.h"
 static task_t *kTaskList0;
 static task_t *kTaskList1;
 static task_t *kTaskList2;
@@ -54,12 +56,18 @@ void initSched()
 {
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
     //Malloc zeroes out memory, so no need to initialize each list
-    kTaskList0=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
-    kTaskList1=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
-    kTaskList2=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
-    kTaskList3=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
-    kTaskList4=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
-    kTaskList5=malloc(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
+    kTaskList0=allocPages(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
+    pagingMapPageCount(KERNEL_CR3,kTaskList0,kTaskList0,(TSS_TABLE_RECORD_COUNT*sizeof(task_t))/0x1000,0x7);
+    kTaskList1=allocPages(TSS_TABLE_RECORD_COUNT*sizeof(task_t)) ;
+    pagingMapPageCount(KERNEL_CR3,kTaskList1,kTaskList1,(TSS_TABLE_RECORD_COUNT*sizeof(task_t))/0x1000,0x7);
+    kTaskList2=allocPages(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
+    pagingMapPageCount(KERNEL_CR3,kTaskList2,kTaskList2,(TSS_TABLE_RECORD_COUNT*sizeof(task_t))/0x1000,0x7);
+    kTaskList3=allocPages(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
+    pagingMapPageCount(KERNEL_CR3,kTaskList3,kTaskList3,(TSS_TABLE_RECORD_COUNT*sizeof(task_t))/0x1000,0x7);
+    kTaskList4=allocPages(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
+    pagingMapPageCount(KERNEL_CR3,kTaskList4,kTaskList4,(TSS_TABLE_RECORD_COUNT*sizeof(task_t))/0x1000,0x7);
+    kTaskList5=allocPages(TSS_TABLE_RECORD_COUNT*sizeof(task_t));
+    pagingMapPageCount(KERNEL_CR3,kTaskList5,kTaskList5,(TSS_TABLE_RECORD_COUNT*sizeof(task_t))/0x1000,0x7);
 
     kTaskList0->prev=NO_PREV;
     ((task_t*)kTaskList0+(TSS_TABLE_RECORD_COUNT-1))->next=NO_NEXT;      //-1 because our array is 0 based

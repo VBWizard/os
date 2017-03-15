@@ -136,7 +136,8 @@ uint32_t pagingGet4kPDEntryValueCR3(uintptr_t PageDirAddress, uint32_t address)
     uintptr_t* lTemp=(uint32_t*)((PageDirAddress + (((address & 0xFFC00000) >> 22) << 2)));
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("pagingGet4kPDEntryValue: dirAddressPtr=0x%08x\n", *lTemp);
+            printd(DEBUG_PAGING,"pagingGet4kPDEntryValue: pageDirEntry=0x%08X, *pageDirEntry=0x%08X, dirAddressPtr=0x%08x (CR3=0x%08X)\n", 
+                    pageDirEntry, *pageDirEntry, *lTemp,PageDirAddress);
 #endif
     return (uint32_t)*lTemp;
 }
@@ -152,7 +153,7 @@ uint32_t pagingGet4kPDEntryAddressCR3(uintptr_t PageDirAddress, uint32_t address
     uintptr_t lTemp=((PageDirAddress  | (((address & 0xFFC00000) >> 22) << 2)));
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("dirEntryAddress=0x%08x\n", lTemp);
+            printd(DEBUG_PAGING,"dirEntryAddress=0x%08x\n", lTemp);
 #endif
     return (uint32_t)lTemp & 0xFFFFFFFF;
 }
@@ -180,7 +181,7 @@ uint32_t pagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address)
     uint32_t* pTablePtr=(uint32_t*)pagingGet4kPTEntryAddressCR3(pageDirAddress,address);
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-             printk("pagingGet4kPTEntryValueCR3: PTAddress=0x%08X, PTValue=0x%08X (PDIR=0x%08X)\n", pTablePtr,*pTablePtr,pageDirAddress);
+             printd(DEBUG_PAGING,"pagingGet4kPTEntryValueCR3: PTAddress=0x%08X, PTValue=0x%08X (PDIR=0x%08X)\n", pTablePtr,*pTablePtr,pageDirAddress);
 #endif
     return *pTablePtr;
 }
@@ -302,8 +303,15 @@ bool pagingMapPageIntoKernel(uintptr_t processCR3, uintptr_t virtualAddress, uin
 
 bool isPageMapped(uintptr_t pageDirAddress, uintptr_t Address)
 {
-    if (!pagingGet4kPTEntryValueCR3(pageDirAddress,Address))
+    uint32_t pageDirValue=pagingGet4kPDEntryValueCR3(pageDirAddress,Address);
+    uint32_t pageEntryValue=pagingGet4kPTEntryValueCR3(pageDirAddress,Address);
+    uint32_t mapping=pagingGet4kPTEntryValueCR3(pageDirAddress,Address);
+    if (!mapping || pageDirValue==0 || pageEntryValue==0)
+    {
+        printd(DEBUG_PAGING,"isPageMapped: Page is not mapped, CR3=0x%08X, Address=0x%08X, mapping=\n",pageDirAddress,Address,mapping);
         return false;
+    }
+    printd(DEBUG_PAGING,"isPageMapped: Page @ 0x%08X is already mapped to 0x%08X, CR3=0x%08X\n",Address, mapping,pageDirAddress);
     return true;
 }
 

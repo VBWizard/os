@@ -59,24 +59,25 @@ int main(int argc, char** argv) {
     initSched();
     printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
-//    char program[40]="/testmainprogramentry";
-//    printk("Loading and executing %s\n",program);
+
+//    char path[40]="/libc.so";
+//    sysLoadElf(path,NULL,KERNEL_CR3,false);
+
+    char program[40]="/testmainprogramentry";
+    printk("Loading and executing %s\n",program);
     /*NOTE: This is how to create argv!!!*/
-//    char test[2][50];
-//    strcpy(test[0],"hello");
-//    strcpy(test[1],"there");
-//    char* testp[2];
-//    testp[0]=test[0];
-//    testp[1]=test[1];
-    /*************************************/
-//    process_t* process = createProcess(program,2,&testp,false);
+    char test[2][50];
+    strcpy(test[0],"hello");
+    strcpy(test[1],"there");
+    char* testp[2];
+    testp[0]=test[0];
+    testp[1]=test[1];
+    process_t* process = createProcess(program,2,&testp,false);
 //    printk("Loading and executing %s again\n",program);
 //    strcpy(test[0],"hello2");
 //    strcpy(test[1],"there2");
 //    printk("Loading and executing %s again\n",program);
 //    process_t* process2 = createProcess(program,2,&testp,false);
-    char path[40]="/libc.so";
-    sysLoadElf(path,NULL,KERNEL_CR3,false);
     schedulerEnabled=true;
     return (0xbad);
 }

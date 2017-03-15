@@ -24,7 +24,7 @@ uint32_t kPagingGet4kPDEntryValueCR3(uintptr_t PageDirAddress, uint32_t address)
     uintptr_t* lTemp=(uint32_t*)((PageDirAddress + (((address & 0xFFC00000) >> 22) << 2)));
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("kPagingGet4kPDEntryValueCR3: dirAddressPtr=0x%08x (PDIR=0x%08X)\n", *lTemp,PageDirAddress);
+            printd(DEBUG_PAGING,"kPagingGet4kPDEntryValueCR3: dirAddressPtr=0x%08x (PDIR=0x%08X)\n", *lTemp,PageDirAddress);
 #endif
     return (uint32_t)*lTemp;
 }
@@ -40,7 +40,7 @@ uint32_t kPagingGet4kPDEntryAddressCR3(uintptr_t PageDirAddress, uint32_t addres
     uintptr_t lTemp=((PageDirAddress  | (((address & 0xFFC00000) >> 22) << 2)));
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("kPagingGet4kPDEntryAddressCR3: dirEntryAddress=0x%08x  (PDIR=0x%08X)\n", lTemp, PageDirAddress);
+            printd(DEBUG_PAGING,"kPagingGet4kPDEntryAddressCR3: dirEntryAddress=0x%08x  (PDIR=0x%08X)\n", lTemp, PageDirAddress);
 #endif
     return (uint32_t)lTemp & 0xFFFFFFFF;
 }
@@ -68,7 +68,7 @@ uint32_t kPagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address)
     uint32_t* pTablePtr=(uint32_t*)kPagingGet4kPTEntryAddressCR3(pageDirAddress,address);
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-             printk("kPagingGet4kPTEntryValueCR3: PTAddress=0x%08X, PTValue=0x%08X (PDIR=0x%08X)\n", pTablePtr,*pTablePtr,pageDirAddress);
+             printd(DEBUG_PAGING,"kPagingGet4kPTEntryValueCR3: PTAddress=0x%08X, PTValue=0x%08X (PDIR=0x%08X)\n", pTablePtr,*pTablePtr,pageDirAddress);
 #endif
     return *pTablePtr;
 }
@@ -85,7 +85,7 @@ void kPagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
 {
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("pagingMakePageReadOnly: 0x%08X - before/after: 0x%08X/", ptEntry, *ptEntry);
+            printd(DEBUG_PAGING,"pagingMakePageReadOnly: 0x%08X - before/after: 0x%08X/", ptEntry, *ptEntry);
 #endif
          if (readOnly)
             *ptEntry&=0xFFFFFFFD;
@@ -94,7 +94,7 @@ void kPagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
     RELOAD_CR3
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("0x%08X\n", *ptEntry);
+            printd(DEBUG_PAGING,"0x%08X\n", *ptEntry);
 #endif
 }
 
@@ -114,14 +114,14 @@ void kSetVirtualRangeRO(uint32_t startAddy, uint32_t endAddy, bool readOnly)
     uintptr_t* startPTE;
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-           printk("kMakeVirtualRangeRO: Make 0x%08X-0x%08X r/o\n", startAddy, endAddy);
+           printd(DEBUG_PAGING,"kMakeVirtualRangeRO: Make 0x%08X-0x%08X r/o\n", startAddy, endAddy);
 #endif
     for (uint32_t cnt=(startAddy);cnt<=(endAddy)+1;cnt+=0x1000)
     {
         startPTE=(uintptr_t*)kPagingGet4kPTEntryAddress(cnt);
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("0x%08X (0x%08X) %s --> ", cnt, startPTE, readOnly?"ro":"rw");
+            printd(DEBUG_PAGING,"0x%08X (0x%08X) %s --> ", cnt, startPTE, readOnly?"ro":"rw");
 #endif
         kPagingSetPageReadOnlyFlag(startPTE++, readOnly);
             
@@ -134,12 +134,12 @@ void kpagingUpdatePresentFlagA(uint32_t address, bool present)
 {
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("kpagingUpdatePresentFlagA: Make 0x%08X %s\n", address, present?"present":"not present");
+            printd(DEBUG_PAGING,"kpagingUpdatePresentFlagA: Make 0x%08X %s\n", address, present?"present":"not present");
 #endif
         uintptr_t* pagePTE= (uintptr_t*)kPagingGet4kPTEntryAddress(address&0xFFFFF000);
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("kpagingUpdatePresentFlagA: updating entry 0x%08X\n", pagePTE);
+            printd(DEBUG_PAGING,"kpagingUpdatePresentFlagA: updating entry 0x%08X\n", pagePTE);
 #endif
         kPagingUpdatePTEPresentFlag(pagePTE, present);
 }
@@ -164,7 +164,7 @@ void kMapPage(uintptr_t mapTo, uintptr_t mapFrom, uint8_t flags)
         ptrT[(mapTo&0x003FFFFF/4096)]=mapFrom | flags;
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("kMapPage: Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)],ptrT[(mapTo&0x003FFFFF/4096)]);
+            printd(DEBUG_PAGING,"kMapPage: Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)],ptrT[(mapTo&0x003FFFFF/4096)]);
 #endif
     }
     else
@@ -179,11 +179,11 @@ void kMapPage(uintptr_t mapTo, uintptr_t mapFrom, uint8_t flags)
         //Now ptrVal will point to offset within page table
         ptrVal=(mapTo&0x003FFFFF)/4096;
         ptrT[ptrVal]=mapFrom | flags;
-//                printk("ptrT=%X(%X)\n",&ptrT[ptrVal],ptrT[ptrVal]);
+//                printd(DEBUG_PAGING,"ptrT=%X(%X)\n",&ptrT[ptrVal],ptrT[ptrVal]);
 //                STOPHERE2
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("2) Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal],ptrT[ptrVal]);
+            printd(DEBUG_PAGING,"2) Mapped 0x%08X via dir=0x%08X, page=0x%08X, to 0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal],ptrT[ptrVal]);
 #endif
     }
 //    if (ptrT[(src&0x003FFFFF/1000)]==0)
@@ -210,7 +210,7 @@ void kUnMapPage(uintptr_t mapTo)
         ptrT[(mapTo&0x003FFFFF/4096)]=0;
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("kMapPage: Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)]);
+            printd(DEBUG_PAGING,"kMapPage: Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[(mapTo&0x003FFFFF/4096)]);
 #endif
     }
     else
@@ -223,11 +223,11 @@ void kUnMapPage(uintptr_t mapTo)
         //Now ptrVal will point to offset within page table
         ptrVal=(mapTo&0x003FFFFF)/4096;
         ptrT[ptrVal]=0;
-//                printk("ptrT=%X(%X)\n",&ptrT[ptrVal],ptrT[ptrVal]);
+//                printd(DEBUG_PAGING,"ptrT=%X(%X)\n",&ptrT[ptrVal],ptrT[ptrVal]);
 //                STOPHERE2
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("2) Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal]);
+            printd(DEBUG_PAGING,"2) Unmapped 0x%08X via dir=0x%08X, page=0x%08X\n", mapTo, &ptr[(mapTo>>22)], &ptrT[ptrVal]);
 #endif
     }
 //    if (ptrT[(src&0x003FFFFF/1000)]==0)
@@ -237,7 +237,7 @@ void kSetPhysicalRangeRO(uint32_t startAddy, uint32_t endAddy, bool readOnly)
 {
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("kMakePhysicalRangeRO: Make 0x%08X(0x%08X)-0x%08X(0x%08X) r/o\n", startAddy, startAddy&0xFffff000, endAddy, endAddy&0xFFFFF000);
+            printd(DEBUG_PAGING,"kMakePhysicalRangeRO: Make 0x%08X(0x%08X)-0x%08X(0x%08X) r/o\n", startAddy, startAddy&0xFffff000, endAddy, endAddy&0xFFFFF000);
 #endif
     kSetVirtualRangeRO((startAddy + KERNEL_PAGED_BASE_ADDRESS) & 0xFFFFF000, (endAddy + KERNEL_PAGED_BASE_ADDRESS) & 0xFFFFF000, readOnly);
 }

@@ -26,7 +26,7 @@ void processELFDynamicSection(elfInfo_t* elfInfo)
         switch (dyn[cnt].d_tag)
         {
             //DT_NEEDED is a library which we need to load
-            case DT_NEEDED:
+/*            case DT_NEEDED:
                 printk("ELF at: 0x%08X, copy to: 0x%08X, neededCount=0x%08X\n",elfInfo, elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount],elfInfo->dynamicInfo.neededCount);
                 strcpy(elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount++],(char*)(elfInfo->dynamicInfo.strTableAddress+dyn[cnt].d_un.d_ptr));
                 char fileName[100]="/";
@@ -55,7 +55,7 @@ void processELFDynamicSection(elfInfo_t* elfInfo)
                     return;
                 }
                 break;
-            case DT_PLTRELSZ:
+*/            case DT_PLTRELSZ:
                 elfInfo->dynamicInfo.pltGOTTableTableSize=dyn[cnt].d_un.d_val;
                 break;
             case DT_PLTGOT:
@@ -80,7 +80,7 @@ void processELFDynamicSection(elfInfo_t* elfInfo)
                 elfInfo->dynamicInfo.relAEntrySize=dyn[cnt].d_un.d_val;
                 break;
             case DT_STRSZ:
-                elfInfo->dynamicInfo.strTableSize=dyn[cnt].d_un.d_val;
+                elfInfo->dynamicInfo.strTableSize[0]=dyn[cnt].d_un.d_val;
                 break;
             case DT_SYMENT:
                 elfInfo->dynamicInfo.symEntrySize=dyn[cnt].d_un.d_val;
@@ -279,9 +279,9 @@ void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary)
         {
             if (dyn[cnt].d_tag==DT_STRTAB)
             {
-                elfInfo->dynamicInfo.strTableAddress=dyn[cnt].d_un.d_ptr;
+                elfInfo->dynamicInfo.strTableAddress[0]=dyn[cnt].d_un.d_ptr;
                 if (isLibrary)
-                    elfInfo->dynamicInfo.strTableAddress+=libLoadOffset;
+                    elfInfo->dynamicInfo.strTableAddress[0]+=libLoadOffset;
                 printd(DEBUG_ELF_LOADER,"Found dynamic string table address 0x%08X\n",elfInfo->dynamicInfo.strTableAddress);
             }
             else if (dyn[cnt].d_tag==DT_SYMTAB)

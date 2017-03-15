@@ -19,11 +19,13 @@ extern uint32_t kDebugLevel;
 typedef struct sElfDynamicInfo
 {
     char neededName[10][256];
-    int neededPtr, strTableAddressCount;
+    int neededPtr;
     int neededExecLoadNum[10];
-    int jmpRelSz, relATableSize, relAEntrySize, strTableName[5], strTableSize[5], symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
-    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[5], strTableFilePtr[5], symTableAddress, relATableAddress, initFunctionAddress, termFunctionAddress, relTableAddress;
-    
+    int jmpRelSz, relATableSize, relAEntrySize, strTableName[50], strTableSize[50], symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
+    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[50], strTableFilePtr[5], symTableAddress, relATableAddress, initFunctionAddress, termFunctionAddress, relTableAddress,
+            relTable_shlink;
+    Elf32_Rela *relATable;
+    Elf32_Rel *relTable;    
 } elfDynamic_t;
 
 typedef struct sElfInfo
@@ -31,12 +33,13 @@ typedef struct sElfInfo
     Elf32_Ehdr hdr;
     Elf32_Shdr secHdrTable[50];
     Elf32_Phdr pgmHdrTable[50];
-    int secHdrRecordCount, pgmHdrRecordCount,dynamicRecordCount;
-    uintptr_t dynamicSectionAddress;
+    Elf32_Sym *symTable;
+    int secHdrRecordCount, pgmHdrRecordCount,dynamicRecordCount, dynamicSymbolRecordCount, symTableRecordCount, symStrTabLink;
+    uintptr_t dynamicSectionAddress, dynamicSymbolAddress;
     elfDynamic_t dynamicInfo;
     uintptr_t libLoadAddress;
     bool loadCompleted;
-    uintptr_t sectionNameStringTable;
+    int sectionNameStringTable;
 } elfInfo_t;
 
 void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);

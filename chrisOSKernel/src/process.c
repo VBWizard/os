@@ -41,8 +41,11 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     process->elf=&kExecLoadInfo[kExecLoadCount++];
     process->task=createTask(kernelProcess);
     //CR3 was set and PDir created by createTask.  Page tables will be created by the load process
-    if (!sysLoadElf(process->path,process->elf,process->task->tss->CR3,false))
+    if (sysLoadElf(process->path,process->elf,process->task->tss->CR3,false)!=0)
+    {
+        printk("SysLoadElf error, failed to load program\n");
         return NULL;
+    }
     process->task->tss->EIP=process->elf->hdr.e_entry;
 
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);

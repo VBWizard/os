@@ -6,13 +6,17 @@
  */
 
 #include "../chrisOS/include/kernelObjects.h"
+#include "../libChrisOS/libChrisOS.h"
 extern uint32_t* sysEnter_Vector;
 /*
  * testMainProgramEntry
  */
+
 int main(int argc, char** argv) {
     uint64_t temp;
     int a=argc;
+
+//    libc_init();
     printk("Param count=%u\n",argc);
     char** b=argv;
     for (int cnt=0;cnt<argc;cnt++)

@@ -54,6 +54,7 @@ void HIGH_CODE_SECTION execCommand(char* cmdline);
 void HIGH_CODE_SECTION displayGDTTable(char *cmdline);
 void HIGH_CODE_SECTION displayIDTTable(char *cmdline);
 void HIGH_CODE_SECTION displayTSSEntry(char *cmdline);
+int HIGH_CODE_SECTION parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size);
 
 command_table_t cmds[] = { 
         {"help","Get help (this information)",helpMe,0},

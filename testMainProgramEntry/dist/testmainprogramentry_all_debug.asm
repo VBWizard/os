@@ -44,11 +44,11 @@ void update_cursor()
 10000022:	83 ec 10             	sub    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:26
     unsigned short position=(terminal_row*VGA_WIDTH) + terminal_column;
-10000025:	a1 00 00 12 00       	mov    eax,ds:0x120000
+10000025:	a1 00 00 00 00       	mov    eax,ds:0x0
 1000002a:	89 c2                	mov    edx,eax
 1000002c:	b8 50 00 00 00       	mov    eax,0x50
 10000031:	0f af c2             	imul   eax,edx
-10000034:	8b 15 04 00 12 00    	mov    edx,DWORD PTR ds:0x120004
+10000034:	8b 15 00 00 00 00    	mov    edx,DWORD PTR ds:0x0
 1000003a:	01 d0                	add    eax,edx
 1000003c:	66 89 45 fe          	mov    WORD PTR [ebp-0x2],ax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:29
@@ -155,7 +155,7 @@ void terminal_setcolor(uint8_t color) {
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:49
         terminal_color = color;
 100000e1:	0f b6 45 fc          	movzx  eax,BYTE PTR [ebp-0x4]
-100000e5:	a2 08 00 12 00       	mov    ds:0x120008,al
+100000e5:	a2 00 00 00 00       	mov    ds:0x0,al
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:50
 }
 100000ea:	90                   	nop
@@ -185,7 +185,7 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
 10000110:	89 45 f8             	mov    DWORD PTR [ebp-0x8],eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:54
         terminal_buffer[index] = make_vgaentry(c, color);
-10000113:	a1 0c 00 12 00       	mov    eax,ds:0x12000c
+10000113:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000118:	8b 55 f8             	mov    edx,DWORD PTR [ebp-0x8]
 1000011b:	01 d2                	add    edx,edx
 1000011d:	8d 1c 10             	lea    ebx,[eax+edx*1]
@@ -193,7 +193,7 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
 10000124:	0f be 45 e8          	movsx  eax,BYTE PTR [ebp-0x18]
 10000128:	52                   	push   edx
 10000129:	50                   	push   eax
-1000012a:	e8 72 ff ff ff       	call   100000a1 <make_vgaentry>
+1000012a:	e8 fc ff ff ff       	call   1000012b <terminal_putentryat+0x3e>
 1000012f:	83 c4 08             	add    esp,0x8
 10000132:	66 89 03             	mov    WORD PTR [ebx],ax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:55
@@ -213,25 +213,25 @@ void cursorSavePosition()
 1000013c:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:59
     if (savedPosPointer < 10)
-1000013e:	0f b6 05 26 00 12 00 	movzx  eax,BYTE PTR ds:0x120026
+1000013e:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 10000145:	3c 09                	cmp    al,0x9
 10000147:	7f 3b                	jg     10000184 <cursorSavePosition+0x49>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:61
     {
         savedPosX[++savedPosPointer] = terminal_column;
-10000149:	0f b6 05 26 00 12 00 	movzx  eax,BYTE PTR ds:0x120026
+10000149:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 10000150:	83 c0 01             	add    eax,0x1
-10000153:	a2 26 00 12 00       	mov    ds:0x120026,al
-10000158:	0f b6 05 26 00 12 00 	movzx  eax,BYTE PTR ds:0x120026
+10000153:	a2 00 00 00 00       	mov    ds:0x0,al
+10000158:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 1000015f:	0f be c0             	movsx  eax,al
-10000162:	8b 15 04 00 12 00    	mov    edx,DWORD PTR ds:0x120004
-10000168:	88 90 10 00 12 00    	mov    BYTE PTR [eax+0x120010],dl
+10000162:	8b 15 00 00 00 00    	mov    edx,DWORD PTR ds:0x0
+10000168:	88 90 00 00 00 00    	mov    BYTE PTR [eax+0x0],dl
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:62
         savedPosY[savedPosPointer] = terminal_row;
-1000016e:	0f b6 05 26 00 12 00 	movzx  eax,BYTE PTR ds:0x120026
+1000016e:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 10000175:	0f be c0             	movsx  eax,al
-10000178:	8b 15 00 00 12 00    	mov    edx,DWORD PTR ds:0x120000
-1000017e:	88 90 1c 00 12 00    	mov    BYTE PTR [eax+0x12001c],dl
+10000178:	8b 15 00 00 00 00    	mov    edx,DWORD PTR ds:0x0
+1000017e:	88 90 00 00 00 00    	mov    BYTE PTR [eax+0x0],dl
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:64
     }
 }
@@ -249,30 +249,30 @@ void cursorRestorePosition()
 10000188:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:68
     if (savedPosPointer > 0)
-1000018a:	0f b6 05 26 00 12 00 	movzx  eax,BYTE PTR ds:0x120026
+1000018a:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 10000191:	84 c0                	test   al,al
 10000193:	7e 42                	jle    100001d7 <cursorRestorePosition+0x50>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:70
     {
         terminal_column = savedPosX[savedPosPointer];
-10000195:	0f b6 05 26 00 12 00 	movzx  eax,BYTE PTR ds:0x120026
+10000195:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 1000019c:	0f be c0             	movsx  eax,al
-1000019f:	0f b6 80 10 00 12 00 	movzx  eax,BYTE PTR [eax+0x120010]
+1000019f:	0f b6 80 00 00 00 00 	movzx  eax,BYTE PTR [eax+0x0]
 100001a6:	0f b6 c0             	movzx  eax,al
-100001a9:	a3 04 00 12 00       	mov    ds:0x120004,eax
+100001a9:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:71
         terminal_row = savedPosY[savedPosPointer--];
-100001ae:	0f b6 05 26 00 12 00 	movzx  eax,BYTE PTR ds:0x120026
+100001ae:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 100001b5:	89 c2                	mov    edx,eax
 100001b7:	83 ea 01             	sub    edx,0x1
-100001ba:	88 15 26 00 12 00    	mov    BYTE PTR ds:0x120026,dl
+100001ba:	88 15 00 00 00 00    	mov    BYTE PTR ds:0x0,dl
 100001c0:	0f be c0             	movsx  eax,al
-100001c3:	0f b6 80 1c 00 12 00 	movzx  eax,BYTE PTR [eax+0x12001c]
+100001c3:	0f b6 80 00 00 00 00 	movzx  eax,BYTE PTR [eax+0x0]
 100001ca:	0f b6 c0             	movzx  eax,al
-100001cd:	a3 00 00 12 00       	mov    ds:0x120000,eax
+100001cd:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:72
         update_cursor();
-100001d2:	e8 48 fe ff ff       	call   1000001f <update_cursor>
+100001d2:	e8 fc ff ff ff       	call   100001d3 <cursorRestorePosition+0x4c>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:74
     }
 }
@@ -309,15 +309,15 @@ void terminal_clear()
 10000203:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:82 (discriminator 3)
                         terminal_buffer[index] = make_vgaentry(' ', terminal_color);
-10000206:	a1 0c 00 12 00       	mov    eax,ds:0x12000c
+10000206:	a1 00 00 00 00       	mov    eax,ds:0x0
 1000020b:	8b 55 f0             	mov    edx,DWORD PTR [ebp-0x10]
 1000020e:	01 d2                	add    edx,edx
 10000210:	8d 1c 10             	lea    ebx,[eax+edx*1]
-10000213:	0f b6 05 08 00 12 00 	movzx  eax,BYTE PTR ds:0x120008
+10000213:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 1000021a:	0f b6 c0             	movzx  eax,al
 1000021d:	50                   	push   eax
 1000021e:	6a 20                	push   0x20
-10000220:	e8 7c fe ff ff       	call   100000a1 <make_vgaentry>
+10000220:	e8 fc ff ff ff       	call   10000221 <terminal_clear+0x47>
 10000225:	83 c4 08             	add    esp,0x8
 10000228:	66 89 03             	mov    WORD PTR [ebx],ax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:80 (discriminator 3)
@@ -341,7 +341,7 @@ void terminal_clear()
         for (size_t y = 0; y < kTerminalHeight; y++) {
 10000239:	83 45 f8 01          	add    DWORD PTR [ebp-0x8],0x1
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:79 (discriminator 1)
-1000023d:	0f b6 05 27 00 12 00 	movzx  eax,BYTE PTR ds:0x120027
+1000023d:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 10000244:	0f b6 c0             	movzx  eax,al
 10000247:	3b 45 f8             	cmp    eax,DWORD PTR [ebp-0x8]
 1000024a:	77 9e                	ja     100001ea <terminal_clear+0x10>
@@ -352,15 +352,15 @@ void terminal_clear()
                 }
         }
     terminal_column=0;
-1000024c:	c7 05 04 00 12 00 00 	mov    DWORD PTR ds:0x120004,0x0
+1000024c:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
 10000253:	00 00 00 
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:86
     terminal_row=0;
-10000256:	c7 05 00 00 12 00 00 	mov    DWORD PTR ds:0x120000,0x0
+10000256:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
 1000025d:	00 00 00 
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:87
     update_cursor();
-10000260:	e8 ba fd ff ff       	call   1000001f <update_cursor>
+10000260:	e8 fc ff ff ff       	call   10000261 <terminal_clear+0x87>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:88
 }
 10000265:	90                   	nop
@@ -398,15 +398,15 @@ void terminal_clear_line(unsigned lineNo)
 10000291:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:97 (discriminator 3)
         terminal_buffer[index] = make_vgaentry(' ', terminal_color);
-10000294:	a1 0c 00 12 00       	mov    eax,ds:0x12000c
+10000294:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000299:	8b 55 f4             	mov    edx,DWORD PTR [ebp-0xc]
 1000029c:	01 d2                	add    edx,edx
 1000029e:	8d 1c 10             	lea    ebx,[eax+edx*1]
-100002a1:	0f b6 05 08 00 12 00 	movzx  eax,BYTE PTR ds:0x120008
+100002a1:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 100002a8:	0f b6 c0             	movzx  eax,al
 100002ab:	50                   	push   eax
 100002ac:	6a 20                	push   0x20
-100002ae:	e8 ee fd ff ff       	call   100000a1 <make_vgaentry>
+100002ae:	e8 fc ff ff ff       	call   100002af <terminal_clear_line+0x44>
 100002b3:	83 c4 08             	add    esp,0x8
 100002b6:	66 89 03             	mov    WORD PTR [ebx],ax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:94 (discriminator 3)
@@ -476,7 +476,7 @@ void terminal_copyline(unsigned dstLine, unsigned srcLine)
 10000306:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
 10000309:	52                   	push   edx
 1000030a:	50                   	push   eax
-1000030b:	e8 60 03 00 00       	call   10000670 <memcpy>
+1000030b:	e8 fc ff ff ff       	call   1000030c <terminal_copyline+0x3d>
 10000310:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:108
 }
@@ -502,13 +502,13 @@ void terminal_putchar(char c) {
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:113
     {
             terminal_column = 0;
-10000329:	c7 05 04 00 12 00 00 	mov    DWORD PTR ds:0x120004,0x0
+10000329:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
 10000330:	00 00 00 
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:114
             terminal_row += 1;
-10000333:	a1 00 00 12 00       	mov    eax,ds:0x120000
+10000333:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000338:	83 c0 01             	add    eax,0x1
-1000033b:	a3 00 00 12 00       	mov    ds:0x120000,eax
+1000033b:	a3 00 00 00 00       	mov    ds:0x0,eax
 10000340:	e9 1f 01 00 00       	jmp    10000464 <terminal_putchar+0x14e>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:116
     }
@@ -518,38 +518,38 @@ void terminal_putchar(char c) {
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:118
     {
         if (terminal_column > 1)
-1000034b:	a1 04 00 12 00       	mov    eax,ds:0x120004
+1000034b:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000350:	83 f8 01             	cmp    eax,0x1
 10000353:	76 0f                	jbe    10000364 <terminal_putchar+0x4e>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:119
             terminal_column--;
-10000355:	a1 04 00 12 00       	mov    eax,ds:0x120004
+10000355:	a1 00 00 00 00       	mov    eax,ds:0x0
 1000035a:	83 e8 01             	sub    eax,0x1
-1000035d:	a3 04 00 12 00       	mov    ds:0x120004,eax
+1000035d:	a3 00 00 00 00       	mov    ds:0x0,eax
 10000362:	eb 17                	jmp    1000037b <terminal_putchar+0x65>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:122
         else
         {
             terminal_row--;
-10000364:	a1 00 00 12 00       	mov    eax,ds:0x120000
+10000364:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000369:	83 e8 01             	sub    eax,0x1
-1000036c:	a3 00 00 12 00       	mov    ds:0x120000,eax
+1000036c:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:123
             terminal_column=VGA_WIDTH;
 10000371:	b8 50 00 00 00       	mov    eax,0x50
-10000376:	a3 04 00 12 00       	mov    ds:0x120004,eax
+10000376:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:125
         }
         terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
-1000037b:	8b 0d 00 00 12 00    	mov    ecx,DWORD PTR ds:0x120000
-10000381:	8b 15 04 00 12 00    	mov    edx,DWORD PTR ds:0x120004
-10000387:	0f b6 05 08 00 12 00 	movzx  eax,BYTE PTR ds:0x120008
+1000037b:	8b 0d 00 00 00 00    	mov    ecx,DWORD PTR ds:0x0
+10000381:	8b 15 00 00 00 00    	mov    edx,DWORD PTR ds:0x0
+10000387:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 1000038e:	0f b6 c0             	movzx  eax,al
 10000391:	51                   	push   ecx
 10000392:	52                   	push   edx
 10000393:	50                   	push   eax
 10000394:	6a 20                	push   0x20
-10000396:	e8 52 fd ff ff       	call   100000ed <terminal_putentryat>
+10000396:	e8 fc ff ff ff       	call   10000397 <terminal_putchar+0x81>
 1000039b:	83 c4 10             	add    esp,0x10
 1000039e:	e9 c1 00 00 00       	jmp    10000464 <terminal_putchar+0x14e>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:128
@@ -561,8 +561,8 @@ void terminal_putchar(char c) {
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:130
     {
         uint32_t goTo= terminal_column + (SCREEN_SPACES_PER_TAB - (terminal_column % SCREEN_SPACES_PER_TAB));
-100003a9:	8b 1d 04 00 12 00    	mov    ebx,DWORD PTR ds:0x120004
-100003af:	8b 0d 04 00 12 00    	mov    ecx,DWORD PTR ds:0x120004
+100003a9:	8b 1d 00 00 00 00    	mov    ebx,DWORD PTR ds:0x0
+100003af:	8b 0d 00 00 00 00    	mov    ecx,DWORD PTR ds:0x0
 100003b5:	ba cd cc cc cc       	mov    edx,0xcccccccd
 100003ba:	89 c8                	mov    eax,ecx
 100003bc:	f7 e2                	mul    edx
@@ -578,7 +578,7 @@ void terminal_putchar(char c) {
 100003d3:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:131
         if (goTo==terminal_column)
-100003d6:	a1 04 00 12 00       	mov    eax,ds:0x120004
+100003d6:	a1 00 00 00 00       	mov    eax,ds:0x0
 100003db:	39 45 f4             	cmp    DWORD PTR [ebp-0xc],eax
 100003de:	75 16                	jne    100003f6 <terminal_putchar+0xe0>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:132
@@ -592,7 +592,7 @@ void terminal_putchar(char c) {
             terminal_putchar(' ');;
 100003e9:	83 ec 0c             	sub    esp,0xc
 100003ec:	6a 20                	push   0x20
-100003ee:	e8 23 ff ff ff       	call   10000316 <terminal_putchar>
+100003ee:	e8 fc ff ff ff       	call   100003ef <terminal_putchar+0xd9>
 100003f3:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:134
     {
@@ -601,7 +601,7 @@ void terminal_putchar(char c) {
             goTo=SCREEN_SPACES_PER_TAB;
         
         while (terminal_column < goTo)
-100003f6:	a1 04 00 12 00       	mov    eax,ds:0x120004
+100003f6:	a1 00 00 00 00       	mov    eax,ds:0x0
 100003fb:	3b 45 f4             	cmp    eax,DWORD PTR [ebp-0xc]
 100003fe:	72 e9                	jb     100003e9 <terminal_putchar+0xd3>
 10000400:	eb 62                	jmp    10000464 <terminal_putchar+0x14e>
@@ -620,42 +620,42 @@ void terminal_putchar(char c) {
         else
         {
                 terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-1000040c:	8b 1d 00 00 12 00    	mov    ebx,DWORD PTR ds:0x120000
-10000412:	8b 0d 04 00 12 00    	mov    ecx,DWORD PTR ds:0x120004
-10000418:	0f b6 05 08 00 12 00 	movzx  eax,BYTE PTR ds:0x120008
+1000040c:	8b 1d 00 00 00 00    	mov    ebx,DWORD PTR ds:0x0
+10000412:	8b 0d 00 00 00 00    	mov    ecx,DWORD PTR ds:0x0
+10000418:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 1000041f:	0f b6 d0             	movzx  edx,al
 10000422:	0f be 45 e4          	movsx  eax,BYTE PTR [ebp-0x1c]
 10000426:	53                   	push   ebx
 10000427:	51                   	push   ecx
 10000428:	52                   	push   edx
 10000429:	50                   	push   eax
-1000042a:	e8 be fc ff ff       	call   100000ed <terminal_putentryat>
+1000042a:	e8 fc ff ff ff       	call   1000042b <terminal_putchar+0x115>
 1000042f:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:147
                 if (++terminal_column == VGA_WIDTH) {
-10000432:	a1 04 00 12 00       	mov    eax,ds:0x120004
+10000432:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000437:	83 c0 01             	add    eax,0x1
-1000043a:	a3 04 00 12 00       	mov    ds:0x120004,eax
-1000043f:	a1 04 00 12 00       	mov    eax,ds:0x120004
+1000043a:	a3 00 00 00 00       	mov    ds:0x0,eax
+1000043f:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000444:	ba 50 00 00 00       	mov    edx,0x50
 10000449:	39 d0                	cmp    eax,edx
 1000044b:	75 17                	jne    10000464 <terminal_putchar+0x14e>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:148
                         terminal_column = 0;
-1000044d:	c7 05 04 00 12 00 00 	mov    DWORD PTR ds:0x120004,0x0
+1000044d:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
 10000454:	00 00 00 
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:149
                         terminal_row++;
-10000457:	a1 00 00 12 00       	mov    eax,ds:0x120000
+10000457:	a1 00 00 00 00       	mov    eax,ds:0x0
 1000045c:	83 c0 01             	add    eax,0x1
-1000045f:	a3 00 00 12 00       	mov    ds:0x120000,eax
+1000045f:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:152
                 }
         }
     if (terminal_row == kTerminalHeight)
-10000464:	0f b6 05 27 00 12 00 	movzx  eax,BYTE PTR ds:0x120027
+10000464:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 1000046b:	0f b6 d0             	movzx  edx,al
-1000046e:	a1 00 00 12 00       	mov    eax,ds:0x120000
+1000046e:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000473:	39 c2                	cmp    edx,eax
 10000475:	75 3e                	jne    100004b5 <terminal_putchar+0x19f>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:154
@@ -670,7 +670,7 @@ void terminal_putchar(char c) {
 10000486:	83 ec 08             	sub    esp,0x8
 10000489:	50                   	push   eax
 1000048a:	ff 75 f0             	push   DWORD PTR [ebp-0x10]
-1000048d:	e8 3d fe ff ff       	call   100002cf <terminal_copyline>
+1000048d:	e8 fc ff ff ff       	call   1000048e <terminal_putchar+0x178>
 10000492:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:154 (discriminator 3)
                         terminal_row++;
@@ -681,7 +681,7 @@ void terminal_putchar(char c) {
         for (unsigned row=0;row<kTerminalHeight;row++)
 10000495:	83 45 f0 01          	add    DWORD PTR [ebp-0x10],0x1
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:154 (discriminator 1)
-10000499:	0f b6 05 27 00 12 00 	movzx  eax,BYTE PTR ds:0x120027
+10000499:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 100004a0:	0f b6 c0             	movzx  eax,al
 100004a3:	3b 45 f0             	cmp    eax,DWORD PTR [ebp-0x10]
 100004a6:	77 d8                	ja     10000480 <terminal_putchar+0x16a>
@@ -689,13 +689,13 @@ void terminal_putchar(char c) {
             terminal_copyline(row, row+1);
         //memcpy((void *)TEXTMODE_MEMORY_START, (void *)TEXTMODE_MEMORY_START+160, 160*25);
         terminal_row--;
-100004a8:	a1 00 00 12 00       	mov    eax,ds:0x120000
+100004a8:	a1 00 00 00 00       	mov    eax,ds:0x0
 100004ad:	83 e8 01             	sub    eax,0x1
-100004b0:	a3 00 00 12 00       	mov    ds:0x120000,eax
+100004b0:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:159
     }
     update_cursor();
-100004b5:	e8 65 fb ff ff       	call   1000001f <update_cursor>
+100004b5:	e8 fc ff ff ff       	call   100004b6 <terminal_putchar+0x1a0>
 100004ba:	eb 01                	jmp    100004bd <terminal_putchar+0x1a7>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:142
     //6 - cnt=0 to (5-1) 4
@@ -730,7 +730,7 @@ void cursorUpdateBiosCursor()
 100004c8:	c7 45 fc 50 04 00 00 	mov    DWORD PTR [ebp-0x4],0x450
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:165
     *bda=(uint8_t)(terminal_column & 0xFF);
-100004cf:	a1 04 00 12 00       	mov    eax,ds:0x120004
+100004cf:	a1 00 00 00 00       	mov    eax,ds:0x0
 100004d4:	89 c2                	mov    edx,eax
 100004d6:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
 100004d9:	88 10                	mov    BYTE PTR [eax],dl
@@ -739,7 +739,7 @@ void cursorUpdateBiosCursor()
 100004db:	83 45 fc 01          	add    DWORD PTR [ebp-0x4],0x1
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:167
     *bda=(uint8_t)((terminal_row+3) & 0xFF);
-100004df:	a1 00 00 12 00       	mov    eax,ds:0x120000
+100004df:	a1 00 00 00 00       	mov    eax,ds:0x0
 100004e4:	8d 50 03             	lea    edx,[eax+0x3]
 100004e7:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
 100004ea:	88 10                	mov    BYTE PTR [eax],dl
@@ -765,14 +765,14 @@ void cursorMoveTo(uint8_t x, uint8_t y)
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:172
     terminal_row = y;
 10000501:	0f b6 45 f8          	movzx  eax,BYTE PTR [ebp-0x8]
-10000505:	a3 00 00 12 00       	mov    ds:0x120000,eax
+10000505:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:173
     terminal_column = x;
 1000050a:	0f b6 45 fc          	movzx  eax,BYTE PTR [ebp-0x4]
-1000050e:	a3 04 00 12 00       	mov    ds:0x120004,eax
+1000050e:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:174
     update_cursor();
-10000513:	e8 07 fb ff ff       	call   1000001f <update_cursor>
+10000513:	e8 fc ff ff ff       	call   10000514 <cursorMoveTo+0x25>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:175
 }
 10000518:	90                   	nop
@@ -793,7 +793,7 @@ void cursorMoveToX(uint8_t x)
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:179
     terminal_column = x;
 10000527:	0f b6 45 fc          	movzx  eax,BYTE PTR [ebp-0x4]
-1000052b:	a3 04 00 12 00       	mov    ds:0x120004,eax
+1000052b:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:180
 }
 10000530:	90                   	nop
@@ -814,7 +814,7 @@ void cursorMoveToY(uint8_t y)
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:184
     terminal_row = y;
 1000053f:	0f b6 45 fc          	movzx  eax,BYTE PTR [ebp-0x4]
-10000543:	a3 00 00 12 00       	mov    ds:0x120000,eax
+10000543:	a3 00 00 00 00       	mov    ds:0x0,eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:185
 }
 10000548:	90                   	nop
@@ -831,7 +831,7 @@ uint8_t cursorGetPosX()
 1000054c:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:189
     return terminal_column;
-1000054e:	a1 04 00 12 00       	mov    eax,ds:0x120004
+1000054e:	a1 00 00 00 00       	mov    eax,ds:0x0
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:190
 }
 10000553:	5d                   	pop    ebp
@@ -862,7 +862,7 @@ int cursorGetMaxY()
 10000560:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:198
     return kTerminalHeight;
-10000562:	0f b6 05 27 00 12 00 	movzx  eax,BYTE PTR ds:0x120027
+10000562:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 10000569:	0f b6 c0             	movzx  eax,al
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:199
 }
@@ -885,7 +885,7 @@ void displayGetMaxXY(int* maxX, int* maxY)
 1000057b:	89 10                	mov    DWORD PTR [eax],edx
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:204
     *maxY=kTerminalHeight;
-1000057d:	0f b6 05 27 00 12 00 	movzx  eax,BYTE PTR ds:0x120027
+1000057d:	0f b6 05 00 00 00 00 	movzx  eax,BYTE PTR ds:0x0
 10000584:	0f b6 d0             	movzx  edx,al
 10000587:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
 1000058a:	89 10                	mov    DWORD PTR [eax],edx
@@ -907,7 +907,7 @@ uint8_t cursorGetPosY()
 10000590:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:210
     return terminal_row;
-10000592:	a1 00 00 12 00       	mov    eax,ds:0x120000
+10000592:	a1 00 00 00 00       	mov    eax,ds:0x0
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:211
 }
 10000597:	5d                   	pop    ebp
@@ -925,7 +925,7 @@ void kTermPrint(const char* data) {
         size_t datalen = strlen(data);
 1000059f:	83 ec 0c             	sub    esp,0xc
 100005a2:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-100005a5:	e8 ea 07 00 00       	call   10000d94 <strlen>
+100005a5:	e8 fc ff ff ff       	call   100005a6 <kTermPrint+0xd>
 100005aa:	83 c4 10             	add    esp,0x10
 100005ad:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:215
@@ -941,7 +941,7 @@ void kTermPrint(const char* data) {
 100005c4:	0f be c0             	movsx  eax,al
 100005c7:	83 ec 0c             	sub    esp,0xc
 100005ca:	50                   	push   eax
-100005cb:	e8 46 fd ff ff       	call   10000316 <terminal_putchar>
+100005cb:	e8 fc ff ff ff       	call   100005cc <kTermPrint+0x33>
 100005d0:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:215 (discriminator 3)
     return terminal_row;
@@ -972,25 +972,25 @@ void kTermInit() {
 100005e3:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:221
     kTerminalHeight=SYS_VGA_HEIGHT;
-100005e5:	c6 05 27 00 12 00 32 	mov    BYTE PTR ds:0x120027,0x32
+100005e5:	c6 05 00 00 00 00 32 	mov    BYTE PTR ds:0x0,0x32
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:222
     terminal_row = 0;
-100005ec:	c7 05 00 00 12 00 00 	mov    DWORD PTR ds:0x120000,0x0
+100005ec:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
 100005f3:	00 00 00 
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:223
     terminal_column = 0;
-100005f6:	c7 05 04 00 12 00 00 	mov    DWORD PTR ds:0x120004,0x0
+100005f6:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
 100005fd:	00 00 00 
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:224
     terminal_color = make_color(COLOR_LIGHT_BROWN, COLOR_BLACK);
 10000600:	6a 00                	push   0x0
 10000602:	6a 0e                	push   0xe
-10000604:	e8 86 fa ff ff       	call   1000008f <make_color>
+10000604:	e8 fc ff ff ff       	call   10000605 <kTermInit+0x23>
 10000609:	83 c4 08             	add    esp,0x8
-1000060c:	a2 08 00 12 00       	mov    ds:0x120008,al
+1000060c:	a2 00 00 00 00       	mov    ds:0x0,al
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:225
     terminal_buffer = (uint16_t*) TEXTMODE_MEMORY_START;
-10000611:	c7 05 0c 00 12 00 00 	mov    DWORD PTR ds:0x12000c,0xb8000
+10000611:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0xb8000
 10000618:	80 0b 00 
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:227
     //terminal_clear();
@@ -1021,7 +1021,7 @@ void puts(char* in)
 10000632:	0f be c0             	movsx  eax,al
 10000635:	83 ec 0c             	sub    esp,0xc
 10000638:	50                   	push   eax
-10000639:	e8 d8 fc ff ff       	call   10000316 <terminal_putchar>
+10000639:	e8 fc ff ff ff       	call   1000063a <puts+0x1c>
 1000063e:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:231
     //terminal_clear();
@@ -1059,7 +1059,7 @@ void putc(char c)
 1000065a:	0f be 45 f4          	movsx  eax,BYTE PTR [ebp-0xc]
 1000065e:	83 ec 0c             	sub    esp,0xc
 10000661:	50                   	push   eax
-10000662:	e8 af fc ff ff       	call   10000316 <terminal_putchar>
+10000662:	e8 fc ff ff ff       	call   10000663 <putc+0x15>
 10000667:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/char/console/basic_display.c:240
 1000066a:	90                   	nop
@@ -1432,7 +1432,7 @@ static void printchar(char **str, int c)
 1000084b:	0f b6 c0             	movzx  eax,al
 1000084e:	83 ec 0c             	sub    esp,0xc
 10000851:	50                   	push   eax
-10000852:	e8 bf fa ff ff       	call   10000316 <terminal_putchar>
+10000852:	e8 fc ff ff ff       	call   10000853 <printchar+0x30>
 10000857:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:52
 }
@@ -2217,7 +2217,7 @@ int printp_valist(const char *format, va_list args)
 10000cb6:	83 ec 0c             	sub    esp,0xc
 10000cb9:	8d 85 f4 fb ff ff    	lea    eax,[ebp-0x40c]
 10000cbf:	50                   	push   eax
-10000cc0:	e8 cf 00 00 00       	call   10000d94 <strlen>
+10000cc0:	e8 fc ff ff ff       	call   10000cc1 <printp_valist+0x67>
 10000cc5:	83 c4 10             	add    esp,0x10
 10000cc8:	3b 45 f4             	cmp    eax,DWORD PTR [ebp-0xc]
 10000ccb:	7f c3                	jg     10000c90 <printp_valist+0x36>
@@ -2293,7 +2293,7 @@ int printk(const char *format, ...)
 10000d09:	83 ec 08             	sub    esp,0x8
 10000d0c:	50                   	push   eax
 10000d0d:	ff 75 08             	push   DWORD PTR [ebp+0x8]
-10000d10:	e8 ca ff ff ff       	call   10000cdf <printk_valist>
+10000d10:	e8 fc ff ff ff       	call   10000d11 <printk+0x17>
 10000d15:	83 c4 10             	add    esp,0x10
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:232
 }
@@ -2314,7 +2314,7 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 10000d1d:	83 ec 18             	sub    esp,0x18
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:239
     if ((kDebugLevel & DebugLevel) == DebugLevel)    
-10000d20:	a1 78 98 12 00       	mov    eax,ds:0x129878
+10000d20:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000d25:	23 45 08             	and    eax,DWORD PTR [ebp+0x8]
 10000d28:	3b 45 08             	cmp    eax,DWORD PTR [ebp+0x8]
 10000d2b:	75 3c                	jne    10000d69 <printd+0x4f>
@@ -2328,7 +2328,7 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:245
         
         if (kDebugLevel & DEBUG_PRINT_TO_PORT)
-10000d33:	a1 78 98 12 00       	mov    eax,ds:0x129878
+10000d33:	a1 00 00 00 00       	mov    eax,ds:0x0
 10000d38:	25 00 00 20 00       	and    eax,0x200000
 10000d3d:	85 c0                	test   eax,eax
 10000d3f:	74 14                	je     10000d55 <printd+0x3b>
@@ -2338,7 +2338,7 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 10000d44:	83 ec 08             	sub    esp,0x8
 10000d47:	50                   	push   eax
 10000d48:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
-10000d4b:	e8 0a ff ff ff       	call   10000c5a <printp_valist>
+10000d4b:	e8 fc ff ff ff       	call   10000d4c <printd+0x32>
 10000d50:	83 c4 10             	add    esp,0x10
 10000d53:	eb 14                	jmp    10000d69 <printd+0x4f>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:248
@@ -2348,7 +2348,7 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 10000d58:	83 ec 08             	sub    esp,0x8
 10000d5b:	50                   	push   eax
 10000d5c:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
-10000d5f:	e8 7b ff ff ff       	call   10000cdf <printk_valist>
+10000d5f:	e8 fc ff ff ff       	call   10000d60 <printd+0x46>
 10000d64:	83 c4 10             	add    esp,0x10
 10000d67:	eb 05                	jmp    10000d6e <printd+0x54>
 /home/yogi/src/os/testMainProgramEntry/../chrisOS/src/printf.c:250
@@ -2433,12 +2433,12 @@ size_t strlen(const char* str) {
 
 10000dbc <main>:
 main():
-/home/yogi/src/os/testMainProgramEntry/main.c:13
-#include "../chrisOS/include/kernelObjects.h"
+/home/yogi/src/os/testMainProgramEntry/main.c:15
 extern uint32_t* sysEnter_Vector;
 /*
  * testMainProgramEntry
  */
+
 int main(int argc, char** argv) {
 10000dbc:	8d 4c 24 04          	lea    ecx,[esp+0x4]
 10000dc0:	83 e4 f0             	and    esp,0xfffffff0
@@ -2449,27 +2449,29 @@ int main(int argc, char** argv) {
 10000dca:	51                   	push   ecx
 10000dcb:	83 ec 10             	sub    esp,0x10
 10000dce:	89 cb                	mov    ebx,ecx
-/home/yogi/src/os/testMainProgramEntry/main.c:15
+/home/yogi/src/os/testMainProgramEntry/main.c:17
     uint64_t temp;
     int a=argc;
 10000dd0:	8b 03                	mov    eax,DWORD PTR [ebx]
 10000dd2:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
-/home/yogi/src/os/testMainProgramEntry/main.c:16
+/home/yogi/src/os/testMainProgramEntry/main.c:20
+
+//    libc_init();
     printk("Param count=%u\n",argc);
 10000dd5:	83 ec 08             	sub    esp,0x8
 10000dd8:	ff 33                	push   DWORD PTR [ebx]
 10000dda:	68 ea 21 00 10       	push   0x100021ea
-10000ddf:	e8 16 ff ff ff       	call   10000cfa <printk>
+10000ddf:	e8 fc ff ff ff       	call   10000de0 <main+0x24>
 10000de4:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/main.c:17
+/home/yogi/src/os/testMainProgramEntry/main.c:21
     char** b=argv;
 10000de7:	8b 43 04             	mov    eax,DWORD PTR [ebx+0x4]
 10000dea:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
-/home/yogi/src/os/testMainProgramEntry/main.c:18
+/home/yogi/src/os/testMainProgramEntry/main.c:22
     for (int cnt=0;cnt<argc;cnt++)
 10000ded:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
 10000df4:	eb 29                	jmp    10000e1f <main+0x63>
-/home/yogi/src/os/testMainProgramEntry/main.c:20 (discriminator 3)
+/home/yogi/src/os/testMainProgramEntry/main.c:24 (discriminator 3)
     {
         printk("Param %u=%s\n",cnt,argv[cnt]);
 10000df6:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
@@ -2481,21 +2483,21 @@ int main(int argc, char** argv) {
 10000e0a:	50                   	push   eax
 10000e0b:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
 10000e0e:	68 fa 21 00 10       	push   0x100021fa
-10000e13:	e8 e2 fe ff ff       	call   10000cfa <printk>
+10000e13:	e8 fc ff ff ff       	call   10000e14 <main+0x58>
 10000e18:	83 c4 10             	add    esp,0x10
-/home/yogi/src/os/testMainProgramEntry/main.c:18 (discriminator 3)
-int main(int argc, char** argv) {
-    uint64_t temp;
+/home/yogi/src/os/testMainProgramEntry/main.c:22 (discriminator 3)
     int a=argc;
+
+//    libc_init();
     printk("Param count=%u\n",argc);
     char** b=argv;
     for (int cnt=0;cnt<argc;cnt++)
 10000e1b:	83 45 f4 01          	add    DWORD PTR [ebp-0xc],0x1
-/home/yogi/src/os/testMainProgramEntry/main.c:18 (discriminator 1)
+/home/yogi/src/os/testMainProgramEntry/main.c:22 (discriminator 1)
 10000e1f:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
 10000e22:	3b 03                	cmp    eax,DWORD PTR [ebx]
 10000e24:	7c d0                	jl     10000df6 <main+0x3a>
-/home/yogi/src/os/testMainProgramEntry/main.c:29
+/home/yogi/src/os/testMainProgramEntry/main.c:33
         printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp);
     temp++;
     goto jumpHere;
@@ -2504,12 +2506,12 @@ int main(int argc, char** argv) {
     __asm__("mov eax,0\ncld\ncall sysEnter_Vector\n");
 10000e26:	b8 00 00 00 00       	mov    eax,0x0
 10000e2b:	fc                   	cld    
-10000e2c:	e8 cf f1 12 f0       	call   130000 <sysEnter_Vector>
-/home/yogi/src/os/testMainProgramEntry/main.c:31
+10000e2c:	e8 fc ff ff ff       	call   10000e2d <main+0x71>
+/home/yogi/src/os/testMainProgramEntry/main.c:35
 //    goto jumpHere;
     return 0x1234;
 10000e31:	b8 34 12 00 00       	mov    eax,0x1234
-/home/yogi/src/os/testMainProgramEntry/main.c:32
+/home/yogi/src/os/testMainProgramEntry/main.c:36
 }
 10000e36:	8d 65 f8             	lea    esp,[ebp-0x8]
 10000e39:	59                   	pop    ecx
@@ -2531,12 +2533,12 @@ time_t time(time_t* arg)
 10000e41:	89 e5                	mov    ebp,esp
 /home/yogi/src/os/testMainProgramEntry/time.c:84
     *arg = kSystemCurrentTime;
-10000e43:	8b 15 cc 97 12 00    	mov    edx,DWORD PTR ds:0x1297cc
+10000e43:	8b 15 00 00 00 00    	mov    edx,DWORD PTR ds:0x0
 10000e49:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
 10000e4c:	89 10                	mov    DWORD PTR [eax],edx
 /home/yogi/src/os/testMainProgramEntry/time.c:85
     return kSystemCurrentTime;
-10000e4e:	a1 cc 97 12 00       	mov    eax,ds:0x1297cc
+10000e4e:	a1 00 00 00 00       	mov    eax,ds:0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:86
 }
 10000e53:	5d                   	pop    ebp
@@ -2818,7 +2820,7 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
 100010a1:	01 d0                	add    eax,edx
 100010a3:	c1 e0 02             	shl    eax,0x2
 100010a6:	01 c8                	add    eax,ecx
-100010a8:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+100010a8:	8b 04 85 00 00 00 00 	mov    eax,DWORD PTR [eax*4+0x0]
 100010af:	29 45 fc             	sub    DWORD PTR [ebp-0x4],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:109 (discriminator 8)
     tmbuf->tm_mon++;
@@ -2881,7 +2883,7 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
 1000112a:	01 d0                	add    eax,edx
 1000112c:	c1 e0 02             	shl    eax,0x2
 1000112f:	01 c8                	add    eax,ecx
-10001131:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+10001131:	8b 04 85 00 00 00 00 	mov    eax,DWORD PTR [eax*4+0x0]
 10001138:	3b 45 fc             	cmp    eax,DWORD PTR [ebp-0x4]
 1000113b:	0f 86 f7 fe ff ff    	jbe    10001038 <gmtime_r+0x1e3>
 /home/yogi/src/os/testMainProgramEntry/time.c:111
@@ -2921,7 +2923,7 @@ struct tm *localtime(const time_t *timer) {
   t = *timer - kTimeZone;
 10001164:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
 10001167:	8b 10                	mov    edx,DWORD PTR [eax]
-10001169:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001169:	a1 00 00 00 00       	mov    eax,ds:0x0
 1000116e:	29 c2                	sub    edx,eax
 10001170:	89 d0                	mov    eax,edx
 10001172:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
@@ -2931,7 +2933,7 @@ struct tm *localtime(const time_t *timer) {
 10001178:	50                   	push   eax
 10001179:	8d 45 fc             	lea    eax,[ebp-0x4]
 1000117c:	50                   	push   eax
-1000117d:	e8 d3 fc ff ff       	call   10000e55 <gmtime_r>
+1000117d:	e8 fc ff ff ff       	call   1000117e <localtime+0x20>
 10001182:	83 c4 08             	add    esp,0x8
 /home/yogi/src/os/testMainProgramEntry/time.c:122
 }
@@ -2952,7 +2954,7 @@ struct tm *localtime_r(const time_t *timer, struct tm *tmbuf) {
   t = *timer - kTimeZone;
 1000118d:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
 10001190:	8b 10                	mov    edx,DWORD PTR [eax]
-10001192:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001192:	a1 00 00 00 00       	mov    eax,ds:0x0
 10001197:	29 c2                	sub    edx,eax
 10001199:	89 d0                	mov    eax,edx
 1000119b:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
@@ -2961,7 +2963,7 @@ struct tm *localtime_r(const time_t *timer, struct tm *tmbuf) {
 1000119e:	ff 75 0c             	push   DWORD PTR [ebp+0xc]
 100011a1:	8d 45 fc             	lea    eax,[ebp-0x4]
 100011a4:	50                   	push   eax
-100011a5:	e8 ab fc ff ff       	call   10000e55 <gmtime_r>
+100011a5:	e8 fc ff ff ff       	call   100011a6 <localtime_r+0x1f>
 100011aa:	83 c4 08             	add    esp,0x8
 /home/yogi/src/os/testMainProgramEntry/time.c:129
 }
@@ -3303,7 +3305,7 @@ time_t mktime(struct tm *tmbuf) {
 1000147b:	01 d0                	add    eax,edx
 1000147d:	c1 e0 02             	shl    eax,0x2
 10001480:	01 c8                	add    eax,ecx
-10001482:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+10001482:	8b 04 85 00 00 00 00 	mov    eax,DWORD PTR [eax*4+0x0]
 10001489:	01 45 f4             	add    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:164
   if (tmbuf->tm_mon < 0) {
@@ -3376,7 +3378,7 @@ time_t mktime(struct tm *tmbuf) {
 10001519:	01 d0                	add    eax,edx
 1000151b:	c1 e0 02             	shl    eax,0x2
 1000151e:	01 c8                	add    eax,ecx
-10001520:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+10001520:	8b 04 85 00 00 00 00 	mov    eax,DWORD PTR [eax*4+0x0]
 10001527:	29 45 f4             	sub    DWORD PTR [ebp-0xc],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:173 (discriminator 8)
     if (++(tmbuf->tm_mon) == 12) {
@@ -3459,7 +3461,7 @@ time_t mktime(struct tm *tmbuf) {
 100015db:	01 d0                	add    eax,edx
 100015dd:	c1 e0 02             	shl    eax,0x2
 100015e0:	01 c8                	add    eax,ecx
-100015e2:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+100015e2:	8b 04 85 00 00 00 00 	mov    eax,DWORD PTR [eax*4+0x0]
 100015e9:	3b 45 f4             	cmp    eax,DWORD PTR [ebp-0xc]
 100015ec:	0f 8e a9 fe ff ff    	jle    1000149b <mktime+0x2ec>
 /home/yogi/src/os/testMainProgramEntry/time.c:178
@@ -3756,7 +3758,7 @@ time_t mktime(struct tm *tmbuf) {
 10001881:	c1 e0 02             	shl    eax,0x2
 10001884:	8b 55 ec             	mov    edx,DWORD PTR [ebp-0x14]
 10001887:	01 d0                	add    eax,edx
-10001889:	8b 04 85 20 22 00 10 	mov    eax,DWORD PTR [eax*4+0x10002220]
+10001889:	8b 04 85 00 00 00 00 	mov    eax,DWORD PTR [eax*4+0x0]
 10001890:	01 45 f0             	add    DWORD PTR [ebp-0x10],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:202 (discriminator 8)
     month++;
@@ -3870,11 +3872,11 @@ time_t mktime(struct tm *tmbuf) {
 
   // Now adjust according to timezone and daylight saving time
   if (((kTimeZone > 0) && (TIME_MAX - kTimeZone < seconds)) || 
-10001967:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001967:	a1 00 00 00 00       	mov    eax,ds:0x0
 1000196c:	85 c0                	test   eax,eax
 1000196e:	7e 13                	jle    10001983 <mktime+0x7d4>
 /home/yogi/src/os/testMainProgramEntry/time.c:217 (discriminator 1)
-10001970:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001970:	a1 00 00 00 00       	mov    eax,ds:0x0
 10001975:	ba ff ff ff 7f       	mov    edx,0x7fffffff
 1000197a:	29 c2                	sub    edx,eax
 1000197c:	89 d0                	mov    eax,edx
@@ -3882,7 +3884,7 @@ time_t mktime(struct tm *tmbuf) {
 10001981:	7c 15                	jl     10001998 <mktime+0x7e9>
 /home/yogi/src/os/testMainProgramEntry/time.c:218 (discriminator 3)
       ((kTimeZone < 0) && (seconds < -kTimeZone))) {
-10001983:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+10001983:	a1 00 00 00 00       	mov    eax,ds:0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:217 (discriminator 3)
 
   if ((TIME_MAX - seconds) / SECS_DAY < day) overflow|=8;
@@ -3894,7 +3896,7 @@ time_t mktime(struct tm *tmbuf) {
 1000198a:	79 10                	jns    1000199c <mktime+0x7ed>
 /home/yogi/src/os/testMainProgramEntry/time.c:218
       ((kTimeZone < 0) && (seconds < -kTimeZone))) {
-1000198c:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+1000198c:	a1 00 00 00 00       	mov    eax,ds:0x0
 10001991:	f7 d8                	neg    eax
 10001993:	3b 45 dc             	cmp    eax,DWORD PTR [ebp-0x24]
 10001996:	7e 04                	jle    1000199c <mktime+0x7ed>
@@ -3904,7 +3906,7 @@ time_t mktime(struct tm *tmbuf) {
 /home/yogi/src/os/testMainProgramEntry/time.c:221
   }
   seconds += kTimeZone;
-1000199c:	a1 d0 97 12 00       	mov    eax,ds:0x1297d0
+1000199c:	a1 00 00 00 00       	mov    eax,ds:0x0
 100019a1:	01 45 dc             	add    DWORD PTR [ebp-0x24],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:223
 
@@ -3915,7 +3917,7 @@ time_t mktime(struct tm *tmbuf) {
 100019ac:	74 0a                	je     100019b8 <mktime+0x809>
 /home/yogi/src/os/testMainProgramEntry/time.c:224
     dst = _dstbias;
-100019ae:	a1 68 99 12 00       	mov    eax,ds:0x129968
+100019ae:	a1 00 00 00 00       	mov    eax,ds:0x0
 100019b3:	89 45 e4             	mov    DWORD PTR [ebp-0x1c],eax
 100019b6:	eb 07                	jmp    100019bf <mktime+0x810>
 /home/yogi/src/os/testMainProgramEntry/time.c:226
@@ -3974,7 +3976,7 @@ char *_strdate(char *s) {
   time(&now);
 100019ef:	8d 45 fc             	lea    eax,[ebp-0x4]
 100019f2:	50                   	push   eax
-100019f3:	e8 48 f4 ff ff       	call   10000e40 <time>
+100019f3:	e8 fc ff ff ff       	call   100019f4 <_strdate+0xb>
 100019f8:	83 c4 04             	add    esp,0x4
 /home/yogi/src/os/testMainProgramEntry/time.c:247
   //fix me!
@@ -4000,7 +4002,7 @@ char *_strtime(char *s) {
   time(&now);
 10001a06:	8d 45 fc             	lea    eax,[ebp-0x4]
 10001a09:	50                   	push   eax
-10001a0a:	e8 31 f4 ff ff       	call   10000e40 <time>
+10001a0a:	e8 fc ff ff ff       	call   10001a0b <_strtime+0xb>
 10001a0f:	83 c4 04             	add    esp,0x4
 /home/yogi/src/os/testMainProgramEntry/time.c:256
   //fix me
@@ -4074,12 +4076,12 @@ void /*__attribute__((noinline))*/wait(int msToWait)
     //printk("msToWait=%u, ticksperms=%u, ticksToWait=%u",msToWait, kTicksPerMS, msToWait*kTicksPerMS);
     //STOPHERE2
     waitTicks(msToWait/kTicksPerMS);
-10001a35:	8b 0d c4 97 12 00    	mov    ecx,DWORD PTR ds:0x1297c4
+10001a35:	8b 0d 00 00 00 00    	mov    ecx,DWORD PTR ds:0x0
 10001a3b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
 10001a3e:	99                   	cdq    
 10001a3f:	f7 f9                	idiv   ecx
 10001a41:	50                   	push   eax
-10001a42:	e8 d0 ff ff ff       	call   10001a17 <waitTicks>
+10001a42:	e8 fc ff ff ff       	call   10001a43 <wait+0x11>
 10001a47:	83 c4 04             	add    esp,0x4
 /home/yogi/src/os/testMainProgramEntry/time.c:278
 }
@@ -4102,7 +4104,7 @@ void wait3(double msToWait)
 10001a5c:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
 /home/yogi/src/os/testMainProgramEntry/time.c:282
 volatile double endTicks = (double)*kTicksSinceStart + msToWait/ (1000/kTicksPerSecond);
-10001a5f:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001a5f:	a1 00 00 00 00       	mov    eax,ds:0x0
 10001a64:	8b 00                	mov    eax,DWORD PTR [eax]
 10001a66:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
 10001a69:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
@@ -4110,7 +4112,7 @@ volatile double endTicks = (double)*kTicksSinceStart + msToWait/ (1000/kTicksPer
 10001a73:	dd 5d e0             	fstp   QWORD PTR [ebp-0x20]
 10001a76:	dd 45 e0             	fld    QWORD PTR [ebp-0x20]
 10001a79:	dd 45 e8             	fld    QWORD PTR [ebp-0x18]
-10001a7c:	8b 0d c0 97 12 00    	mov    ecx,DWORD PTR ds:0x1297c0
+10001a7c:	8b 0d 00 00 00 00    	mov    ecx,DWORD PTR ds:0x0
 10001a82:	b8 e8 03 00 00       	mov    eax,0x3e8
 10001a87:	ba 00 00 00 00       	mov    edx,0x0
 10001a8c:	f7 f1                	div    ecx
@@ -4139,7 +4141,7 @@ void wait3(double msToWait)
 volatile double endTicks = (double)*kTicksSinceStart + msToWait/ (1000/kTicksPerSecond);
 
 while (endTicks > (double)*kTicksSinceStart)
-10001ab2:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001ab2:	a1 00 00 00 00       	mov    eax,ds:0x0
 10001ab7:	8b 00                	mov    eax,DWORD PTR [eax]
 10001ab9:	89 45 d8             	mov    DWORD PTR [ebp-0x28],eax
 10001abc:	c7 45 dc 00 00 00 00 	mov    DWORD PTR [ebp-0x24],0x0
@@ -4170,13 +4172,13 @@ void wait2(unsigned msToWait)
 10001adc:	83 ec 24             	sub    esp,0x24
 /home/yogi/src/os/testMainProgramEntry/time.c:291
     uint64_t startTicks = *kTicksSinceStart;             //25
-10001adf:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001adf:	a1 00 00 00 00       	mov    eax,ds:0x0
 10001ae4:	8b 00                	mov    eax,DWORD PTR [eax]
 10001ae6:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
 10001ae9:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
 /home/yogi/src/os/testMainProgramEntry/time.c:292
     unsigned msPerTick = 1000 / kTicksPerSecond;         //18
-10001af0:	8b 1d c0 97 12 00    	mov    ebx,DWORD PTR ds:0x1297c0
+10001af0:	8b 1d 00 00 00 00    	mov    ebx,DWORD PTR ds:0x0
 10001af6:	b8 e8 03 00 00       	mov    eax,0x3e8
 10001afb:	ba 00 00 00 00       	mov    edx,0x0
 10001b00:	f7 f3                	div    ebx
@@ -4201,7 +4203,7 @@ void wait2(unsigned msToWait)
 /home/yogi/src/os/testMainProgramEntry/time.c:296
 
     if (endTicks < *kTicksSinceStart)
-10001b30:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001b30:	a1 00 00 00 00       	mov    eax,ds:0x0
 10001b35:	8b 00                	mov    eax,DWORD PTR [eax]
 10001b37:	ba 00 00 00 00       	mov    edx,0x0
 10001b3c:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]
@@ -4228,7 +4230,7 @@ void wait2(unsigned msToWait)
     //printf ("startTicks=%u, msPerTick=%u, totalTicksToWait=%u, endTicks=%u, kTicksSinceStart=%u", startTicks, msPerTick, totalTicksToWait, endTicks, kTicksSinceStart);
     //printf("\nStart waiting ... endTicks=%u, kTicksSinceStart=%u\n",endTicks, kTicksSinceStart);
     while (endTicks > *kTicksSinceStart)
-10001b4e:	a1 a4 97 12 00       	mov    eax,ds:0x1297a4
+10001b4e:	a1 00 00 00 00       	mov    eax,ds:0x0
 10001b53:	8b 00                	mov    eax,DWORD PTR [eax]
 10001b55:	ba 00 00 00 00       	mov    edx,0x0
 10001b5a:	3b 55 dc             	cmp    edx,DWORD PTR [ebp-0x24]

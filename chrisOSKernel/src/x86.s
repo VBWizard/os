@@ -50,6 +50,41 @@ _sysEnter:
 .type set_gdt, @function
 idtPtrToLoad: .word 0,0
 
+ .globl doPagingJump
+.type doPagingJump, @function
+doPagingJump:
+.code32
+cli #turn off interrupts until we get the IDT fixed up
+ljmp 0x20:pagingEnableJmp
+pagingEnableJmp:
+push eax
+mov ax, 0x10
+mov ds, ax
+mov es, ax
+mov gs, ax
+mov fs, ax
+pop eax
+ret
+ .globl doNonPagingJump
+.type doNonPagingJump, @function
+doNonPagingJump:
+ljmp 0x88:pagingDisableJmp1
+pagingDisableJmp1:
+push eax
+mov eax,cr0
+and eax,0x7FFFFFFF
+mov cr0,eax
+ljmp 0x88:pagingDisableJmp2
+pagingDisableJmp2:
+mov ax, 0x18
+mov ds, ax
+mov es, ax
+mov gs, ax
+mov fs, ax
+pop eax
+ret
+
+
 set_gdt:
 .code32
 push eax
@@ -95,3 +130,4 @@ idt_load:
     pop ebp
     ret
 .globl idt_load
+

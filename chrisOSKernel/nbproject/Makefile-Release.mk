@@ -64,6 +64,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strlen.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strncmp.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strncpy.o \
+	${OBJECTDIR}/_ext/3e0a6d34/stroul.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strparts.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
 	${OBJECTDIR}/_ext/30f91903/kInit.o \
@@ -252,6 +253,11 @@ ${OBJECTDIR}/_ext/3e0a6d34/strncpy.o: ../chrisOS/src/strings/strncpy.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strncpy.o ../chrisOS/src/strings/strncpy.c
+
+${OBJECTDIR}/_ext/3e0a6d34/stroul.o: ../chrisOS/src/strings/stroul.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/stroul.o ../chrisOS/src/strings/stroul.c
 
 ${OBJECTDIR}/_ext/3e0a6d34/strparts.o: ../chrisOS/src/strings/strparts.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34

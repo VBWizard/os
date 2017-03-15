@@ -49,12 +49,13 @@ void initKernelInternals()
     printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for kernel task ESP0\n",kKernelTask->tss->ESP1);
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP0 | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP0,16,0x7);
     kKernelTask->tss->ESP0+=0x15000;
-    kKernelTask->tss->ESP1=allocPagesAndMap(0x16000);           //Syscall stack
+    kKernelTask->tss->ESP1=allocPages(0x16000);           //Syscall stack
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP1 | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP1,16,0x7);
     printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for (ESP1) sysEnter\n",kKernelTask->tss->ESP1);
     kKernelTask->tss->ESP1+=0x15000;
     kKernelTask->tss->EFLAGS=0x200207;
-    kKernelTask->tss->ESP=allocPagesAndMap(0x16000);
+    kKernelTask->tss->ESP=allocPages(0x16000);
+    pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP1 | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP1,16,0x7);
     kKernelTask->tss->LINK=0x0;
     kKernelTask->tss->IOPB=sizeof(tss_t);
     idt_set_gate (&idtTable[0x80], 0x8, (int)&_sysCall, ACS_INT | ACS_DPL_3);

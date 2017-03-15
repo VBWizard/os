@@ -55,7 +55,12 @@
           <linkerAddLib>
             <pElem>/usr/local/lib</pElem>
             <pElem>/home/yogi/opt/cross/lib</pElem>
+            <pElem>../libChrisOS/src</pElem>
           </linkerAddLib>
+          <linkerLibItems>
+            <linkerOptionItem>-shared</linkerOptionItem>
+            <linkerLibLibItem>c</linkerLibLibItem>
+          </linkerLibItems>
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>

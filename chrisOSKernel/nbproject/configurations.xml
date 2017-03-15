@@ -99,6 +99,7 @@
       <itemPath>../chrisOS/src/strings/strlen.c</itemPath>
       <itemPath>../chrisOS/src/strings/strncmp.c</itemPath>
       <itemPath>../chrisOS/src/strings/strncpy.c</itemPath>
+      <itemPath>../chrisOS/src/strings/stroul.c</itemPath>
       <itemPath>../chrisOS/src/strings/strparts.c</itemPath>
       <itemPath>src/syscall.c</itemPath>
       <itemPath>src/sysloader.c</itemPath>
@@ -280,6 +281,8 @@
       <item path="../chrisOS/src/strings/strncmp.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strncpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/strings/stroul.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -527,6 +530,8 @@
       <item path="../chrisOS/src/strings/strncmp.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strncpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/strings/stroul.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>

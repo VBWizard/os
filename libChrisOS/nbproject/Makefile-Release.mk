@@ -36,7 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/input.o \
-	${OBJECTDIR}/src/libcChrisOS.o
+	${OBJECTDIR}/src/libChrisOS.o
 
 
 # C Compiler Flags
@@ -68,10 +68,10 @@ ${OBJECTDIR}/src/input.o: src/input.c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input.o src/input.c
 
-${OBJECTDIR}/src/libcChrisOS.o: src/libcChrisOS.c 
+${OBJECTDIR}/src/libChrisOS.o: src/libChrisOS.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libcChrisOS.o src/libcChrisOS.c
+	$(COMPILE.c) -O2 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libChrisOS.o src/libChrisOS.c
 
 # Subprojects
 .build-subprojects:

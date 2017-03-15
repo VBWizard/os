@@ -57,6 +57,8 @@ void mmInitHeapTracking()
 
 void mmInit()
 {
+    uint32_t kOldDebugLevel=kDebugLevel;
+    kDebugLevel &= ~DEBUG_PAGING;
     kernelSize=kernelLoadEnd-kernelLoadAddress;
     //0x10000000 represents segment 0xC0000000-0xCFFFFFFF ... don't want to map anything there for now
     kernelMemoryUsed=kernelStart + kernelSize;
@@ -114,6 +116,7 @@ void mmInit()
     }
  
     printk("\n");
+    kDebugLevel=kOldDebugLevel;
 /*    
     printd(DEBUG_KERNEL_PAGING,"Test mallocs:\n");
     uintptr_t* b1 = allocPages(50);
