@@ -60,8 +60,8 @@ int main(int argc, char** argv) {
     printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
 
-//    char path[40]="/libc.so";
-//    sysLoadElf(path,NULL,KERNEL_CR3,false);
+    char path[40]="/libc.so";
+    sysLoadElf(path,NULL,KERNEL_CR3,false);
 
     char program[40]="/testmainprogramentry";
     printk("Loading and executing %s\n",program);

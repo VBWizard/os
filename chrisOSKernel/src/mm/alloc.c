@@ -124,16 +124,18 @@ void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
     phys=allocPages(newSize);
     printd("allocPagesAndMap: allocPage'd 0x%08X bytes at 0x%08X\n",newSize,phys);
     
-    uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(cr3,newSize/PAGE_SIZE);
+    //Using random mappings isn't working, it stomps on other things
+    //uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(cr3,newSize/PAGE_SIZE);
+    
     //Map page into cr3 address space
-    pagingMapPageCount(cr3,virtualAddress,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
-    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",virtualAddress,phys);
+    pagingMapPageCount(cr3,phys,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",phys,phys);
     //Zero out the memory
-    pagingMapPageCount(KERNEL_CR3,virtualAddress | 0xC0000000,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    pagingMapPageCount(KERNEL_CR3,(uint32_t)(phys) | 0xC0000000,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Zeroing out page(s) at 0x%08X for 0x%08X\n",phys,newSize);
-    memset(virtualAddress,0,newSize);
+    memset(phys,0,newSize);
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Returning address 0x%08X\n",phys);
-    return virtualAddress & 0xFFFFF000;
+    return (void*)((uint32_t)(phys) & 0xFFFFF000);
 }
 
 void* allocProcessPages(uintptr_t cr3, uint32_t size)

@@ -180,12 +180,15 @@ char * strtoupper(char* pointerToString)
     return pointerToString;
 }
 
+#define LOAD_ZERO_BASED_DS     __asm__("mov eax,0x90\nmov ds,eax":::"eax");
+#define LOAD_KERNEL_BASED_DS __asm__("mov eax,0x10\nmov ds,eax":::"eax");
+
 void printDumpedRegs()
 {
     uint32_t esp = exceptionSavedESP;
     uint8_t* lCSIPPtr;
 
-    
+LOAD_ZERO_BASED_DS    
     lCSIPPtr=(uint8_t*)(exceptionEIP);
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
@@ -194,17 +197,16 @@ void printDumpedRegs()
     printk("GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
           printk("Bytes at CS:EIP: ");
-/*          for (int cnt=0;cnt<19;cnt++)
+          for (int cnt=0;cnt<19;cnt++)
               printk("%02X ", lCSIPPtr[cnt]);
-*/          printk("\n");
+          printk("\n");
           printk ("Stack @ 0x%08x:0x%08X:\n",exceptionSS, esp);
           for (int cnt=0;cnt<20;cnt++)
           {
               printk("\t0x%08X%: 0x%08X\n",esp, exceptionSavedStack[cnt]);
               esp+=4;
           }
-
-
+LOAD_KERNEL_BASED_DS
 }
 
 void printDebugRegs()

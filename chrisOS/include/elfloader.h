@@ -21,9 +21,11 @@ typedef struct sElfDynamicInfo
     char neededName[10][256];
     int neededPtr;
     int neededExecLoadNum[10];
-    int jmpRelSz, relATableSize, relAEntrySize, strTableName[50], strTableSize[50], symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
-    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[50], strTableFilePtr[5], symTableAddress, relATableAddress, initFunctionAddress, termFunctionAddress, relTableAddress,
-            relTable_shlink;
+    int jmpRelSz, relATableSize, relAEntrySize, strTableName[50], strTableSize[50], symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,
+            neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
+    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[50], strTableFilePtr[5], symTableAddress, relATableAddress, initFunctionAddress, 
+            termFunctionAddress, relTableAddress,
+            relTable_symTableLink;
     Elf32_Rela *relATable;
     Elf32_Rel *relTable;    
 } elfDynamic_t;

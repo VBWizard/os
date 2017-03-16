@@ -365,10 +365,10 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3,bool isLibrary)
             
             //Get pages 
             printd(DEBUG_ELF_LOADER,"Allocating pages to store %u bytes of data on\n",elfInfo->pgmHdrTable[pgmSectionNum].p_memsz);
-            if (!putDataOnPages(CR3,virtualLoadAddress,file,true,elfInfo->pgmHdrTable[pgmSectionNum].p_memsz,0))
+            if (!putDataOnPages(CR3,virtualLoadAddress,file,true,elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,0))
                 return false;
             printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, virtualLoadAddress);
-            if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz<elfInfo->pgmHdrTable[pgmSectionNum].p_memsz)
+            if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz<elfInfo->pgmHdrTable[pgmSectionNum].p_filesz)
             {
                 printd(DEBUG_ELF_LOADER,"Section %u has uninitialized data (msize>fsize), zeroed 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, virtualLoadAddress);
                 //CLR 02/20/2017 - Replaced memset
@@ -512,7 +512,7 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
             elfInfo->dynamicInfo.relTableSize=elfInfo->secHdrTable[cnt].sh_size;
             elfInfo->dynamicInfo.relTable=malloc(elfInfo->dynamicInfo.relTableSize);
-            elfInfo->dynamicInfo.relTable_shlink=elfInfo->secHdrTable[cnt].sh_link;
+            elfInfo->dynamicInfo.relTable_symTableLink=elfInfo->secHdrTable[cnt].sh_link;
             fl_fread(elfInfo->dynamicInfo.relTable,1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
             printd(DEBUG_ELF_LOADER,"Found %s (REL) section, read %u bytes to 0x%08X.\n",
                     strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
@@ -638,7 +638,7 @@ static int elf_do_reloc(Elf32_Rel* relEntry)
 
 static int elf_relocate(elfInfo_t* elf) {
     Elf32_Rel* relEntry;
-    uint32_t symVal;
+    uint32_t symValPtr;
 
     LOAD_ZERO_BASED_DS
     printd(DEBUG_ELF_LOADER,"Processing relocation (REL) table at 0x%08X, record count=0x%08X\n",elf->dynamicInfo.relTable, elf->dynamicInfo.relTableSize/sizeof(Elf32_Rel));
@@ -650,23 +650,44 @@ static int elf_relocate(elfInfo_t* elf) {
             relEntry=&elf->dynamicInfo.relTable[cnt];
             if (ELF32_R_SYM(relEntry->r_info) != SHN_UNDEF && relEntry->r_offset !=0)
             {
-                uint32_t dynEntryNum=elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value;
-                printd(DEBUG_ELF_LOADER,"Found relocation entry type 0x%08X with offset 0x%08X, dynamic symbol table entry 0x%04X\n",
-                        relEntry->r_info, 
+                //NOTE: I don't know why I had to subtract 1 from the entry number
+                uint32_t symEntryNum=elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value;
+                printd(DEBUG_ELF_LOADER,"Found relocation entry type 0x%02X with offset 0x%08X, dynamic symbol table entry 0x%02X\n",
+                        ELF32_R_TYPE(relEntry->r_info), 
                         relEntry->r_offset,
                         ELF32_R_SYM(relEntry->r_info));
-                //NOTE: I don't know why I had to subtract 1 from the entry number
-                Elf32_Dyn* dyn = (Elf32_Dyn*)(elf->dynamicSymbolAddress+((ELF32_R_SYM(relEntry->r_info)-1)*sizeof(Elf32_Dyn)));
-                printd(DEBUG_ELF_LOADER,"sizeof Elf32_Dyn=0x%08X, dynEntryNum=0x%04X, dynPtr=0x%08X, dynPtr+base=0x%08X\n",sizeof(Elf32_Dyn), 
-                        (ELF32_R_SYM(relEntry->r_info)-1),
-                        ((ELF32_R_SYM(relEntry->r_info)-1)*sizeof(Elf32_Dyn)),
-                        elf->dynamicSymbolAddress+(ELF32_R_SYM(relEntry->r_info)*sizeof(Elf32_Dyn)));
-                printd(DEBUG_ELF_LOADER,"\tUsing dynamic symbol at 0x%08X (0x%08X)\n",elf->dynamicSymbolAddress,dyn);
-                symVal=dyn->d_un.d_ptr;
-                printd(DEBUG_ELF_LOADER,"\tSymbol value=0x%08X (addr=0x%08X)\n",symVal,dyn);
+                Elf32_Sym* sym = (Elf32_Sym*)(elf->dynamicSymbolAddress+((ELF32_R_SYM(relEntry->r_info))*sizeof(Elf32_Sym)));
+                printd(DEBUG_ELF_LOADER,"sizeof Elf32_Sym=0x%08X, symTable=0x%08X, symEntryNum=0x%04X, symPtr=0x%08X, base+symPtr=0x%08X\n",
+                        sizeof(Elf32_Sym), 
+                        elf->dynamicSymbolAddress,
+                        symEntryNum,
+                        (symEntryNum*sizeof(Elf32_Sym)),
+                        elf->dynamicSymbolAddress+(symEntryNum*sizeof(Elf32_Sym)));
+                printd(DEBUG_ELF_LOADER," Using dynamic symbol at 0x%08X (symtab=0x%08X)\n",sym,elf->dynamicSymbolAddress);
+                symValPtr=sym->st_value;
+                printd(DEBUG_ELF_LOADER," Symbol Name '%s', Symbol value=0x%08X (addr=0x%08X)\n",
+                        strTabEntry(0x6,elf,sym->st_name), 
+                        symValPtr,
+                        sym);
                 uint32_t* rel=relEntry->r_offset;
-                printd(DEBUG_ELF_LOADER,"\tWriting 0x%08X to memory address 0x%08X.  Value before/after=0x%08X/ ",symVal,rel,*rel);
-                *rel=symVal;
+                printd(DEBUG_ELF_LOADER," Writing 0x%08X to memory address 0x%08X.  Value before/after=0x%08X/ ",symValPtr,rel,*rel);
+                switch(ELF32_R_TYPE(relEntry->r_info)) {
+		case R_386_NONE:
+			// No relocation
+			break;
+		case R_386_32:
+			// Symbol + Offset
+			*rel = DO_386_32(symValPtr, *rel);
+			break;
+		case R_386_PC32:
+			// Symbol + Offset - Section Offset
+			*rel = DO_386_PC32(symValPtr, *rel, (int)rel);
+			break;
+		default:
+			// Relocation type not supported, display error and return
+			panic("Unsupported Relocation Type (%d).\n", ELF32_R_TYPE(relEntry->r_info));
+			return ELF_RELOC_ERR;
+                }
                 printd(DEBUG_ELF_LOADER,"0x%08X\n",*rel);
             }
         }
