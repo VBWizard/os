@@ -83,7 +83,8 @@ void restoreCR3()
     __asm__("mov cr3,eax\n"::[oldCR3] "a" (INIT_GDT_TABLE_ADDRESS));
 }
 
-uint32_t processELFDynamicSection(elfInfo_t* elfInfo)
+
+uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
 {
     Elf32_Dyn* dyn=(Elf32_Dyn*)elfInfo->dynamicSectionAddress;
 
@@ -112,7 +113,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo)
                 {
                     printd(DEBUG_ELF_LOADER,"loadElf: Calling loadElf again to load '%s'\n",&fileName);
                 }
-                elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=sysLoadElf(fileName,NULL,0x0);
+                elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=sysLoadElf(fileName,NULL,targetCR3);
                 if (! ((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount++])->loadCompleted)
                 {
                     printd(DEBUG_ELF_LOADER,"EXEC: processELFDynamicSection ... loading library failed.");
@@ -562,7 +563,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
                 ELF32_ST_TYPE(sym->st_info), 
                 sym->st_other, sym->st_shndx);
     }
-    uint32_t err=processELFDynamicSection(elfInfo);
+    uint32_t err=processELFDynamicSection(elfInfo,CR3);
      if (err)
      {
          printd(DEBUG_ELF_LOADER,"Failed to process ELF dynamic section, error=0x%08X\n",err);

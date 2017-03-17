@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     goto jumpHere;
     __asm__("mov eax,0\ncld\nint 0x80\n");
 */
-    __asm__("mov eax,0\ncld\ncall sysEnter_Vector\n");
+//    __asm__("mov eax,0\ncld\ncall sysEnter_Vector\n");
 //    goto jumpHere;
     return 0x1234;
 }
