@@ -672,7 +672,7 @@ uint32_t elfLookUpSymVal(elfInfo_t* elf, char* symName)
             strcpy(symNameToLinkTo,strTabEntry(lib->symStrTabLink, lib, symToFind->st_name));
             if (strncmp(symNameToLinkTo, symName,255)==0)
             {
-                printd(DEBUG_ELF_LOADER,"elfLookupSymVal: Found symbol '%s', value=0x%08X",symNameToLinkTo,symToFind->st_value);
+                printd(DEBUG_ELF_LOADER,"elfLookupSymVal: Found symbol '%s', value=0x%08X\n",symNameToLinkTo,symToFind->st_value);
                 return symToFind->st_value;
             }
         }
@@ -689,7 +689,7 @@ static int elf_relocate(elfInfo_t* elf) {
     printd(DEBUG_ELF_LOADER, "NOTE: Only processing REL tables, TODO: process RELA tables\n");
     if (elf->dynamicInfo.relTableSize>0)
     {
-        for (int cnt=0;cnt<elf->dynamicInfo.relTableSize / sizeof(Elf32_Rel);cnt++)
+        for (int cnt=0;cnt<(elf->dynamicInfo.relTableSize / sizeof(Elf32_Rel))+1;cnt++)
         {
             relEntry=&elf->dynamicInfo.relTable[cnt];
                 printd(DEBUG_ELF_LOADER,"Found relocation entry type 0x%02X with offset 0x%08X, dynamic symbol table entry 0x%02X\n",
@@ -716,25 +716,30 @@ static int elf_relocate(elfInfo_t* elf) {
                 if (symValPtr==0)
                     symValPtr=elfLookUpSymVal(elf,strTabEntry(0x6,elf,sym->st_name));
                 uint32_t* rel=relEntry->r_offset;
-                printd(DEBUG_ELF_LOADER," Writing 0x%08X to memory address 0x%08X.  Value before/after=0x%08X/ ",symValPtr,rel,*rel);
+                printd(DEBUG_ELF_LOADER," Writing 0x%08X to memory address 0x%08X.\n\tValue before/after=0x%08X/ ",symValPtr,rel,*rel);
                 switch(ELF32_R_TYPE(relEntry->r_info)) {
 		case R_386_NONE:
-			// No relocation
-			break;
+                    // No relocation
+                    break;
 		case R_386_32:
-			// Symbol + Offset
-			*rel = DO_386_32(symValPtr, *rel);
-			break;
+                    // Symbol + Offset
+                    *rel = DO_386_32(symValPtr, *rel);
+                    printd(DEBUG_ELF_LOADER,"0x%08X (using R_386_32)\n",*rel);
+                    break;
+                case R_386_JMP_SLOT:
+                    *rel = symValPtr;
+                    printd(DEBUG_ELF_LOADER,"0x%08X (using R_386_JMP_SLOT)\n",*rel);
+                    break;
 		case R_386_PC32:
-			// Symbol + Offset - Section Offset
-			*rel = DO_386_PC32(symValPtr, *rel, (int)rel);
-			break;
+                    // Symbol + Offset - Section Offset
+                    *rel = DO_386_PC32(symValPtr, *rel, (int)rel);
+                    printd(DEBUG_ELF_LOADER,"0x%08X (using R_386_PC32)\n",*rel);
+                    break;
 		default:
 			// Relocation type not supported, display error and return
 			panic("Unsupported Relocation Type (%d).\n", ELF32_R_TYPE(relEntry->r_info));
 			return ELF_RELOC_ERR;
                 }
-                printd(DEBUG_ELF_LOADER,"0x%08X\n",*rel);
             }
         }
     }
@@ -744,33 +749,3 @@ static int elf_relocate(elfInfo_t* elf) {
 
 extern void markTaskEnded(uint32_t taskNum);
 
-void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
-{
-    uint32_t processID, processCR3;
-    
-    __asm__("str ecx\nmov %[cr3],cr3":[processID] "=c" (processID),[cr3] "=a" (processCR3));
-    printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
-
-    switch (callNum)
-    {
-        case 0x0:
-            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, invalid call number.\n",callNum);
-            break;
-        case 0x1:       //exit
-             //Get back home
-             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
-             __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
-             printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08X\n",processCR3);
-             markTaskEnded(processCR3);
-             printd(DEBUG_PROCESS,"syscall: The process is dead, long live the process!\n",processID);
-             //****DESTROY STUFF HERE****
-             //When a task is ended, the scheduler is will deal with it on the next tick, so lets wait for that to happen
-             __asm__("sysCallIdleLoop: sti;hlt;jmp sysCallIdleLoop");
-             panic("_syscall: exit call, continued after halt!");
-             __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
-            break;
-        default:
-            panic("_syscall: Invalid call number 0x%04X\n",callNum);
-    }
-    __asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
-}

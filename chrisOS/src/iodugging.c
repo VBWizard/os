@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include "io.h"
 
-extern int print(char **out, const char *format, va_list args );
+extern int printI(char **out, const char *format, va_list args );
 size_t strlen(const char* str);
 
 void init_serial() {

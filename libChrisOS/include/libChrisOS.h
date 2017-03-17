@@ -17,8 +17,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <stdarg.h>
 
-    extern void libc_init(void);
+#define VISIBLE __attribute__((visibility("default")))
+
+void libc_init(void);
+int VISIBLE print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
 
 
 #ifdef __cplusplus

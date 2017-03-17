@@ -6,7 +6,7 @@
  */
 
 #include "../chrisOS/include/kernelObjects.h"
-#include "../libChrisOS/libChrisOS.h"
+#include "../chrisOS/include/chrisos.h"
 extern uint32_t* sysEnter_Vector;
 /*
  * testMainProgramEntry

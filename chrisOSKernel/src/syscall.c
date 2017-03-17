@@ -5,6 +5,7 @@
  */
 
 #include "syscall.h"
+#include "printf.h"
 
 #define KBRD_INTRFC 0x64
 /* keyboard interface bits */
@@ -15,6 +16,41 @@
 #define bit(n) (1<<(n)) /* Set bit n to 1 */
 #define check_flag(flags, n) ((flags) & bit(n))
 
+void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
+{
+    uint32_t processID, processCR3;
+    
+    __asm__("mov %[cr3],cr3":[cr3] "=a" (processCR3));
+    printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
+
+    switch (callNum)
+    {
+        case 0x0:
+            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, invalid call number.\n",callNum);
+            break;
+        case 0x1:       //exit
+             //Get back home
+             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
+             __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
+             printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08X\n",processCR3);
+             markTaskEnded(processCR3);
+             printd(DEBUG_PROCESS,"syscall: The process is dead, long live the process!\n");
+             //****DESTROY STUFF HERE****
+             //When a task is ended, the scheduler is will deal with it on the next tick, so lets wait for that to happen
+             __asm__("sysCallIdleLoop: sti;hlt;jmp sysCallIdleLoop");
+             panic("_syscall: exit call, continued after halt!");
+             __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
+            break;
+        case 0x169:
+            sysReboot();
+        case 0x300:
+            printk((const char*)param1, (const char*)param2);
+            break;
+        default:
+            panic("_syscall: Invalid call number 0x%04X\n",callNum);
+    }
+    __asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
+}
 
 void syscall169()
 {

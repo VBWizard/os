@@ -197,9 +197,9 @@ LOAD_ZERO_BASED_DS
     printk("GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
           printk("Bytes at CS:EIP: ");
-          for (int cnt=0;cnt<19;cnt++)
-              printk("%02X ", lCSIPPtr[cnt]);
-          printk("\n");
+//          for (int cnt=0;cnt<19;cnt++)
+//              printk("%02X ", lCSIPPtr[cnt]);
+//          printk("\n");
           printk ("Stack @ 0x%08x:0x%08X:\n",exceptionSS, esp);
           for (int cnt=0;cnt<20;cnt++)
           {

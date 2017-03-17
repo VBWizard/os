@@ -130,7 +130,7 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	return pc + prints (out, s, width, pad);
 }
 
-static int print(char **out, const char *format, va_list args )
+static int printI(char **out, const char *format, va_list args )
 {
 	register int width, pad;
 	register int pc = 0;
@@ -196,7 +196,7 @@ static int print(char **out, const char *format, va_list args )
 
 int printd_valist(const char *format, va_list args)
 {
-    return print(0, format, args);
+    return printI(0, format, args);
 }
 
 int printp_valist(const char *format, va_list args)
@@ -204,7 +204,7 @@ int printp_valist(const char *format, va_list args)
     char inString[1024];
     char* in=inString;
 
-    print(&in, format,args);
+    printI(&in, format,args);
     
     for (int cnt=0;cnt<strlen(inString);cnt++)
     {
@@ -221,7 +221,7 @@ void printp(const char *format, ...)
 
 int printk_valist(const char *format, va_list args)
 {
-    return print(0, format, args);
+    return printI(0, format, args);
 }
 
 int printk(const char *format, ...)
@@ -256,7 +256,7 @@ int sprintf(char *out, const char *format, ...)
         va_list args;
         
         va_start( args, format );
-        return print( &out, format, args );
+        return printI( &out, format, args );
 }
 
 #ifdef TEST_PRINTF
