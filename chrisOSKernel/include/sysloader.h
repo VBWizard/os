@@ -13,5 +13,5 @@
 
 int sysExec(process_t* process,int argc,char** argv);
 elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3);
-bool elfProcessLibExports(elfInfo_t* elf);
+uint32_t elfLookUpSymVal(elfInfo_t* elf, char* symName);
 #endif	/* SYSLOADER_H */

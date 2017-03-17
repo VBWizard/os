@@ -17,11 +17,11 @@ CND_PACKAGE_PATH_Debug=dist/Debug/cross-Linux/package/liblibChrisOS.so.tar
 # Release configuration
 CND_PLATFORM_Release=cross-Linux
 CND_ARTIFACT_DIR_Release=dist/Release/cross-Linux
-CND_ARTIFACT_NAME_Release=liblibChrisOS.so
-CND_ARTIFACT_PATH_Release=dist/Release/cross-Linux/liblibChrisOS.so
+CND_ARTIFACT_NAME_Release=liblibchrisos.a
+CND_ARTIFACT_PATH_Release=dist/Release/cross-Linux/liblibchrisos.a
 CND_PACKAGE_DIR_Release=dist/Release/cross-Linux/package
-CND_PACKAGE_NAME_Release=liblibChrisOS.so.tar
-CND_PACKAGE_PATH_Release=dist/Release/cross-Linux/package/liblibChrisOS.so.tar
+CND_PACKAGE_NAME_Release=libChrisOS.tar
+CND_PACKAGE_PATH_Release=dist/Release/cross-Linux/package/libChrisOS.tar
 #
 # include compiler specific variables
 #

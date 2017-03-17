@@ -53,7 +53,7 @@
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
-    <conf name="Release" type="2">
+    <conf name="Release" type="3">
       <toolsSet>
         <compilerSet>cross|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
@@ -73,9 +73,8 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
-        <linkerTool>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc -fvisibility=hidden</commandLine>
-        </linkerTool>
+        <archiverTool>
+        </archiverTool>
       </compileType>
       <item path="libChrisOS.h" ex="false" tool="3" flavor2="0">
       </item>

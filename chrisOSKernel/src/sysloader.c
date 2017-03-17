@@ -106,14 +106,14 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo)
                         strTabEntry(elfInfo->dynamicNameStringTable,elfInfo,dyn[cnt].d_un.d_val));
                 char fileName[100]="/";
                 strcat(fileName,elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount]);
-                printd(DEBUG_ELF_LOADER,"Found NEEDED, library name='%s', orig name='%s'\n",fileName,elfInfo->dynamicInfo.strTableAddress+dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found NEEDED, library name='%s'\n",
+                        fileName);
                 if (kDebugLevel&DEBUG_ELF_LOADER)
                 {
                     printd(DEBUG_ELF_LOADER,"loadElf: Calling loadElf again to load '%s'\n",&fileName);
                 }
-                elfInfo->dynamicInfo.neededExecLoadNum[elfInfo->dynamicInfo.neededPtr++]=kExecLoadCount;
-                elfInfo_t* elfLibPtr=sysLoadElf(fileName,elfLibPtr,0x0);
-                if (!elfLibPtr->loadCompleted)
+                elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=sysLoadElf(fileName,NULL,0x0);
+                if (! ((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount++])->loadCompleted)
                 {
                     printd(DEBUG_ELF_LOADER,"EXEC: processELFDynamicSection ... loading library failed.");
                     elfInfo->loadCompleted=false;
@@ -550,7 +550,8 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         }
 
     }
-    printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Done processing the section header table\nIterating the symbol table, %u records\n",elfInfo->symTableRecordCount);
+    printd(DEBUG_ELF_LOADER,"Done processing the section header table\n");
+    printd(DEBUG_ELF_LOADER  | DEBUG_DETAILED,"Iterating the symbol table, %u records\n",elfInfo->symTableRecordCount);
     printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Using string table 0x%04X\n",elfInfo->symStrTabLink);
     for (int cnt=0;cnt<elfInfo->symTableRecordCount;cnt++)
     {
@@ -570,16 +571,11 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         return elfInfo;
      }
      elf_relocate(elfInfo);
-     elfProcessLibExports(elfInfo);
      fl_fclose(fPtr);
         elfInfo->loadCompleted=true;
         return elfInfo;
 }
 
-bool elfProcessLibExports(elfInfo_t* elf)
-{
-    
-}
 
 
 static inline Elf32_Shdr *elf_sheader(Elf32_Ehdr *hdr) {
@@ -662,6 +658,27 @@ static int elf_do_reloc(Elf32_Rel* relEntry)
     
 }
 
+uint32_t elfLookUpSymVal(elfInfo_t* elf, char* symName)
+{
+    Elf32_Sym* symToFind;
+    for (int libNum=0;libNum<elf->libraryElfCount;libNum++)
+    {
+        elfInfo_t* lib=elf->libraryElfPtr[libNum];
+        for (int symNum=0;symNum<lib->symTableRecordCount;symNum++)
+        {
+            symToFind=&lib->symTable[symNum];
+            char symNameToLinkTo[255];
+            strcpy(symNameToLinkTo,strTabEntry(lib->symStrTabLink, lib, symToFind->st_name));
+            if (strncmp(symNameToLinkTo, symName,255)==0)
+            {
+                printd(DEBUG_ELF_LOADER,"elfLookupSymVal: Found symbol '%s', value=0x%08X",symNameToLinkTo,symToFind->st_value);
+                return symToFind->st_value;
+            }
+        }
+        panic("elfLookupSymVal: Could not find symbol '%s'",symName);
+    }
+}
+
 static int elf_relocate(elfInfo_t* elf) {
     Elf32_Rel* relEntry;
     uint32_t symValPtr;
@@ -681,21 +698,22 @@ static int elf_relocate(elfInfo_t* elf) {
             if (ELF32_R_SYM(relEntry->r_info) != SHN_UNDEF)
             {
                 //NOTE: I don't know why I had to subtract 1 from the entry number
-                printd(DEBUG_ELF_LOADER,"Getting symbol entry number from 0x%08X\n",&elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value);
+                printd(DEBUG_ELF_LOADER," Getting symbol entry number from 0x%08X\n",&elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value);
                 uint32_t symEntryNum=elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value;
                 Elf32_Sym* sym = (Elf32_Sym*)(elf->dynamicSymbolAddress+((ELF32_R_SYM(relEntry->r_info))*sizeof(Elf32_Sym)));
-                printd(DEBUG_ELF_LOADER,"sizeof Elf32_Sym=0x%08X, symTable=0x%08X, symEntryNum=0x%04X, symPtr=0x%08X, base+symPtr=0x%08X\n",
+/*                printd(DEBUG_ELF_LOADER,"sizeof Elf32_Sym=0x%08X, symTable=0x%08X, symEntryNum=0x%04X, symPtr=0x%08X, base+symPtr=0x%08X\n",
                         sizeof(Elf32_Sym), 
                         elf->dynamicSymbolAddress,
                         symEntryNum,
                         (symEntryNum*sizeof(Elf32_Sym)),
                         elf->dynamicSymbolAddress+(symEntryNum*sizeof(Elf32_Sym)));
-                printd(DEBUG_ELF_LOADER," Using dynamic symbol at 0x%08X (symtab=0x%08X)\n",sym,elf->dynamicSymbolAddress);
-                symValPtr=sym->st_value;
+*/                symValPtr=sym->st_value;
                 printd(DEBUG_ELF_LOADER," Symbol Name '%s', Symbol value=0x%08X (addr=0x%08X)\n",
                         strTabEntry(0x6,elf,sym->st_name), 
                         symValPtr,
                         sym);
+                if (symValPtr==0)
+                    symValPtr=elfLookUpSymVal(elf,strTabEntry(0x6,elf,sym->st_name));
                 uint32_t* rel=relEntry->r_offset;
                 printd(DEBUG_ELF_LOADER," Writing 0x%08X to memory address 0x%08X.  Value before/after=0x%08X/ ",symValPtr,rel,*rel);
                 switch(ELF32_R_TYPE(relEntry->r_info)) {

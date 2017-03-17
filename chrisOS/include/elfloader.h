@@ -20,18 +20,20 @@ typedef struct sElfDynamicInfo
 {
     char neededName[10][256];
     int neededPtr;
-    int neededExecLoadNum[10];
     int jmpRelSz, relATableSize, relAEntrySize, strTableName[50], strTableSize[50], symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,
-            neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
+            neededCount, soNameStringIndex, rPathStringIndex, relEntryCount, dynTableSize, dynEntrySize, dynEntryCount;
     uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[50], strTableFilePtr[50], symTableAddress, relATableAddress, initFunctionAddress, 
             termFunctionAddress, relTableAddress,
             relTable_symTableLink;
     Elf32_Rela *relATable;
     Elf32_Rel *relTable;    
+    Elf32_Dyn* dynTable;
 } elfDynamic_t;
 
 typedef struct sElfInfo
 {
+    int libraryElfCount;
+    void* libraryElfPtr[10];
     Elf32_Ehdr hdr;
     Elf32_Shdr secHdrTable[50];
     Elf32_Phdr pgmHdrTable[50];
