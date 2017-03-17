@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     uint64_t temp;
     int a=argc;
 
-//    libc_init();
+    //libc_init();
     printk("Param count=%u\n",argc);
     char** b=argv;
     for (int cnt=0;cnt<argc;cnt++)

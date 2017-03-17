@@ -100,10 +100,10 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo)
                 printd(DEBUG_ELF_LOADER,"ELF at: 0x%08X, copy to: 0x%08X, neededCount=0x%08X\n",
                         elfInfo, elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount],++elfInfo->dynamicInfo.neededCount);
                 printd(DEBUG_ELF_LOADER,"Reading NEEDED name from string table index 0x%04X (0x%04X)\n",dyn[cnt].d_un.d_val, dyn[cnt].d_un.d_ptr);
-                printd(DEBUG_ELF_LOADER,"Needed name = %s\n",strTabEntry(0x6,elfInfo,dyn[cnt].d_un.d_val));
+                printd(DEBUG_ELF_LOADER,"Needed name = %s\n",strTabEntry(elfInfo->dynamicNameStringTable,elfInfo,dyn[cnt].d_un.d_val));
                 strcpy(elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount],
                         //strTabEntryBySTName(".strtab",elfInfo,dyn[cnt].d_un.d_val));
-                        strTabEntry(0x6,elfInfo,dyn[cnt].d_un.d_val));
+                        strTabEntry(elfInfo->dynamicNameStringTable,elfInfo,dyn[cnt].d_un.d_val));
                 char fileName[100]="/";
                 strcat(fileName,elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount]);
                 printd(DEBUG_ELF_LOADER,"Found NEEDED, library name='%s', orig name='%s'\n",fileName,elfInfo->dynamicInfo.strTableAddress+dyn[cnt].d_un.d_ptr);
@@ -112,8 +112,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo)
                     printd(DEBUG_ELF_LOADER,"loadElf: Calling loadElf again to load '%s'\n",&fileName);
                 }
                 elfInfo->dynamicInfo.neededExecLoadNum[elfInfo->dynamicInfo.neededPtr++]=kExecLoadCount;
-                elfInfo_t* elfLibPtr=&kExecLoadInfo[kExecLoadCount++];
-                sysLoadElf(fileName,elfLibPtr,0x0,true);
+                elfInfo_t* elfLibPtr=sysLoadElf(fileName,elfLibPtr,0x0);
                 if (!elfLibPtr->loadCompleted)
                 {
                     printd(DEBUG_ELF_LOADER,"EXEC: processELFDynamicSection ... loading library failed.");
@@ -277,7 +276,7 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
     return true;
 }
 
-bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3,bool isLibrary)
+bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
 {
     uint32_t virtualLoadAddress;
     
@@ -308,6 +307,9 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3,bool isLibrary)
         return false;
     }
     
+    if (elfInfo->hdr.e_type!=ET_DYN)
+        elfInfo->isLibrary=true;
+            
     printd(DEBUG_ELF_LOADER,"ELF file type %u, machine type %u\n",elfInfo->hdr.e_type,elfInfo->hdr.e_machine);
     
     //Get the Section Header String Table Index (e_shstrndx)
@@ -335,11 +337,11 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3,bool isLibrary)
     for (int pgmSectionNum=0;pgmSectionNum<elfInfo->hdr.e_phnum;pgmSectionNum++)
     {
         virtualLoadAddress = elfInfo->pgmHdrTable[pgmSectionNum].p_vaddr;
-        if (isLibrary)
-        {
-            //virtualLoadAddress+=libLoadOffset;
-            //elfInfo->pgmHdrTable[cnt].p_vaddr=virtualLoadAddress;
-        }
+//        if (isLibrary)
+//        {
+//            //virtualLoadAddress+=libLoadOffset;
+//            //elfInfo->pgmHdrTable[cnt].p_vaddr=virtualLoadAddress;
+//        }
 
         if (virtualLoadAddress==(uint32_t)KERNEL_DATA_LOAD_ADDRESS)
         {
@@ -395,37 +397,49 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3,bool isLibrary)
     return true;
 }
 
-uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isLibrary)
+elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
 {
-
-    printd(DEBUG_ELF_LOADER,"Opening image file %s\n",fileName);
-    void* fPtr=fopen(fileName, "r");
-    printd(DEBUG_ELF_LOADER,"fopen returned %u\n",fPtr);
-    if (fPtr==0)
-    {
-        printk("Error opening file '%s' (err=%u), cannot exec\n",fileName,fPtr);
-        return -3;
-    }   
- 
     GET_OLD_CR3;
             
     if (CR3==0x0)
         CR3=CURRENT_CR3;
     elfInfo_t* elfInfo;
     if (pElfInfo==NULL)
-        //Get a slot in the load info
-        elfInfo=&kExecLoadInfo[kExecLoadCount++];
+        elfInfo=malloc(sizeof(elfInfo_t));
     else
+    {
         elfInfo=pElfInfo;
+    }
+    elfInfo_t* execLoadInfo=kExecLoadInfo;
+    execLoadInfo+=kExecLoadCount;
+    printk("Storing elfInfo to load info array at 0x%08X (count=0x%04X)\n",execLoadInfo,kExecLoadCount);
+    execLoadInfo=elfInfo;
+    kExecLoadCount++;
     
     //Initialize the structs we will be using
     memset(elfInfo,0,sizeof(elfInfo_t));
     memset(&elfInfo->dynamicInfo,0,sizeof(elfDynamic_t));
 
+    elfInfo->fileName=malloc(strlen(fileName));
+    strcpy(elfInfo->fileName,fileName);
+
+    printd(DEBUG_ELF_LOADER,"Opening image file %s\n",elfInfo->fileName);
+    void* fPtr=fopen(elfInfo->fileName, "r");
+    printd(DEBUG_ELF_LOADER,"fopen returned %u\n",fPtr);
+    if (fPtr==0)
+    {
+        printk("Error opening file '%s' (err=%u), cannot exec\n",elfInfo->fileName,fPtr);
+        elfInfo->loadCompleted=false;
+        return elfInfo;
+    }   
+
     elfInfo->loadCompleted=true;
     //Load all of the sections in the file to memory
-    if (!elfLoadSections(fPtr,elfInfo,CR3,isLibrary))
-        return -4;
+    if (!elfLoadSections(fPtr,elfInfo,CR3))
+    {
+        elfInfo->loadCompleted=false;
+        return elfInfo;
+    }
 
     //First iterate the sections to find the string & symbol tables
     printd(DEBUG_ELF_LOADER,"Scanning section header entries (%u)\n",elfInfo->secHdrRecordCount);
@@ -435,24 +449,17 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
     {
         if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
         {
-            if (cnt==elfInfo->sectionNameStringTable)
-                elfInfo->sectionNameStringTable=cnt;
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            elfInfo->dynamicInfo.strTableAddress[cnt]=allocPages(elfInfo->secHdrTable[cnt].sh_size);
+            elfInfo->dynamicInfo.strTableAddress[cnt]=malloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
             printd(DEBUG_ELF_LOADER,"Mapping string table @ 0x%08X (0x%08X) for 0x%08X bytes into kernel\n",
                     elfInfo->dynamicInfo.strTableAddress[cnt], 
                     (uint32_t)(elfInfo->dynamicInfo.strTableAddress[cnt]) | KERNEL_PAGED_BASE_ADDRESS,
-                    elfInfo->secHdrTable[cnt].sh_size/0x1000+1);
-            pagingMapPageCount(KERNEL_CR3,
-                    (uint32_t)(elfInfo->dynamicInfo.strTableAddress[cnt]) | KERNEL_PAGED_BASE_ADDRESS,
-                    elfInfo->dynamicInfo.strTableAddress[cnt],
-                    elfInfo->secHdrTable[cnt].sh_size/0x1000+1,0x7);
+                    elfInfo->secHdrTable[cnt].sh_size/0x1000+0x1000);
             elfInfo->dynamicInfo.strTableName[cnt]=elfInfo->secHdrTable[cnt].sh_name;
             uint32_t lResult=fl_fread((char*)elfInfo->dynamicInfo.strTableAddress[cnt],1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
             printd(DEBUG_ELF_LOADER,"Reading string table to 0x%08X, 0x%08X bytes, result=0x%08X\n",elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,lResult);
             elfInfo->dynamicInfo.strTableFilePtr[cnt]=elfInfo->secHdrTable[cnt].sh_offset;
             elfInfo->dynamicInfo.strTableSize[cnt]=elfInfo->secHdrTable[cnt].sh_size;
-            
             tabCount++;
             //break;
         }
@@ -466,16 +473,26 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
                 cnt,
                 strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),
                 elfInfo->dynamicInfo.strTableAddress[cnt], elfInfo->dynamicInfo.strTableSize[cnt]);
+                if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),".dynstr",7)==0)
+                {
+                    elfInfo->dynamicNameStringTable=cnt;
+                    printd(DEBUG_ELF_LOADER,"Dynamic string table entry = 0x%04X\n",cnt);
+                }
+                else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),".strtab",7)==0)
+                {
+                    elfInfo->generalNameStringTable=cnt;
+                    printd(DEBUG_ELF_LOADER,"General string table entry = 0x%04X\n",cnt);
+                }
         }
     }
     printd(DEBUG_ELF_LOADER,"Scanning section header table, %u records\n",elfInfo->secHdrRecordCount);
     for (int cnt=0;cnt<elfInfo->secHdrRecordCount;cnt++)
     {
         if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
-        {}
+        {printd(DEBUG_ELF_LOADER,"Found (STRTAB), already processed string tables, skipping\n");}
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_SYMTAB)
         {
-            elfInfo->symTable=malloc(elfInfo->secHdrTable[cnt].sh_size);
+            elfInfo->symTable=malloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
             fl_fread(elfInfo->symTable,elfInfo->secHdrTable[cnt].sh_size,1,fPtr);
             elfInfo->symTableRecordCount=(elfInfo->secHdrTable[cnt].sh_size / sizeof(Elf32_Sym));
@@ -499,7 +516,7 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_RELA)
         {
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            elfInfo->dynamicInfo.relATable=malloc(elfInfo->secHdrTable[cnt].sh_size);
+            elfInfo->dynamicInfo.relATable=malloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
             elfInfo->dynamicInfo.relATableSize=elfInfo->secHdrTable[cnt].sh_size;
             fl_fread(elfInfo->dynamicInfo.relATable,1,elfInfo->dynamicInfo.relATableSize,fPtr);
             printd(DEBUG_ELF_LOADER,"Found %s (RELA) section, read %u bytes to 0x%08X.\n",
@@ -511,7 +528,7 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
         {
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
             elfInfo->dynamicInfo.relTableSize=elfInfo->secHdrTable[cnt].sh_size;
-            elfInfo->dynamicInfo.relTable=malloc(elfInfo->dynamicInfo.relTableSize);
+            elfInfo->dynamicInfo.relTable=malloc(elfInfo->dynamicInfo.relTableSize+0x1000);
             elfInfo->dynamicInfo.relTable_symTableLink=elfInfo->secHdrTable[cnt].sh_link;
             fl_fread(elfInfo->dynamicInfo.relTable,1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
             printd(DEBUG_ELF_LOADER,"Found %s (REL) section, read %u bytes to 0x%08X.\n",
@@ -533,7 +550,7 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
         }
 
     }
-    printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Iterating the symbol table, %u records\n",elfInfo->symTableRecordCount);
+    printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Done processing the section header table\nIterating the symbol table, %u records\n",elfInfo->symTableRecordCount);
     printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Using string table 0x%04X\n",elfInfo->symStrTabLink);
     for (int cnt=0;cnt<elfInfo->symTableRecordCount;cnt++)
     {
@@ -547,14 +564,23 @@ uint32_t sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool isL
     uint32_t err=processELFDynamicSection(elfInfo);
      if (err)
      {
-         printd(DEBUG_ELF_LOADER,"Failed ot process ELF dynamic section, error=0x%08X\n",err);
+         printd(DEBUG_ELF_LOADER,"Failed to process ELF dynamic section, error=0x%08X\n",err);
         fl_fclose(fPtr);
-         return -3;
+        elfInfo->loadCompleted=false;
+        return elfInfo;
      }
      elf_relocate(elfInfo);
+     elfProcessLibExports(elfInfo);
      fl_fclose(fPtr);
-     return 0;
+        elfInfo->loadCompleted=true;
+        return elfInfo;
 }
+
+bool elfProcessLibExports(elfInfo_t* elf)
+{
+    
+}
+
 
 static inline Elf32_Shdr *elf_sheader(Elf32_Ehdr *hdr) {
 	return (Elf32_Shdr *)((int)hdr + hdr->e_shoff);
@@ -648,14 +674,15 @@ static int elf_relocate(elfInfo_t* elf) {
         for (int cnt=0;cnt<elf->dynamicInfo.relTableSize / sizeof(Elf32_Rel);cnt++)
         {
             relEntry=&elf->dynamicInfo.relTable[cnt];
-            if (ELF32_R_SYM(relEntry->r_info) != SHN_UNDEF && relEntry->r_offset !=0)
-            {
-                //NOTE: I don't know why I had to subtract 1 from the entry number
-                uint32_t symEntryNum=elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value;
                 printd(DEBUG_ELF_LOADER,"Found relocation entry type 0x%02X with offset 0x%08X, dynamic symbol table entry 0x%02X\n",
                         ELF32_R_TYPE(relEntry->r_info), 
                         relEntry->r_offset,
                         ELF32_R_SYM(relEntry->r_info));
+            if (ELF32_R_SYM(relEntry->r_info) != SHN_UNDEF)
+            {
+                //NOTE: I don't know why I had to subtract 1 from the entry number
+                printd(DEBUG_ELF_LOADER,"Getting symbol entry number from 0x%08X\n",&elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value);
+                uint32_t symEntryNum=elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value;
                 Elf32_Sym* sym = (Elf32_Sym*)(elf->dynamicSymbolAddress+((ELF32_R_SYM(relEntry->r_info))*sizeof(Elf32_Sym)));
                 printd(DEBUG_ELF_LOADER,"sizeof Elf32_Sym=0x%08X, symTable=0x%08X, symEntryNum=0x%04X, symPtr=0x%08X, base+symPtr=0x%08X\n",
                         sizeof(Elf32_Sym), 
@@ -694,69 +721,6 @@ static int elf_relocate(elfInfo_t* elf) {
     }
     LOAD_KERNEL_BASED_DS;
     return 0;
-}
-int sysExec(process_t* process,int argc,char** argv)
-{
-    int lsysExecRetVal=0;
-     register int *eax __asm__("eax");
-
-     GET_OLD_CR3;
-    newCR3=process->task->tss->CR3;
-    printd(DEBUG_LOADER,"sysExec: Entered ... executing '%s'\n",process->path);
-    //If loaded successfully then execute
-    if (process->elf->loadCompleted)
-    {
-        printd(DEBUG_ELF_LOADER,"exec: Executing %s at 0x%08X, CR3=0x%08X, return address is =0x%08X\n", process->path, process->elf->hdr.e_entry, newCR3 ,__builtin_return_address(0));
-        //Create tss GDT entry for the process
-        uint32_t tssFlags=ACS_TSS;
-        uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;
-        if (process->task->kernel)
-        {
-            gdtFlags |= GDT_DPL0;
-            tssFlags |= ACS_DPL_0;
-        }
-        else
-        {
-            gdtFlags |= GDT_DPL3;
-            tssFlags |= ACS_DPL_3;
-        }
-        
-        printk("Process CS=0x%08X, taskNum=0x%08X\n",process->task->tss->CS,process->task->taskNum);
-        //This is the gdt TSS entry for the process
-        gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
-        __asm__("mov  ds,bx\n":: "b" (process->task->tss->DS));
-        __asm__("mov  es,bx\n":: "b" (process->task->tss->ES));
-        __asm__("mov  fs,bx\n":: "b" (process->task->tss->FS));
-        __asm__("mov  gs,bx\n":: "b" (process->task->tss->GS));
-        __asm__("push %[ssTSS]\n"
-        "push %[stackPtr]\n"                                //Target esp
-        "push %[eFlags]\n"                                  //Target EFLAGS
-        "mov eax,%[taskTSS]\n"                                    //Load task register with user process TSS entry
-        "ltr ax\n"
-        "mov eax,%[procCSTSS]\n"                            //GDT of DPL 0/3 code segment, not specific to the process
-        "push eax\n"                                        //Target CS
-        "lea eax,jmpHere\npush eax\n"                       //Target EIP is right after the iRet
-        ::[stackPtr] "b" (process->task->tss->ESP),
-                [eFlags] "d" (process->task->tss->EFLAGS),
-                [procCSTSS] "r" (process->task->tss->CS),
-                [ssTSS] "r" (process->task->tss->SS),
-                        [taskTSS] "r" (process->task->taskNum<<3));
-       SWITCH_CR3;                                          //Switch to the process CR3 before the jump
-        __asm__("iretd\njmpHere:nop\n");                    //Jump to (possibly) ring 3
-         printk("MADE IT!!!\n");                             //We've made it!
-        //Now jump to the user task
-        printd(DEBUG_ELF_LOADER,"sysExec: Jumping to 0x%04X:0x%08X\n", process->task->tss->CS,process->task->tss->EIP);
-        __asm__("push cs\npush %[entryPoint]\nretf\n"::[entryPoint] "r" (process->task->tss->EIP));
-        JMPHR: goto JMPHR;
-        panic("SysExec: Should never get here!!!");
-        lsysExecRetVal=(uint32_t)eax;
-        printd(DEBUG_ELF_LOADER,"exec: Back from executing %s, return value is 0x%08X, 0x%08X, __bra=0x%08X\n", process->path, lsysExecRetVal, &process->path, __builtin_return_address(0));
-    }
-    else
-    {
-        panic("SysExec: Should never get here!!!");
-    }
-    return lsysExecRetVal;
 }
 
 extern void markTaskEnded(uint32_t taskNum);

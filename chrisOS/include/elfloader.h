@@ -23,7 +23,7 @@ typedef struct sElfDynamicInfo
     int neededExecLoadNum[10];
     int jmpRelSz, relATableSize, relAEntrySize, strTableName[50], strTableSize[50], symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,
             neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
-    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[50], strTableFilePtr[5], symTableAddress, relATableAddress, initFunctionAddress, 
+    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[50], strTableFilePtr[50], symTableAddress, relATableAddress, initFunctionAddress, 
             termFunctionAddress, relTableAddress,
             relTable_symTableLink;
     Elf32_Rela *relATable;
@@ -40,8 +40,9 @@ typedef struct sElfInfo
     uintptr_t dynamicSectionAddress, dynamicSymbolAddress;
     elfDynamic_t dynamicInfo;
     uintptr_t libLoadAddress;
-    bool loadCompleted;
-    int sectionNameStringTable;
+    bool loadCompleted,isLibrary;
+    int sectionNameStringTable, dynamicNameStringTable, generalNameStringTable;
+    char* fileName;
 } elfInfo_t;
 
 void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);

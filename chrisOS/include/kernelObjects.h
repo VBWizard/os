@@ -80,7 +80,7 @@ KERNEL_DATA_SECTION uint32_t* kGDTSlotAvailableInd=(uint32_t*)GDT_AVAILABLE_ADDR
 KERNEL_DATA_SECTION uint32_t* kTaskSlotAvailableInd=(uint32_t*)TASK_AVAILABLE_ADDRESS;
 KERNEL_DATA_SECTION tss_t* kTSSTable=(tss_t*)TSS_TABLE_ADDRESS;
 KERNEL_DATA_SECTION task_t* kTaskTable=(task_t*)TASK_TABLE_ADDRESS;
-KERNEL_DATA_SECTION elfInfo_t* kExecLoadInfo=(elfInfo_t*)EXEC_FILE_LOAD_INFO;
+KERNEL_DATA_SECTION elfInfo_t* kExecLoadInfo;
 KERNEL_DATA_SECTION int kExecLoadCount=0;
 KERNEL_DATA_SECTION int kSelectedDiskNum=-1; 
 KERNEL_DATA_SECTION int kSelectedPartNum=-1;

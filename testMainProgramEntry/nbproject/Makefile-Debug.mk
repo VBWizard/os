@@ -57,7 +57,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L/usr/local/lib -L/home/yogi/opt/cross/lib -L../libChrisOS/src -shared -lc
+LDLIBSOPTIONS=-L/usr/local/lib -L/home/yogi/opt/cross/lib -L../libChrisOS/src -dynamic -lc
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

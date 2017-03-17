@@ -58,7 +58,7 @@
             <pElem>../libChrisOS/src</pElem>
           </linkerAddLib>
           <linkerLibItems>
-            <linkerOptionItem>-shared</linkerOptionItem>
+            <linkerOptionItem>-dynamic</linkerOptionItem>
             <linkerLibLibItem>c</linkerLibLibItem>
           </linkerLibItems>
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>

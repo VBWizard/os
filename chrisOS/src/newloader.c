@@ -324,7 +324,8 @@ int exec(char* fileName,int argc,char** argv)
     } 
     
     //Get a slot in the load info
-    elfInfo_t* elf=&kExecLoadInfo[kExecLoadCount++];
+    elfInfo_t elfF;
+    elfInfo_t* elf=&elfF;
     
     //Load the executable
     loadElf(fPtr,elf,false);

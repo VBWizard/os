@@ -39,6 +39,7 @@
       <itemPath>../chrisOS/include/chrisos.h</itemPath>
       <itemPath>../chrisOS/include/i386/cpu.h</itemPath>
       <itemPath>include/drv_genKeyboard.h</itemPath>
+      <itemPath>include/elfLibraryTable.h</itemPath>
       <itemPath>../chrisOS/include/filesystem.h</itemPath>
       <itemPath>include/kIRQHandlers.h</itemPath>
       <itemPath>/home/yogi/src/os/chrisOSKernel/include/kInit.h</itemPath>
@@ -312,6 +313,8 @@
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
@@ -560,6 +563,8 @@
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
       </item>

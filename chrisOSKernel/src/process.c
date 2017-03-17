@@ -14,8 +14,6 @@
 #include "sysloader.h"
 #include "strings.h"
 
-extern elfInfo_t* kExecLoadInfo;
-extern int kExecLoadCount;
 extern void submitNewTask(task_t* task);
 void processWrapup();
 bool taskRegInitialized=false;
@@ -38,10 +36,11 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     strcpy(process->path,path);
     printd(DEBUG_PROCESS,"createProcess: Copied path (0x%08X) to process->path (0x%08X)\n",path,process->path);
     printd(DEBUG_PROCESS,"process->path (0x%08X)=%s\n",process->path,process->path);
-    process->elf=&kExecLoadInfo[kExecLoadCount++];
+    process->elf=NULL;
     process->task=createTask(kernelProcess);
     //CR3 was set and PDir created by createTask.  Page tables will be created by the load process
-    if (sysLoadElf(process->path,process->elf,process->task->tss->CR3,false)!=0)
+    process->elf=sysLoadElf(process->path,process->elf,process->task->tss->CR3);
+    if (!process->elf->loadCompleted)
     {
         printk("SysLoadElf error, failed to load program\n");
         return NULL;
