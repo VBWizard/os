@@ -90,8 +90,6 @@ void kbd_handler()
     rawKey = inb(KEYB_DATA_PORT);
     kKeyChar = rawKey;//& 0x80;
 
-    __asm__("cli\n");
-    
     switch(rawKey)  
     {
         case KEY_SHIFT_DN: kKeyStatus[INDEX_SHIFT]=1;break;
@@ -145,23 +143,27 @@ void kbd_handler()
                 }
 #ifndef DEBUG_NONE
                  if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
+                 {
                     printk("kbd_handler: %c-(%08X)\n",translatedKeypress, kKbdBuffCurrTop);
+                    cursorSavePosition();
+                    cursorMoveTo(78,0);
+                    printk("%c",'k');
+                    cursorRestorePosition();
+                 }
 #endif
-                cursorSavePosition();
-                cursorMoveTo(78,0);
-                printk("%c",'k');
-                cursorRestorePosition();
             }
             else
             {
 #ifndef DEBUG_NONE
                 if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-                      printk("noRoomForKey: %c\n",kKbdBuffCurrTop);
+                {
+                    printk("noRoomForKey: %c\n",kKbdBuffCurrTop);
+                    cursorSavePosition();
+                    cursorMoveTo(78,0);
+                    printk("%c",'K');
+                    cursorRestorePosition();
+                }
 #endif
-                cursorSavePosition();
-                cursorMoveTo(78,0);
-                printk("%c",'K');
-                cursorRestorePosition();
             }
                  //Debug
                  if (kKeyStatus[INDEX_ALT] && translatedKeypress==0x6A)

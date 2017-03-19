@@ -184,6 +184,7 @@ mov exceptionSavedESP, esp
         mov     ebp, esp
         mov     ax, 0xe                  # save exception number
 isr_My_Common:
+cli
         mov exceptionNumber,ax
         pushad                          # other regs because its an ISR
         mov eax,ds
@@ -240,7 +241,7 @@ getExceptionDetailsWithError:
      mov exceptionErrorCode, bx
 
 saveTheStack:
-jmp overSaveTheStack
+#jmp overSaveTheStack
         mov esi, exceptionSavedESP
 //        add esi, 16 #drop the 4 dwords that are passed to the proc
         mov edi, exceptionSavedStack
