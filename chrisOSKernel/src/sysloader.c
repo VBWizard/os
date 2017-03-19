@@ -233,10 +233,13 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
     {
         printd(DEBUG_ELF_LOADER,"putDataOnPages: Bytes left to go: 0x%08X\n",totalLeftToWrite);
         //If either the write doesn't start at the beginning of the page, or there is less than a page left to write
-        if ((!startVirtAddr%PAGE_SIZE) | (totalLeftToWrite < PAGE_SIZE))
+        if ((startVirtAddr%PAGE_SIZE!=0) || (totalLeftToWrite < PAGE_SIZE))
         {
-                countToWrite=totalLeftToWrite%PAGE_SIZE;
-                printd(DEBUG_ELF_LOADER,"putDataOnPages: Non-aligned or not full page write, writing 0x%08X bytes to 0x%08X\n",countToWrite,startVirtAddr);
+            if (totalLeftToWrite>PAGE_SIZE-(startVirtAddr%PAGE_SIZE))
+                countToWrite=PAGE_SIZE-(startVirtAddr%PAGE_SIZE);
+            else
+                countToWrite=totalLeftToWrite;
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: Non-aligned or not full page write, writing 0x%08X bytes to 0x%08X\n",countToWrite,startVirtAddr);
         }
         else
         {
@@ -344,7 +347,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
 //            //elfInfo->pgmHdrTable[cnt].p_vaddr=virtualLoadAddress;
 //        }
 
-        if (virtualLoadAddress==(uint32_t)KERNEL_DATA_LOAD_ADDRESS)
+        if (virtualLoadAddress==(uint32_t)&KERNEL_DATA_LOAD_ADDRESS)
         {
             printd(DEBUG_ELF_LOADER,"Section %u load address is kernel data base address (0x%08X), skipping load\n",pgmSectionNum,virtualLoadAddress);
             continue;
@@ -362,26 +365,42 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
         }
         if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz>0)
         {
-            printd(DEBUG_ELF_LOADER,"Found loadable section (fsize > 0), seeking to 0x%08X ...\n",elfInfo->pgmHdrTable[pgmSectionNum].p_offset);
+            printd(DEBUG_ELF_LOADER,"Section %u, load fsize=0x%04X,msize=0x%04X to 0x%08X, seeking to 0x%08X ...\n",
+                    pgmSectionNum,
+                    elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
+                    elfInfo->pgmHdrTable[pgmSectionNum].p_memsz,
+                    virtualLoadAddress,
+                    elfInfo->pgmHdrTable[pgmSectionNum].p_offset);
             //Seek to the loadable section in the file
             fl_fseek(file, elfInfo->pgmHdrTable[pgmSectionNum].p_offset, SEEK_SET);
             
             //Get pages 
-            printd(DEBUG_ELF_LOADER,"Allocating pages to store %u bytes of data on\n",elfInfo->pgmHdrTable[pgmSectionNum].p_memsz);
             if (!putDataOnPages(CR3,virtualLoadAddress,file,true,elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,0))
                 return false;
-            printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, virtualLoadAddress);
-            if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz<elfInfo->pgmHdrTable[pgmSectionNum].p_filesz)
+            
+            printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, virtualLoadAddress);
+            
+            if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz<elfInfo->pgmHdrTable[pgmSectionNum].p_memsz)
             {
-                printd(DEBUG_ELF_LOADER,"Section %u has uninitialized data (msize>fsize), zeroed 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, virtualLoadAddress);
+                printd(DEBUG_ELF_LOADER,"Section %u has uninitialized data (msize>fsize), zeroed 0x%08X bytes at 0x%08X\n", 
+                        pgmSectionNum, 
+                        elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 
+                        virtualLoadAddress+elfInfo->pgmHdrTable[pgmSectionNum].p_filesz);
                 //CLR 02/20/2017 - Replaced memset
-                if (!putDataOnPages(CR3,virtualLoadAddress,NULL,false,elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,0))
+                if (!putDataOnPages(CR3,
+                        virtualLoadAddress+elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
+                        NULL,
+                        false,
+                        elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
+                        0))
                     return false;
             }
         }
         else if (elfInfo->pgmHdrTable[pgmSectionNum].p_memsz>0)
         {
             printd(DEBUG_ELF_LOADER,"Section %u not loadable (fsize=0,msize>0), zeroed 0x%08X bytes at 0x%08X\n",pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, virtualLoadAddress);
+            putDataOnPages(CR3,virtualLoadAddress,NULL,false,elfInfo->pgmHdrTable[pgmSectionNum].p_memsz,0);
+            
         }
 #ifndef DEBUG_NONE
         else
@@ -710,11 +729,11 @@ static int elf_relocate(elfInfo_t* elf) {
                         elf->dynamicSymbolAddress+(symEntryNum*sizeof(Elf32_Sym)));
 */                symValPtr=sym->st_value;
                 printd(DEBUG_ELF_LOADER," Symbol Name '%s', Symbol value=0x%08X (addr=0x%08X)\n",
-                        strTabEntry(0x6,elf,sym->st_name), 
+                        strTabEntry(elf->dynamicNameStringTable,elf,sym->st_name), 
                         symValPtr,
                         sym);
                 if (symValPtr==0)
-                    symValPtr=elfLookUpSymVal(elf,strTabEntry(0x6,elf,sym->st_name));
+                    symValPtr=elfLookUpSymVal(elf,strTabEntry(elf->dynamicNameStringTable,elf,sym->st_name));
                 uint32_t* rel=relEntry->r_offset;
                 printd(DEBUG_ELF_LOADER," Writing 0x%08X to memory address 0x%08X.\n\tValue before/after=0x%08X/ ",symValPtr,rel,*rel);
                 switch(ELF32_R_TYPE(relEntry->r_info)) {

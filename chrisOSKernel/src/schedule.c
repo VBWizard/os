@@ -526,29 +526,17 @@ task_t* findFirstActiveTaskInList(eTaskState state)
     return findFirstActiveTaskInListL(taskList);
 }
 
-void scheduler()
+task_t* findTaskToRun()
 {
     int32_t mostIdleTicks=-1;
-    task_t* taskToRun = {0};
-    task_t* taskToStop = {0};
     task_t* tempTask=kTaskList[TASK_RUNNABLE];
-    uint32_t oldCR3;
-
-    //NOTE: When this method is entered, it is time to reschedule.  The check for whether it is time is in kIRQ0_handler()
-    
-    nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
-
-    __asm__("mov ebx,cr3\nmov cr3,%[cr3Val]\n"
-            :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
-    printd(DEBUG_PROCESS,"\n****************************** TASK SWITCH ******************************\n");
-    printd(DEBUG_PROCESS,"*Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
-    //Only scheduling on CPU 0 for now
+    task_t* taskToRun = {0};
     tempTask=findFirstActiveTaskInList(TASK_RUNNABLE);
     if (tempTask!=NULL)
         while (tempTask->taskNum!=0)                                //Loop through "runnable" processes
         {
-            //Using fairness doctrine
-            if (tempTask->ticksSincePutInRunnable>mostIdleTicks)
+            //Using fairness doctrine - Also increment every ticksSincePutInRunnable as we review them
+            if (++tempTask->ticksSincePutInRunnable>mostIdleTicks)
             {
                 mostIdleTicks=tempTask->ticksSincePutInRunnable;
                 taskToRun=tempTask;
@@ -557,10 +545,28 @@ void scheduler()
                 break;
             tempTask=tempTask->next;
         }
+    return taskToRun;
+}
+
+void scheduler()
+{
+    task_t* taskToRun = {0};
+    task_t* taskToStop = {0};
+    uint32_t oldCR3;
+
+    //NOTE: When this method is entered, it is time to reschedule.  The check for whether it is time is in kIRQ0_handler()
     
+    nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
+
+    __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
+            :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
+    printd(DEBUG_PROCESS,"\n****************************** TASK SWITCH ******************************\n");
+    printd(DEBUG_PROCESS,"*Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
+    //Only scheduling on CPU 0 for now
+    taskToRun=findTaskToRun();
     if (taskToRun->taskNum) //If =0 then no runnable tasks, so do not switch tasks
     {
-        printd(DEBUG_PROCESS,"*Found one (0x%04X)!\n",taskToRun->taskNum);
+        printd(DEBUG_PROCESS,"*Found task to run (0x%04X)!\n",taskToRun->taskNum);
         
         taskToStop=findRunningTaskToReplace();
         if (taskToStop!=NULL)                                             //There might not be a prior task if this is the first time through the routine
@@ -592,10 +598,10 @@ void scheduler()
     }
     else
     {
-        __asm__("cli\nmov cr3,%[cr3Val]"::[cr3Val] "r" (oldCR3));
+        __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (oldCR3));
         printd(DEBUG_PROCESS,"*No new process to run, continuing with the current process");
     }
     printd(DEBUG_PROCESS,"(Task switch count=%u)\n",kTaskSwitchCount);
-    printd(DEBUG_PROCESS,"\n*************************************************************************\n");
+    printd(DEBUG_PROCESS,"*************************************************************************\n");
     return;
 }

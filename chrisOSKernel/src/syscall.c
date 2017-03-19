@@ -18,10 +18,12 @@
 
 void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
 {
-    uint32_t processID, processCR3;
+    uint32_t processCR3;
+    va_list ap;
+    uint32_t retVal;
     
     __asm__("mov %[cr3],cr3":[cr3] "=a" (processCR3));
-    printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
+    //printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
 
     switch (callNum)
     {
@@ -43,13 +45,19 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case 0x169:
             sysReboot();
+        case 0x170:
+            retVal=*kTicksSinceStart;
+            break;
         case 0x300:
-            printk((const char*)param1, (const char*)param2);
+            va_copy(ap,(va_list*)(param2));
+            printu((const char*)param1, ap);
             break;
         default:
             panic("_syscall: Invalid call number 0x%04X\n",callNum);
     }
-    __asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
+    //__asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
+    __asm__("mov eax,%0\nmov esp,ebp;add esp,4;ret"::"r" (retVal)); /* BLACK MAGIC! */
+
 }
 
 void syscall169()

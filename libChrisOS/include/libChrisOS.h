@@ -18,12 +18,14 @@
 extern "C" {
 #endif
 #include <stdarg.h>
-
+#include <stdint.h>
+#include "chrisos.h"
+    
 #define VISIBLE __attribute__((visibility("default")))
 
-void libc_init(void);
+void VISIBLE libc_init(void);
 int VISIBLE print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
-
+unsigned int VISIBLE sleep (unsigned int __seconds);
 
 #ifdef __cplusplus
 }

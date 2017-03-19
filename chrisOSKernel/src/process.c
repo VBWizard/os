@@ -91,5 +91,5 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
 
 void processWrapup()
 {
-    __asm__("mov ebx,eax\nmov eax,0x1\nmov ecx,cs\nint 0x80\n");
+    __asm__("mov ebx,eax\nmov eax,0x1\nmov ecx,cs\ncall sysEnter_Vector\n");
  }

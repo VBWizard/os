@@ -19,6 +19,9 @@ extern "C" {
 #endif
 
 #include "kernel.h"
+#include <stdarg.h>
+
+extern volatile uint32_t* kTicksSinceStart;
 void syscall169();
 
 #define sysReboot() syscall169()

@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
         //    break;
     }
 */
-    printp("Hello kernel world!!!\n");
+    printk("Hello kernel world!!!\n");
     schedulerEnabled=false;
     schedulerTaskSwitched=false;
     printk("Initializing memory management ...\n");
@@ -70,11 +70,13 @@ int main(int argc, char** argv) {
     testp[0]=test[0];
     testp[1]=test[1];
     process_t* process = createProcess(program,2,&testp,false);
-//    printk("Loading and executing %s again\n",program);
-//    strcpy(test[0],"hello2");
-//    strcpy(test[1],"there2");
-//    printk("Loading and executing %s again\n",program);
-//    process_t* process2 = createProcess(program,2,&testp,false);
+/*    printk("Loading and executing %s again\n",program);
+    strcpy(test[0],"hello2");
+    strcpy(test[1],"there2");
+    printk("Loading and executing %s again\n",program);
+    process_t* process2 = createProcess(program,2,&testp,false);
+    waitTicks(TICKS_PER_SECOND*5);
+*/    
     schedulerEnabled=true;
     return (0xbad);
 }

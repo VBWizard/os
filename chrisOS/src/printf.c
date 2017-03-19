@@ -213,10 +213,9 @@ int printp_valist(const char *format, va_list args)
     
 }
 
-void printp(const char *format, ...)
+void printu(const char *format, va_list args)
 {
-    va_list args;
-    va_start( args, format );
+        return printI(0, format, args);
 }
 
 int printk_valist(const char *format, va_list args)
@@ -228,7 +227,8 @@ int printk(const char *format, ...)
 {
         va_list args;
         va_start( args, format );
-        return printk_valist(format, args);
+        return printI(0, format, args);
+        //return printk_valist(format, args);
 }
 
 #ifdef DEBUG_NONE

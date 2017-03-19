@@ -7,11 +7,13 @@
 #include "libChrisOS.h"
 
 extern void sysEnter_Vector();
+extern uint32_t* kTicksSinceStart;
+int a=123;int b=456; int c=789;
 
-void /*VISIBLE*/ libc_init(void)
+void VISIBLE libc_init(void)
 {
-    print("Hi from libc!!!");
-    //asm("mov eax,0\ncall sysEnter_Vector\n");
+    print("libc initialized %u, %u, %u.\n",a,b,c);
+    asm("mov eax,0\ncall sysEnter_Vector\n");
 }
 
 void initMe()
@@ -19,13 +21,29 @@ void initMe()
     
 }
 
-int /*VISIBLE*/ print(const char *format, ...)
+int VISIBLE print(const char *format, ...)
 {
-    //TODO: This needs to be update once the syscall prints to a file pointer, but for now ...
     va_list args;
+    //TODO: This needs to be update once the syscall prints to a file pointer, but for now ...
 
     va_start( args, format );
     //asm("gotohere2: jmp gotohere2\n"::"b" (format), "c" (&args));
-    asm("mov eax,0x300\ncall sysEnter_Vector\n"::"b" (format), "c" (&args));
+    asm("mov eax,0x300\ncall sysEnter_Vector\n"::"b" (format), "c" (args));
+    return 0;
+}
+
+unsigned int VISIBLE sleep (unsigned int __seconds)
+{
+    uint32_t currTicks,wakeTicks;
+    
+        asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
+        print("Ticks since start = 0x%08X\n",currTicks);
+        wakeTicks=currTicks+(TICKS_PER_SECOND*__seconds);
+        while (wakeTicks>currTicks)
+        {
+            //yield the CPU
+            asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
+        }
+        //print("sleep: Ticks at return=0x%08X\n",currTicks);
     return 0;
 }

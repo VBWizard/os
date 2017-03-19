@@ -17,12 +17,13 @@ int main(int argc, char** argv) {
     int a=argc;
 
     libc_init();
-    printk("Param count=%u\n",argc);
+    print("Param count=%u\n",argc);
     char** b=argv;
     for (int cnt=0;cnt<argc;cnt++)
     {
-        printk("Param %u=%s\n",cnt,argv[cnt]);
+        print("Param %u=%s\n",cnt,argv[cnt]);
     }
+    sleep(100);
     jumpHere:
 /*    if (temp%1000000==0)
         printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp);

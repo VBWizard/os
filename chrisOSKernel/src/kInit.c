@@ -60,7 +60,9 @@ void initKernelInternals()
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP1 | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP1,16,0x7);
     kKernelTask->tss->LINK=0x0;
     kKernelTask->tss->IOPB=sizeof(tss_t);
-    idt_set_gate (&idtTable[0x80], 0x8, (int)&_sysCall, ACS_INT | ACS_DPL_3);
+    
+    
+    //idt_set_gate (&idtTable[0x80], 0x8, (int)&_sysCall, ACS_INT | ACS_DPL_3);
     idt_set_gate (&idtTable[0x80], 0x8, (int)&vector128, ACS_INT | ACS_DPL_3);
 
     //Configure SysEnter/SysExit

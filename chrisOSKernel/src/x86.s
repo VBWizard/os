@@ -24,8 +24,10 @@ sysEnterReturn:
 .globl _sysEnter
 .type _sysEnter, @function
 _sysEnter:
-#    sti
+    mov esp,ebp
+    sti
     push ebp
+    pushd 0         #placeholder for RetVal (eax)
     pusha
     pushfd
     push edx
@@ -33,18 +35,20 @@ _sysEnter:
     push ebx
     push eax
     call _sysCall
+    mov [esp+52],eax
+    pop ebx             #4
+    pop ebx             #8
+    pop ebx             #12
+    pop ebx             #16
+    popfd               #20
+    popa                #52
     pop eax
-    pop eax
-    pop eax
-    pop eax
-    popfd
-    popa
     pop ebp
     mov edx,[ebp]
     mov ecx,ebp
     sysexit
 .globl _sysEnter
-
+retVal: .word 0x0, 0x0
 .section .text
 .globl set_gdt
 .type set_gdt, @function

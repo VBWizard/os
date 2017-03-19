@@ -40,13 +40,14 @@
         <cTool>
           <incDir>
             <pElem>include</pElem>
+            <pElem>../chrisOS/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden</commandLine>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}</output>
           <commandlineTool>gcc</commandlineTool>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -fvisibility=hidden</commandLine>
         </linkerTool>
       </compileType>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">

@@ -17,7 +17,6 @@
 
 void IRQ_set_mask(unsigned char IRQline);
 void IRQ_clear_mask(unsigned char IRQline);
-void printp(const char *format, ...);
 void init_serial();
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
