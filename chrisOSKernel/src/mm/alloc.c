@@ -143,6 +143,7 @@ void* allocProcessPages(uintptr_t cr3, uint32_t size)
     return allocPagesAndMapI(cr3,size);
 }
 
+//Allocates full pages (PAGE_SIZE) and maps them
 void* allocPagesAndMap(uint32_t size)
 {
     return allocPagesAndMapI(CURRENT_CR3, size);

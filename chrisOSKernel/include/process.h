@@ -22,19 +22,23 @@
 extern "C" {
 #endif
 
-typedef struct sprocess
-{
-    task_t* task;
-    //char image[512];
-    sGDT* gdtEntry;
-    elfInfo_t* elf;
-    char* path;
-    uint32_t retVal;
-} process_t;
-
+#include "signals.h"
     
-process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess);
-void destroyProcess(process_t* process);
+    typedef struct sprocess
+    {
+        uint32_t processSyscallESP;         //NOTE: this must be the first item in the struct, as it is mapped into the process later
+        task_t* task;
+        //char image[512];
+        sGDT* gdtEntry;
+        elfInfo_t* elf;
+        char* path;
+        uint32_t retVal;
+        signal_t signals;
+    } process_t;
+
+
+    process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess);
+    void destroyProcess(process_t* process);
 
 #ifdef __cplusplus
 }

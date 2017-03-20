@@ -8,6 +8,7 @@
 #include "i386/msr.h"
 #include "paging.h"
 #include "elfloader.h"
+#include "process.h"
 
 extern void _sysCall();
 extern void _sysEnter();
@@ -15,6 +16,7 @@ extern void vector32();
 extern void vector128();
 
 extern task_t* kKernelTask;
+extern process_t* kKernelProcess;
 extern uint32_t getCS();
 extern uint32_t getDS();
 extern uint32_t getES();
@@ -31,7 +33,6 @@ struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
 void initKernelInternals()
 {
     uint32_t oldCR3=0;
-
     kKernelTask=getAvailableTask();
      __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
     //Set up our kernel task
@@ -48,7 +49,7 @@ void initKernelInternals()
     kKernelTask->tss->CR3=oldCR3;
     kKernelTask->tss->SS0=0x18;
     kKernelTask->tss->ESP0=allocPages(0x16000);
-    printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for kernel task ESP0\n",kKernelTask->tss->ESP1);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for kernel task ESP0\n",kKernelTask->tss->ESP0);
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP0 | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP0,16,0x7);
     kKernelTask->tss->ESP0+=0x15000;
     kKernelTask->tss->ESP1=allocPages(0x16000);           //Syscall stack

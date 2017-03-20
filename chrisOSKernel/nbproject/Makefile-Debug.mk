@@ -80,6 +80,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/paging.o \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/schedule.o \
+	${OBJECTDIR}/src/signals.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
@@ -332,6 +333,11 @@ ${OBJECTDIR}/src/schedule.o: nbproject/Makefile-${CND_CONF}.mk src/schedule.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/schedule.o src/schedule.c
+
+${OBJECTDIR}/src/signals.o: nbproject/Makefile-${CND_CONF}.mk src/signals.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/signals.o src/signals.c
 
 ${OBJECTDIR}/src/syscall.o: nbproject/Makefile-${CND_CONF}.mk src/syscall.c 
 	${MKDIR} -p ${OBJECTDIR}/src

@@ -15,7 +15,7 @@ sysEnter_Vector:
     pop ecx
     ret
 sysEnterReturn:
-    mov ebp,esp
+    mov ebp,esp         #ebp will be the ESP (ECX) point to the return address, on sysExit
     sysenter
 .globl sysEnter_Vector
 
@@ -24,8 +24,7 @@ sysEnterReturn:
 .globl _sysEnter
 .type _sysEnter, @function
 _sysEnter:
-    mov esp,ebp
-    sti
+    mov esp,[0xF000F000]    #This is where the process's processSyscallESP (ESP1) is mapped into the process.  TODO: Fix this or process can see its own process struct
     push ebp
     pushd 0         #placeholder for RetVal (eax)
     pusha
@@ -34,6 +33,7 @@ _sysEnter:
     push ecx
     push ebx
     push eax
+    sti
     call _sysCall
     mov [esp+52],eax
     pop ebx             #4

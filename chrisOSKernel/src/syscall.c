@@ -24,7 +24,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     
     __asm__("mov %[cr3],cr3":[cr3] "=a" (processCR3));
     //printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
-
+    __asm__("cli\n");
     switch (callNum)
     {
         case 0x0:
@@ -43,8 +43,13 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              panic("_syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
             break;
+        case 0x168:
+            printd(DEBUG_PROCESS,"_syscall: SIG_STOP called.\n");
+            sys_sigaction(SIG_STOP,0,0);
+            break;
         case 0x169:
             sysReboot();
+            break;
         case 0x170:
             retVal=*kTicksSinceStart;
             break;
@@ -56,7 +61,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             panic("_syscall: Invalid call number 0x%04X\n",callNum);
     }
     //__asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
-    __asm__("mov eax,%0\nmov esp,ebp;add esp,4;ret"::"r" (retVal)); /* BLACK MAGIC! */
+    __asm__("sti\nmov eax,%0\nmov esp,ebp;add esp,4;ret"::"r" (retVal)); /* BLACK MAGIC! */
 
 }
 

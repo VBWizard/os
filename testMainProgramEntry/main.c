@@ -7,6 +7,8 @@
 
 #include "../chrisOS/include/kernelObjects.h"
 #include "../chrisOS/include/chrisos.h"
+#include "../libChrisOS/include/libChrisOS.h"
+
 extern uint32_t* sysEnter_Vector;
 /*
  * testMainProgramEntry
@@ -23,14 +25,15 @@ int main(int argc, char** argv) {
     {
         print("Param %u=%s\n",cnt,argv[cnt]);
     }
-    sleep(100);
     jumpHere:
-/*    if (temp%1000000==0)
-        printd(DEBUG_PROCESS,"\tStill in the loop, %u iterations\n",temp);
-    temp++;
+    sleep(1);
+    print("Calling stop\n");
+    stop();
+//    if (temp%1000000==0)
+        print("\tStill in the loop, %u iterations\n",temp++);
     goto jumpHere;
     __asm__("mov eax,0\ncld\nint 0x80\n");
-*/
+
 //    __asm__("mov eax,0\ncld\ncall sysEnter_Vector\n");
 //    goto jumpHere;
     return 0x1234;

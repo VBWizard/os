@@ -31,11 +31,12 @@ typedef struct s_task
     tss_t* tss;
     uint32_t* pageDir;
     uint32_t* kernelPageDirPtr; //Kernel's paged pointer to pageDir
-    void* next, *prev;
+    uint32_t next, prev;
     bool kernel;
     eTaskState taskState;
     int32_t ticksSinceLastInterrupted, ticksSincePutInRunnable;
     bool exited;
+    void* process;
 } task_t;
 
 task_t* createTask(bool kernelTSS);

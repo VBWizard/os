@@ -47,6 +47,7 @@
           <incDir>
             <pElem>../chrisOS/include</pElem>
             <pElem>../processManager/include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>

@@ -22,6 +22,10 @@ extern "C" {
 #include "task.h"
 #include "tss.h"
 #include "malloc.h"
+#include "kernelVariables.h"
+#include "alloc.h"
+#include "paging.h"
+#include "process.h"
     
     extern uint32_t* kTaskSlotAvailableInd;
     extern tss_t* kTSSTable;
@@ -31,7 +35,8 @@ extern "C" {
     void scheduler();
     task_t* submitNewTask(task_t* task);
     void markTaskEnded(uint32_t taskNum);
-    
+    task_t* findTaskByCR3(uint32_t cr3);
+
 #ifdef __cplusplus
 }
 #endif

@@ -26,6 +26,7 @@ extern "C" {
 void VISIBLE libc_init(void);
 int VISIBLE print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
 unsigned int VISIBLE sleep (unsigned int __seconds);
+void stop();
 
 #ifdef __cplusplus
 }

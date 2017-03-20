@@ -5,6 +5,7 @@
  */
 
 #include "libChrisOS.h"
+#include "../../chrisOSKernel/include/signals.h"
 
 extern void sysEnter_Vector();
 extern uint32_t* kTicksSinceStart;
@@ -36,14 +37,19 @@ unsigned int VISIBLE sleep (unsigned int __seconds)
 {
     uint32_t currTicks,wakeTicks;
     
+    asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
+    wakeTicks=currTicks+(TICKS_PER_SECOND*__seconds);
+//    print("sleep(%u): Starting with currTicks=0x%08X,__seconds, wakeTicks=0x%08X\n",__seconds,currTicks,wakeTicks);
+    while (wakeTicks>currTicks)
+    {
+        //yield the CPU
         asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
-        print("Ticks since start = 0x%08X\n",currTicks);
-        wakeTicks=currTicks+(TICKS_PER_SECOND*__seconds);
-        while (wakeTicks>currTicks)
-        {
-            //yield the CPU
-            asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
-        }
-        //print("sleep: Ticks at return=0x%08X\n",currTicks);
+    }
+//    print("sleep(%u): Ticks at return=0x%08X\n",__seconds,currTicks);
     return 0;
+}
+
+void stop()
+{
+        asm("call sysEnter_Vector\n"::"a" (0x168));
 }

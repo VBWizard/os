@@ -14,7 +14,6 @@
 #include "sysloader.h"
 #include "strings.h"
 
-extern void submitNewTask(task_t* task);
 void processWrapup();
 bool taskRegInitialized=false;
 
@@ -30,7 +29,11 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     
 
     printd(DEBUG_PROCESS,"Creating %s process for %s\n",kernelProcess?"kernel":"user",path);
-    process=(process_t*)malloc(sizeof(process_t));
+    //NOTE: Using allocPages instead of malloc because we need the process struct to start on a page boundary for paging reasons, and
+    //      allocPages always allocates entire pages
+    //process=(process_t*)malloc(sizeof(process_t));
+    process=allocPagesAndMap(sizeof(process_t));
+    memset(process,0,sizeof(process_t));
     process->path=(char*)malloc(512);
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
     strcpy(process->path,path);
@@ -38,6 +41,12 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     printd(DEBUG_PROCESS,"process->path (0x%08X)=%s\n",process->path,process->path);
     process->elf=NULL;
     process->task=createTask(kernelProcess);
+    process->task->process=process;
+    process->processSyscallESP=process->task->tss->ESP1;
+   
+    printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",0xF000F000,process);
+    pagingMapPage(process->task->tss->CR3,0xF000F000, (uint32_t)process & 0xFFFFF000,0x5);
+
     //CR3 was set and PDir created by createTask.  Page tables will be created by the load process
     process->elf=sysLoadElf(process->path,process->elf,process->task->tss->CR3);
     if (!process->elf->loadCompleted)
@@ -61,7 +70,7 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     memcpy((void*)process->task->tss->ESP-0xfc,&argc,4);
     memcpy((void*)process->task->tss->ESP-0xf8,&argv,4);
     //Set the return point since the task will simply ret to exit
-    printd(DEBUG_PROCESS,"Return point for process is 0x%08X",&processWrapup);
+    printd(DEBUG_PROCESS,"Return point for process is 0x%08X\n",&processWrapup);
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
  
     uint32_t tssFlags=ACS_TSS;

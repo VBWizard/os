@@ -70,32 +70,32 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ${OBJECTFILES}
 ${OBJECTDIR}/_ext/7450142c/basic_display.o: ../chrisOS/src/char/console/basic_display.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/7450142c
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7450142c/basic_display.o ../chrisOS/src/char/console/basic_display.c
+	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -I../chrisOSKernel/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7450142c/basic_display.o ../chrisOS/src/char/console/basic_display.c
 
 ${OBJECTDIR}/_ext/9e02dec1/memcpy.o: ../chrisOS/src/memcpy.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/memcpy.o ../chrisOS/src/memcpy.c
+	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -I../chrisOSKernel/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/memcpy.o ../chrisOS/src/memcpy.c
 
 ${OBJECTDIR}/_ext/9e02dec1/printf.o: ../chrisOS/src/printf.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/printf.o ../chrisOS/src/printf.c
+	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -I../chrisOSKernel/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/printf.o ../chrisOS/src/printf.c
 
 ${OBJECTDIR}/_ext/3e0a6d34/strlen.o: ../chrisOS/src/strings/strlen.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strlen.o ../chrisOS/src/strings/strlen.c
+	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -I../chrisOSKernel/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strlen.o ../chrisOS/src/strings/strlen.c
 
 ${OBJECTDIR}/main.o: main.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -I../chrisOSKernel/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
 
 ${OBJECTDIR}/time.o: time.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/time.o time.c
+	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -I../chrisOSKernel/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/time.o time.c
 
 # Subprojects
 .build-subprojects:

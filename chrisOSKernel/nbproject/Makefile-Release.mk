@@ -80,6 +80,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/paging.o \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/schedule.o \
+	${OBJECTDIR}/src/signals.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
@@ -332,6 +333,11 @@ ${OBJECTDIR}/src/schedule.o: src/schedule.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/schedule.o src/schedule.c
+
+${OBJECTDIR}/src/signals.o: src/signals.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/signals.o src/signals.c
 
 ${OBJECTDIR}/src/syscall.o: src/syscall.c 
 	${MKDIR} -p ${OBJECTDIR}/src

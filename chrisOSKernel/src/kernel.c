@@ -28,6 +28,7 @@ extern struct gdt_ptr kernelGDT;
 extern bool schedulerEnabled;
 bool schedulerTaskSwitched=0;
 
+process_t* kKernelProcess;
 task_t* kKernelTask;
 uint32_t saveESP;
 uint32_t kKernelCR3=KERNEL_CR3;

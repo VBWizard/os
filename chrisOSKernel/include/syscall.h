@@ -20,7 +20,8 @@ extern "C" {
 
 #include "kernel.h"
 #include <stdarg.h>
-
+#include "signals.h"
+    
 extern volatile uint32_t* kTicksSinceStart;
 void syscall169();
 
