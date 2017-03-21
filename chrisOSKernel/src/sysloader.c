@@ -37,9 +37,9 @@ extern uint32_t getESP();
 extern sGDT* bootGdt;
 
 uint32_t libLoadOffset=LIBRARY_BASE_LOAD_ADDRESS;
-uintptr_t oldCR3=0,newCR3;
+uintptr_t previousCR3=0,newCR3;
 
-#define GET_OLD_CR3 __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
+#define GET_OLD_CR3 __asm__("mov ebx,cr3\n":[previousCR3] "=b" (previousCR3));
 #define SWITCH_CR3 __asm__("mov cr3,eax\n"::[newCR3] "a" (newCR3));
 #define CURRENT_CR3 ({uint32_t cr3Val; \
                       __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
@@ -80,7 +80,7 @@ char* strTabEntryBySTName(char* stringTableName, elfInfo_t* elf, int index)
 
 void restoreCR3()
 {
-    __asm__("mov cr3,eax\n"::[oldCR3] "a" (INIT_GDT_TABLE_ADDRESS));
+    __asm__("mov cr3,eax\n"::[previousCR3] "a" (INIT_GDT_TABLE_ADDRESS));
 }
 
 
@@ -260,9 +260,9 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
             startPhysAddr=(uintptr_t)allocPages(size) | (startVirtAddr & 0x00000FFF);
             pagingMapPage(CR3,startVirtAddr,startPhysAddr,0x7);
             printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08X not mapped, mapped to P=0x%08X (CR3=0x%08X)\n",startVirtAddr,startPhysAddr,CR3);
-            pagingMapPage(oldCR3,startVirtAddr,startPhysAddr,0x7);
-            pagingMapPage(oldCR3,startPhysAddr,startPhysAddr,0x7);
-            printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08X also mapped to KP=0x%08X (CR3=0x%08X)\n",startVirtAddr,startPhysAddr,oldCR3);
+            pagingMapPage(previousCR3,startVirtAddr,startPhysAddr,0x7);
+            pagingMapPage(previousCR3,startPhysAddr,startPhysAddr,0x7);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08X also mapped to KP=0x%08X (CR3=0x%08X)\n",startVirtAddr,startPhysAddr,previousCR3);
         }
         //if page is not mapped, map it!
         printd(DEBUG_ELF_LOADER,"putDataOnPages: Reading %u bytes to 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
@@ -432,7 +432,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     }
     elfInfo_t* execLoadInfo=kExecLoadInfo;
     execLoadInfo+=kExecLoadCount;
-    printk("Storing elfInfo to load info array at 0x%08X (count=0x%04X)\n",execLoadInfo,kExecLoadCount);
+    printd(DEBUG_ELF_LOADER,"Storing elfInfo to load info array at 0x%08X (count=0x%04X)\n",execLoadInfo,kExecLoadCount);
     execLoadInfo=elfInfo;
     kExecLoadCount++;
     

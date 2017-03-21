@@ -18,6 +18,8 @@ extern uint32_t getESP();
 extern task_t* kKernelTask;
 extern uint32_t* sysEnter_Vector;
 
+uint32_t firstTaskTSS=0,firstTaskESP0=0;
+
 void taskInit()
 {
     for (int cnt=0;cnt<TSS_TABLE_RECORD_COUNT/32;cnt++)
@@ -124,9 +126,13 @@ task_t* createTask(bool kernelTSS)
     pagingMapPage(KERNEL_CR3,task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,task->tss->CR3,0x3);
     task->pageDir=(uint32_t*)task->tss->CR3;
 
-    pagingMapPage(task->tss->CR3,(uintptr_t)task->tss,(uintptr_t)task->tss,0x7);
-    pagingMapPage(KERNEL_CR3,(uintptr_t)task->tss,(uintptr_t)task->tss,0x7);
-    printd(DEBUG_TASK,"Mapped tss 0x%08X into task and kernel\n", task->tss);
+    //TODO: Fix this.  At the minimum, this will break when we start free()ing stuff.
+    //Map TSS of task 0 since we are always using it
+    if (!firstTaskTSS)
+        firstTaskTSS=task->tss;
+    pagingMapPage(task->tss->CR3,(uintptr_t)firstTaskTSS,(uintptr_t)firstTaskTSS,0x7);
+    pagingMapPage(KERNEL_CR3,(uintptr_t)firstTaskTSS,(uintptr_t)firstTaskTSS,0x7);
+    printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08X) into task and kernel\n", firstTaskTSS);
     
     mmMapKernelIntoTask(task);
     
@@ -152,7 +158,9 @@ task_t* createTask(bool kernelTSS)
         task->tss->CS=(0x3b);
     }
     //Allocate space for the stack
-    task->tss->ESP0=(uint32_t)allocPages(0x16000);
+    if (firstTaskESP0==0)
+        firstTaskESP0=(uint32_t)allocPages(0x16000);
+    task->tss->ESP0=firstTaskESP0;
     printd(DEBUG_TASK,"createTask: ESP0 for task allocated at 0x%08X\n",task->tss->ESP0);
     pagingMapPageCount(task->tss->CR3,task->tss->ESP0,task->tss->ESP0,0x16,0x7);
     pagingMapPageCount(task->tss->CR3,task->tss->ESP0 | KERNEL_PAGED_BASE_ADDRESS,task->tss->ESP0,0x16,0x7);

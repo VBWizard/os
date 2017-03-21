@@ -40,10 +40,13 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     printd(DEBUG_PROCESS,"createProcess: Copied path (0x%08X) to process->path (0x%08X)\n",path,process->path);
     printd(DEBUG_PROCESS,"process->path (0x%08X)=%s\n",process->path,process->path);
     process->elf=NULL;
+    
     process->task=createTask(kernelProcess);
     process->task->process=process;
     process->processSyscallESP=process->task->tss->ESP1;
    
+process->pageDirPtr=process->task->tss->CR3;
+    
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",0xF000F000,process);
     pagingMapPage(process->task->tss->CR3,0xF000F000, (uint32_t)process & 0xFFFFF000,0x5);
 

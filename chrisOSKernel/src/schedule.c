@@ -6,6 +6,9 @@
 
 #include "schedule.h"
 
+#define SCHEDULER_DEBUG 1
+
+
 task_t *kTaskList;
 uintptr_t *qZombie;
 uintptr_t *qRunning;
@@ -17,7 +20,6 @@ uintptr_t *qISleep;
 extern uint32_t* kTicksSinceStart;
 uint32_t kTaskSwitchCount;
 uint32_t NO_TASK=0xFFFFFFFF;
-uint32_t NO_PREV=0xFFFFFFFF, NO_NEXT=0xFFFFFFFF;
 
 uint32_t nextScheduleTicks;
 
@@ -27,6 +29,8 @@ extern task_t* kKernelTask;
 
 void changeTaskQueue(task_t* task, eTaskState newState);
 
+#define MAX_TASKS 100
+
 void initSched()
 {
     kTaskList=malloc(1000*sizeof(task_t));
@@ -35,18 +39,22 @@ void initSched()
     kTaskList[0].prev=NO_PREV;
     kTaskList[999].next=NO_NEXT;
     //TODO: Change # of array elements to # of processors
-    qRunning=malloc(9*sizeof(uintptr_t));
-    memset(qRunning,0,9*sizeof(uintptr_t));
-    qRunning[8]=NO_NEXT;
+    qRunning=malloc(MAX_TASKS*sizeof(uintptr_t));
+    memset(qRunning,0,MAX_TASKS*sizeof(uintptr_t));
+    qRunning[MAX_TASKS-1]=NO_NEXT;
     //TODO: Change # of array elements to # of processors
-    qRunnable=malloc(9*sizeof(uintptr_t));
-    memset(qRunnable,0,9*sizeof(uintptr_t));
-    qRunnable[8]=NO_NEXT;
+    qRunnable=malloc(MAX_TASKS*sizeof(uintptr_t));
+    memset(qRunnable,0,MAX_TASKS*sizeof(uintptr_t));
+    qRunnable[MAX_TASKS-1]=NO_NEXT;
 
-    qStopped=malloc(9*sizeof(uintptr_t));
-    memset(qStopped,0,9*sizeof(uintptr_t));
-    qStopped[8]=NO_NEXT;
+    qStopped=malloc(MAX_TASKS*sizeof(uintptr_t));
+    memset(qStopped,0,MAX_TASKS*sizeof(uintptr_t));
+    qStopped[MAX_TASKS-1]=NO_NEXT;
     
+    qISleep=malloc(MAX_TASKS*sizeof(uintptr_t));
+    memset(qISleep,0,MAX_TASKS*sizeof(uintptr_t));
+    qISleep[MAX_TASKS-1]=NO_NEXT;
+
     //Put the current (kernel) task in the running queue, as it IS running!
     kTaskSwitchCount=0;
     kKernelTask=submitNewTask(kKernelTask);
@@ -110,74 +118,76 @@ void markTaskEnded(uint32_t cr3)
 
 void storeISRSavedRegs(task_t* task)
 {
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tSave: ");
     task->tss->CS=isrSavedCS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
     task->tss->EIP=isrSavedEIP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
     task->tss->SS=isrSavedSS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
     task->tss->DS=isrSavedDS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
     task->tss->EAX=isrSavedEAX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
     task->tss->EBX=isrSavedEBX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
     task->tss->ECX=isrSavedECX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
     task->tss->EDX=isrSavedEDX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
     task->tss->ESI=isrSavedESI;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
     task->tss->EDI=isrSavedEDI;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
     task->tss->ESP=isrSavedESP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
     task->tss->EBP=isrSavedEBP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
     task->tss->EFLAGS=isrSavedFlags;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
     task->tss->ES=isrSavedES;
     task->tss->FS=isrSavedFS;
     task->tss->GS=isrSavedGS;
+#ifdef SCHEDULER_DEBUG
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tSave: ");
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
+#endif
 }
 
 void loadISRSavedRegs(task_t* task)
 {
+#ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tLoad: ");
-
-
-    isrSavedCS=task->tss->CS;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
-    isrSavedEIP=task->tss->EIP;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
-    isrSavedSS=task->tss->SS;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
-    isrSavedDS=task->tss->DS;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
-    isrSavedEAX=task->tss->EAX;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
-    isrSavedEBX=task->tss->EBX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBX=0x%08X,",task->tss->EBX);
-    isrSavedECX=task->tss->ECX;
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
-    isrSavedEDX=task->tss->EDX;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
-    isrSavedESI=task->tss->ESI;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
-    isrSavedEDI=task->tss->EDI;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
-    isrSavedESP=task->tss->ESP;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
-    isrSavedEBP=task->tss->EBP;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X\n",task->tss->CR3);
+#endif
+    isrSavedCS=task->tss->CS;
+    isrSavedEIP=task->tss->EIP;
+    isrSavedSS=task->tss->SS;
+    isrSavedDS=task->tss->DS;
+    isrSavedEAX=task->tss->EAX;
+    isrSavedEBX=task->tss->EBX;
+    isrSavedECX=task->tss->ECX;
+    isrSavedEDX=task->tss->EDX;
+    isrSavedESI=task->tss->ESI;
+    isrSavedEDI=task->tss->EDI;
+    isrSavedESP=task->tss->ESP;
+    isrSavedEBP=task->tss->EBP;
     isrSavedFlags=task->tss->EFLAGS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X,",task->tss->EFLAGS);
     isrSavedES=task->tss->ES;
     isrSavedFS=task->tss->FS;
     isrSavedGS=task->tss->GS;
     isrSavedCR3=task->tss->CR3;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X\n",task->tss->CR3);
 }
 
 uintptr_t* getQ(eTaskState state)
@@ -203,6 +213,7 @@ uintptr_t* getQ(eTaskState state)
             return qStopped;
             break;
         default:
+            printd(DEBUG_PROCESS,"getQ: Invalid queue 0x%02X - %s",state,TASK_STATE_NAMES[state]);
             return NULL;
             break;
     }
@@ -283,10 +294,12 @@ task_t* findTaskToRun()
 
 void removeFromQ(uintptr_t* queue, task_t* taskPtr)
 {
+#ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS,"\tRemoving task 0x%04X (0x%08X) from queue %s\n",
             taskPtr->taskNum,
             taskPtr,
             TASK_STATE_NAMES[taskPtr->taskState]);
+#endif
     while (*queue!=NO_NEXT)
     {
         if (*queue==(uintptr_t)taskPtr)
@@ -301,7 +314,9 @@ void removeFromQ(uintptr_t* queue, task_t* taskPtr)
 
 void addToQ(uintptr_t* queue, task_t* taskPtr)
 {
+#ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS,"\tAdding task 0x%04X to queue %s\n",taskPtr->taskNum,TASK_STATE_NAMES[taskPtr->taskState]);
+#endif
     while (*queue!=NO_NEXT)
     {
         if (*queue==0)
@@ -320,14 +335,16 @@ void changeTaskQueue(task_t* task, eTaskState newState)
     uintptr_t* newQ=getQ(newState);
     uintptr_t* oldQ=getQ(task->taskState);
 
+#ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS,"\tchangeTaskQueue: Changing task state for 0x%04X from %s to %s\n",
             task->taskNum,
             TASK_STATE_NAMES[task->taskState],
             TASK_STATE_NAMES[newState]);
+#endif
     if (oldQ==NULL)
         panic("changeTaskQueue: Invalid queue oldQ=0x%08X, state=%s",oldQ,TASK_STATE_NAMES[task->taskState]);
     if (newQ==NULL && newState!=TASK_EXITED)
-        panic("changeTaskQueue: Invalid queue newQ=0x%08X, state=%s",newQ,TASK_STATE_NAMES[task->taskState]);
+        panic("changeTaskQueue: Invalid queue newQ=0x%08X, state=%s",newQ,TASK_STATE_NAMES[newState]);
     removeFromQ(oldQ,task);
     if (newState!=TASK_EXITED)
     {
@@ -349,7 +366,7 @@ void runAnotherTask(bool schedulerRequested)
 
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
             :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
-    printd(DEBUG_PROCESS,"\n****************************** TASK SWITCH ******************************\n");
+    printd(DEBUG_PROCESS,"\n****************************** TASK SWITCH *******************************\n");
     //printd(DEBUG_PROCESS,"*Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
     //Get task to stop
     task_t* taskToStop=findRunningTaskToReplace();
@@ -360,23 +377,35 @@ void runAnotherTask(bool schedulerRequested)
     task_t* taskToRun=findTaskToRun();
     if (taskToRun!=NULL)
     {
+#ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Found process (0x%04X) to take off CPU @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
         printd(DEBUG_PROCESS,"*Found task move to CPU (0x%04X)!\n",taskToRun->taskNum);
+#endif
         if (taskToStop->exited)
         {
+#ifdef SCHEDULER_DEBUG
             printd(DEBUG_PROCESS,"*Task (0x%04X) ended, removing it from %s list.\n",taskToStop->taskNum,TASK_STATE_NAMES[taskToStop->taskState]);
+#endif
             changeTaskQueue(taskToStop,TASK_EXITED);
         }
         else if ((taskToStop->taskNum!=1) && ((process_t*)(taskToStop->process))->signals.sigind)
         {
+#ifdef SCHEDULER_DEBUG
             printd(DEBUG_PROCESS,"*sys_sigaction: sigind=0x%08X\n",((process_t*)(taskToStop->process))->signals.sigind);
+#endif
             switch (((process_t*)(taskToStop->process))->signals.sigind)
             {
                 case SIG_STOP:
                     changeTaskQueue(taskToStop,TASK_STOPPED);
+                    storeISRSavedRegs(taskToStop);
+#ifdef SCHEDULER_DEBUG
                     printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
+#endif
                     break;
                 default:
+                case SIG_SLEEP:
+                    changeTaskQueue(taskToStop,TASK_ISLEEP);
+                    storeISRSavedRegs(taskToStop);
                     break;
             }
         }
@@ -388,17 +417,23 @@ void runAnotherTask(bool schedulerRequested)
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
         //Move the new task onto the CPU
+#ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08X",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
+#endif
         schedulerTaskSwitched=true;
         kTaskSwitchCount++;
     }
     else
     {
         __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (oldCR3));
+#ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*No new process to run, continuing with the current process");
+#endif
     }
+#ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS,"(Task switch count=%u)\n",kTaskSwitchCount);
-    printd(DEBUG_PROCESS,"*************************************************************************\n");
+    printd(DEBUG_PROCESS,"**************************************************************************\n");
+#endif
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
     return;
 }

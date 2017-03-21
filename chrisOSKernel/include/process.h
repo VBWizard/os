@@ -27,8 +27,8 @@ extern "C" {
     typedef struct sprocess
     {
         uint32_t processSyscallESP;         //NOTE: this must be the first item in the struct, as it is mapped into the process later
+        uint32_t pageDirPtr;
         task_t* task;
-        //char image[512];
         sGDT* gdtEntry;
         elfInfo_t* elf;
         char* path;

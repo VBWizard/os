@@ -95,6 +95,7 @@
       <itemPath>src/process.c</itemPath>
       <itemPath>src/schedule.c</itemPath>
       <itemPath>src/schedule_old.c</itemPath>
+      <itemPath>src/signals.c</itemPath>
       <itemPath>../chrisOS/src/strings/strcat.c</itemPath>
       <itemPath>../chrisOS/src/strings/strcpy.c</itemPath>
       <itemPath>../chrisOS/src/char/console/strftime.c</itemPath>
@@ -331,8 +332,6 @@
       <item path="include/process.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/schedule.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/signals.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -586,8 +585,6 @@
       <item path="include/process.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/schedule.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/signals.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
       </item>

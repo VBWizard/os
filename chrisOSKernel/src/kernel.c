@@ -65,20 +65,29 @@ int main(int argc, char** argv) {
     printk("Loading and executing %s\n",program);
     /*NOTE: This is how to create argv!!!*/
     char test[2][50];
-    strcpy(test[0],"hello");
-    strcpy(test[1],"there");
+    strcpy(test[0],"1");
+    strcpy(test[1],"1");
     char* testp[2];
     testp[0]=test[0];
     testp[1]=test[1];
     process_t* process = createProcess(program,2,&testp,false);
-/*    printk("Loading and executing %s again\n",program);
-    strcpy(test[0],"hello2");
-    strcpy(test[1],"there2");
-    printk("Loading and executing %s again\n",program);
-    process_t* process2 = createProcess(program,2,&testp,false);
-    waitTicks(TICKS_PER_SECOND*5);
-*/    
     schedulerEnabled=true;
+
+#define pcount 3
+    char* param1[pcount][10];
+    char* param2[pcount][10];
+    char* pptr[pcount][2];
+    process_t* proc[pcount]={0};
+    for (int cnt=0;cnt<pcount;cnt++)
+    {
+        sprintf(&param1[cnt][0],"%u",cnt+2);
+        sprintf(&param2[cnt][0],"%u",cnt+2);
+        pptr[cnt][0]=&param1[cnt][0];
+        pptr[cnt][1]=&param1[cnt][0];
+        proc[cnt]=createProcess(program,2,&pptr[cnt],false);
+        waitTicks(cnt*25);
+    }
+
     return (0xbad);
 }
 

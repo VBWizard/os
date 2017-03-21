@@ -26,6 +26,7 @@ extern "C" {
 #include "alloc.h"
 #include "paging.h"
 #include "process.h"
+#include "kernel.h"
     
     extern uint32_t* kTaskSlotAvailableInd;
     extern tss_t* kTSSTable;
@@ -36,6 +37,7 @@ extern "C" {
     task_t* submitNewTask(task_t* task);
     void markTaskEnded(uint32_t taskNum);
     task_t* findTaskByCR3(uint32_t cr3);
+    uint32_t NO_PREV=0xFFFFFFFF, NO_NEXT=0xFFFFFFFF;
 
 #ifdef __cplusplus
 }

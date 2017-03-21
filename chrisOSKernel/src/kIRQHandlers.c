@@ -8,18 +8,33 @@
 
 bool schedulerEnabled=false;
 extern uint32_t nextScheduleTicks;
+extern void processSignals();
 
 void kIRQ0_handler()
 {
 #ifndef DEBUG_NONE
 static char currTime[200];
 static struct tm theDateTime;
+static bool doSigProc=true;
 #endif
     *kTicksSinceStart=*kTicksSinceStart+1;
     if (*kTicksSinceStart % kTicksPerSecond == 0)
         kSystemCurrentTime++;
-    if (schedulerEnabled && (*kTicksSinceStart>nextScheduleTicks))
-        scheduler();
+    if (schedulerEnabled)
+    {
+        if(*kTicksSinceStart>nextScheduleTicks)
+        {
+            scheduler();
+        }
+        else if (doSigProc)
+        {
+            printd(DEBUG_SIGNALS,"\nProcessing signals\n");
+            processSignals();
+            doSigProc=!doSigProc;
+        }
+        else
+            doSigProc=!doSigProc;
+    }
 #ifndef DEBUG_EXPANDED_TICK
         if ((kDebugLevel & DEBUG_EXPANDED_TICK) == DEBUG_EXPANDED_TICK)
         {

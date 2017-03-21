@@ -556,11 +556,13 @@ cld
         mov exceptionCS, bx
         mov ebx, [ebp+0]
         mov exceptionEIP, ebx
+        mov ebx,ds
+        mov exceptionDS,ebx
         mov     bx, 0x10
         mov     ds, bx
-        mov     es, bx                  # load ds and es with valid selector
-	mov     gs, bx
         call    kbd_handler          # call actual ISR code
+        mov ebx,exceptionDS
+        mov ds,bx
         popf
         popad  
 mov al,0x20

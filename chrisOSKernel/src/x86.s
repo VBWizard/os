@@ -36,6 +36,7 @@ _sysEnter:
     sti
     call _sysCall
     mov [esp+52],eax
+    sti
     pop ebx             #4
     pop ebx             #8
     pop ebx             #12

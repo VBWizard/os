@@ -6,6 +6,7 @@
 
 #include "syscall.h"
 #include "printf.h"
+#include "signals.h"
 
 #define KBRD_INTRFC 0x64
 /* keyboard interface bits */
@@ -16,6 +17,7 @@
 #define bit(n) (1<<(n)) /* Set bit n to 1 */
 #define check_flag(flags, n) ((flags) & bit(n))
 
+//NOTE: Upon entering _sysCall, the process' CR3 is still being used
 void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
 {
     uint32_t processCR3;
@@ -28,7 +30,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     switch (callNum)
     {
         case 0x0:
-            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, invalid call number.\n",callNum);
+            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, invalid call number. (cr3=0x%08X)\n",callNum,processCR3);
             break;
         case 0x1:       //exit
              //Get back home
@@ -43,8 +45,16 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              panic("_syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
             break;
+        case 0x166:
+            printd(DEBUG_PROCESS,"_syscall: sleep(0x%08X) called\n",param1);
+            sys_sigaction(SIG_SLEEP,0,param1);
+            break;
+        case 0x167:
+            printd(DEBUG_PROCESS,"_syscall: sys_setsigaction(0x%08X, 0x%08X, 0x%08X) called\n",param1,param2,param3);
+            sys_setsigaction(param1,(uintptr_t*)param2,param3);
+            break;
         case 0x168:
-            printd(DEBUG_PROCESS,"_syscall: SIG_STOP called.\n");
+            printd(DEBUG_PROCESS,"_syscall: Stop() called.\n");
             sys_sigaction(SIG_STOP,0,0);
             break;
         case 0x169:
@@ -55,6 +65,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case 0x300:
             va_copy(ap,(va_list*)(param2));
+            //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
             printu((const char*)param1, ap);
             break;
         default:

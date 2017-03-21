@@ -27,6 +27,7 @@ void VISIBLE libc_init(void);
 int VISIBLE print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
 unsigned int VISIBLE sleep (unsigned int __seconds);
 void stop();
+void modifySignal(int signal, void* sigHandler, int sigData);
 
 #ifdef __cplusplus
 }
