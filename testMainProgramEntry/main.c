@@ -22,9 +22,6 @@ int main(int argc, char** argv) {
     int a=argc;
     uint32_t cr3;
     
-    __asm__("mov eax,[0xF000F004]\n":"=a" (cr3));
-
-    
     libc_init();
     //modifySignal(SIG_SEGV,HandleSEGV,0);
     print("Param count=%u\n",argc);
@@ -34,15 +31,17 @@ int main(int argc, char** argv) {
         print("Param %u=%s\n",cnt,argv[cnt]);
     }
     jumpHere:
-    sleep(10);
-    //print("Calling stop\n");
-    //stop();
+    sleep(1);
+    temp++;
 //    if (temp%1000000==0)
-        print("\t%s: Still in the loop, %u iterations (cr3=0x%08X)\n",argv[1],temp++,cr3);
-  //  goto jumpHere;
+        print("\t%s: Still in the loop, %u iterations\n",argv[1],temp);
     //__asm__("mov eax,0\ncld\nint 0x80\n");  //Shouldn't do this from a program
-
 //    __asm__("mov eax,0\ncld\ncall sysEnter_Vector\n");
+    if (temp==5)
+    {
+        print("Triggering SEGV\n");
+        __asm__("mov eax,[0x50000000]\n");
+    }
     goto jumpHere;
     return 0x1234;
 }

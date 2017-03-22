@@ -12,6 +12,7 @@
 
 extern void _sysCall();
 extern void _sysEnter();
+extern void vector14();
 extern void vector32();
 extern void vector128();
 
@@ -65,6 +66,7 @@ void initKernelInternals()
     
     //idt_set_gate (&idtTable[0x80], 0x8, (int)&_sysCall, ACS_INT | ACS_DPL_3);
     idt_set_gate (&idtTable[0x80], 0x8, (int)&vector128, ACS_INT | ACS_DPL_3);
+    idt_set_gate (&idtTable[0xe], 0x8, (int)&vector14, ACS_INT);   //paging exception
 
     //Configure SysEnter/SysExit
     if (!kCPUFeatures.cpuid_feature_bits.sep)

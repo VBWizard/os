@@ -15,17 +15,14 @@
 .extern kKernelCR3
 
 isrNumber: .word 0,0
-
+tempEAX: .word 0,0
 .globl alltraps
 .type alltraps, @function
 alltraps:
     #NOTE: CLI not necessary, Interrupt Gate
     push eax
-    push ds
     mov eax,0x10
     mov ds,eax
-    pop eax
-    mov isrSavedDS,eax
     pop eax
     mov isrSavedEAX,eax
     mov eax,[esp]
@@ -43,9 +40,6 @@ alltraps:
     mov isrSavedEBX,ebx
     mov isrSavedECX,ecx
 
-    mov eax,kDebugLevel
-    and  eax,0x800000
-    jz  overCPUDebug
     mov isrSavedEDX,edx
     mov isrSavedESI,esi
     mov isrSavedEDI,edi
@@ -57,9 +51,6 @@ alltraps:
     mov isrSavedGS,eax
     #Save the task register
     str isrSavedTR
-overCPUDebug:
-    #Save segment registers
-
     mov eax,0x10
     mov ds,ax
     mov es,ax
@@ -71,27 +62,20 @@ overCPUDebug:
     #No need to do this as they won't change
     #Save general registers
     #no need to do this, they are already on the stack! (pushad)
-    mov ebx,isrNumber
-    mov bl,[_isr_has_errorCode+ebx]
-    cmp bl,1
-    je  getExceptionDetailsWithError
     mov ebx, [ebp+8]
     mov isrSavedFlags, ebx
     mov ebx, [ebp+4]
     mov isrSavedCS, ebx
     mov ebx, [ebp]
     mov isrSavedEIP, ebx
-    jmp saveTheStack
+    mov ebx, cr2
+    mov isrSavedCR2, ebx
+    mov ebx,isrNumber
+    mov bl,[_isr_has_errorCode+ebx]
+    cmp bl,1
+    jne  saveTheStack
 getExceptionDetailsWithError:
-     mov ebx, [ebp+12]
-     mov isrSavedFlags, ebx
-     mov ebx, [ebp+8]
-     mov isrSavedCS, ebx
-     mov ebx, [ebp+4]
-     mov isrSavedEIP, ebx
-     mov ebx, cr2
-     mov isrSavedCR2, ebx
-     mov ebx, [ebp]
+     mov ebx, [ebp-4]
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
@@ -99,7 +83,7 @@ saveTheStack:
     cmp eax,0x20
     je overSaveTheStack
     mov esi, isrSavedESP
-//        add esi, 16 #drop the 4 dwords that are passed to the proc
+    add esi,12                  #drop the eip/cs/flags from the call to this proc
     mov edi, isrSavedStack
     mov ecx, 40       #NOTE: This can cause an exception if the target's esp is within 40 bytes of non-mapped memory
     cld
@@ -113,7 +97,48 @@ overSaveTheStack:
 notIRQ0Handler:
     cmp eax,0xe
     jne notPagingHandler
-    call pagingExceptionHandler
+
+pagingHandler:
+    mov eax,ds
+    mov exceptionDS,eax
+    mov exceptionBX, ebx
+    mov exceptionCX, ecx
+    mov exceptionDX, edx
+    mov exceptionSI, esi
+    mov exceptionDI, edi
+    str exceptionTR
+    mov eax, cr0
+    mov exceptionCR0, eax
+    mov eax, cr3
+    mov exceptionCR3, eax
+    mov eax, cr4
+    mov exceptionCR4, eax
+    mov eax,es
+    mov exceptionES,eax
+    mov eax,fs
+    mov exceptionFS,eax
+    mov eax,gs
+    mov exceptionGS,eax
+    mov eax,ss
+    mov exceptionSS,eax
+    mov eax, exceptionAX
+    mov ebx,isrSavedCS
+    mov exceptionCS,ebx
+    mov ebx,isrSavedEIP
+    mov exceptionEIP,ebx
+    mov ebx,isrSavedESP
+    mov exceptionSavedESP,ebx
+    mov ebx,isrSavedEBP
+    mov exceptionBP,ebx
+    mov ebx,isrSavedCR2
+    mov exceptionCR2,ebx
+    mov ebx,isrSavedErrorCode
+    mov exceptionErrorCode,ebx
+    mov ebx,isrSavedEAX
+    mov exceptionAX,ebx
+    mov ebx,isrSavedEBX
+    mov exceptionBX,ebx
+    call kPagingExceptionHandler
     jmp ckeckForIRQResponse
 notPagingHandler:
     cmp eax,0x80

@@ -38,7 +38,7 @@ extern "C" {
         
     } signal_t;
 
-    void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData);
+    void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t cr3);
     void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData);
     extern task_t* findTaskByCR3(uint32_t cr3);
     extern uint32_t NO_PREV;

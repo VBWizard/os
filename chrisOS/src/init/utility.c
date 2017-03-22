@@ -183,6 +183,7 @@ char * strtoupper(char* pointerToString)
 #define LOAD_ZERO_BASED_DS     __asm__("mov eax,0x90\nmov ds,eax":::"eax");
 #define LOAD_KERNEL_BASED_DS __asm__("mov eax,0x10\nmov ds,eax":::"eax");
 
+//Called by exception 0xd & 0xe (possibly more)
 void printDumpedRegs()
 {
     uint32_t esp = exceptionSavedESP;

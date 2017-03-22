@@ -212,6 +212,8 @@ uintptr_t* getQ(eTaskState state)
         case TASK_STOPPED:
             return qStopped;
             break;
+        case TASK_EXITED:
+            return NULL;
         default:
             printd(DEBUG_PROCESS,"getQ: Invalid queue 0x%02X - %s",state,TASK_STATE_NAMES[state]);
             return NULL;
@@ -278,6 +280,9 @@ task_t* findTaskToRun()
         {
             //This is where we increment all the runnable ticks
             ((task_t*)*queue)->ticksSincePutInRunnable++;
+            if (((task_t*)*queue)->taskNum==1) 
+                ((task_t*)*queue)->ticksSincePutInRunnable++;   //Kernel task always gets extra priority.  This will usually allow the kernel to run 
+                                                                //every other tick.
             if ( ((task_t*)*queue)->ticksSincePutInRunnable > mostIdleTicks)
             {
                 taskToRun=(task_t*)*queue;
@@ -395,6 +400,9 @@ void runAnotherTask(bool schedulerRequested)
 #endif
             switch (((process_t*)(taskToStop->process))->signals.sigind)
             {
+                case SIG_SEGV:
+                    changeTaskQueue(taskToStop,TASK_EXITED);
+                    break;
                 case SIG_STOP:
                     changeTaskQueue(taskToStop,TASK_STOPPED);
                     storeISRSavedRegs(taskToStop);

@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
     process_t* process = createProcess(program,2,&testp,false);
     schedulerEnabled=true;
 
-#define pcount 3
+/*#define pcount 3
     char* param1[pcount][10];
     char* param2[pcount][10];
     char* pptr[pcount][2];
@@ -85,9 +85,8 @@ int main(int argc, char** argv) {
         pptr[cnt][0]=&param1[cnt][0];
         pptr[cnt][1]=&param1[cnt][0];
         proc[cnt]=createProcess(program,2,&pptr[cnt],false);
-        waitTicks(cnt*25);
     }
-
+*/
     return (0xbad);
 }
 

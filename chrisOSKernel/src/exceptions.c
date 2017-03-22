@@ -11,6 +11,8 @@
 #include "i386/irqHandlers.h"
 #include "i386/kPaging.h"
 #include "utility.h"
+#include "signals.h"
+#include "process.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
@@ -40,14 +42,17 @@ uint32_t tds=0;
 unsigned volatile char kKeyStatus[11];
 extern struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf);
 extern void kpagingUpdatePresentFlagA(uint32_t address, bool present);
+void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t cr3);
 
-void pagingExceptionHandler()
+void kPagingExceptionHandler()
 {
     uint32_t lPDEValue=0;
     uint32_t lPTEValue=0;
     uint32_t lPDEAddress=0, lPTEAddress=0;
     uint32_t lOldDebugLevel=0;
 
+    __asm__("mov cr3,eax\n"::"a"(KERNEL_CR3));
+    
     if (exceptionNumber==0x0e)
         //Get the address of the page table entry for the exception
         lPTEAddress=kPagingGet4kPTEntryAddress(exceptionCR2);
@@ -67,37 +72,30 @@ void pagingExceptionHandler()
           printk("\nPaging handler called for virtual address 0x%02X\n",exceptionCR2);
           printk("PDE@0x%08X=0x%08X, PTE@0x%08X=0x%08X\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
           printDumpedRegs();
-          printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
+          //printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
 #endif
     if (lOldDebugLevel)
         kDebugLevel=lOldDebugLevel;
-    if ((exceptionCR2&0xFFFFF000)==0xC0000000 && (!kPagingInitDone))
-    {
-#ifndef DEBUG_NONE
-        if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
-            printk("\n\tpagingExceptionHandler: Updating 0x%08X to read/write for WP test ...\n\t",exceptionCR2);
-#endif
-        kPagingSetPageReadOnlyFlag((uintptr_t*)lPTEAddress, false);
-    }
     
     kPagingExceptionsSinceStart++;
-#ifndef DEBUG_NONE
-//    if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
-//    {
-//        waitForKeyboardKey();
-//    }
-#endif
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08X\n",exceptionCR3);
+    process_t* p=sys_sigaction2(SIG_SEGV,0,0xe,exceptionCR3);
+    printk("segfault in '%s' at 0x%08X (cr2=0x%08X)\n",p->path,exceptionEIP,exceptionCR2);
+
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
-    if ((!kPagingInitDone) && exceptionCR2==0xC0000000)
+
+    if (p->task->taskNum!=1)      //retval=1 is Kernel, so don't return.
     {
-        exceptionCR2=0;
+        printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Returning\n");
+        __asm__("\sti\nnop\nnop\nnop\nmov cr3,eax\n":"=a"(exceptionCR3));
         return;
     }
-    __asm__("sti\n");
-    pagingExceptionStop: __asm__("hlt\n"); goto pagingExceptionStop;
+pagingExceptionStop: 
+    printk("Exception was in kernel, halting system\n");
     __asm__("cli");
     __asm__("hlt");
+    goto pagingExceptionStop;
 }
 
 void defaultISRHandler()

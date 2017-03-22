@@ -44,19 +44,19 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     __asm__("mov cr3,eax\nsti\n"::"a" (oldCR3));
 }
 
-void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
+//Process a sigaction against a process, called by sys_sigaction or the kernel
+void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t cr3)
 {
-    uint32_t oldCR3;
-    
-    __asm__("mov eax,cr3\n":"=a" (oldCR3));
-    __asm__("cli\n");
-    __asm__("mov eax,%[newCR3]\n"
-            "mov cr3,eax\n"::[newCR3] "r" (KERNEL_CR3));
-    
-    process_t *p=findTaskByCR3(oldCR3)->process;
-    
+    uint32_t currCR3=0;
+
+    __asm__("mov eax,cr3\n":"=a" (currCR3));
+    printd(DEBUG_SIGNALS, "sys_sigaction2: sys_sigAction2(0x%08X, 0x%08X, 0x%08X, 0x%08X), current cr3=0x%08X\n"
+            ,signal, sigAction, sigData, cr3,currCR3);
+
+    process_t *p=findTaskByCR3(cr3)->process;
+    printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08X for cr3\n",p);
     if (!p)
-        panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",oldCR3,signal,sigAction);
+        panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",cr3,signal,sigAction);
     switch (signal)
     {
         case SIG_SLEEP:
@@ -65,7 +65,7 @@ void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
             printd(DEBUG_SIGNALS,"Signalling SLEEP for task 0x%04X, wakeTicks=0x%08X\n",p->task->taskNum,sigData);
             __asm__("cli\n");
             triggerScheduler();
-            __asm__("mov cr3,eax\nsti\n"::"a" (oldCR3));
+            __asm__("mov cr3,eax\nsti\n"::"a" (cr3));
             __asm__("sti\nhlt\n");      //Put the task to sleep until the next tick when another task will take its place
             break;
         case SIG_STOP:
@@ -75,13 +75,35 @@ void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
             __asm__("cli\n");
             triggerScheduler();
             printd(DEBUG_SIGNALS,"Scheduler triggered, halting until next tick\n");
-            __asm__("mov cr3,eax\nsti\n"::"a" (oldCR3));
+            __asm__("mov cr3,eax\nsti\n"::"a" (cr3));
             __asm__("sti\nhlt\n");      //Put the task to sleep until the next tick when another task will take its place    
             printd(DEBUG_SIGNALS,"Process resumed from SIG_STOP");
+            break;
+        case SIG_SEGV:
+            printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald=0x%08X processing signal\n",cr3,p->signals.sigind);
+            p->signals.sigind|=SIG_SEGV;
+            triggerScheduler();
+            printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald=0x%08X, returning to caller\n",cr3,p->signals.sigind);
+            return p;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         default:
             panic("Unhandled signal 0x%08X, sigAction 0x%08X\n",signal,sigAction);
     }
+    return NULL;
+}
+
+//Process a sigaction, called by running program which wants the signal
+void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
+{
+    uint32_t oldCR3;
+    
+    __asm__("mov eax,cr3\n":"=a" (oldCR3));
+    __asm__("cli\n");
+    __asm__("mov eax,%[newCR3]\n"
+            "mov cr3,eax\n"::[newCR3] "r" (KERNEL_CR3));
+
+    void* junk=sys_sigaction2(signal, sigAction, sigData, oldCR3);
+    
 }
 
 
@@ -132,7 +154,7 @@ scanSleep:
                 printd("\tWaking task %0x04X as wakeTicks (0x%08X) < kTicksSinceStart (0x%08X)",((process_t*)(task->process))->signals.sigdata[SIG_SLEEP],*kTicksSinceStart);
                 changeTaskQueue(task,TASK_RUNNABLE);
                 ((process_t*)(task->process))->signals.sigdata[SIG_SLEEP]=0;
-                ((process_t*)(task->process))->signals.sigind=~SIG_SLEEP;
+                ((process_t*)(task->process))->signals.sigind&=~SIG_SLEEP;
                 task->ticksSincePutInRunnable=1000000;  //Make this the next chosen task
             }
         }
