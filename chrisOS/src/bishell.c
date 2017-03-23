@@ -13,6 +13,7 @@
 #include "fat/fat_filelib.h"
 #include "../include/elfloader.h"
 #include "i386/kPaging.h"
+#include "charDev.h"
 
 
 extern uint64_t kE820MemoryBytes;
@@ -482,7 +483,6 @@ void HIGH_CODE_SECTION biShell()
     int commandsPtr=0;
     int commandBuffPtr=0;
     int commandWasFromThisBufferPtr=0;
-    bool stopCountingKeys=false;
     strcpy(sExecutingProgram,sbiShellProgramName);
     puts("\nWelcome to biShell ... hang a while!\n");
 
@@ -546,18 +546,22 @@ getAKey:
                 goto getAKey;
             
         }   
+    cursorSavePosition();
+    cursorMoveTo(1,1);
+    printk("Current command = %s          ",lCommand);
+    cursorRestorePosition();
         if (lCurrKey==0xcb) //left
         {
             if (cursorGetPosX()>4)
             {
                 cursorMoveTo(cursorGetPosX()-1,cursorGetPosY());
-                stopCountingKeys=true;
+                lCurrKeyCount--;
             }
             goto getAKey;
         }
         if (lCurrKey=='\b')
         {
-            if (lCurrKeyCount>=0)
+            if (lCurrKeyCount>0)
             {
                 int lTemp=cursorGetPosY();
 
@@ -573,20 +577,20 @@ getAKey:
         else if (lCurrKey==0xa)
         {
             putc(lCurrKey);
-            lCommand[lCurrKeyCount++]='\0';
             goto doneGettingKeys;
         }
         else
         {
             lCommand[lCurrKeyCount++]=lCurrKey;
-            if (stopCountingKeys)
-                    lCurrKeyCount--;
             putc(lCurrKey);
         }
-        stopCountingKeys=false;
         goto getAKey;
 //        gets(lCommand,50);
 doneGettingKeys:
+    cursorSavePosition();
+    cursorMoveTo(1,1);
+    printk("doneGettingKeys: Current command = %s          ",lCommand);
+    cursorRestorePosition();
         if (lCommand[0]==0x0)
             goto getACommand;
         int i = findCommand(lCommand);

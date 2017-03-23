@@ -269,8 +269,9 @@ gdt_init();
     __asm__("sti\n");
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
-    printk("Boot: ");
-    gets(kBootCmd,150);
+    printk("Boot: disk 4;part 5;exec /kernel;");
+    strcpy(kBootCmd,"disk 4;part 5;exec /kernel;");
+    gets(kBootCmd+strlen(kBootCmd),150);
     kBootParamCount=parseParamsShell(kBootCmd, kBootParams, MAX_PARAM_COUNT*MAX_PARAM_WIDTH);
     strftime((char*)&currTime, 50, "%H:%M:%S on %m/%d/%y", &theDateTime);
     //wait(50);
@@ -360,6 +361,7 @@ gdt_init();
     doHDSetup();
     __asm__("mov eax,0x28\nmov ss,eax\n":::"eax");
 kInitDone = true;
+printk("Boot commandline: %s\n",kBootCmd);
 goto overStuff; /*******************************************/
     
     bool lRetVal=parseMBR(&kATADeviceInfo[4], (struct mbr_t*)&kMBR[0]);
