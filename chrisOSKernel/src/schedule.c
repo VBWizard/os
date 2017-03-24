@@ -33,25 +33,25 @@ void changeTaskQueue(task_t* task, eTaskState newState);
 
 void initSched()
 {
-    kTaskList=malloc(1000*sizeof(task_t));
+    kTaskList=kMalloc(1000*sizeof(task_t));
     memset(kTaskList,0,1000*sizeof(task_t));
     printd(DEBUG_PROCESS,"\tInitialized kTaskList @ 0x%08X, sizeof(task_t)=0x%02X\n",kTaskList,sizeof(task_t));
     kTaskList[0].prev=NO_PREV;
     kTaskList[999].next=NO_NEXT;
     //TODO: Change # of array elements to # of processors
-    qRunning=malloc(MAX_TASKS*sizeof(uintptr_t));
+    qRunning=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qRunning,0,MAX_TASKS*sizeof(uintptr_t));
     qRunning[MAX_TASKS-1]=NO_NEXT;
     //TODO: Change # of array elements to # of processors
-    qRunnable=malloc(MAX_TASKS*sizeof(uintptr_t));
+    qRunnable=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qRunnable,0,MAX_TASKS*sizeof(uintptr_t));
     qRunnable[MAX_TASKS-1]=NO_NEXT;
 
-    qStopped=malloc(MAX_TASKS*sizeof(uintptr_t));
+    qStopped=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qStopped,0,MAX_TASKS*sizeof(uintptr_t));
     qStopped[MAX_TASKS-1]=NO_NEXT;
     
-    qISleep=malloc(MAX_TASKS*sizeof(uintptr_t));
+    qISleep=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qISleep,0,MAX_TASKS*sizeof(uintptr_t));
     qISleep[MAX_TASKS-1]=NO_NEXT;
 

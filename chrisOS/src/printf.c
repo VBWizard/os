@@ -194,11 +194,6 @@ static int printI(char **out, const char *format, va_list args )
 	return pc;
 }
 
-int printd_valist(const char *format, va_list args)
-{
-    return printI(0, format, args);
-}
-
 int printp_valist(const char *format, va_list args)
 {
     char inString[1024];
@@ -234,6 +229,15 @@ int printk(const char *format, ...)
 #ifdef DEBUG_NONE
 int printd() {}
 #else
+int printd_valist(uint32_t DebugLevel, const char *format, va_list args)
+{
+    if ((kDebugLevel & DebugLevel) == DebugLevel)    
+        if (kDebugLevel & DEBUG_PRINT_TO_PORT)
+            printp_valist(format,args);
+        else
+            return printk_valist(format, args);
+}
+
 int printd(uint32_t DebugLevel, const char *format, ...)
 {
     if ((kDebugLevel & DebugLevel) == DebugLevel)    

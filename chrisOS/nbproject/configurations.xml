@@ -38,8 +38,8 @@
       <itemPath>include/ahcicommands.h</itemPath>
       <itemPath>include/i386/apic.h</itemPath>
       <itemPath>include/init/ata_disk.h</itemPath>
-      <itemPath>include/bishell.h</itemPath>
       <itemPath>include/i386/bits/bits.h</itemPath>
+      <itemPath>include/bootShell.h</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/include/build_num.h</itemPath>
       <itemPath>include/charDev.h</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/include/chrisos.h</itemPath>
@@ -86,10 +86,10 @@
       <itemPath>asm/asmFunctions.s</itemPath>
       <itemPath>src/init/ata_disk.c</itemPath>
       <itemPath>src/char/console/basic_display.c</itemPath>
-      <itemPath>src/bishell.c</itemPath>
       <itemPath>src/cpu/bits.c</itemPath>
       <itemPath>asm/boot.s</itemPath>
       <itemPath>asm/bootCPU.s</itemPath>
+      <itemPath>src/bootShell.c</itemPath>
       <itemPath>src/init/cpudet-clean.c</itemPath>
       <itemPath>src/debugger/debugger.c</itemPath>
       <itemPath>src/init/e820.c</itemPath>
@@ -254,7 +254,7 @@
       </item>
       <item path="include/ahcicommands.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/bishell.h" ex="false" tool="3" flavor2="0">
+      <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -318,11 +318,11 @@
       </item>
       <item path="linker.ld" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/bishell.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/block/ahci.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/bootShell.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/char/console/basic_display.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -567,7 +567,7 @@
       </item>
       <item path="include/ahcicommands.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/bishell.h" ex="false" tool="3" flavor2="0">
+      <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -631,11 +631,11 @@
       </item>
       <item path="linker.ld" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/bishell.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/block/ahci.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/bootShell.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/char/console/basic_display.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -900,7 +900,7 @@
       </item>
       <item path="include/ahcicommands.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/bishell.h" ex="false" tool="3" flavor2="0">
+      <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -964,11 +964,11 @@
       </item>
       <item path="linker.ld" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/bishell.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/block/ahci.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/bootShell.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/char/console/basic_display.c" ex="false" tool="0" flavor2="0">
       </item>

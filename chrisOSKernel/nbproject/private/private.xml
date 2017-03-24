@@ -7,16 +7,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/yogi/src/os/chrisOSKernel/src/kInit.c</file>
-            <file>file:/home/yogi/src/os/chrisOS/src/init/utility.c</file>
-            <file>file:/home/yogi/src/os/chrisOSKernel/include/process.h</file>
-            <file>file:/home/yogi/src/os/chrisOSKernel/src/exceptions.c</file>
-            <file>file:/home/yogi/src/os/chrisOSKernel/src/kernel.c</file>
-            <file>file:/home/yogi/src/os/chrisOSKernel/src/signals.c</file>
-            <file>file:/home/yogi/src/os/chrisOSKernel/include/signals.h</file>
-            <file>file:/home/yogi/src/os/chrisOSKernel/src/kernelISR.s</file>
-            <file>file:/home/yogi/src/os/chrisOS/include/chrisos.h</file>
-            <file>file:/home/yogi/src/os/chrisOSKernel/src/schedule.c</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/mm/kmalloc.c</file>
         </group>
     </open-files>
 </project-private>

@@ -44,9 +44,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/asm/asmFunctions.o \
 	${OBJECTDIR}/asm/boot.o \
 	${OBJECTDIR}/asm/bootCPU.o \
-	${OBJECTDIR}/src/bishell.o \
 	${OBJECTDIR}/src/block/ahci.o \
 	${OBJECTDIR}/src/block/pci.o \
+	${OBJECTDIR}/src/bootShell.o \
 	${OBJECTDIR}/src/char/console/basic_display.o \
 	${OBJECTDIR}/src/cpu/acpi.o \
 	${OBJECTDIR}/src/cpu/apic.o \
@@ -155,11 +155,6 @@ ${OBJECTDIR}/asm/bootCPU.o: nbproject/Makefile-${CND_CONF}.mk asm/bootCPU.s
 	${MKDIR} -p ${OBJECTDIR}/asm
 	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/asm/bootCPU.o asm/bootCPU.s
 
-${OBJECTDIR}/src/bishell.o: nbproject/Makefile-${CND_CONF}.mk src/bishell.c 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bishell.o src/bishell.c
-
 ${OBJECTDIR}/src/block/ahci.o: nbproject/Makefile-${CND_CONF}.mk src/block/ahci.c 
 	${MKDIR} -p ${OBJECTDIR}/src/block
 	${RM} "$@.d"
@@ -169,6 +164,11 @@ ${OBJECTDIR}/src/block/pci.o: nbproject/Makefile-${CND_CONF}.mk src/block/pci.c
 	${MKDIR} -p ${OBJECTDIR}/src/block
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/block/pci.o src/block/pci.c
+
+${OBJECTDIR}/src/bootShell.o: nbproject/Makefile-${CND_CONF}.mk src/bootShell.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bootShell.o src/bootShell.c
 
 ${OBJECTDIR}/src/char/console/basic_display.o: nbproject/Makefile-${CND_CONF}.mk src/char/console/basic_display.c 
 	${MKDIR} -p ${OBJECTDIR}/src/char/console

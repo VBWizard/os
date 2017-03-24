@@ -1,0 +1,60 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   malloc.h
+ * Author: yogi
+ *
+ * Created on March 23, 2017, 7:50 PM
+ */
+
+#ifndef MALLOC_H
+#define MALLOC_H
+
+/*Malloc creates a heap within the program's mapped memory.  The start of this
+ heap is currently statically defined by the constant HEAP_START and the potential
+ end of the heap is HEAP_END, so you can only allocate 1.25GB to any one process
+ 
+ Malloc starts with no memory allocated to it.  When it needs memory to fulfill a request,
+ it asks the kernel for memory.  The kernel only returns memory in PAGE_SIZE chunks,
+ so if a program asks for 1 byte of memory, malloc requests 1 page.  After fulfilling the initial
+ request, Malloc keeps track of how much memory is left on the page, and
+ if it can fulfill the next request with the memory it has left on the page, it does so
+ without asking the kernel for more memory.
+
+ Malloc is not responsible for mapping the memory returned by the kernel into the program's
+ mapped memory.  The kernel uses HEAP_START for every program 
+ */
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include "chrisos.h"
+    
+    typedef struct sheap
+    {
+        int marker;
+        int len;
+        bool inUse;
+    } heaprec_t;
+
+uint32_t heapBase;    
+uint32_t heapCurr;
+uint32_t heapEnd;
+
+void initmalloc();
+void* malloc(size_t size);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* MALLOC_H */
+

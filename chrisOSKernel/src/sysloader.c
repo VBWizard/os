@@ -15,7 +15,7 @@
 #include "../include/mm.h"
 #include "../include/paging.h"
 #include "../include/alloc.h"
-#include "malloc.h"
+#include "kmalloc.h"
 #include "../../chrisOS/include/printf.h"
 
 extern struct ataDeviceInfo_t* kATADeviceInfo;
@@ -425,7 +425,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         CR3=CURRENT_CR3;
     elfInfo_t* elfInfo;
     if (pElfInfo==NULL)
-        elfInfo=malloc(sizeof(elfInfo_t));
+        elfInfo=kMalloc(sizeof(elfInfo_t));
     else
     {
         elfInfo=pElfInfo;
@@ -440,7 +440,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     memset(elfInfo,0,sizeof(elfInfo_t));
     memset(&elfInfo->dynamicInfo,0,sizeof(elfDynamic_t));
 
-    elfInfo->fileName=malloc(strlen(fileName));
+    elfInfo->fileName=kMalloc(strlen(fileName));
     strcpy(elfInfo->fileName,fileName);
 
     printd(DEBUG_ELF_LOADER,"Opening image file %s\n",elfInfo->fileName);
@@ -470,7 +470,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
         {
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            elfInfo->dynamicInfo.strTableAddress[cnt]=malloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
+            elfInfo->dynamicInfo.strTableAddress[cnt]=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
             printd(DEBUG_ELF_LOADER,"Mapping string table @ 0x%08X (0x%08X) for 0x%08X bytes into kernel\n",
                     elfInfo->dynamicInfo.strTableAddress[cnt], 
                     (uint32_t)(elfInfo->dynamicInfo.strTableAddress[cnt]) | KERNEL_PAGED_BASE_ADDRESS,
@@ -512,7 +512,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         {printd(DEBUG_ELF_LOADER,"Found (STRTAB), already processed string tables, skipping\n");}
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_SYMTAB)
         {
-            elfInfo->symTable=malloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
+            elfInfo->symTable=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
             fl_fread(elfInfo->symTable,elfInfo->secHdrTable[cnt].sh_size,1,fPtr);
             elfInfo->symTableRecordCount=(elfInfo->secHdrTable[cnt].sh_size / sizeof(Elf32_Sym));
@@ -536,7 +536,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_RELA)
         {
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            elfInfo->dynamicInfo.relATable=malloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
+            elfInfo->dynamicInfo.relATable=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
             elfInfo->dynamicInfo.relATableSize=elfInfo->secHdrTable[cnt].sh_size;
             fl_fread(elfInfo->dynamicInfo.relATable,1,elfInfo->dynamicInfo.relATableSize,fPtr);
             printd(DEBUG_ELF_LOADER,"Found %s (RELA) section, read %u bytes to 0x%08X.\n",
@@ -548,7 +548,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         {
             fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
             elfInfo->dynamicInfo.relTableSize=elfInfo->secHdrTable[cnt].sh_size;
-            elfInfo->dynamicInfo.relTable=malloc(elfInfo->dynamicInfo.relTableSize+0x1000);
+            elfInfo->dynamicInfo.relTable=kMalloc(elfInfo->dynamicInfo.relTableSize+0x1000);
             elfInfo->dynamicInfo.relTable_symTableLink=elfInfo->secHdrTable[cnt].sh_link;
             fl_fread(elfInfo->dynamicInfo.relTable,1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
             printd(DEBUG_ELF_LOADER,"Found %s (REL) section, read %u bytes to 0x%08X.\n",
@@ -673,11 +673,6 @@ static int elf_get_symval(elfInfo_t *elfInfo, uint32_t idx) {
 # define DO_386_32(S, A)	((S) + (A))
 # define DO_386_PC32(S, A, P)	((S) + (A) - (P))
  
-static int elf_do_reloc(Elf32_Rel* relEntry)
-{
-    
-}
-
 uint32_t elfLookUpSymVal(elfInfo_t* elf, char* symName)
 {
     Elf32_Sym* symToFind;
@@ -741,6 +736,7 @@ static int elf_relocate(elfInfo_t* elf) {
                     // No relocation
                     break;
 		case R_386_32:
+                case R_386_GLOB_DAT:        //CLR 03/24/2017: Added glob dat
                     // Symbol + Offset
                     *rel = DO_386_32(symValPtr, *rel);
                     printd(DEBUG_ELF_LOADER,"0x%08X (using R_386_32)\n",*rel);

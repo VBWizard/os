@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include "kbd.h"
-#include "bishell.h"
+#include "bootShell.h"
 #include "strings.h"
 #include "utility.h"
 #include "memory.h"
@@ -28,7 +28,7 @@ extern int kSelectedDiskNum;
 extern int kSelectedPartNum;
 char selectedDir[100];
 char sExecutingProgram[100];
-char sbiShellProgramName[100] = "biShell";
+char sbootShellProgramName[100] = "bs";
 struct mbr_t mbr;
 HBA_PORT* port;
 char programParams[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
@@ -448,7 +448,7 @@ void HIGH_CODE_SECTION execCommand(char* cmdline)
 //        printk("%u = '%s'\n",cnt,lTemp[cnt]);
    
     exec (params[0],paramCount,lTemp);
-    strcpy(sExecutingProgram,sbiShellProgramName);
+    strcpy(sExecutingProgram,sbootShellProgramName);
 }
 
 void HIGH_CODE_SECTION execInternalCommand(char lCommand[256])
@@ -474,7 +474,7 @@ void HIGH_CODE_SECTION execInternalCommand(char lCommand[256])
     }
 }
 
-void HIGH_CODE_SECTION biShell()
+void HIGH_CODE_SECTION bootShell()
 {
     char lCommand[256];
     uint8_t lCurrKey=0;
@@ -483,8 +483,8 @@ void HIGH_CODE_SECTION biShell()
     int commandsPtr=0;
     int commandBuffPtr=0;
     int commandWasFromThisBufferPtr=0;
-    strcpy(sExecutingProgram,sbiShellProgramName);
-    puts("\nWelcome to biShell ... hang a while!\n");
+    strcpy(sExecutingProgram,sbootShellProgramName);
+    puts("\nWelcome to bs ... hang a while!\n");
 
     if (kBootCmd[0]==0x0)
     {
@@ -546,10 +546,6 @@ getAKey:
                 goto getAKey;
             
         }   
-    cursorSavePosition();
-    cursorMoveTo(1,1);
-    printk("Current command = %s          ",lCommand);
-    cursorRestorePosition();
         if (lCurrKey==0xcb) //left
         {
             if (cursorGetPosX()>4)
@@ -587,10 +583,6 @@ getAKey:
         goto getAKey;
 //        gets(lCommand,50);
 doneGettingKeys:
-    cursorSavePosition();
-    cursorMoveTo(1,1);
-    printk("doneGettingKeys: Current command = %s          ",lCommand);
-    cursorRestorePosition();
         if (lCommand[0]==0x0)
             goto getACommand;
         int i = findCommand(lCommand);

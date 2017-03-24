@@ -47,7 +47,7 @@
       <itemPath>include/kernel.h</itemPath>
       <itemPath>../chrisOS/include/kernelObjects.h</itemPath>
       <itemPath>include/kernelVariables.h</itemPath>
-      <itemPath>include/malloc.h</itemPath>
+      <itemPath>include/kmalloc.h</itemPath>
       <itemPath>include/mm.h</itemPath>
       <itemPath>include/paging.h</itemPath>
       <itemPath>../chrisOS/include/pci/pci.h</itemPath>
@@ -83,8 +83,8 @@
       <itemPath>src/kernel.c</itemPath>
       <itemPath>src/kernelISR.s</itemPath>
       <itemPath>../chrisOS/src/char/keyboard.c</itemPath>
+      <itemPath>src/mm/kmalloc.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
-      <itemPath>src/mm/malloc.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
       <itemPath>src/mm/mm.c</itemPath>
       <itemPath>../chrisOS/src/cpu/msr.c</itemPath>
@@ -323,7 +323,7 @@
       </item>
       <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
+      <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -353,7 +353,7 @@
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/mm/malloc.c" ex="false" tool="0" flavor2="0">
+      <item path="src/mm/kmalloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/mm.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -576,7 +576,7 @@
       </item>
       <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
+      <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -606,7 +606,7 @@
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/mm/malloc.c" ex="false" tool="0" flavor2="0">
+      <item path="src/mm/kmalloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/mm.c" ex="false" tool="0" flavor2="0">
       </item>

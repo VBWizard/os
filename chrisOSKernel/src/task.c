@@ -42,7 +42,7 @@ task_t* getAvailableTask()
     if (slot>-1)
     {
         printd(DEBUG_TASK,"getAvailableTask: Found free slot for task (0x%04X)\n",slot);
-        task_t* task=(task_t*)malloc(sizeof(task_t));//&kTaskTable[slot];
+        task_t* task=(task_t*)kMalloc(sizeof(task_t));//&kTaskTable[slot];
         task->taskNum=slot;
         printd(DEBUG_TASK,"getAvailableTask: Marking TSS %u used\n",slot);
         bitsReset(ptr,slot);
@@ -72,10 +72,11 @@ void mmMapKernelIntoTask(task_t* task)
 
     //Map the kernel data into the user process (read/write - process memory space)
     //NOTE: This mapping is first because it is read/write so it will set up the PDE as read/write
+/*
     printd(DEBUG_TASK,"Map kernel data into user process: 0x%08X to 0x%08X\n",kdla,kdla+(0x1000*0x100));
     pagingMapPageCount(task->tss->CR3,kdla,kdla,0x100,0x7);
     pagingMapPageCount(task->tss->CR3,kdla | KERNEL_PAGED_BASE_ADDRESS,kdla,0x100,0x7);
-
+*/
     //Map map kernel into the user process (read only - 0x0 memory space)
     printd(DEBUG_TASK,"Map K to U: p=0x%08X (v=0x%08X) to p=0x%08X (v=0x%08X)\n",kla,kla,kle,kle);
     pagingMapPageRange(task->tss->CR3,kla, kle, kla,0x7);
@@ -84,26 +85,27 @@ void mmMapKernelIntoTask(task_t* task)
     printd(DEBUG_TASK,"Map K to U: p=0x%08X (v=0x%08X) to p=0x%08X (v=0x%08X)\n",kla | KERNEL_PAGED_BASE_ADDRESS,kla,kle | KERNEL_PAGED_BASE_ADDRESS,kle);
     pagingMapPageRange(task->tss->CR3,kla |  KERNEL_PAGED_BASE_ADDRESS, kle | KERNEL_PAGED_BASE_ADDRESS, kla,0x3);
 
+/*
     //Map map kernel into the user process (read only - process memory space)
     printd(DEBUG_TASK,"Map K to U: p=0x%08X (v=0x%08X) to p=0x%08X (v=0x%08X)\n",kla,kla|0xC0000000,kle,kle|0xC0000000);
     pagingMapPageRange(task->tss->CR3,kla, kle, kla,0x5);
-
-    //Map our kernel stack into the user process ... FIXME: this is BAD***
+*/
+/*    //Map our kernel stack into the user process ... FIXME: this is BAD***
     uint32_t kStack=getESP();
     pagingMapPageCount(task->tss->CR3,kStack-0x1000  | 0xC0000000,kStack-0x1000,3,0x7); //read/write
-    
-    //Map the kernel interrupt table into the process so that it can execute 0x80 to return to the kernel
+  */  
+/*    //Map the kernel interrupt table into the process so that it can execute 0x80 to return to the kernel
     pagingMapPageCount(task->tss->CR3,IDT_TABLE_ADDRESS,IDT_TABLE_ADDRESS,10,0x7);
-    
+*/    
     //Map the first 1Mb (except page at 0x0) into the process, where the OS loader is, so that ISRs can run
     printd(DEBUG_TASK,"Map OS loader into user process: 0x%08X to 0x%08X r/o\n",0x1000,0xffffff+1);
     //pagingMapPageRange(task->tss->CR3,0x1000,0xffffff,0x1000,0x7);
     pagingMapPageCount(task->tss->CR3,0x1000,0x1000,0xFFF,0x7);
     pagingMapPageRange(task->tss->CR3,0x1000 | KERNEL_PAGED_BASE_ADDRESS,0xffffff | KERNEL_PAGED_BASE_ADDRESS,0x1000,0x7);
 
-    printd(DEBUG_TASK,"Map screen buffer into user process at 0xB8000, 4 pages (r/w)\n");
+/*    printd(DEBUG_TASK,"Map screen buffer into user process at 0xB8000, 4 pages (r/w)\n");
     pagingMapPageCount(task->tss->CR3,0xB0000,0xB0000,4,0x7);
-
+*/
     printd(DEBUG_TASK,"Mapping sysEnter_Vector page (0x%08X) to process, r/o\n",&sysEnter_Vector);
     pagingMapPage(task->tss->CR3,&sysEnter_Vector,&sysEnter_Vector,0x5);
     
@@ -178,7 +180,7 @@ task_t* createTask(bool kernelTSS)
     task->tss->ESP+=0x15000;
     printd(DEBUG_TASK,"createTask: ESP set to 0x%08X\n", task->tss->ESP);
     //Mapping sysEnter (kKernelTask::ESP1) stack into process
-    task->tss->ESP1=malloc(0x1000);
+    task->tss->ESP1=kMalloc(0x1000);
     printd(DEBUG_TASK,"Allocated task ESP1 for syscall at 0x%08X (0x1000 bytes)\n",task->tss->ESP1);
     pagingMapPageCount(task->tss->CR3,task->tss->ESP1 | KERNEL_PAGED_BASE_ADDRESS,task->tss->ESP1,0x1,0x7);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
     task->tss->ESP1-=0x100;

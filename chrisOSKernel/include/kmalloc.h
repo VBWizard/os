@@ -36,7 +36,8 @@ extern "C" {
         void* next;                     //4
     } heapPtrPage;
 
-void* malloc(size_t size);
+void* kMalloc(size_t size);
+void* mallocI(uint32_t cr3, size_t size);
 
 #ifdef __cplusplus
 }

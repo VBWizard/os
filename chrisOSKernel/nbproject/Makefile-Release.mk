@@ -75,7 +75,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/kernel.o \
 	${OBJECTDIR}/src/kernelISR.o \
 	${OBJECTDIR}/src/mm/alloc.o \
-	${OBJECTDIR}/src/mm/malloc.o \
+	${OBJECTDIR}/src/mm/kmalloc.o \
 	${OBJECTDIR}/src/mm/mm.o \
 	${OBJECTDIR}/src/paging.o \
 	${OBJECTDIR}/src/process.o \
@@ -309,10 +309,10 @@ ${OBJECTDIR}/src/mm/alloc.o: src/mm/alloc.c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/alloc.o src/mm/alloc.c
 
-${OBJECTDIR}/src/mm/malloc.o: src/mm/malloc.c 
+${OBJECTDIR}/src/mm/kmalloc.o: src/mm/kmalloc.c 
 	${MKDIR} -p ${OBJECTDIR}/src/mm
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/malloc.o src/mm/malloc.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/kmalloc.o src/mm/kmalloc.c
 
 ${OBJECTDIR}/src/mm/mm.o: src/mm/mm.c 
 	${MKDIR} -p ${OBJECTDIR}/src/mm

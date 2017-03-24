@@ -44,7 +44,7 @@ extern struct mbr_t* kMBR;
 extern uint8_t* lowSmapTablePtr;
 extern uint32_t kOriginalAddressZeroValue;
 extern uint8_t smpBootCPUCount, smpBootCPUsStarted;
-extern void biShell();
+extern void bootShell();
 extern void AP_startup();
 extern int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count);
 extern int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count);
@@ -269,9 +269,8 @@ gdt_init();
     __asm__("sti\n");
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
-    printk("Boot: disk 4;part 5;exec /kernel;");
-    strcpy(kBootCmd,"disk 4;part 5;exec /kernel;");
-    gets(kBootCmd+strlen(kBootCmd),150);
+    printk("Boot: ");
+    gets(kBootCmd,150);
     kBootParamCount=parseParamsShell(kBootCmd, kBootParams, MAX_PARAM_COUNT*MAX_PARAM_WIDTH);
     strftime((char*)&currTime, 50, "%H:%M:%S on %m/%d/%y", &theDateTime);
     //wait(50);
@@ -383,45 +382,17 @@ goto overStuff; /*******************************************/
     }
 
     printk("Media Attach=%u\n",lRetVal);
-    //cursorMoveTo(1,24);
-    //uint8_t buffer[512];
-    //ataBlockingRead28(0, 1, buffer, 1);
-    //strcpy(buffer,"I'm trying to write this to the disk ... wish me luck!!!");
-    //memset(buffer+56,0,512-56);
-    //ataBlockingWrite28(0, 2, buffer, 1);
 
-/*
-    if(lRetVal==0)
-    {
-        __asm__("cli\n");
-        //terminal_clear();
-        printk("Before myHelloWorld, system ticks=%u\n", *kTicksSinceStart);
-        //exec("/myHelloWorld");
-        printk("After myHelloWorld, system ticks=%u\n", *kTicksSinceStart);
-        //exec("/myHelloWorld2");
-        printk("about to execute testmainprogramentry\n");
-        int result=exec("/testmainprogramentry");
-        printk("back from testmainprogramentry, result=0x%08X\n", result);
-        printk("About to load chrisoskernel (pm)\n");
-        int result2=exec("/chrisoskernel");
-        printk("back from PM, result=0x%08X\n",result2);
-    }
-*/
 overStuff:
-        //__asm__("mov eax,0\nmov edx,0\ndiv eax\n"); //test divide by zero exception
-        //kpagingUpdatePresentFlagA(0x0,false);
-//    __asm__("mov eax,0xdeadbead\n mov [0x0100],eax\n");    //purposely read address 0 which we made "read only"
-        
-//        terminal_clear();
+       /*
+        if (kBootParamCount==0)
+        {
+        execInternalCommand("disk 4");
+        execInternalCommand("part 5");
+        execInternalCommand("exec /kernel");
+        }*/
 MAINLOOPv:
-//    char a[255];
-//    gets(a,255);
-//    if (!strncmp(a,"debug",5))
-        biShell();
-//    if (a>0)
-//        printk("%c",a);
-//    __asm__("hlt\n");
+        bootShell();
     goto MAINLOOPv;
-//  if (kDebugStartsNow)
     __asm__("cli\nhlt\n");
 }

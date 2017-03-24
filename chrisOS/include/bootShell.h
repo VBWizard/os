@@ -32,7 +32,7 @@ void dumpP(char* cmdline);
 void dumpV(char* cmdline);
 extern void printPCIConfig();
 void QueryBDF(char* cmdline);
-void biShell();
+void bootShell();
 void inPortB(char* cmdline);
 void inPortW(char* cmdline);
 void inPortD(char* cmdline);

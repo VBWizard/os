@@ -7,6 +7,7 @@
 #include "syscall.h"
 #include "printf.h"
 #include "signals.h"
+#include "kmalloc.h"
 
 #define KBRD_INTRFC 0x64
 /* keyboard interface bits */
@@ -45,6 +46,13 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              panic("_syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
             break;
+        case 0x165:
+            //printd(DEBUG_PROCESS,"_syscall: malloc(0x%08X) called (cr3=0x%08X)\n",param1,processCR3);
+            __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
+            retVal=mallocI(processCR3,param1);
+            //printd(DEBUG_PROCESS,"_syscall: malloc returning 0x%08X\n",retVal);
+            __asm__("mov cr3,eax;"::"a" (processCR3));
+            break;
         case 0x166:
             printd(DEBUG_PROCESS,"_syscall: sleep(0x%08X) called\n",param1);
             sys_sigaction(SIG_SLEEP,0,param1);
@@ -68,11 +76,16 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
             printu((const char*)param1, ap);
             break;
+        case 0x301: //printd: param1 debuglevel, param2 format, param3 args
+            //printd(DEBUG_PROCESS,"_syscall: printd(0x%08X,0x%08X,0x%08X)\n",param1,&param2,param3);
+            va_copy(ap,(va_list*)(param3));
+            printd_valist(param1, (const char*)param2, ap);
+            break;
         default:
             panic("_syscall: Invalid call number 0x%04X\n",callNum);
     }
     //__asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
-    __asm__("sti\nmov eax,%0\nmov esp,ebp;add esp,4;ret"::"r" (retVal)); /* BLACK MAGIC! */
+    __asm__("sti\n\nmov esp,ebp;add esp,4;ret"::"a" (retVal)); /* BLACK MAGIC! */
 
 }
 

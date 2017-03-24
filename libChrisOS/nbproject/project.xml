@@ -9,7 +9,12 @@
             <header-extensions>h</header-extensions>
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects/>
-            <sourceRootList/>
+            <sourceRootList>
+                <sourceRootElem>/home/yogi/src/os/chrisOS/include</sourceRootElem>
+                <sourceRootElem>/home/yogi/src/os/chrisOS/src/strings</sourceRootElem>
+                <sourceRootElem>/home/yogi/src/os/libChrisOS/src</sourceRootElem>
+                <sourceRootElem>/home/yogi/src/os/libChrisOS/include</sourceRootElem>
+            </sourceRootList>
             <confList>
                 <confElem>
                     <name>Debug</name>

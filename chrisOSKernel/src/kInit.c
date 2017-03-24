@@ -81,5 +81,5 @@ void initKernelInternals()
     printk("Installing new IRQ0 handler\n");
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
 
-    kExecLoadInfo=malloc(100*sizeof(elfInfo_t));
+    kExecLoadInfo=kMalloc(100*sizeof(elfInfo_t));
 }

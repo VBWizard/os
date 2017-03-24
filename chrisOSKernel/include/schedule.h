@@ -21,7 +21,7 @@ extern "C" {
 #include "chrisos.h"
 #include "task.h"
 #include "tss.h"
-#include "malloc.h"
+#include "kmalloc.h"
 #include "kernelVariables.h"
 #include "alloc.h"
 #include "paging.h"

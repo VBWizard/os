@@ -35,12 +35,14 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/117d59b5/strcpy.o \
 	${OBJECTDIR}/src/input.o \
-	${OBJECTDIR}/src/libChrisOS.o
+	${OBJECTDIR}/src/libChrisOS.o \
+	${OBJECTDIR}/src/malloc.o
 
 
 # C Compiler Flags
-CFLAGS=-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden
+CFLAGS=-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,libc_init
 
 # CC Compiler Flags
 CCFLAGS=
@@ -63,6 +65,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	gcc -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT} ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -fvisibility=hidden -shared -fPIC
 
+${OBJECTDIR}/_ext/117d59b5/strcpy.o: /home/yogi/src/os/libChrisOS/src/strcpy.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/117d59b5
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/117d59b5/strcpy.o /home/yogi/src/os/libChrisOS/src/strcpy.c
+
 ${OBJECTDIR}/src/input.o: src/input.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -72,6 +79,11 @@ ${OBJECTDIR}/src/libChrisOS.o: src/libChrisOS.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libChrisOS.o src/libChrisOS.c
+
+${OBJECTDIR}/src/malloc.o: src/malloc.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/malloc.o src/malloc.c
 
 # Subprojects
 .build-subprojects:

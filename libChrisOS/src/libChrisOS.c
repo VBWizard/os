@@ -7,28 +7,31 @@
 #include "libChrisOS.h"
 #include "../../chrisOSKernel/include/signals.h"
 
+
 extern void sysEnter_Vector();
 int a=123;int b=456; int c=789;
 
 void VISIBLE libc_init(void)
 {
+    initmalloc();
     print("libc initialized %u, %u, %u.\n",a,b,c);
     asm("mov eax,0\ncall sysEnter_Vector\n");
 }
 
-void initMe()
-{
-    
-}
 
 int VISIBLE print(const char *format, ...)
 {
     va_list args;
-    //TODO: This needs to be update once the syscall prints to a file pointer, but for now ...
-
     va_start( args, format );
-    //asm("gotohere2: jmp gotohere2\n"::"b" (format), "c" (&args));
     asm("mov eax,0x300\ncall sysEnter_Vector\n"::"b" (format), "c" (args));
+    return 0;
+}
+
+int VISIBLE printDebug(uint32_t DebugLevel, const char *format, ...)
+{
+    va_list args;
+    va_start( args, format );
+    asm("mov eax,0x301\ncall sysEnter_Vector\n"::"b" (DebugLevel), "c" (format), "d" (args));
     return 0;
 }
 

@@ -19,7 +19,7 @@ extern "C" {
 #endif
 #include <stdint.h>
 #include "task.h"
-#include "chrisos.h"
+#include "/home/yogi/src/os/chrisOS/include/chrisos.h"
 #include "kernel.h"
     
     typedef enum esignals

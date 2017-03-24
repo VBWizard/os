@@ -209,7 +209,6 @@ restoreCR3:
 
 overSetCR3:
     mov eax, isrSavedEAX
-    mov ebx, isrSavedEAX
     iretd
 
 .globl vector0

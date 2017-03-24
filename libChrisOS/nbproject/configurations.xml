@@ -5,6 +5,8 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>include/libChrisOS.h</itemPath>
+      <itemPath>include/malloc.h</itemPath>
+      <itemPath>/home/yogi/src/os/libChrisOS/include/strings.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -15,6 +17,8 @@
                    projectFiles="true">
       <itemPath>src/input.c</itemPath>
       <itemPath>src/libChrisOS.c</itemPath>
+      <itemPath>src/malloc.c</itemPath>
+      <itemPath>/home/yogi/src/os/libChrisOS/src/strcpy.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -28,6 +32,12 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>/home/yogi/src/os/chrisOS/include</Elem>
+    <Elem>/home/yogi/src/os/chrisOS/src/strings</Elem>
+    <Elem>/home/yogi/src/os/libChrisOS/src</Elem>
+    <Elem>/home/yogi/src/os/libChrisOS/include</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="2">
@@ -42,7 +52,7 @@
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden</commandLine>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,libc_init</commandLine>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}</output>
@@ -50,11 +60,25 @@
           <commandLine>-T linker.ld -ffreestanding -nostdlib -fvisibility=hidden</commandLine>
         </linkerTool>
       </compileType>
+      <item path="/home/yogi/src/os/libChrisOS/include/strings.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strcpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/input.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="3">
@@ -66,7 +90,11 @@
       <compileType>
         <cTool>
           <developmentMode>5</developmentMode>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden</commandLine>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>../chrisOS/include</pElem>
+          </incDir>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,&lt;function name></commandLine>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
@@ -80,11 +108,25 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="/home/yogi/src/os/libChrisOS/include/strings.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strcpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/input.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

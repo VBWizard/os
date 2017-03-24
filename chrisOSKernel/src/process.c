@@ -10,7 +10,7 @@
 #include "process.h"
 #include "alloc.h"
 #include "printf.h"
-#include "malloc.h"
+#include "kmalloc.h"
 #include "sysloader.h"
 #include "strings.h"
 
@@ -26,15 +26,15 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
 {
 
     process_t* process;
-    
 
     printd(DEBUG_PROCESS,"Creating %s process for %s\n",kernelProcess?"kernel":"user",path);
     //NOTE: Using allocPages instead of malloc because we need the process struct to start on a page boundary for paging reasons, and
     //      allocPages always allocates entire pages
-    //process=(process_t*)malloc(sizeof(process_t));
     process=allocPagesAndMap(sizeof(process_t));
     memset(process,0,sizeof(process_t));
-    process->path=(char*)malloc(512);
+    process->heapStart=PROCESS_HEAP_START;
+    process->heapEnd=PROCESS_HEAP_START;
+    process->path=(char*)kMalloc(512);
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
     strcpy(process->path,path);
     printd(DEBUG_PROCESS,"createProcess: Copied path (0x%08X) to process->path (0x%08X)\n",path,process->path);

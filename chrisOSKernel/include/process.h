@@ -23,6 +23,8 @@ extern "C" {
 #endif
 
 #include "signals.h"
+#define PROCESS_HEAP_START 0x70000000
+#define PROCESS_HEAP_END   0xBFFFFFFF
     
     typedef struct sprocess
     {
@@ -34,6 +36,7 @@ extern "C" {
         char* path;
         uint32_t retVal;
         signal_t signals;
+        uint32_t heapStart, heapEnd;
     } process_t;
 
 

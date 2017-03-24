@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     printk("Initializing memory management ...\n");
     mmInit();
     printk("Done initializing memory management.\n\nInitializing malloc ...\n");
-    initMalloc();
+    initKMalloc();
     printk("Done initializing malloc\n\nInitializing task management ...\n");
     taskInit();
     printk("Done initializing task management\nInitializing kernel...\n");

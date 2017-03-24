@@ -130,9 +130,9 @@ void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
     //Map page into cr3 address space
     pagingMapPageCount(cr3,phys,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",phys,phys);
-    //Zero out the memory
     pagingMapPageCount(KERNEL_CR3,(uint32_t)(phys) | 0xC0000000,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Zeroing out page(s) at 0x%08X for 0x%08X\n",phys,newSize);
+    //Zero out the memory
     memset(phys,0,newSize);
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Returning address 0x%08X\n",phys);
     return (void*)((uint32_t)(phys) & 0xFFFFF000);

@@ -5,11 +5,7 @@
  * Created on May 16, 2016, 11:49 AM
  */
 
-#include "../chrisOS/include/kernelObjects.h"
-#include "../chrisOS/include/chrisos.h"
 #include "../libChrisOS/include/libChrisOS.h"
-#include "../chrisOSKernel/include/signals.h"
-
 extern uint32_t* sysEnter_Vector;
 /*
  * testMainProgramEntry
@@ -17,32 +13,39 @@ extern uint32_t* sysEnter_Vector;
 
 void HandleSEGV();
 
-int main(int argc, char** argv) {
-    uint64_t temp;
-    int a=argc;
-    uint32_t cr3;
-    
-    libc_init();
-    //modifySignal(SIG_SEGV,HandleSEGV,0);
-    print("Param count=%u\n",argc);
-    char** b=argv;
-    for (int cnt=0;cnt<argc;cnt++)
-    {
-        print("Param %u=%s\n",cnt,argv[cnt]);
-    }
+void crashFail(char** argv)
+{
+    uint64_t temp=0;
+
     jumpHere:
     sleep(1);
     temp++;
-//    if (temp%1000000==0)
-        print("\t%s: Still in the loop, %u iterations\n",argv[1],temp);
-    //__asm__("mov eax,0\ncld\nint 0x80\n");  //Shouldn't do this from a program
-//    __asm__("mov eax,0\ncld\ncall sysEnter_Vector\n");
+    print("\t%s: Still in the loop, %u iterations\n",argv[1],temp);
     if (temp==5)
     {
         print("Triggering SEGV\n");
         __asm__("mov eax,[0x50000000]\n");
     }
     goto jumpHere;
+
+}
+
+int main(int argc, char** argv) {
+    
+    libc_init();
+    print("Param count=%u\n",argc);
+    for (int cnt=0;cnt<argc;cnt++)
+    {
+        print("Param %u=%s\n",cnt,argv[cnt]);
+    }
+    print("\n");
+    for (int cnt=0;cnt<0x100;cnt++)
+    {
+        char* test=malloc(25);
+        print("Malloc%x returned 0x%08X\n",cnt,test);
+    }
+    
+    //crashFail(argv);
     return 0x1234;
 }
 

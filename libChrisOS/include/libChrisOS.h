@@ -19,12 +19,15 @@ extern "C" {
 #endif
 #include <stdarg.h>
 #include <stdint.h>
-#include "chrisos.h"
+#include "/home/yogi/src/os/chrisOS/include/chrisos.h"
+#include "malloc.h"
+#include "strings.h"
     
 #define VISIBLE __attribute__((visibility("default")))
 
 void VISIBLE libc_init(void);
 int VISIBLE print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
+int VISIBLE printDebug(uint32_t DebugLevel, const char *format, ...);
 unsigned int VISIBLE sleep (unsigned int __seconds);
 void stop();
 void modifySignal(int signal, void* sigHandler, int sigData);
