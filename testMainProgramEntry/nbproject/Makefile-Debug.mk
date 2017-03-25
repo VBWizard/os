@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/testMainProgramEntry.o
 
 
 # C Compiler Flags
@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-Linclude -L/home/yogi/src/os/chrisOS/include -shared -lc
+LDLIBSOPTIONS=-L../libChrisOS/dist/Debug/cross-Linux
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -60,12 +60,12 @@ LDLIBSOPTIONS=-Linclude -L/home/yogi/src/os/chrisOS/include -shared -lc
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lgcc
+	gcc -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lc
 
-${OBJECTDIR}/main.o: main.c 
+${OBJECTDIR}/testMainProgramEntry.o: testMainProgramEntry.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -I../chrisOSKernel/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -g -I../chrisOS/include -I../processManager/include -I../chrisOSKernel/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/testMainProgramEntry.o testMainProgramEntry.c
 
 # Subprojects
 .build-subprojects:

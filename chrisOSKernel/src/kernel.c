@@ -72,7 +72,6 @@ int main(int argc, char** argv) {
     testp[1]=test[1];
     process_t* process = createProcess(program,2,&testp,false);
     schedulerEnabled=true;
-
 /*#define pcount 3
     char* param1[pcount][10];
     char* param2[pcount][10];

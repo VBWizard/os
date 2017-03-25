@@ -230,7 +230,7 @@ void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/
 char currTime[150];
 struct tm theDateTime;
     //Zero out all of the memory we will be using as rebooting a computer doesn't necessarily clear memory
-    memset(KERNEL_OBJECT_BASE_ADDRESS,0,0x2000000);
+    memset((void*)KERNEL_OBJECT_BASE_ADDRESS,0,0x2000000);
     kBootCmd[0]=0x0;
     kExecLoadCount=0;
 __asm__("cli\nsgdt [eax]\n"::"a" (&kernelGDT));

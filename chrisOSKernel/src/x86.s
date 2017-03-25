@@ -3,7 +3,7 @@
 .section .systemData, "xa"
 .globl sysEnter_Vector
 .type sysEnter_Vector, @function
-sysEnter_Vector:
+sysEnter_Vector:                #WARNING: change libChrisOS linker file if you change this from 0x130000
     push ecx
     push edx
     push ebp

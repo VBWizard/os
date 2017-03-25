@@ -25,6 +25,10 @@ extern "C" {
 #include "signals.h"
 #define PROCESS_HEAP_START 0x70000000
 #define PROCESS_HEAP_END   0xBFFFFFFF
+#define PROCESS_MAX_EXIT_HANDLERS 20    
+#define PROCESS_STRUCT_VADDR 0xF000F000
+    
+    typedef void exitHandler(void);
     
     typedef struct sprocess
     {
@@ -37,12 +41,14 @@ extern "C" {
         uint32_t retVal;
         signal_t signals;
         uint32_t heapStart, heapEnd;
+        void* exitHandler[PROCESS_MAX_EXIT_HANDLERS];
     } process_t;
 
 
     process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess);
-    void destroyProcess(process_t* process);
-
+    void processExit();
+    bool processRegExit(process_t* process, void* routineAddr);
+    
 #ifdef __cplusplus
 }
 #endif

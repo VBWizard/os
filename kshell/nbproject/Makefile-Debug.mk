@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/kshell.o
 
 
 # C Compiler Flags
@@ -52,23 +52,26 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=
+LDLIBSOPTIONS=-Wl,-rpath,/home/yogi/src/os/libChrisOS/dist/Debug/cross-Linux -L/home/yogi/src/os/libChrisOS/dist/Debug/cross-Linux -lc
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kshell
 
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kshell: /home/yogi/src/os/libChrisOS/dist/Debug/cross-Linux/libc.so
+
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kshell: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kshell ${OBJECTFILES} ${LDLIBSOPTIONS}
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kshell ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc
 
-${OBJECTDIR}/main.o: main.c 
+${OBJECTDIR}/kshell.o: kshell.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -Iinclude -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -g -Iinclude -I/home/yogi/src/os/libChrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/kshell.o kshell.c
 
 # Subprojects
 .build-subprojects:
+	cd /home/yogi/src/os/libChrisOS && ${MAKE}  -f Makefile CONF=Debug
 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
@@ -77,6 +80,7 @@ ${OBJECTDIR}/main.o: main.c
 
 # Subprojects
 .clean-subprojects:
+	cd /home/yogi/src/os/libChrisOS && ${MAKE}  -f Makefile CONF=Debug clean
 
 # Enable dependency checking
 .dep.inc: .depcheck-impl

@@ -36,12 +36,14 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "chrisos.h"
+
     
+#define ALLOC_REQUEST_SIZE 0x32000
+#define ALLOC_MARKER_VALUE 0xB00F00D0
     typedef struct sheap
     {
-        int marker;
-        int len;
+        uint32_t marker;
+        uint32_t len;
         bool inUse;
     } heaprec_t;
 
@@ -51,6 +53,7 @@ uint32_t heapEnd;
 
 void initmalloc();
 void* malloc(size_t size);
+void malloc_cleanup();
 
 #ifdef __cplusplus
 }

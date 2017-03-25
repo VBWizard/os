@@ -9,7 +9,6 @@
 #define	STRINGS_H
 
 #include "libChrisOS.h"
-#include "i386/bits/types.h"
 #include <stddef.h>
 
 #define ISDIGIT(c) ((c) - '0' + 0U <= 9U)

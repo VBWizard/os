@@ -8,6 +8,7 @@
 #include "printf.h"
 #include "signals.h"
 #include "kmalloc.h"
+#include "process.h"
 
 #define KBRD_INTRFC 0x64
 /* keyboard interface bits */
@@ -34,8 +35,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, invalid call number. (cr3=0x%08X)\n",callNum,processCR3);
             break;
         case 0x1:       //exit
-             //Get back home
-             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
+            __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
              __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
              printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08X\n",processCR3);
              markTaskEnded(processCR3);
@@ -46,10 +46,20 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              panic("_syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
             break;
+        case 0x163: //Register exit handler
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            processRegExit(findTaskByCR3(processCR3)->process,param1);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
+        case 0x164: //free
+            //__asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
+            printd(DEBUG_PROCESS,"_syscall: free(0x%08X) called, NOT IMPLEMENTED (cr3=0x%08X)\n",param1,processCR3);
+            //__asm__("mov cr3,eax;"::"a" (processCR3));
+            break;
         case 0x165:
-            //printd(DEBUG_PROCESS,"_syscall: malloc(0x%08X) called (cr3=0x%08X)\n",param1,processCR3);
             __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
             retVal=mallocI(processCR3,param1);
+            printd(DEBUG_PROCESS,"_syscall: malloc(0x%08X) returned 0x%08X (cr3=0x%08X)\n",param1,retVal,   processCR3);
             //printd(DEBUG_PROCESS,"_syscall: malloc returning 0x%08X\n",retVal);
             __asm__("mov cr3,eax;"::"a" (processCR3));
             break;

@@ -25,12 +25,13 @@ extern "C" {
     
 #define VISIBLE __attribute__((visibility("default")))
 
-void VISIBLE libc_init(void);
-int VISIBLE print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
-int VISIBLE printDebug(uint32_t DebugLevel, const char *format, ...);
+void libc_init(void);
+int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
+int printDebug(uint32_t DebugLevel, const char *format, ...);
 unsigned int VISIBLE sleep (unsigned int __seconds);
 void stop();
 void modifySignal(int signal, void* sigHandler, int sigData);
+void libc_cleanup(void);
 
 #ifdef __cplusplus
 }

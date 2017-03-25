@@ -6,14 +6,13 @@
  */
 
 #include "../libChrisOS/include/libChrisOS.h"
-extern uint32_t* sysEnter_Vector;
 /*
  * testMainProgramEntry
  */
 
 void HandleSEGV();
 
-void crashFail(char** argv)
+/*void crashFail(char** argv)
 {
     uint64_t temp=0;
 
@@ -29,8 +28,8 @@ void crashFail(char** argv)
     goto jumpHere;
 
 }
-
-int main(int argc, char** argv) {
+*/
+int main2(int argc, char** argv) {
     
     libc_init();
     print("Param count=%u\n",argc);
@@ -39,10 +38,13 @@ int main(int argc, char** argv) {
         print("Param %u=%s\n",cnt,argv[cnt]);
     }
     print("\n");
-    for (int cnt=0;cnt<0x100;cnt++)
+    for (int cnt=0;cnt<0x5;cnt++)
     {
         char* test=malloc(25);
-        print("Malloc%x returned 0x%08X\n",cnt,test);
+    return 0x5678;
+        free(test);
+        if (!(cnt%0x1000))
+            print("Malloc%x returned 0x%08X\n",cnt,test);
     }
     
     //crashFail(argv);

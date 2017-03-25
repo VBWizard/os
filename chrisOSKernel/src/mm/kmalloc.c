@@ -136,6 +136,8 @@ void* mallocI(uint32_t cr3, size_t size)
     uint32_t *phys=allocPages(size);
     printd(DEBUG_KMALLOC,"mallocI: Allocated 0x%08X bytes @ 0x%08X\n",size,phys);
     pagingMapPageCount(cr3,p->heapEnd,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    //Map phys to phys, kernel 
+    pagingMapPageCount(KERNEL_CR3,phys,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     retVal=p->heapEnd;
     p->heapEnd+=newSize;
     printd(DEBUG_KMALLOC,"mallocI: returning 0x%08X\n",retVal);

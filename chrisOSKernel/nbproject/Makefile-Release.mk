@@ -69,11 +69,13 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
 	${OBJECTDIR}/_ext/30f91903/kInit.o \
 	${OBJECTDIR}/_ext/e6f004ae/x86idt.o \
+	${OBJECTDIR}/src/device.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
 	${OBJECTDIR}/src/exceptions.o \
 	${OBJECTDIR}/src/kIRQHandlers.o \
 	${OBJECTDIR}/src/kernel.o \
 	${OBJECTDIR}/src/kernelISR.o \
+	${OBJECTDIR}/src/list.o \
 	${OBJECTDIR}/src/mm/alloc.o \
 	${OBJECTDIR}/src/mm/kmalloc.o \
 	${OBJECTDIR}/src/mm/mm.o \
@@ -280,6 +282,11 @@ ${OBJECTDIR}/_ext/e6f004ae/x86idt.o: /home/yogi/src/os/chrisOSKernel/x86idt.c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e6f004ae/x86idt.o /home/yogi/src/os/chrisOSKernel/x86idt.c
 
+${OBJECTDIR}/src/device.o: src/device.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/device.o src/device.c
+
 ${OBJECTDIR}/src/drivers/drv_genKeyboard.o: src/drivers/drv_genKeyboard.c 
 	${MKDIR} -p ${OBJECTDIR}/src/drivers
 	${RM} "$@.d"
@@ -303,6 +310,11 @@ ${OBJECTDIR}/src/kernel.o: src/kernel.c
 ${OBJECTDIR}/src/kernelISR.o: src/kernelISR.s 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/src/kernelISR.o src/kernelISR.s
+
+${OBJECTDIR}/src/list.o: src/list.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/list.o src/list.c
 
 ${OBJECTDIR}/src/mm/alloc.o: src/mm/alloc.c 
 	${MKDIR} -p ${OBJECTDIR}/src/mm

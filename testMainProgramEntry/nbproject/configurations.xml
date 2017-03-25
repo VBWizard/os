@@ -13,7 +13,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>main.c</itemPath>
+      <itemPath>testMainProgramEntry.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -49,17 +49,13 @@
         </cTool>
         <linkerTool>
           <linkerAddLib>
-            <pElem>include</pElem>
-            <pElem>/home/yogi/src/os/chrisOS/include</pElem>
+            <pElem>../libChrisOS/dist/Debug/cross-Linux</pElem>
           </linkerAddLib>
-          <linkerLibItems>
-            <linkerOptionItem>-shared</linkerOptionItem>
-            <linkerLibLibItem>c</linkerLibLibItem>
-          </linkerLibItems>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
+          <commandlineTool>gcc</commandlineTool>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lc</commandLine>
         </linkerTool>
       </compileType>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
+      <item path="testMainProgramEntry.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="testmainprogramentry.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -88,10 +84,14 @@
             <pElem>include</pElem>
             <pElem>/home/yogi/src/os/chrisOS/include</pElem>
           </linkerAddLib>
+          <linkerLibItems>
+            <linkerOptionItem>-dynamic</linkerOptionItem>
+            <linkerLibLibItem>c</linkerLibLibItem>
+          </linkerLibItems>
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
+      <item path="testMainProgramEntry.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="testmainprogramentry.h" ex="false" tool="3" flavor2="0">
       </item>

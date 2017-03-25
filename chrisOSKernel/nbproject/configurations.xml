@@ -38,6 +38,7 @@
       <itemPath>../chrisOS/include/i386/bits/bits.h</itemPath>
       <itemPath>../chrisOS/include/chrisos.h</itemPath>
       <itemPath>../chrisOS/include/i386/cpu.h</itemPath>
+      <itemPath>include/device.h</itemPath>
       <itemPath>include/drv_genKeyboard.h</itemPath>
       <itemPath>include/elfLibraryTable.h</itemPath>
       <itemPath>../chrisOS/include/filesystem.h</itemPath>
@@ -48,6 +49,7 @@
       <itemPath>../chrisOS/include/kernelObjects.h</itemPath>
       <itemPath>include/kernelVariables.h</itemPath>
       <itemPath>include/kmalloc.h</itemPath>
+      <itemPath>include/list.h</itemPath>
       <itemPath>include/mm.h</itemPath>
       <itemPath>include/paging.h</itemPath>
       <itemPath>../chrisOS/include/pci/pci.h</itemPath>
@@ -74,6 +76,7 @@
       <itemPath>../chrisOS/src/init/ata_disk.c</itemPath>
       <itemPath>../chrisOS/src/char/console/basic_display.c</itemPath>
       <itemPath>../chrisOS/src/cpu/bits.c</itemPath>
+      <itemPath>src/device.c</itemPath>
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
       <itemPath>src/exceptions.c</itemPath>
       <itemPath>../chrisOS/src/cpu/gdt.c</itemPath>
@@ -85,6 +88,7 @@
       <itemPath>../chrisOS/src/char/keyboard.c</itemPath>
       <itemPath>src/mm/kmalloc.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
+      <itemPath>src/list.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
       <itemPath>src/mm/mm.c</itemPath>
       <itemPath>../chrisOS/src/cpu/msr.c</itemPath>
@@ -313,6 +317,8 @@
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/device.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
@@ -324,6 +330,8 @@
       <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/list.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -341,6 +349,8 @@
       </item>
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/device.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
@@ -350,6 +360,8 @@
       <item path="src/kernel.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="src/list.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -566,6 +578,8 @@
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/device.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
@@ -577,6 +591,8 @@
       <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/list.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -594,6 +610,8 @@
       </item>
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/device.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
@@ -603,6 +621,8 @@
       <item path="src/kernel.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="src/list.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>

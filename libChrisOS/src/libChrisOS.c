@@ -7,19 +7,22 @@
 #include "libChrisOS.h"
 #include "../../chrisOSKernel/include/signals.h"
 
-
 extern void sysEnter_Vector();
 int a=123;int b=456; int c=789;
 
-void VISIBLE libc_init(void)
+VISIBLE void libc_init(void)
 {
     initmalloc();
-    print("libc initialized %u, %u, %u.\n",a,b,c);
     asm("mov eax,0\ncall sysEnter_Vector\n");
+    asm("mov eax,0x163\ncall sysEnter_Vector\n"::"b" (&libc_cleanup));
 }
 
+void libc_cleanup(void)
+{
+    malloc_cleanup();
+}
 
-int VISIBLE print(const char *format, ...)
+VISIBLE int print(const char *format, ...)
 {
     va_list args;
     va_start( args, format );
@@ -27,7 +30,7 @@ int VISIBLE print(const char *format, ...)
     return 0;
 }
 
-int VISIBLE printDebug(uint32_t DebugLevel, const char *format, ...)
+VISIBLE int printDebug(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
     va_start( args, format );
@@ -35,9 +38,9 @@ int VISIBLE printDebug(uint32_t DebugLevel, const char *format, ...)
     return 0;
 }
 
-unsigned int VISIBLE sleep (unsigned int __seconds)
+VISIBLE unsigned int sleep (unsigned int __seconds)
 {
-    uint32_t currTicks,wakeTicks;
+    uint32_t currTicks;
     
     asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
     __seconds=(__seconds*TICKS_PER_SECOND)+currTicks;

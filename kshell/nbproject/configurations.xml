@@ -13,7 +13,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>main.c</itemPath>
+      <itemPath>kshell.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -40,12 +40,30 @@
           <standard>3</standard>
           <incDir>
             <pElem>include</pElem>
+            <pElem>/home/yogi/src/os/libChrisOS/include</pElem>
           </incDir>
         </cTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibProjectItem>
+              <makeArtifact PL="/home/yogi/src/os/libChrisOS"
+                            CT="2"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="/home/yogi/src/os/libChrisOS"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}">
+              </makeArtifact>
+            </linkerLibProjectItem>
+          </linkerLibItems>
+          <commandLine>-ffreestanding -nostdlib -lgcc</commandLine>
+        </linkerTool>
       </compileType>
       <item path="include/kshell.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
+      <item path="kshell.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -58,6 +76,10 @@
         <cTool>
           <developmentMode>5</developmentMode>
           <standard>3</standard>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>/home/yogi/src/os/libChrisOS/include</pElem>
+          </incDir>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
@@ -68,10 +90,27 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibProjectItem>
+              <makeArtifact PL="/home/yogi/src/os/libChrisOS"
+                            CT="2"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="/home/yogi/src/os/libChrisOS"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}">
+              </makeArtifact>
+            </linkerLibProjectItem>
+          </linkerLibItems>
+          <commandLine>-ffreestanding -nostdlib -lgcc</commandLine>
+        </linkerTool>
       </compileType>
       <item path="include/kshell.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
+      <item path="kshell.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

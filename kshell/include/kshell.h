@@ -8,16 +8,12 @@
 #ifndef BISHELL_H
 #define	BISHELL_H
 /*Parts from: http://wiki.osdev.org/Creating_A_Shell*/
-#include "memory.h"
-#include "utility.h"
-#include "pci/pci.h"
+#include "libChrisOS.h"
 
 #define INITIAL_MAXARGC 20
 #define EOS '\0'
 #define NUMBER_OF_COMMANDS sizeof(cmds)/sizeof(command_table_t)
 
-extern void terminal_clear();
-extern void printMPTable();
 
 typedef struct
 {
@@ -28,66 +24,12 @@ typedef struct
 } command_table_t;
 
 void helpMe();
-void dumpP(char* cmdline);
-void dumpV(char* cmdline);
-extern void printPCIConfig();
-void QueryBDF(char* cmdline);
-void bootShell();
-void inPortB(char* cmdline);
-void inPortW(char* cmdline);
-void inPortD(char* cmdline);
-void outPortB(char* cmdline);
-void outPortW(char* cmdline);
-void outPortD(char* cmdline);
-void writeBytes(char* cmdline);
-void writeWords(char* cmdline);
-void writeDWords(char* cmdline);
-void printAHCICaps();
-void showMapping(char* cmdline);
-void  showMappingCR3(char* cmdline);
-void  selectHDNum (char* cmdline);
-void  selectPart(char* cmdline);
-void  listParts(char* cmdline);
-void  attach(char* cmdline);
-void  listDir(char* cmdline);
-void  execCommand(char* cmdline);
-void  displayGDTTable(char *cmdline);
-void  displayIDTTable(char *cmdline);
-void  displayTSSEntry(char *cmdline);
-int  parseParamsShell(char* cmdLine, char* params[], int size);
-
+void kShell();
+char sExecutingProgram[512];
+char* sbootShellProgramName;
 command_table_t cmds[] = { 
         {"help","Get help (this information)",helpMe,0},
-        {"ahci","Get AHCI capabilities info",printAHCICaps,0},
-//        {"attach","Attach selected disk and partition to /",attach,0},
-        {"bdf","Query PCI device by bus/device/function",QueryBDF,1},
-        {"cls","Clear screen",terminal_clear,0}, 
-        {"disk","Make a disk the 'current' disk (integer)",selectHDNum,1},
-        {"dko","Dump kernel object addresses",dumpKernelAddresses,0},
-        {"dtss","Show TSS entry",displayTSSEntry,1},
-        {"e820","Print E820 Memory Map",printE820Map,0},
-        {"exec","Execute a program from disk",execCommand,1},
-        {"gdt","Display the GDT table",displayGDTTable,1},
-        {"idt","Display the IDT table",displayIDTTable,1},
-        {"inb","Get a byte from a port",inPortB,1},
-        {"inw","Get a word from a port",inPortW,1},
-        {"ind","Get a dword from a port",inPortD,1},
-        {"listparts","List partitions for the current disk",listParts,1},
-        {"ls","List directory",listDir,1},
-        {"outb","Write a byte to a port",outPortB,1},
-        {"outw","Write a word to a port",outPortW,1},
-        {"outd","Write a dword to a port",outPortD,1},
-        {"page","Show the mapping for a virtual address (optionally pass CR3 as first parameter)",showMapping,1},
-        {"pci","Dump PCI table",printPCIConfig,0},
-        {"part","select partition of selected HD",selectPart,1},
-        {"reboot","Reboot the computer",reboot,0},
-        {"scanpci","Re-scan the PCI busses",pciInitialize,0},
-        {"smp","Dump MP table",printMPTable,0}, 
-        {"db","Write bytes at address",writeBytes,1},
-        {"dw","Write bytes at address",writeWords,1},
-        {"dd","Write bytes at address",writeDWords,1},
-        {"xp","Dump physical memory addresses",dumpP,1}, 
-        {"x","Dump virtual memory addresses",dumpV,1} };
+    };
 void (*command_function)(void);
 void (*command_function_p)(char*);
 
