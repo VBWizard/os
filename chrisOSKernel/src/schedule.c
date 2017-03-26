@@ -55,6 +55,10 @@ void initSched()
     memset(qISleep,0,MAX_TASKS*sizeof(uintptr_t));
     qISleep[MAX_TASKS-1]=NO_NEXT;
 
+    qUSleep=kMalloc(MAX_TASKS*sizeof(uintptr_t));
+    memset(qUSleep,0,MAX_TASKS*sizeof(uintptr_t));
+    qUSleep[MAX_TASKS-1]=NO_NEXT;
+
     //Put the current (kernel) task in the running queue, as it IS running!
     kTaskSwitchCount=0;
     kKernelTask=submitNewTask(kKernelTask);
@@ -71,16 +75,17 @@ task_t* findTaskByCR3(uint32_t cr3)
     taskList=kTaskList;
     do
     {
-        if (taskList->tss->CR3==cr3)
+        if ((uint32_t)taskList->pageDir==cr3)
             break;
         taskList++;
     } while (taskList->next!=NO_NEXT);
 
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Found task @ 0x%08X\n",taskList);
     if (taskList->taskNum==0x0)
     {
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Could not find task with CR3=0x%08X\n",cr3);
         return NULL;
     }
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Found task @ 0x%08X\n",taskList);
     return taskList;
 }
 
@@ -96,6 +101,12 @@ task_t* findTaskByTaskNum(uint32_t taskNum)
             break;
         taskList++;
     } while (taskList->next!=NO_NEXT);
+
+    if (taskList->taskNum==0x0)
+    {
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByTaskNum: Could not find task with TaskNum=0x%08X\n",taskNum);
+        return NULL;
+    }
 
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByNum: Found task @ 0x%08X\n",taskList);
     return taskList;
@@ -394,7 +405,25 @@ void runAnotherTask(bool schedulerRequested)
 #endif
             changeTaskQueue(taskToStop,TASK_EXITED);
             gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
-
+            //Look through the USleep looking for task that is waiting on this one to end
+            uintptr_t* q=qUSleep;
+            task_t* task;
+            process_t* process;
+            printd(DEBUG_PROCESS,"Looking through USLEEP queue for tasks to wake up\n");
+            while (*q!=NO_NEXT)
+            {
+                task=(task_t*)*q;
+                process=task->process;
+                if (process->signals.sigdata[SIG_USLEEP]==taskToStop->taskNum)
+                {
+                    printd(DEBUG_PROCESS,"scheduler: Found process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
+                    process->signals.sigdata[SIG_USLEEP]=0;
+                    process->signals.sigind &=~SIG_USLEEP;
+                    printd(DEBUG_PROCESS,"scheduler: Process 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
+                    changeTaskQueue(task,TASK_RUNNABLE);
+                }
+                q++;
+            }
         }
         else if ((taskToStop->taskNum!=1) && ((process_t*)(taskToStop->process))->signals.sigind)
         {
@@ -403,6 +432,10 @@ void runAnotherTask(bool schedulerRequested)
 #endif
             switch (((process_t*)(taskToStop->process))->signals.sigind)
             {
+                case SIG_USLEEP:
+                    changeTaskQueue(taskToStop,TASK_USLEEP);
+                    storeISRSavedRegs(taskToStop);
+                    break;
                 case SIG_SEGV:
                     changeTaskQueue(taskToStop,TASK_EXITED);
                     break;
@@ -413,10 +446,12 @@ void runAnotherTask(bool schedulerRequested)
                     printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
 #endif
                     break;
-                default:
                 case SIG_SLEEP:
                     changeTaskQueue(taskToStop,TASK_ISLEEP);
                     storeISRSavedRegs(taskToStop);
+                    break;
+                default:
+                    panic("scheduler: Unhandled signal");
                     break;
             }
         }

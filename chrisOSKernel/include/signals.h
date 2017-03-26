@@ -19,15 +19,15 @@ extern "C" {
 #endif
 #include <stdint.h>
 #include "task.h"
-#include "/home/yogi/src/os/chrisOS/include/chrisos.h"
 #include "kernel.h"
     
     typedef enum esignals
     {
         SIG_HALT = 1,
         SIG_SLEEP = 2,
+        SIG_USLEEP = 4,
         SIG_SEGV = 0x800,
-        SIG_STOP = 0x2000
+        SIG_STOP = 0x2000,
     } eSignals;
     
     typedef struct ssignal
@@ -38,7 +38,7 @@ extern "C" {
         
     } signal_t;
 
-    void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t cr3);
+    void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t callerCR3);
     void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData);
     extern task_t* findTaskByCR3(uint32_t cr3);
     extern uint32_t NO_PREV;

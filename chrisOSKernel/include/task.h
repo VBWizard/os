@@ -36,7 +36,9 @@ typedef struct s_task
     eTaskState taskState;
     int32_t ticksSinceLastInterrupted, ticksSincePutInRunnable;
     bool exited;
+    uint32_t buffer;
     void* process;
+    uint32_t buffer2;
 } task_t;
 
 task_t* createTask(bool kernelTSS);

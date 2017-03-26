@@ -75,7 +75,7 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
 process->pageDirPtr=process->task->tss->CR3;
     
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
-    pagingMapPage(process->task->tss->CR3,PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000,0x5);
+    pagingMapPage(process->task->tss->CR3,PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000,0x7); //FIX ME!!!  Had to change this for sys_sigaction2 USLEEP
 
     //CR3 was set and PDir created by createTask.  Page tables will be created by the load process
     process->elf=sysLoadElf(process->path,process->elf,process->task->tss->CR3);

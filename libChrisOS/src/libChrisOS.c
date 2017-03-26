@@ -62,12 +62,5 @@ VISIBLE void exec(char* path, int argc, char** argv)
 
 VISIBLE void waitpid(uint32_t pid)
 {
-    bool isPidBusy=true;
-    
-    do 
-    {
-        asm("call sysEnter_Vector\n":"=a" (isPidBusy):"a" (0x61),"b" (pid));    //waitForPID
-        if (isPidBusy)
-            asm("call sysEnter_Vector\n"::"a" (0x302));         //hlt
-    } while (isPidBusy);
+    asm("call sysEnter_Vector\n"::"a" (0x61),"b" (pid));    //waitForPID
 }

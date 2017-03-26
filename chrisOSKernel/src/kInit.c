@@ -35,6 +35,9 @@ void initKernelInternals()
 {
     uint32_t oldCR3=0;
     kKernelTask=getAvailableTask();
+    kKernelProcess=(process_t*)allocPagesAndMap(sizeof(process_t));
+    kKernelProcess->task=kKernelTask;
+    kKernelTask->process=kKernelProcess;
      __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
     //Set up our kernel task
     kKernelTask->taskNum=0x1;

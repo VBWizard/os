@@ -18,6 +18,7 @@
 #include "ahci.h"
 #include "../../chrisOSKernel/include/tss.h"
 #include "../../chrisOSKernel/include/task.h"
+#include "../../chrisOSKernel/include/process.h"
 #include "elfloader.h"
 
 #ifndef KERNELOBJECTADDRESSES_H
@@ -106,7 +107,7 @@ KERNEL_DATA_SECTION char kBootCmd[255];
 KERNEL_DATA_SECTION HBA_MEM* ahciABAR = (HBA_MEM*)AHCI_ABAR_ADDRESS;
 
 KERNEL_DATA_SECTION task_t* kKernelTask;
-
+KERNEL_DATA_SECTION process_t* kKernelProcess;
 KERNEL_DATA_SECTION const char *_days[7] = {
   "Sunday", "Monday", "Tuesday", "Wednesday",
   "Thursday", "Friday", "Saturday"

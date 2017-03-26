@@ -29,7 +29,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     char test[2][50];
     char* testp[2];
     
-    __asm__("mov %[cr3],cr3":[cr3] "=a" (processCR3));
+    __asm__("mov eax,cr3": "=a" (processCR3));
     //printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
     __asm__("cli\n");
     switch (callNum)
@@ -71,8 +71,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax"::"a" (processCR3));
             break;
         case 0x61: //waitForPID - param1=pid to check
-            retVal=gdtIsEntryInUse(param1);
-            printd(DEBUG_PROCESS,"_syscall: waitForPID returning %s for pid=0x%04X",retVal?"true":"false",param1);
+            printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08X) on pid=0x%04X.  Good night!\n",processCR3,param1);
+            sys_sigaction(SIG_USLEEP,0,param1);
             break;
         case 0x163: //Register exit handler
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
@@ -87,12 +87,12 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case 0x165:
             __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
             retVal=mallocI(processCR3,param1);
-            printd(DEBUG_PROCESS,"_syscall: malloc(0x%08X) returned 0x%08X (cr3=0x%08X)\n",param1,retVal,   processCR3);
+            printd(DEBUG_PROCESS,"_syscall: malloc(0x%08X) returned 0x%08X (cr3=0x%08X)\n",param1,retVal,processCR3);
             //printd(DEBUG_PROCESS,"_syscall: malloc returning 0x%08X\n",retVal);
             __asm__("mov cr3,eax;"::"a" (processCR3));
             break;
         case 0x166:
-            printd(DEBUG_PROCESS,"_syscall: sleep(0x%08X) called\n",param1);
+            printd(DEBUG_PROCESS,"_syscall: sleep(0x%08X) called (cr3=0x%08X)\n",param1,processCR3);
             sys_sigaction(SIG_SLEEP,0,param1);
             break;
         case 0x167:

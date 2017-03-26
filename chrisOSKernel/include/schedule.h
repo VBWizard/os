@@ -37,6 +37,7 @@ extern "C" {
     task_t* submitNewTask(task_t* task);
     void markTaskEnded(uint32_t taskNum);
     task_t* findTaskByCR3(uint32_t cr3);
+    task_t* findTaskByTaskNum(uint32_t taskNum);
     uint32_t NO_PREV=0xFFFFFFFF, NO_NEXT=0xFFFFFFFF;
 
 #ifdef __cplusplus
