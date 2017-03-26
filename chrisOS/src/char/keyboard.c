@@ -85,11 +85,6 @@ void gets(char* buffer, int len)
 
 char getc()
 {
-   int inchar=waitForKeyboardKey();
-   
-   while (inchar==0)
-   {
-       inchar=waitForKeyboardKey();
-   }
+   int inchar=keyboardGetKeyFromBuffer();
    return inchar;
 }

@@ -9,7 +9,7 @@
 
 void initmalloc()
 {
-    heapBase=NULL;
+    heapBase=0;
     heapCurr=0;
     heapEnd=0;
 }
@@ -47,9 +47,9 @@ VISIBLE void*  malloc(size_t size)
         asm("mov eax,0x165\ncall sysEnter_Vector\n":"=a" (allocatedPtr):"b" (needed));
         //This is needed to keep in sync with what the kernel thinks
         //printDebug(DEBUG_MALLOC,"libc_malloc: heaEnd=0x%08X\n",heapEnd);
-        heapEnd=(uint32_t*)(allocatedPtr+needed);
+        heapEnd=allocatedPtr+needed;
         //printDebug(DEBUG_MALLOC,"libc_malloc: Req 0x%08X bytes, ret was 0x%08X, heapEnd=0x%08X, heapBase=0x%08X\n",needed,allocatedPtr,heapEnd);
-        if (heapBase==NULL)    //Hasn't been initialized yet!
+        if (heapBase==0)    //Hasn't been initialized yet!
         {
             heapCurr=allocatedPtr;
             heapBase=allocatedPtr;
@@ -61,7 +61,7 @@ VISIBLE void*  malloc(size_t size)
     heapPtr->len=size;
     heapPtr->inUse=true;
     //printDebug(DEBUG_MALLOC,"libc_malloc: heapCurr=0x%08X, sizeof(heaprec_t)=0x%08X\n",heapCurr,sizeof(heaprec_t));
-    retVal=heapCurr+sizeof(heaprec_t);
+    retVal=(void*)(heapCurr+sizeof(heaprec_t));
     heapCurr+=size+(sizeof(heaprec_t));
     //printDebug(DEBUG_MALLOC,"\n");
     return retVal;

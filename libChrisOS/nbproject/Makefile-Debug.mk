@@ -47,7 +47,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/85a4b428/strparts.o \
 	${OBJECTDIR}/_ext/85a4b428/strtol.o \
 	${OBJECTDIR}/_ext/85a4b428/strtrim.o \
-	${OBJECTDIR}/src/input.o \
+	${OBJECTDIR}/src/input/input.o \
 	${OBJECTDIR}/src/libChrisOS.o \
 	${OBJECTDIR}/src/malloc.o
 
@@ -136,10 +136,10 @@ ${OBJECTDIR}/_ext/85a4b428/strtrim.o: /home/yogi/src/os/libChrisOS/src/strings/s
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strtrim.o /home/yogi/src/os/libChrisOS/src/strings/strtrim.c
 
-${OBJECTDIR}/src/input.o: src/input.c 
-	${MKDIR} -p ${OBJECTDIR}/src
+${OBJECTDIR}/src/input/input.o: src/input/input.c 
+	${MKDIR} -p ${OBJECTDIR}/src/input
 	${RM} "$@.d"
-	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input.o src/input.c
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input/input.o src/input/input.c
 
 ${OBJECTDIR}/src/libChrisOS.o: src/libChrisOS.c 
 	${MKDIR} -p ${OBJECTDIR}/src

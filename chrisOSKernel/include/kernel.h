@@ -10,7 +10,6 @@
 
 #include <stdint.h>
 #include "chrisos.h"
-#include "kbd.h"
 #include "io.h"
 #include "utility.h"
 

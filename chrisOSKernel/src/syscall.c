@@ -46,6 +46,21 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              panic("_syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
             break;
+        case 0x3:   //read from descriptor, param1 = descriptor #
+            if (param1==0x1)
+                retVal=getc();
+            else
+                panic("_sysCall: sys_read for descriptor 0x%08X not implemented\n",param1);
+            break;
+        case 0x4:   //write to descriptor, param1 = descriptor #, param2 = string to write
+            if (param1==0x1)
+            {
+                //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
+                printu((const char*)param2, NULL);
+            }
+            else
+                panic("_sysCall: sys_write for descriptor 0x%08X not implemented\n",param1);
+            break;
         case 0x163: //Register exit handler
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             processRegExit(findTaskByCR3(processCR3)->process,param1);
@@ -81,7 +96,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case 0x170:
             retVal=*kTicksSinceStart;
             break;
-        case 0x300:
+        case 0x300: //sys_print (prints to screen)
             va_copy(ap,(va_list*)(param2));
             //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
             printu((const char*)param1, ap);

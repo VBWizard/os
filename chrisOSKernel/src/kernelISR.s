@@ -13,6 +13,7 @@
 .extern kTicksSinceStart
 .extern nextScheduleTicks
 .extern kKernelCR3
+.extern keyboardHandlerRoutine;
 
 isrNumber: .word 0,0
 tempEAX: .word 0,0
@@ -80,8 +81,8 @@ getExceptionDetailsWithError:
      mov isrSavedErrorCode, bx
 saveTheStack:
     mov eax,isrNumber
-    cmp eax,0x20
-    je overSaveTheStack
+    cmp eax,0x20                
+    jge overSaveTheStack        #CLR 03/26/2017: Changed (je to jge) to skip stack capture for 0x20 (IRQ0) & 0x21 (KBD) (not sure what else)
     mov esi, isrSavedESP
     add esi,12                  #drop the eip/cs/flags from the call to this proc
     mov edi, isrSavedStack
@@ -156,6 +157,18 @@ notPagingHandler:
     mov cr3,eax
     jmp noIRQResponseRequired
 notSysCallHandler:
+    cmp ax,21
+    jne notKbdHandler
+    mov eax,keyboardHandlerRoutine
+    cmp eax,0
+    je  kbdError
+    call eax
+    mov al,0x20
+    out 0x20,al
+    jmp noIRQResponseRequired
+kbdError:
+    jmp kbdError
+notKbdHandler:
     call defaultISRHandler
 ckeckForIRQResponse:
     mov eax,isrNumber

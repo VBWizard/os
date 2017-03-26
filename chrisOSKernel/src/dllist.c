@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-#include "list.h"
+#include "dllist.h"
 
 //Initialize a new list
 void listInit(dllist_t* list)

@@ -19,9 +19,10 @@ extern "C" {
 #endif
 #include <stdarg.h>
 #include <stdint.h>
-#include "/home/yogi/src/os/chrisOS/include/chrisos.h"
 #include "malloc.h"
 #include "strings.h"
+#include "input.h"
+#include "/home/yogi/src/os/chrisOS/include/chrisos.h"
     
 #define VISIBLE __attribute__((visibility("default")))
 

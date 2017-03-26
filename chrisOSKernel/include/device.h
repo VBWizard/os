@@ -13,11 +13,13 @@
 
 #ifndef DEVICE_H
 #define DEVICE_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include "dllist.h"
+#include <stdint.h>
+#include <stdbool.h>
     //Types of device
     //methods
     //  read                USB/HD/Mouse/Keyboard/Display/Timer/
@@ -36,8 +38,8 @@ extern "C" {
     typedef struct sinterrupt
     {
         int interrupt_num;
-        void handler_high();
-        void handler_low();
+        void (*handler_high)();
+        void (*handler_low)();
     } interrupt_t;
     
     typedef enum eseektype
@@ -45,25 +47,22 @@ extern "C" {
         SEEK_SET,
         SEEK_CUR,
         SEEK_END
-    } seek_t;
+    } eSeekType;
     
     typedef struct sdevice
     {
         uint64_t node_id;
         char* device_id;
         uint64_t port;
-        int read (uint64_t node, uint64_t targetAddress, void* buffer, uint64_t count);          //Function prototype for reading
-        int write(uint64_t node, uint64_t targetAddress, void* buffer, uint64_t count);          //Function prototype for writing
-        int seek (uint64_t node, uint64_t targetAddress, seek_t seek_type);          //Function prototype for seeking
-        
+        int (*read) (uint64_t node, uint64_t targetAddress, void* buffer, uint64_t count);          //Function prototype for reading
+        int (*write) (uint64_t node, uint64_t targetAddress, void* buffer, uint64_t count);          //Function prototype for writing
+        int (*seek) (uint64_t node, uint64_t targetAddress, eSeekType seek_type);          //Function prototype for seeking
+        dllist_t listItem;
     } device_t;
 
-    typedef struct sdevices
-    {
-        listhead_t list;
-        device_t* device;
-    } devices_t;
-    
+    dllist_t* kDevList;
+void deviceRegister(device_t* dev);
+void deviceUnregister(device_t* dev);
 
 #ifdef __cplusplus
 }

@@ -119,6 +119,7 @@ void* kMalloc(size_t size)
     return ptr->address;
 }
 
+//Called by syscall only
 void* mallocI(uint32_t cr3, size_t size)
 {
     uint32_t newSize, retVal;

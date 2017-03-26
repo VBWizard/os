@@ -18,6 +18,8 @@ extern uint32_t getESP();
 extern task_t* kKernelTask;
 extern uint32_t* sysEnter_Vector;
 
+//TODO: Replace current list with dllist_t!
+
 uint32_t firstTaskTSS=0,firstTaskESP0=0;
 
 void taskInit()

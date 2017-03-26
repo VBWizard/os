@@ -34,11 +34,17 @@ char * strcpy(char *s1, const char *s2);
  */
 //int strcmp (const char *p1, const char *p2);
 //int strncmp(const char *s1, const char *s2, size_t n);
+char* strcat (char *dest, const char *src);
+int strcmp (const char *p1, const char *p2);
+char * strcpy(char *s1, const char *s2);
+char * strcpyc(char *s1, const char *s2, unsigned count);
+char* strleft(char* val, int cnt);
+size_t strlen(const char* str);
+int strncmp(const char *s1, const char *s2, size_t n);
 char * strncpy(char *s1, const char *s2, size_t n);
-char * strtrim(char * *pointerToString);
 long strtol(const char *nptr, char **endptr, register int base);
 unsigned long strtoul(const char *nptr, char **endptr, register int base);
-char* strcat (char *dest, const char *src);
-char* strleft(char* val, int cnt);
+char * strtrim(char * *pointerToString);
+
 #endif	/* STRINGS_H */
 

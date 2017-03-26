@@ -8,5 +8,5 @@ alias sv = set variable
 #dashboard assembly
 #dashboard history -output /dev/pts/6
 target remote localhost:1234
-#c
+c
 

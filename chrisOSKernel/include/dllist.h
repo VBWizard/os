@@ -23,6 +23,7 @@ extern "C" {
     typedef struct slisthead
     {
         struct slisthead *next, *prev;
+        void *payload;
     } dllist_t;
 
     void listInit(dllist_t* list);

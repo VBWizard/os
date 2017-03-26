@@ -32,6 +32,13 @@ void HandleSEGV();
 int main2(int argc, char** argv) {
     
     libc_init();
+    char input[100];
+    
+    print("Enter something: ");
+    gets((char*)&input,100,1);
+    print("\n");
+    puts("This is what you entered: ");
+    puts((char*)&input);
     print("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
     {
@@ -41,7 +48,6 @@ int main2(int argc, char** argv) {
     for (int cnt=0;cnt<0x5;cnt++)
     {
         char* test=malloc(25);
-    return 0x5678;
         free(test);
         if (!(cnt%0x1000))
             print("Malloc%x returned 0x%08X\n",cnt,test);

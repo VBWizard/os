@@ -22,6 +22,7 @@
 #include "../../chrisOS/src/fat/fat_access.h"
 #include "../include/task.h"
 #include "io.h"
+#include "kbd.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -32,7 +33,7 @@ process_t* kKernelProcess;
 task_t* kKernelTask;
 uint32_t saveESP;
 uint32_t kKernelCR3=KERNEL_CR3;
-
+void* keyboardHandlerRoutine=NULL;
 
 int main(int argc, char** argv) {
     init_serial();
@@ -45,6 +46,7 @@ int main(int argc, char** argv) {
         //    break;
     }
 */
+    kbd_handler_generic_init();
     printk("Hello kernel world!!!\n");
     schedulerEnabled=false;
     schedulerTaskSwitched=false;
@@ -86,6 +88,8 @@ int main(int argc, char** argv) {
         proc[cnt]=createProcess(program,2,&pptr[cnt],false);
     }
 */
+    
+    waitTicks(0x7FFFFFFF);
     return (0xbad);
 }
 
