@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
     printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
 
-    char program[40]="/testmainprogramentry";
+    char program[40]="/kshell";
     printk("Loading and executing %s\n",program);
     /*NOTE: This is how to create argv!!!*/
     char test[2][50];
@@ -89,7 +89,8 @@ int main(int argc, char** argv) {
     }
 */
     
-    waitTicks(0x7FFFFFFF);
+    //waitTicks(0x7FFFFFFF);
+    loopit: goto loopit;
     return (0xbad);
 }
 

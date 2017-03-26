@@ -72,6 +72,24 @@ void HIGH_CODE_SECTION gdtEntryOS(int entryNo, int base, int limit, char access,
     gdtEntryI(entryNo,base,limit,access,flags,inUse,false);
 }
 
+sGDT HIGH_CODE_SECTION getGDTEntry(int entryNo)
+{
+    sGDT gdtEntry;
+    memcpy(&gdtEntry,&bootGdt[entryNo],sizeof(sGDT));
+//    gdtEntry.access=bootGdt[entryNo].access;
+//    gdtEntry.base_high=bootGdt[entryNo].base_high;
+//    gdtEntry.base_low=bootGdt[entryNo].base_low;
+//    gdtEntry.base_middle=bootGdt[entryNo].base_middle;
+//    gdtEntry.flags_and_limit=bootGdt[entryNo].flags_and_limit;
+//    gdtEntry.limit_low=bootGdt[entryNo].limit_low;
+}
+
+bool HIGH_CODE_SECTION gdtIsEntryInUse(int entryNo)
+{
+    //NOTE: indicator is set to 0 when busy, 1 when not busy
+    return !bitsTest(kGDTSlotAvailableInd,entryNo);
+    
+}
 //Create entries in the real mode GDT table
 void HIGH_CODE_SECTION gdtEntryRM(int entryNo, int base, int limit, char access, char flags)
 {

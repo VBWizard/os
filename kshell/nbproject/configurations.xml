@@ -42,6 +42,8 @@
             <pElem>include</pElem>
             <pElem>/home/yogi/src/os/libChrisOS/include</pElem>
           </incDir>
+          <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
+          <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <linkerTool>
           <linkerLibItems>
@@ -58,7 +60,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>-ffreestanding -nostdlib -lgcc</commandLine>
+          <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
       <item path="include/kshell.h" ex="false" tool="3" flavor2="0">
@@ -80,6 +82,7 @@
             <pElem>include</pElem>
             <pElem>/home/yogi/src/os/libChrisOS/include</pElem>
           </incDir>
+          <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
@@ -105,7 +108,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>-ffreestanding -nostdlib -lgcc</commandLine>
+          <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
       <item path="include/kshell.h" ex="false" tool="3" flavor2="0">

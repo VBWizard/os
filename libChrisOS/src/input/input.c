@@ -33,7 +33,6 @@ VISIBLE void gets(char* buffer, int maxlen, int stream)
 {
     char inchar;
     int len=0;
-    char backspace[2]="\b";
     char lbuf[2]={0,0};
     
     if (stream!=1)
@@ -49,20 +48,20 @@ VISIBLE void gets(char* buffer, int maxlen, int stream)
         {
             buffer[len]=0;
             len--;
-            PUTSTRING(&backspace);
-            
         }
         else if (inchar>0)
         {
-            if ((len-2)<maxlen)
-            {
-                lbuf[0]=inchar;
-                PUTSTRING(&lbuf);
-                buffer[len++]=inchar;
-            }
-            if (inchar==0x0a)
+            lbuf[0]=inchar;
+            PUTSTRING(&lbuf);
+            buffer[len++]=inchar;
+            //Note: Written this way so that gets an be used as a getc which waits for the key
+            if ((len+1>=maxlen) || (inchar==0x0a)) //-1 because we need to leave the terminator (0x0) at the end of the string
+            
                 return;
         }
+        else
+            asm("call sysEnter_Vector\n"::"a" (0x302));
+
     }
-    return;
 }
+

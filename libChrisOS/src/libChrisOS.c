@@ -5,7 +5,6 @@
  */
 
 #include "libChrisOS.h"
-#include "../../chrisOSKernel/include/signals.h"
 
 extern void sysEnter_Vector();
 int a=123;int b=456; int c=789;
@@ -40,22 +39,8 @@ VISIBLE int printDebug(uint32_t DebugLevel, const char *format, ...)
 
 VISIBLE unsigned int sleep (unsigned int __seconds)
 {
-    uint32_t currTicks;
-    
-    asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
-    __seconds=(__seconds*TICKS_PER_SECOND)+currTicks;
-    asm("call sysEnter_Vector\n"::"a" (0x166), "b" (__seconds), "c" (0), "d" (0));
-
-/*    asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
-    wakeTicks=currTicks+(TICKS_PER_SECOND*__seconds);
-    print("sleep(%u): Starting with currTicks=0x%08X,__seconds, wakeTicks=0x%08X\n",__seconds,currTicks,wakeTicks);
-    while (wakeTicks>currTicks)
-    {
-        //yield the CPU
-        asm("mov eax,0x170\ncall sysEnter_Vector\n":[currTicks] "=a" (currTicks));
-    }
-    print("sleep(%u): Ticks at return=0x%08X\n",__seconds,currTicks);
-*/    return 0;
+    SLEEP_SECONDS(__seconds)
+    return 0;
 }
 
 void stop()
@@ -66,4 +51,23 @@ void stop()
 void modifySignal(int signal, void* sigHandler, int sigData)
 {
     asm("call sysEnter_Vector\n"::"a" (0x167), "b" (signal), "c" (sigHandler), "d" (sigData));
+}
+
+VISIBLE void exec(char* path, int argc, char** argv)
+{
+    print("libc_exec: Not implemented, see 0x80 call in kshell");
+    execError: goto execError;
+    
+}
+
+VISIBLE void waitpid(uint32_t pid)
+{
+    bool isPidBusy=true;
+    
+    do 
+    {
+        asm("call sysEnter_Vector\n":"=a" (isPidBusy):"a" (0x61),"b" (pid));    //waitForPID
+        if (isPidBusy)
+            asm("call sysEnter_Vector\n"::"a" (0x302));         //hlt
+    } while (isPidBusy);
 }

@@ -55,7 +55,9 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     printd(DEBUG_PROCESS,"Creating %s process for %s\n",kernelProcess?"kernel":"user",path);
     //NOTE: Using allocPages instead of malloc because we need the process struct to start on a page boundary for paging reasons, and
     //      allocPages always allocates entire pages
+    printd(DEBUG_PROCESS,"createProcess: Mallocing process_t\n",process);
     process=allocPagesAndMap(sizeof(process_t));
+    printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process\n",process);
     memset(process,0,sizeof(process_t));
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;

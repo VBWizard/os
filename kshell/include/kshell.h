@@ -25,10 +25,12 @@ typedef struct
 
 void helpMe();
 void kShell();
+void execp(char* cmdline);
 char sExecutingProgram[512];
-char* sbootShellProgramName;
+char* sKShellProgramName;
 command_table_t cmds[] = { 
         {"help","Get help (this information)",helpMe,0},
+        {"exec","Execute a program",execp,1}
     };
 void (*command_function)(void);
 void (*command_function_p)(char*);

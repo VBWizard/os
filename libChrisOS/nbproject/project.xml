@@ -10,10 +10,9 @@
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects/>
             <sourceRootList>
-                <sourceRootElem>/home/yogi/src/os/chrisOS/include</sourceRootElem>
-                <sourceRootElem>/home/yogi/src/os/chrisOS/src/strings</sourceRootElem>
-                <sourceRootElem>/home/yogi/src/os/libChrisOS/src</sourceRootElem>
-                <sourceRootElem>/home/yogi/src/os/libChrisOS/include</sourceRootElem>
+                <sourceRootElem>../chrisOS/src/strings</sourceRootElem>
+                <sourceRootElem>src</sourceRootElem>
+                <sourceRootElem>include</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

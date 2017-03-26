@@ -20,6 +20,7 @@ extern "C" {
 
     char getc();
     void gets(char* buffer, int maxlen, int stream);
+    void putc(char c);
     void puts(char* buffer);
 
 #ifdef __cplusplus

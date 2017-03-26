@@ -25,6 +25,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     uint32_t processCR3;
     va_list ap;
     uint32_t retVal;
+    process_t* process;
+    char test[2][50];
+    char* testp[2];
     
     __asm__("mov %[cr3],cr3":[cr3] "=a" (processCR3));
     //printd(DEBUG_PROCESS,"In _sysCall, callNum=0x%08X\n",callNum);
@@ -60,6 +63,16 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             }
             else
                 panic("_sysCall: sys_write for descriptor 0x%08X not implemented\n",param1);
+            break;
+        case 0x59:  //exec: param1=program path
+            __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
+            process = createProcess((char*)param1,2,&testp,false);
+            retVal=process->task->taskNum;
+            __asm__("mov cr3,eax"::"a" (processCR3));
+            break;
+        case 0x61: //waitForPID - param1=pid to check
+            retVal=gdtIsEntryInUse(param1);
+            printd(DEBUG_PROCESS,"_syscall: waitForPID returning %s for pid=0x%04X",retVal?"true":"false",param1);
             break;
         case 0x163: //Register exit handler
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
@@ -105,6 +118,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             //printd(DEBUG_PROCESS,"_syscall: printd(0x%08X,0x%08X,0x%08X)\n",param1,&param2,param3);
             va_copy(ap,(va_list*)(param3));
             printd_valist(param1, (const char*)param2, ap);
+            break;
+        case 0x302:
+            __asm__("sti;hlt;");
             break;
         default:
             panic("_syscall: Invalid call number 0x%04X\n",callNum);

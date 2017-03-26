@@ -10,6 +10,8 @@ cd $basePath/chrisOSKernel/dist
 ./makeit
 cd $basePath/libChrisOS/dist
 ./makeit
+cd $basePath/kshell/dist
+./makeit
 #cd $basePath/fatLib/dist
 #./makeit
 #cd $pp

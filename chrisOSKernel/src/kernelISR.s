@@ -31,6 +31,8 @@ alltraps:
     mov eax,esp
     add eax,8                 #Get rid of the vector parameters in the saved esp
     mov isrSavedESP,eax
+    mov eax,cr3
+    mov isrSavedCR3,eax
     mov isrSavedEBP, ebp
     mov ebp,esp
     add ebp,8
@@ -144,6 +146,8 @@ pagingHandler:
 notPagingHandler:
     cmp eax,0x80
     jne notSysCallHandler
+
+sysCallHandler:
     mov eax,cr3
     push eax
     mov eax,kKernelCR3
@@ -859,9 +863,31 @@ vector127:
   jmp alltraps
 .globl vector128
 vector128:
-  pushd 0
-  pushd 128
-  jmp alltraps
+//  pushd 0
+//  pushd 128
+//  jmp alltraps
+    mov isrSavedEAX,eax
+    mov isrSavedEBX,ebx
+    mov isrSavedECX,ecx
+    mov isrSavedEDX,edx
+    pushad
+    pushfd
+    mov eax,cr3
+    push eax
+    mov eax,kKernelCR3
+    pushd isrSavedEDX
+    pushd isrSavedECX
+    pushd isrSavedEBX
+    pushd isrSavedEAX
+    call _sysCall
+    mov isrSavedEAX,eax
+    add esp,16                      #get rid of the registers we pushed on the stack before calling sysCall
+    pop eax                         #pop cr3
+    mov cr3,eax
+    popfd
+    popad
+    mov eax,isrSavedEAX
+    iret
 .globl vector129
 vector129:
   pushd 0

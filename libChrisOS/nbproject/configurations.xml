@@ -4,7 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>../chrisOS/include/input.h</itemPath>
+      <itemPath>include/input.h</itemPath>
       <itemPath>include/libChrisOS.h</itemPath>
       <itemPath>include/malloc.h</itemPath>
       <itemPath>/home/yogi/src/os/libChrisOS/include/memory.h</itemPath>
@@ -48,10 +48,9 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>/home/yogi/src/os/chrisOS/include</Elem>
-    <Elem>/home/yogi/src/os/chrisOS/src/strings</Elem>
-    <Elem>/home/yogi/src/os/libChrisOS/src</Elem>
-    <Elem>/home/yogi/src/os/libChrisOS/include</Elem>
+    <Elem>../chrisOS/src/strings</Elem>
+    <Elem>src</Elem>
+    <Elem>include</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -65,18 +64,15 @@
         <cTool>
           <incDir>
             <pElem>include</pElem>
-            <pElem>../chrisOS/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,libc_init</commandLine>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}</output>
           <commandlineTool>gcc</commandlineTool>
-          <commandLine>-nostdlib -T linker.ld -ffreestanding -lgcc</commandLine>
+          <commandLine>-nostdlib -T linker.ld -ffreestanding</commandLine>
         </linkerTool>
       </compileType>
-      <item path="../chrisOS/include/input.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="/home/yogi/src/os/libChrisOS/include/memory.h"
             ex="false"
             tool="3"
@@ -146,6 +142,8 @@
             ex="false"
             tool="0"
             flavor2="0">
+      </item>
+      <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -185,8 +183,6 @@
         <archiverTool>
         </archiverTool>
       </compileType>
-      <item path="../chrisOS/include/input.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="/home/yogi/src/os/libChrisOS/include/memory.h"
             ex="false"
             tool="3"
@@ -256,6 +252,8 @@
             ex="false"
             tool="0"
             flavor2="0">
+      </item>
+      <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
       </item>
