@@ -13,14 +13,8 @@
 
 #include "kshell.h"
 
-/*
- * 
- */
-int main(int argc, char** argv) {
-
-    return (0);
-}
-
+bool timeToExit=false;
+uint32_t exitCode=0;
 
 extern int kATADeviceInfoCount;
 
@@ -278,7 +272,7 @@ void execp(char* cmdline)
     //strcpy(sExecutingProgram,params[0]+1);
 }
 
-void kShell()
+int kShell(int argc, char** argv)
 {
     char lCommand[256];
     uint8_t lCurrKey=0;
@@ -295,7 +289,7 @@ void kShell()
     strcpy(sExecutingProgram,sKShellProgramName);
     puts("\nWelcome to kShell ... hang a while!\n");
 
-    while (1==1)
+    while (!timeToExit)
     {
 getACommand:
         lCurrKey=0;
@@ -402,4 +396,18 @@ doneGettingKeys:
             commandBuffPtr=commandsPtr;
         }
     }
+    return exitCode;
+}
+
+void kExit(char *cmdline)
+{
+    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
+
+    if (parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT))
+    {
+        exitCode = strtoul(params[0],0,10);
+    }
+    else
+        exitCode = 0;
+    timeToExit=true;
 }

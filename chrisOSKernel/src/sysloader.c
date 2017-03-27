@@ -762,5 +762,5 @@ static int elf_relocate(elfInfo_t* elf) {
     return 0;
 }
 
-extern void markTaskEnded(uint32_t taskNum);
+extern void markTaskEnded(uint32_t taskNum, uint32_t retval);
 

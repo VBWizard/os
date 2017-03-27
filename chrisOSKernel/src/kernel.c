@@ -88,9 +88,11 @@ int main(int argc, char** argv) {
         proc[cnt]=createProcess(program,2,&pptr[cnt],false);
     }
 */
-    
+
     //waitTicks(0x7FFFFFFF);
-    loopit: goto loopit;
+    waitTicks(TICKS_PER_SECOND*5);
+    printk("Going to sleep now!\n");
+    sys_sigaction(SIG_USLEEP,0,10000000);
     return (0xbad);
 }
 

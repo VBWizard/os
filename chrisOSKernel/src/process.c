@@ -17,11 +17,13 @@
 void processWrapup();
 bool taskRegInitialized=false;
 
+//This runs as the program.  We're just calling cleanup procedures and passing on the return value.
 void processExit()
 {
+    uint32_t lRetVal=0;
+    __asm__("mov %0,eax\n":"=r" (lRetVal));
     int lCounter;
     process_t* process=(process_t*)PROCESS_STRUCT_VADDR;
-    printd(DEBUG_PROCESS,"processExit: Processing process 0x%08X\n",process);
     printd(DEBUG_PROCESS,"processExit: Checking for exit handlers\n");
     for (lCounter=0;lCounter<PROCESS_MAX_EXIT_HANDLERS;lCounter++)
         if (process->exitHandler[lCounter]!=NULL)
@@ -31,7 +33,7 @@ void processExit()
             x();
         }
 
-     __asm__("mov ebx,eax\nmov eax,0x1\nmov ecx,cs\ncall sysEnter_Vector\n");
+     __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (0x1), "b" (lRetVal));
     //freeMemory(process);
 }
 

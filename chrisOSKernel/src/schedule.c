@@ -112,18 +112,19 @@ task_t* findTaskByTaskNum(uint32_t taskNum)
     return taskList;
 }
 
-void markTaskEnded(uint32_t cr3)
+void markTaskEnded(uint32_t cr3, uint32_t retval)
 {
     int listNum=0;
     task_t* taskList=findTaskByCR3(cr3);
 
+    ((process_t*)taskList)->retVal=retval;
     if (taskList->tss->CR3!=cr3)
         panic("markTaskEnded: Could not find task for CR3=0x%08X to end\n",cr3);
     taskList->exited=true;
     //If the task being ended is running, trigger a schedule on the next tick to get rid of it
     if (listNum==TASK_RUNNING)
         nextScheduleTicks=*kTicksSinceStart;
-    printd("\tmarkTaskEnded: Marked task 0x%04X ended, triggered scheduler() run\n",taskList->taskNum);
+    printd(DEBUG_PROCESS,"\tmarkTaskEnded: Marked task 0x%04X ended w/ retval=0x%08X, triggered scheduler\n",taskList->taskNum,retval);
 }
 
 void storeISRSavedRegs(task_t* task)
@@ -388,78 +389,78 @@ void runAnotherTask(bool schedulerRequested)
     //Get task to stop
     task_t* taskToStop=findRunningTaskToReplace();
     if (taskToStop==NULL)
-        panic("Can't find task to in the running queue ... not possible!!!\n");
+    panic("Can't find task to in the running queue ... not possible!!!\n");
 
+#ifdef SCHEDULER_DEBUG
+    printd(DEBUG_PROCESS,"*Found process (0x%04X) to take off CPU @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
+#endif
+    if (taskToStop->exited)
+    {
+#ifdef SCHEDULER_DEBUG
+        printd(DEBUG_PROCESS,"*Task (0x%04X) ended, removing it from %s list.\n",taskToStop->taskNum,TASK_STATE_NAMES[taskToStop->taskState]);
+#endif
+        changeTaskQueue(taskToStop,TASK_EXITED);
+        gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
+        //Look through the USleep looking for task that is waiting on this one to end
+        uintptr_t* q=qUSleep;
+        task_t* task;
+        process_t* process;
+        printd(DEBUG_PROCESS,"Looking through USLEEP queue for tasks to wake up\n");
+        while (*q!=NO_NEXT)
+        {
+            task=(task_t*)*q;
+            process=task->process;
+            if (process->signals.sigdata[SIG_USLEEP]==taskToStop->taskNum)
+            {
+                printd(DEBUG_PROCESS,"scheduler: Found process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
+                process->signals.sigdata[SIG_USLEEP]=0;
+                process->signals.sigind &=~SIG_USLEEP;
+                printd(DEBUG_PROCESS,"scheduler: Process 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
+                changeTaskQueue(task,TASK_RUNNABLE);
+            }
+            q++;
+        }
+    }
+    else if (/*(taskToStop->taskNum!=1) && */((process_t*)(taskToStop->process))->signals.sigind)
+    {
+#ifdef SCHEDULER_DEBUG
+        printd(DEBUG_PROCESS,"*sys_sigaction: sigind=0x%08X\n",((process_t*)(taskToStop->process))->signals.sigind);
+#endif
+        switch (((process_t*)(taskToStop->process))->signals.sigind)
+        {
+            case SIG_USLEEP:
+                changeTaskQueue(taskToStop,TASK_USLEEP);
+                storeISRSavedRegs(taskToStop);
+                break;
+            case SIG_SEGV:
+                changeTaskQueue(taskToStop,TASK_EXITED);
+                break;
+            case SIG_STOP:
+                changeTaskQueue(taskToStop,TASK_STOPPED);
+                storeISRSavedRegs(taskToStop);
+#ifdef SCHEDULER_DEBUG
+                printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
+#endif
+                break;
+            case SIG_SLEEP:
+                changeTaskQueue(taskToStop,TASK_ISLEEP);
+                storeISRSavedRegs(taskToStop);
+                break;
+            default:
+                panic("scheduler: Unhandled signal");
+                break;
+        }
+    }
+    else
+    {
+        changeTaskQueue(taskToStop,TASK_RUNNABLE);
+        storeISRSavedRegs(taskToStop);
+    }
     //Get task to start
     task_t* taskToRun=findTaskToRun();
     if (taskToRun!=NULL)
     {
-#ifdef SCHEDULER_DEBUG
-        printd(DEBUG_PROCESS,"*Found process (0x%04X) to take off CPU @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
         printd(DEBUG_PROCESS,"*Found task move to CPU (0x%04X)!\n",taskToRun->taskNum);
-#endif
-        if (taskToStop->exited)
-        {
-#ifdef SCHEDULER_DEBUG
-            printd(DEBUG_PROCESS,"*Task (0x%04X) ended, removing it from %s list.\n",taskToStop->taskNum,TASK_STATE_NAMES[taskToStop->taskState]);
-#endif
-            changeTaskQueue(taskToStop,TASK_EXITED);
-            gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
-            //Look through the USleep looking for task that is waiting on this one to end
-            uintptr_t* q=qUSleep;
-            task_t* task;
-            process_t* process;
-            printd(DEBUG_PROCESS,"Looking through USLEEP queue for tasks to wake up\n");
-            while (*q!=NO_NEXT)
-            {
-                task=(task_t*)*q;
-                process=task->process;
-                if (process->signals.sigdata[SIG_USLEEP]==taskToStop->taskNum)
-                {
-                    printd(DEBUG_PROCESS,"scheduler: Found process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
-                    process->signals.sigdata[SIG_USLEEP]=0;
-                    process->signals.sigind &=~SIG_USLEEP;
-                    printd(DEBUG_PROCESS,"scheduler: Process 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
-                    changeTaskQueue(task,TASK_RUNNABLE);
-                }
-                q++;
-            }
-        }
-        else if ((taskToStop->taskNum!=1) && ((process_t*)(taskToStop->process))->signals.sigind)
-        {
-#ifdef SCHEDULER_DEBUG
-            printd(DEBUG_PROCESS,"*sys_sigaction: sigind=0x%08X\n",((process_t*)(taskToStop->process))->signals.sigind);
-#endif
-            switch (((process_t*)(taskToStop->process))->signals.sigind)
-            {
-                case SIG_USLEEP:
-                    changeTaskQueue(taskToStop,TASK_USLEEP);
-                    storeISRSavedRegs(taskToStop);
-                    break;
-                case SIG_SEGV:
-                    changeTaskQueue(taskToStop,TASK_EXITED);
-                    break;
-                case SIG_STOP:
-                    changeTaskQueue(taskToStop,TASK_STOPPED);
-                    storeISRSavedRegs(taskToStop);
-#ifdef SCHEDULER_DEBUG
-                    printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
-#endif
-                    break;
-                case SIG_SLEEP:
-                    changeTaskQueue(taskToStop,TASK_ISLEEP);
-                    storeISRSavedRegs(taskToStop);
-                    break;
-                default:
-                    panic("scheduler: Unhandled signal");
-                    break;
-            }
-        }
-        else
-        {
-            changeTaskQueue(taskToStop,TASK_RUNNABLE);
-            storeISRSavedRegs(taskToStop);
-        }
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
         //Move the new task onto the CPU

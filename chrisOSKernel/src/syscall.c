@@ -41,7 +41,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
              __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
              printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08X\n",processCR3);
-             markTaskEnded(processCR3);
+             markTaskEnded(processCR3, param1);
              printd(DEBUG_PROCESS,"syscall: The process is dead, long live the process!\n");
              //****DESTROY STUFF HERE****
              //When a task is ended, the scheduler is will deal with it on the next tick, so lets wait for that to happen
