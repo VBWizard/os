@@ -11,11 +11,11 @@ void deviceRegister(device_t* dev)
     if (kDevList==NULL)
     {
         kDevList=kMalloc(sizeof(dllist_t));
-        listInit(kDevList);
+        listInit(kDevList,dev);
         kDevList->payload=dev;
     }
     else
-        listAdd(kDevList,&dev->listItem);
+        listAdd(kDevList,&dev->listItem,dev);
 }
 
 //NOTE: Caller should free the dev when they are done with it

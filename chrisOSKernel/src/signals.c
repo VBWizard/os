@@ -112,7 +112,6 @@ void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     __asm__("cli\n");
     __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
 
-    //For SIG_USLEEP we want to pass pointer to task instead of cr3
     printd(DEBUG_PROCESS,"sys_sigaction(0x%08X,0x%08X,0x%08X,0x%08X)\n",signal,sigAction,sigData,oldCR3);
     void* junk=sys_sigaction2(signal, sigAction, sigData, oldCR3);
     

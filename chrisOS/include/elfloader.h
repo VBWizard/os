@@ -7,6 +7,7 @@
 
 #ifndef ELFLOADER_H
 #define	ELFLOADER_H
+#include "../../chrisOSKernel/include/dllist.h"
 
 #ifdef	__cplusplus
 extern "C" {
@@ -45,6 +46,8 @@ typedef struct sElfInfo
     bool loadCompleted,isLibrary;
     int sectionNameStringTable, dynamicNameStringTable, generalNameStringTable;
     char* fileName;
+    dllist_t loadList;
+    bool mapMemoryOnly; //set to true if library is already loaded, and we only want to map it into the new process
 } elfInfo_t;
 
 void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);

@@ -237,7 +237,6 @@ struct tm theDateTime;
     //Zero out all of the memory we will be using as rebooting a computer doesn't necessarily clear memory
     memset((void*)KERNEL_OBJECT_BASE_ADDRESS,0,0x2000000);
     kBootCmd[0]=0x0;
-    kExecLoadCount=0;
 __asm__("cli\nsgdt [eax]\n"::"a" (&kernelGDT));
 gdt_init();
     kTicksPerSecond=TICKS_PER_SECOND;

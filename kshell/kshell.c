@@ -11,6 +11,8 @@
  * Created on March 23, 2017, 7:34 PM
  */
 
+#include <unistd.h>
+
 #include "kshell.h"
 
 bool timeToExit=false;
@@ -18,6 +20,28 @@ uint32_t exitCode=0;
 
 extern int kATADeviceInfoCount;
 
+void execInternalCommand(char lCommand[256])
+{
+    int i = findCommand(lCommand);
+
+    if(i>0)
+    {
+        i--;
+        //print("Executing command # %u (%s)\n", i, cmds[i].name);
+        command_function = cmds[i].function;
+        command_function_p = cmds[i].function;
+        if (cmds[i].paramCount==0)
+            command_function();
+        else
+        {
+            command_function_p(&lCommand[strlen(cmds[i].name)+1]);  
+        }
+    }
+    else
+    {
+        print("Invalid command '%s' ya dummy!\n",lCommand);
+    }
+}
 
 int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size)
     {
@@ -206,51 +230,6 @@ void helpMe()
         print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
 }
 
-
-/*void execCommand(char* cmdline)
-{
-    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-    int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
-
-    
-    strcpy(sExecutingProgram,params[0]+1);
-    //print("execProgram: param count = %u\n",paramCount);
-
-    lTemp=buildargv(cmdline);
-//    print("executed buildargv\n");
-
-//    print("listing parameters:\n");
-//    for (int cnt=0;cnt<paramCount;cnt++)
-//        print("%u = '%s'\n",cnt,lTemp[cnt]);
-   
-    exec (params[0],paramCount,lTemp);
-    strcpy(sExecutingProgram,sbootShellProgramName);
-}
-*/
-
-void execInternalCommand(char lCommand[256])
-{
-    int i = findCommand(lCommand);
-
-    if(i>0)
-    {
-        i--;
-        //print("Executing command # %u (%s)\n", i, cmds[i].name);
-        command_function = cmds[i].function;
-        command_function_p = cmds[i].function;
-        if (cmds[i].paramCount==0)
-            command_function();
-        else
-        {
-            command_function_p(&lCommand[strlen(cmds[i].name)+1]);  
-        }
-    }
-    else
-    {
-        print("Invalid command '%s' ya dummy!\n",lCommand);
-    }
-}
-
 void execp(char* cmdline)
 {
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
@@ -271,6 +250,21 @@ void execp(char* cmdline)
     //exec(params[0],0,0);
     //strcpy(sExecutingProgram,params[0]+1);
 }
+
+void kSleep(char *cmdline)
+{
+    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
+    int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
+
+    if (params[0][0]==0)
+    {
+        print("Requires 1 parameter which is the number of seconds to sleep\n");
+        return;
+    }
+    print("Sleeping for %u seconds\n",strtoul(params[0],0,10));
+    sleep(strtoul(params[0],0,10));
+}
+
 
 int kShell(int argc, char** argv)
 {

@@ -26,12 +26,15 @@ typedef struct
 void helpMe();
 void kExit(char *cmdline);
 void execp(char* cmdline);
+void kSleep(char *cmdline);
+
 char sExecutingProgram[512];
 char* sKShellProgramName;
 command_table_t cmds[] = { 
         {"help","Get help (this information)",helpMe,0},
         {"exec","Execute a program",execp,1},
-        {"exit","Exit kshell",kExit,1}
+        {"exit","Exit kshell",kExit,1},
+        {"sleep","Sleep for x seconds",kSleep,1}
     };
 void (*command_function)(void);
 void (*command_function_p)(char*);

@@ -6,22 +6,27 @@
 #include "dllist.h"
 
 //Initialize a new list
-void listInit(dllist_t* list)
+dllist_t* listInit(dllist_t* firstItem, void* payload)
 {
-    list->next=list;
-    list->prev=list;
-
+    firstItem->next=firstItem;
+    firstItem->prev=firstItem;
+    return firstItem;
+    firstItem->payload=payload;
 }
 
-void listAdd(dllist_t* list, dllist_t* item)
+void listAdd(dllist_t* list, dllist_t* item, void* payload)
 {
     
     while (list->next!=list)
         list=list->next;
-    
+    if (list==NULL)
+        panic("dllist_t-listAdd: Error, list is null\n");
+    if (list==NULL)
+        panic("dllist_t-listAdd: Error, item is null\n");
     item->prev=list;
     item->next=item;
     list->next=item;
+    item->payload=payload;
 }
 void listRemove(dllist_t* item)
 {

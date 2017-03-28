@@ -89,10 +89,8 @@ int main(int argc, char** argv) {
     }
 */
 
-    //waitTicks(0x7FFFFFFF);
-    waitTicks(TICKS_PER_SECOND*5);
-    printk("Going to sleep now!\n");
-    sys_sigaction(SIG_USLEEP,0,10000000);
+    //sys_sigaction(SIG_USLEEP,0,process->task->taskNum);
+    kernelLoop: triggerScheduler(); goto kernelLoop;
     return (0xbad);
 }
 

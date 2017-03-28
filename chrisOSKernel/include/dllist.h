@@ -22,12 +22,12 @@ extern "C" {
     
     typedef struct slisthead
     {
-        struct slisthead *next, *prev;
+        struct slisthead *next, *prev;          //4+4+4
         void *payload;
     } dllist_t;
 
-    void listInit(dllist_t* list);
-    void listAdd(dllist_t* list, dllist_t* item);
+    dllist_t* listInit(dllist_t* firstItem, void* payload);
+    void listAdd(dllist_t* list, dllist_t* item, void* payload);
     void listRemove(dllist_t* item);
     void* listPrev(dllist_t* list);
     void* listNext(dllist_t* list);

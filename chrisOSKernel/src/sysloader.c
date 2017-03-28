@@ -17,6 +17,7 @@
 #include "../include/alloc.h"
 #include "kmalloc.h"
 #include "../../chrisOS/include/printf.h"
+#include "dllist.h"
 
 extern struct ataDeviceInfo_t* kATADeviceInfo;
 extern tss_t* kTSSTable;
@@ -25,8 +26,6 @@ extern int kAHCISelectedDiskNum;
 extern int kAHCISelectedPartNum;
 extern int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count);
 extern int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count);
-extern int kExecLoadCount;
-extern elfInfo_t* kExecLoadInfo;
 extern uint32_t getCS();
 extern uint32_t getDS();
 extern uint32_t getES();
@@ -35,6 +34,7 @@ extern uint32_t getGS();
 extern uint32_t getSS();
 extern uint32_t getESP();
 extern sGDT* bootGdt;
+extern dllist_t* kLoadedElfInfo;
 
 uint32_t libLoadOffset=LIBRARY_BASE_LOAD_ADDRESS;
 uintptr_t previousCR3=0,newCR3;
@@ -107,13 +107,37 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                         strTabEntry(elfInfo->dynamicNameStringTable,elfInfo,dyn[cnt].d_un.d_val));
                 char fileName[100]="/";
                 strcat(fileName,elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount]);
-                printd(DEBUG_ELF_LOADER,"Found NEEDED, library name='%s'\n",
+                printd(DEBUG_ELF_LOADER,"Found NEEDED, library name='%s', checking to see if it is already loaded.\n",
                         fileName);
+                
+                dllist_t* theList=kLoadedElfInfo;
+                do
+                {
+                    elfInfo_t* searchElf=theList->payload;
+                    printd(DEBUG_ELF_LOADER,"\tFound loaded module %s ... ",searchElf->fileName);
+                    if (searchElf->isLibrary)
+                    {
+                        if (strncmp(searchElf->fileName,fileName,1024)==0)
+                        {
+                            printd(DEBUG_ELF_LOADER,"\tthis is the module we want ... mapping into program's vm.\n",searchElf->fileName);
+                            //TODO: Implement this when ready to test again: searchElf->mapMemoryOnly=true;
+                            //DO STUFF HERE
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        printd(DEBUG_ELF_LOADER,"Not a library, skipping to the next\n");
+                    }
+                    theList=theList->next;
+                } while (theList->next!=theList);
+                
                 if (kDebugLevel&DEBUG_ELF_LOADER)
                 {
                     printd(DEBUG_ELF_LOADER,"loadElf: Calling loadElf again to load '%s'\n",&fileName);
                 }
                 elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=sysLoadElf(fileName,NULL,targetCR3);
+                ((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount])->isLibrary=true;
                 if (! ((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount++])->loadCompleted)
                 {
                     printd(DEBUG_ELF_LOADER,"EXEC: processELFDynamicSection ... loading library failed.");
@@ -222,8 +246,9 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
     return 0;
 }
 
+
 //Read the data from the file and write it to the virtual addresses, mapping new pages as necessary
-bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue)
+bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue, _Bool mapOnly)
 {
     int startVirtAddr=virtAddr;
     int startPhysAddr=0;
@@ -257,7 +282,7 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
         }
         else
         {
-            startPhysAddr=(uintptr_t)allocPages(size) | (startVirtAddr & 0x00000FFF);
+            startPhysAddr=(uintptr_t)allocPages(countToWrite) | (startVirtAddr & 0x00000FFF);
             pagingMapPage(CR3,startVirtAddr,startPhysAddr,0x7);
             printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08X not mapped, mapped to P=0x%08X (CR3=0x%08X)\n",startVirtAddr,startPhysAddr,CR3);
             pagingMapPage(previousCR3,startVirtAddr,startPhysAddr,0x7);
@@ -278,6 +303,64 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
         startPhysAddr+=countToWrite;
     }
     return true;
+}
+
+bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue, _Bool mapOnly)
+{
+    //New strategy.  
+    //  1) If enter function with page aligned virtAddr, see if virtAddr is mapped.  
+    //      *If it is, write the whole size there and leave
+    //      *If it is not, alloc entire size, write there, map there (page count to map is +1 if size%PAGE_SIZE!=0)
+    //  2) If enter function with non-aligned virtAddr, see if virtAddr is already mapped.  
+    //      *If it is, write the whole size there and leave
+    //      *If it is not, alloc entire size, write there, map there
+
+    int startVirtAddr=virtAddr;
+    int startPhysAddr=0;
+    int countToWrite=size + PAGE_SIZE;
+    bool areaIsMapped=true;
+
+    if (isPageMapped(CR3,startVirtAddr))    //Write overlaps previous one, write the whole thing without mapping and leave
+    {
+        int tempAddr=startVirtAddr+PAGE_SIZE;
+        countToWrite-=size%PAGE_SIZE;  //size of 3328 = 3328-328=3000 - doesn't matter if non-aligned data is on first page or last
+        //see if the entire area is mapped.
+        while (isPageMapped(CR3,tempAddr) && countToWrite>0)
+        {
+            countToWrite-=PAGE_SIZE;
+            tempAddr+=PAGE_SIZE;
+        }
+        if (countToWrite==0)
+        {
+            startPhysAddr=(pagingGet4kPTEntryValueCR3(CR3,startVirtAddr) & 0xFFFFF000) | (startVirtAddr&0x00000FFF);  //Clear the last 3 bytes of the 
+            printd(DEBUG_ELF_LOADER,"putDataOnPages2: Entire write area (startVirtAddr=0x%08X) already mapped.  %s 0x%08X bytes to 0x%08X\n",startVirtAddr, writeFromFile?"Writing":"Zeroing", size, startPhysAddr);
+            if (writeFromFile)
+                fl_fread((void*)startPhysAddr, 1, size, file);
+            else
+                memset((void*)startPhysAddr,nonFileWriteValue,size);
+            return true;
+        }
+        else
+        {
+            printd(DEBUG_ELF_LOADER,"putDataOnPages2: Entire area starting at 0x%08X for 0x%08X bytes isn't mapped, falling back to putDataOnPages\n",startVirtAddr,size);
+            return putDataOnPages(CR3, virtAddr, file, writeFromFile, size, nonFileWriteValue, mapOnly);   //Everything is not mapped, fallback to page-at-a-time strategy
+        }
+    }
+    else        //alloc, map, write
+    {
+        startPhysAddr=(uintptr_t)allocPages(size+(PAGE_SIZE-(size%PAGE_SIZE))) | (startVirtAddr & 0x00000FFF);
+        printd(DEBUG_ELF_LOADER,"Mapping v=0x%08X to p=0x%08X via cr3=0x%08X\n",startVirtAddr,startPhysAddr,CR3);
+        pagingMapPageCount(CR3,startVirtAddr,startPhysAddr,(size/PAGE_SIZE)+1,0x7);
+        printd(DEBUG_ELF_LOADER,"Also mapping v=0x%08X to p=0x%08X via cr3=0x%08X\n",startVirtAddr,startPhysAddr,KERNEL_CR3);
+        pagingMapPageCount(KERNEL_CR3,startPhysAddr,startPhysAddr,(size/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(KERNEL_CR3,startVirtAddr,startPhysAddr,(size/PAGE_SIZE)+1,0x7);
+        printd(DEBUG_ELF_LOADER,"putDataOnPages2: %s 0x%08X bytes to v=0x%08X/p=0x%08X\n",writeFromFile?"Writing":"Zeroing",size, startVirtAddr,startPhysAddr);
+        if (writeFromFile)
+            fl_fread((void*)startPhysAddr, 1, size, file);
+        else
+            memset((void*)startPhysAddr,nonFileWriteValue,size);
+        return true;
+    }
 }
 
 bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
@@ -375,7 +458,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
             fl_fseek(file, elfInfo->pgmHdrTable[pgmSectionNum].p_offset, SEEK_SET);
             
             //Get pages 
-            if (!putDataOnPages(CR3,virtualLoadAddress,file,true,elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,0))
+            if (!putDataOnPages2(CR3, virtualLoadAddress, file, true, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 0, elfInfo->mapMemoryOnly))
                 return false;
             
             printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, virtualLoadAddress);
@@ -387,19 +470,19 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
                         elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 
                         virtualLoadAddress+elfInfo->pgmHdrTable[pgmSectionNum].p_filesz);
                 //CLR 02/20/2017 - Replaced memset
-                if (!putDataOnPages(CR3,
+                if (!putDataOnPages2(CR3,
                         virtualLoadAddress+elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
                         NULL,
                         false,
                         elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
-                        0))
+                        0, elfInfo->mapMemoryOnly))
                     return false;
             }
         }
         else if (elfInfo->pgmHdrTable[pgmSectionNum].p_memsz>0)
         {
             printd(DEBUG_ELF_LOADER,"Section %u not loadable (fsize=0,msize>0), zeroed 0x%08X bytes at 0x%08X\n",pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, virtualLoadAddress);
-            putDataOnPages(CR3,virtualLoadAddress,NULL,false,elfInfo->pgmHdrTable[pgmSectionNum].p_memsz,0);
+            putDataOnPages2(CR3, virtualLoadAddress, NULL, false, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, 0, elfInfo->mapMemoryOnly);
             
         }
 #ifndef DEBUG_NONE
@@ -430,15 +513,19 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     {
         elfInfo=pElfInfo;
     }
-    elfInfo_t* execLoadInfo=kExecLoadInfo;
-    execLoadInfo+=kExecLoadCount;
-    printd(DEBUG_ELF_LOADER,"Storing elfInfo to load info array at 0x%08X (count=0x%04X)\n",execLoadInfo,kExecLoadCount);
-    execLoadInfo=elfInfo;
-    kExecLoadCount++;
     
     //Initialize the structs we will be using
     memset(elfInfo,0,sizeof(elfInfo_t));
     memset(&elfInfo->dynamicInfo,0,sizeof(elfDynamic_t));
+
+    //NOTE: Any elfInfo_t added to the kLoadedElfInfo list must exist (not be free()d until after it is removed from the list!
+    if (kLoadedElfInfo==NULL)
+        kLoadedElfInfo=listInit(&elfInfo->loadList,elfInfo);
+    else if (elfInfo->loadList.next==0)
+        listAdd(kLoadedElfInfo,&elfInfo->loadList,elfInfo);
+    
+    printd(DEBUG_ELF_LOADER,"Added elfInfo to kLoadedElfInfo list\n");
+    
 
     elfInfo->fileName=kMalloc(strlen(fileName));
     strcpy(elfInfo->fileName,fileName);

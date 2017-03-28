@@ -5,17 +5,18 @@
  */
 
 #include "kIRQHandlers.h"
+#include "printf.h"
 
 bool schedulerEnabled=false;
 extern uint32_t nextScheduleTicks;
 extern void processSignals();
+uint32_t kNextSignalCheckTicks=0;
 
 void kIRQ0_handler()
 {
 #ifndef DEBUG_NONE
 static char currTime[200];
 static struct tm theDateTime;
-static bool doSigProc=true;
 #endif
     *kTicksSinceStart=*kTicksSinceStart+1;
     if (*kTicksSinceStart % kTicksPerSecond == 0)
@@ -26,14 +27,12 @@ static bool doSigProc=true;
         {
             scheduler();
         }
-        else if (doSigProc)
+        if (*kTicksSinceStart>kNextSignalCheckTicks)
         {
             printd(DEBUG_SIGNALS,"\nProcessing signals\n");
             processSignals();
-            doSigProc=!doSigProc;
+            kNextSignalCheckTicks+=TICKS_PER_SIGNAL_CHECK;
         }
-        else
-            doSigProc=!doSigProc;
     }
 #ifndef DEBUG_EXPANDED_TICK
         if ((kDebugLevel & DEBUG_EXPANDED_TICK) == DEBUG_EXPANDED_TICK)

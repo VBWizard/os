@@ -9,6 +9,7 @@
 #include "paging.h"
 #include "elfloader.h"
 #include "process.h"
+#include "dllist.h"
 
 extern void _sysCall();
 extern void _sysEnter();
@@ -27,9 +28,9 @@ extern uint32_t getSS();
 extern uint32_t getESP();
 extern bool schedulerTaskSwitched;
 extern cpuid_features_t kCPUFeatures;
-extern elfInfo_t* kExecLoadInfo;
 
 struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
+dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call listInit and pass the first item (a dllist_t*) to it
 
 void initKernelInternals()
 {
@@ -83,6 +84,4 @@ void initKernelInternals()
 
     printk("Installing new IRQ0 handler\n");
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
-
-    kExecLoadInfo=kMalloc(100*sizeof(elfInfo_t));
 }

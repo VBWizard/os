@@ -293,8 +293,8 @@ task_t* findTaskToRun()
         {
             //This is where we increment all the runnable ticks
             ((task_t*)*queue)->ticksSincePutInRunnable++;
-            if (((task_t*)*queue)->taskNum==1) 
-                ((task_t*)*queue)->ticksSincePutInRunnable++;   //Kernel task always gets extra priority.  This will usually allow the kernel to run 
+            //if (((task_t*)*queue)->taskNum==1) 
+            //    ((task_t*)*queue)->ticksSincePutInRunnable++;   //Kernel task always gets extra priority.  This will usually allow the kernel to run 
                                                                 //every other tick.
             if ( ((task_t*)*queue)->ticksSincePutInRunnable > mostIdleTicks)
             {
