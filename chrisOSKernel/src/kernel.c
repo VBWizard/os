@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
     char* testp[2];
     testp[0]=test[0];
     testp[1]=test[1];
-    process_t* process = createProcess(program,2,&testp,false);
+    process_t* process = createProcess(program, 2, &testp, NULL, false);
     schedulerEnabled=true;
 /*#define pcount 3
     char* param1[pcount][10];

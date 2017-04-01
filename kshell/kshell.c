@@ -99,8 +99,6 @@ int findCommand(char* command)
             return -1;
 }
 
-
-
 /*parts from http://*/
 char **buildargv (const char *input)
 {

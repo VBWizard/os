@@ -235,15 +235,18 @@ time_t mktime(struct tm *tmbuf) {
   return (time_t) seconds;
 }
 
-#if !defined(KERNEL) && !defined(OS_LIB)
-
+void getDateTimeString(char *s)
+{
+    static struct tm theDateTime;
+    gmtime_r((time_t*)&kSystemCurrentTime,&theDateTime);
+    strftime(s, 50, "%m/%d/%Y %H:%M:%S", &theDateTime);
+}
 
 char *_strdate(char *s) {
   time_t now;
 
   time(&now);
-  //fix me!
-  //  strftime(s, 9, "%D", localtime(&now));
+  strftime(s, 9, "%D", localtime(&now));
   return s;
 }
 
@@ -251,11 +254,11 @@ char *_strtime(char *s) {
   time_t now;
 
   time(&now);
-  //fix me
-  //  strftime(s, 9, "%T", localtime(&now));
+  strftime(s, 9, "%T", localtime(&now));
   return s;
 }
 
+#if !defined(KERNEL) && !defined(OS_LIB)
 void __attribute__((noinline))waitTicks(int TicksToWait)
 {
     //printf("ttw=%u",ttw);

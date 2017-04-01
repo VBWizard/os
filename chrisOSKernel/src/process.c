@@ -14,6 +14,8 @@
 #include "sysloader.h"
 #include "strings.h"
 
+extern time_t kSystemCurrentTime;
+
 void processWrapup();
 bool taskRegInitialized=false;
 
@@ -32,6 +34,7 @@ void processExit()
             printd(DEBUG_PROCESS,"processExit: Executing exitHandler %u @ 0x%08X\n",lCounter,process->exitHandler[lCounter]);
             x();
         }
+    gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
 
      __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (0x1), "b" (lRetVal));
     //freeMemory(process);
@@ -56,31 +59,36 @@ int sys_setpriority(process_t* process, int newpriority)
     return retVal;
 }
 
-process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
+process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool isKernelProcess)
 {
 
     process_t* process;
 
-    printd(DEBUG_PROCESS,"Creating %s process for %s\n",kernelProcess?"kernel":"user",path);
+    printd(DEBUG_PROCESS,"Creating %s process for %s\n",isKernelProcess?"kernel":"user",path);
     //NOTE: Using allocPages instead of malloc because we need the process struct to start on a page boundary for paging reasons, and
     //      allocPages always allocates entire pages
-    printd(DEBUG_PROCESS,"createProcess: Mallocing process_t\n",process);
+    printd(DEBUG_PROCESS,"createProcess: Mallocing process_t\n");
     process=allocPagesAndMap(sizeof(process_t));
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process\n",process);
     memset(process,0,sizeof(process_t));
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;
-    process->path=(char*)kMalloc(512);
+    process->path=(char*)kMalloc(0x1000);
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
     strcpy(process->path,path);
-    printd(DEBUG_PROCESS,"createProcess: Copied path (0x%08X) to process->path (0x%08X)\n",path,process->path);
     printd(DEBUG_PROCESS,"process->path (0x%08X)=%s\n",process->path,process->path);
     process->elf=NULL;
+    gmtime_r((time_t*)&kSystemCurrentTime,&process->startTime);
     
-    process->task=createTask(kernelProcess);
+    process->parent=parentProcessPtr;
+    if (process->parent!=NULL)
+        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
+    else
+        process->kernelProcess=isKernelProcess;
+       
+    process->task=createTask(isKernelProcess);
     process->task->process=process;
     process->processSyscallESP=process->task->tss->ESP1;
-   
     process->pageDirPtr=process->task->tss->CR3;
     process->priority=PROCESS_DEFAULT_PRIORITY;
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);

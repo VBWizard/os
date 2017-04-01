@@ -10,6 +10,7 @@
 #include "elfloader.h"
 #include "process.h"
 #include "dllist.h"
+#include "time_os.h"
 
 extern void _sysCall();
 extern void _sysEnter();
@@ -29,12 +30,18 @@ extern uint32_t getSS();
 extern uint32_t getESP();
 extern bool schedulerTaskSwitched;
 extern cpuid_features_t kCPUFeatures;
+extern time_t kSystemCurrentTime;
+extern void getDateTimeString(char *s);
 
 struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
 dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call listInit and pass the first item (a dllist_t*) to it
 
 void initKernelInternals()
 {
+    char currTime[50];
+    getDateTimeString((char*)currTime);
+    printk("Kernel init time is: %s\n",currTime);
+    
     uint32_t oldCR3=0;
     kKernelTask=getAvailableTask();
     kKernelProcess=(process_t*)allocPagesAndMap(sizeof(process_t));

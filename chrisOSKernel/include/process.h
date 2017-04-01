@@ -14,6 +14,7 @@
 #include "task.h"
 #include "../../chrisOS/include/i386/gdt.h"
 #include "../../chrisOS/include/elfloader.h"
+#include "time_os.h"
 
 #ifndef PROCESS_H
 #define PROCESS_H
@@ -43,10 +44,13 @@ extern "C" {
         uint32_t heapStart, heapEnd;
         short priority;           //-20=highest, 20=lowest
         void* exitHandler[PROCESS_MAX_EXIT_HANDLERS];
+        void* parent;
+        bool kernelProcess;
+        struct tm startTime, endTime;
     } process_t;
 
 
-    process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess);
+    process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool kernelProcess);
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);

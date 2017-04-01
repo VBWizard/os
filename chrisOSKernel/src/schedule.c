@@ -16,6 +16,7 @@ uintptr_t *qRunnable;
 uintptr_t *qStopped;
 uintptr_t *qUSleep;
 uintptr_t *qISleep;
+uintptr_t *qExited;
 
 extern uint32_t* kTicksSinceStart;
 uint32_t kTaskSwitchCount;
@@ -54,6 +55,10 @@ void initSched()
     qISleep=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qISleep,0,MAX_TASKS*sizeof(uintptr_t));
     qISleep[MAX_TASKS-1]=NO_NEXT;
+
+    qExited=kMalloc(MAX_TASKS*10*sizeof(uintptr_t));    //We want to store lots of exited tasks!
+    memset(qExited,0,MAX_TASKS*10*sizeof(uintptr_t));
+    qExited[(MAX_TASKS*10)-1]=NO_NEXT;
 
     qUSleep=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qUSleep,0,MAX_TASKS*sizeof(uintptr_t));
@@ -226,7 +231,7 @@ uintptr_t* getQ(eTaskState state)
             return qStopped;
             break;
         case TASK_EXITED:
-            return NULL;
+            return qExited;
         default:
             printd(DEBUG_PROCESS,"getQ: Invalid queue 0x%02X - %s",state,TASK_STATE_NAMES[state]);
             return NULL;
@@ -366,14 +371,11 @@ void changeTaskQueue(task_t* task, eTaskState newState)
 #endif
     if (oldQ==NULL)
         panic("changeTaskQueue: Invalid queue oldQ=0x%08X, state=%s",oldQ,TASK_STATE_NAMES[task->taskState]);
-    if (newQ==NULL && newState!=TASK_EXITED)
+    if (newQ==NULL)
         panic("changeTaskQueue: Invalid queue newQ=0x%08X, state=%s",newQ,TASK_STATE_NAMES[newState]);
     removeFromQ(oldQ,task);
-    if (newState!=TASK_EXITED)
-    {
-       task->taskState=newState;
-       addToQ(newQ,task);
-    }
+    task->taskState=newState;
+    addToQ(newQ,task);
     if (newState==TASK_RUNNABLE)
         task->prioritizedTicksInRunnable=0;
 }
@@ -439,6 +441,7 @@ void runAnotherTask(bool schedulerRequested)
                 break;
             case SIG_SEGV:
                 changeTaskQueue(taskToStop,TASK_EXITED);
+                storeISRSavedRegs(taskToStop);
                 break;
             case SIG_STOP:
                 changeTaskQueue(taskToStop,TASK_STOPPED);
