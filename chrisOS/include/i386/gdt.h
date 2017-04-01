@@ -8,17 +8,20 @@
 #ifndef GDT_H
 #define	GDT_H
 #include <stdbool.h>
+#include <stdint.h>
+
 #pragma once
 #pragma pack(1)
-struct GDT
+
+typedef struct sgdt
 {
-    unsigned short limit_low;
-    unsigned short base_low;
-    char base_middle;
-    char access;
-    char flags_and_limit;
-    char base_high;
-} __attribute__((packed)) ;
+    unsigned short limit_low;       //2
+    unsigned short base_low;        //2
+    char base_middle;               //1
+    char access;                    //1
+    char flags_and_limit;           //1
+    char base_high;                 //1
+} sGDT;
 
 struct gdt_ptr 
 {
@@ -48,11 +51,15 @@ enum {
     GDT_32BIT       = 0x40,
     GDT_16BIT       = 0x00
 };
-
-#define GDT_ENTRIES 50
+//80+60+
 
 void gdt_init();
-void gdtEntry(int entryNo, int base, int limit, char access, char flags,bool inUse);
-
+void gdtEntryApplication(int entryNo, int base, int limit, char access, char flags,bool inUse);
+void gdtEntryOS(int entryNo, int base, int limit, char access, char flags,bool inUse);
+sGDT* getNewGDTEntry();
+uint16_t getNonKernelCodeGDTIndex();
+uint16_t getNonKernelDataGDTIndex();
+uint16_t getKernelCodeGDTIndex();
+uint16_t getKernelDataGDTIndex();
+void installGDT();
 #endif	/* GDT_H */
-

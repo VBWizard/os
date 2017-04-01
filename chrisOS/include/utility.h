@@ -49,6 +49,8 @@ void displayPause();
 void printDumpedRegs();
 void reboot(bool waitFirst);
 bool pauseDisplay(bool offerToQuit);
+void displayGDTTable();
+
 #if defined(__i386__)
 
 static __inline__ unsigned long long rdtsc(void)

@@ -17,7 +17,7 @@
 
 void IRQ_set_mask(unsigned char IRQline);
 void IRQ_clear_mask(unsigned char IRQline);
-
+void init_serial();
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
 	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));

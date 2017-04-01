@@ -11,6 +11,8 @@ void __attribute__((noinline))panic(const char *format, ...)
     printk("\n>>>panic at instruction prior to address 0x%08X<<<\n", __builtin_return_address(0));
     printk("  >>>");
     printk_valist( format,args);
-    panicLoop: goto panicLoop;
+    panicLoop: 
+    __asm__("cli\nhlt\n");
+    goto panicLoop;
 }
 

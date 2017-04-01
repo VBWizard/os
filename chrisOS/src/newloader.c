@@ -26,7 +26,7 @@ void processELFDynamicSection(elfInfo_t* elfInfo)
         switch (dyn[cnt].d_tag)
         {
             //DT_NEEDED is a library which we need to load
-            case DT_NEEDED:
+/*            case DT_NEEDED:
                 printk("ELF at: 0x%08X, copy to: 0x%08X, neededCount=0x%08X\n",elfInfo, elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount],elfInfo->dynamicInfo.neededCount);
                 strcpy(elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount++],(char*)(elfInfo->dynamicInfo.strTableAddress+dyn[cnt].d_un.d_ptr));
                 char fileName[100]="/";
@@ -55,7 +55,7 @@ void processELFDynamicSection(elfInfo_t* elfInfo)
                     return;
                 }
                 break;
-            case DT_PLTRELSZ:
+*/            case DT_PLTRELSZ:
                 elfInfo->dynamicInfo.pltGOTTableTableSize=dyn[cnt].d_un.d_val;
                 break;
             case DT_PLTGOT:
@@ -80,7 +80,7 @@ void processELFDynamicSection(elfInfo_t* elfInfo)
                 elfInfo->dynamicInfo.relAEntrySize=dyn[cnt].d_un.d_val;
                 break;
             case DT_STRSZ:
-                elfInfo->dynamicInfo.strTableSize=dyn[cnt].d_un.d_val;
+                elfInfo->dynamicInfo.strTableSize[0]=dyn[cnt].d_un.d_val;
                 break;
             case DT_SYMENT:
                 elfInfo->dynamicInfo.symEntrySize=dyn[cnt].d_un.d_val;
@@ -213,9 +213,9 @@ void loadSections(void* file,elfInfo_t* elfInfo, bool isLibrary)
         {
             printd(DEBUG_ELF_LOADER,"seeking to 0x%08X ...",elfInfo->pgmHdrTable[cnt].p_offset);
             fl_fseek(file, elfInfo->pgmHdrTable[cnt].p_offset, SEEK_SET);
-            printd(DEBUG_ELF_LOADER,"reading %u bytes to 0x%08X\n",elfInfo->pgmHdrTable[cnt].p_memsz,loadAddress);
-            fl_fread(loadAddress, 1, elfInfo->pgmHdrTable[cnt].p_memsz, file);
-            printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", cnt, elfInfo->pgmHdrTable[cnt].p_memsz, loadAddress);
+            printd(DEBUG_ELF_LOADER,"reading %u bytes to 0x%08X\n",elfInfo->pgmHdrTable[cnt].p_filesz,loadAddress);
+            fl_fread(loadAddress, 1, elfInfo->pgmHdrTable[cnt].p_filesz, file); //CLR 03/12/2017: Changed from p_memsz to p_filesz (prev & next line too))
+            printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", cnt, elfInfo->pgmHdrTable[cnt].p_filesz, loadAddress);
             if (elfInfo->pgmHdrTable[cnt].p_filesz<elfInfo->pgmHdrTable[cnt].p_memsz)
             {
                 printd(DEBUG_ELF_LOADER,"Section %u has uninitialized data, zeroed 0x%08X bytes at 0x%08X\n", cnt, elfInfo->pgmHdrTable[cnt].p_memsz-elfInfo->pgmHdrTable[cnt].p_filesz, loadAddress+elfInfo->pgmHdrTable[cnt].p_filesz);
@@ -225,8 +225,6 @@ void loadSections(void* file,elfInfo_t* elfInfo, bool isLibrary)
         else if (elfInfo->pgmHdrTable[cnt].p_memsz>0)
         {
             printd(DEBUG_ELF_LOADER,"Section %u not loadable, zeroed 0x%08X bytes at 0x%08X\n",cnt, elfInfo->pgmHdrTable[cnt].p_memsz, loadAddress);
-            //CLR 02/10/2017: Remarked out memset below, as loading the kernelData was overwriting all the existing values.
-            //memset(loadAddress,0,elfInfo->pgmHdrTable[cnt].p_memsz);
         }
 #ifndef DEBUG_NONE
         else
@@ -268,7 +266,6 @@ void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary)
                         elfInfo->secHdrTable[cnt].sh_type);
         }
         printd(DEBUG_ELF_LOADER,"End of section table... press a key to continue\n");
-        waitForKeyboardKey();
     }
     
     //Find the symbol and string tables in the dynamic section
@@ -282,9 +279,9 @@ void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary)
         {
             if (dyn[cnt].d_tag==DT_STRTAB)
             {
-                elfInfo->dynamicInfo.strTableAddress=dyn[cnt].d_un.d_ptr;
+                elfInfo->dynamicInfo.strTableAddress[0]=dyn[cnt].d_un.d_ptr;
                 if (isLibrary)
-                    elfInfo->dynamicInfo.strTableAddress+=libLoadOffset;
+                    elfInfo->dynamicInfo.strTableAddress[0]+=libLoadOffset;
                 printd(DEBUG_ELF_LOADER,"Found dynamic string table address 0x%08X\n",elfInfo->dynamicInfo.strTableAddress);
             }
             else if (dyn[cnt].d_tag==DT_SYMTAB)
@@ -327,7 +324,8 @@ int exec(char* fileName,int argc,char** argv)
     } 
     
     //Get a slot in the load info
-    elfInfo_t* elf=&kExecLoadInfo[kExecLoadCount++];
+    elfInfo_t elfF;
+    elfInfo_t* elf=&elfF;
     
     //Load the executable
     loadElf(fPtr,elf,false);

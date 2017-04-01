@@ -1,14 +1,16 @@
 #!/bin/bash
+#!/bin/bash
 rm ./myos.iso
 pushd ..
 ./make_debug
 popd
+./makeall
 #strip --strip-debug --strip-unneeded Debug/cross-Linux-x86/chrisos
-cp Debug/cross-Linux-x86/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
+cp Debug/cross-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
 grub-mkrescue -o myos.iso ~/src/os/build_dir/isodir
 qemu-system-i386 							\
 	-m 1536								\
-	-smp 8    							\
+	-smp 4    							\
 	-usb                                            		\
 	-cdrom /home/yogi/src/os//chrisOS/dist/myos.iso 	\
 	-boot order=d							\
@@ -22,7 +24,11 @@ qemu-system-i386 							\
 	-device ide-cd,drive=sata-cd-0,bus=ahci0.1			\
        	-device ide-drive,drive=sata-disk-2,bus=ahci1.0 		\
         -device ide-drive,drive=sata-disk-0,bus=ahci1.1 		\
-	-S -s
+	-serial file:"qemu_port.log"					\
+	-S -s								\
+	-d int,cpu_reset,pcall,guest_errors                                     \
+	-machine accel=tcg						\
+#	@$
 #	--enable-kvm
 
 #drive=/home/yogi/qemu-usb-mass-storage.dsk

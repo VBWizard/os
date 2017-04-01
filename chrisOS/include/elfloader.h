@@ -7,6 +7,7 @@
 
 #ifndef ELFLOADER_H
 #define	ELFLOADER_H
+#include "../../chrisOSKernel/include/dllist.h"
 
 #ifdef	__cplusplus
 extern "C" {
@@ -20,25 +21,37 @@ typedef struct sElfDynamicInfo
 {
     char neededName[10][256];
     int neededPtr;
-    int neededExecLoadNum[10];
-    int jmpRelSz, relATableSize, relAEntrySize, strTableSize, symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,neededCount, soNameStringIndex, rPathStringIndex, relEntryCount;
-    uintptr_t pltGOTTableAddress, hashTableAddress, strTableAddress, symTableAddress, relATableAddress, initFunctionAddress, termFunctionAddress, relTableAddress;
-    
+    int jmpRelSz, relATableSize, relAEntrySize, strTableName[50], strTableSize[50], symEntrySize, relTableSize, pltGOTTableTableSize,relEntrySize,
+            neededCount, soNameStringIndex, rPathStringIndex, relEntryCount, dynTableSize, dynEntrySize, dynEntryCount;
+    uintptr_t pltGOTTableAddress, hashTableAddress, *strTableAddress[50], strTableFilePtr[50], symTableAddress, relATableAddress, initFunctionAddress, 
+            termFunctionAddress, relTableAddress,
+            relTable_symTableLink;
+    Elf32_Rela *relATable;
+    Elf32_Rel *relTable;    
+    Elf32_Dyn* dynTable;
 } elfDynamic_t;
 
 typedef struct sElfInfo
 {
+    int libraryElfCount;
+    void* libraryElfPtr[10];
     Elf32_Ehdr hdr;
     Elf32_Shdr secHdrTable[50];
     Elf32_Phdr pgmHdrTable[50];
-    int secHdrRecordCount, pgmHdrRecordCount,dynamicRecordCount;
-    uintptr_t dynamicSectionAddress;
+    Elf32_Sym *symTable;
+    int secHdrRecordCount, pgmHdrRecordCount,dynamicRecordCount, dynamicSymbolRecordCount, symTableRecordCount, symStrTabLink;
+    uintptr_t dynamicSectionAddress, dynamicSymbolAddress;
     elfDynamic_t dynamicInfo;
     uintptr_t libLoadAddress;
-    bool loadCompleted;
+    bool loadCompleted,isLibrary;
+    int sectionNameStringTable, dynamicNameStringTable, generalNameStringTable;
+    char* fileName;
+    dllist_t loadList;
+    bool mapMemoryOnly; //set to true if library is already loaded, and we only want to map it into the new process
 } elfInfo_t;
 
 void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);
+void sysProcessReturn();
 
 #ifdef	__cplusplus
 }

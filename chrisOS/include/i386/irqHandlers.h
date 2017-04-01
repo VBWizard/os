@@ -14,6 +14,6 @@ void irq0_handler();
 void kbd_handler();
 void defaultISRHandler();
 void pagingExceptionHandler();
-extern volatile char* kKeyboardBuffer;   //reuse original BIOS keyboard buffer!
+extern volatile char* kKeyboardBufferBasePtr;   //reuse original BIOS keyboard buffer!
 #endif	/* NEWFILE_H */
 

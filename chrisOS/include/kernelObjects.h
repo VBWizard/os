@@ -18,6 +18,7 @@
 #include "ahci.h"
 #include "../../chrisOSKernel/include/tss.h"
 #include "../../chrisOSKernel/include/task.h"
+#include "../../chrisOSKernel/include/process.h"
 #include "elfloader.h"
 
 #ifndef KERNELOBJECTADDRESSES_H
@@ -35,7 +36,7 @@ KERNEL_DATA_SECTION uint32_t exceptionNumber;
 uint32_t KERNEL_DATA_SECTION *exceptionSavedStack = (uint32_t *)SAVED_STACK_FOR_EXCEPTIONS_ADDRESS;
 KERNEL_DATA_SECTION uint32_t *debugSavedStack = (uint32_t *)SAVED_STACK_FOR_DEBUGGING_ADDRESS;
 uint32_t KERNEL_DATA_SECTION exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR3, exceptionCR4,
-                             exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionSavedESP,exceptionFlags, exceptionErrorCode, exceptionEIP, exceptionCS, exceptionCR2;
+                             exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionSavedESP,exceptionFlags, exceptionErrorCode, exceptionEIP, exceptionCS, exceptionCR2, exceptionTR;
 KERNEL_DATA_SECTION uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR3, debugCR4,
                              debugDS, debugES, debugFS, debugGS, debugSS, debugSavedESP,debugFlags, debugErrorCode, debugCS, debugEIP;
 KERNEL_DATA_SECTION sizeof_t kDataSizes;
@@ -52,7 +53,7 @@ KERNEL_DATA_SECTION int kTimeZone = (3600*TIMEZONE);
 KERNEL_DATA_SECTION uint64_t kKernelPagedBaseAddress = KERNEL_PAGED_BASE_ADDRESS;
 KERNEL_DATA_SECTION bool kInitDone = 0;
 KERNEL_DATA_SECTION bool kPagingInitDone = 0;
-KERNEL_DATA_SECTION uint32_t* kKernelPageDir = (uint32_t*)KERNEL_PAGE_DIR_ADDRESS;
+KERNEL_DATA_SECTION uint32_t* kKernelPageDir = (uint32_t*)KERNEL_CR3;
 KERNEL_DATA_SECTION uint32_t* kKernelPageTables = (uint32_t*)KERNEL_PAGE_TABLE_BASE_ADDRESS;
 KERNEL_DATA_SECTION uint8_t kPCIDeviceCount=0;
 KERNEL_DATA_SECTION uint8_t kPCIBridgeCount=0;
@@ -73,21 +74,18 @@ KERNEL_DATA_SECTION uintptr_t* kIOAPICPtr;
 KERNEL_DATA_SECTION mpConfig_t* kMPConfigTable=(mpConfig_t*)MP_CONFIG_TABLE_ADDRESS;
 KERNEL_DATA_SECTION cpuid_features_t kCPUFeatures;
 KERNEL_DATA_SECTION cpu_t kCPU[8];
-KERNEL_DATA_SECTION volatile char* kKeyboardBuffer = (char*)KEYBOARD_BUFFER_ADDRESS-1;
 KERNEL_DATA_SECTION uint32_t kOriginalAddressZeroValue=0;
 KERNEL_DATA_SECTION ahcicaps_t* ahciCaps=(ahcicaps_t*)AHCI_CAPS_ADDRESS;
 KERNEL_DATA_SECTION int ahciCapsCount=0;
 KERNEL_DATA_SECTION uint32_t* kGDTSlotAvailableInd=(uint32_t*)GDT_AVAILABLE_ADDRESS;
-KERNEL_DATA_SECTION uint32_t* kTSSSlotAvailableInd=(uint32_t*)TSS_AVAILABLE_ADDRESS;
+KERNEL_DATA_SECTION uint32_t* kTaskSlotAvailableInd=(uint32_t*)TASK_AVAILABLE_ADDRESS;
 KERNEL_DATA_SECTION tss_t* kTSSTable=(tss_t*)TSS_TABLE_ADDRESS;
 KERNEL_DATA_SECTION task_t* kTaskTable=(task_t*)TASK_TABLE_ADDRESS;
-KERNEL_DATA_SECTION elfInfo_t* kExecLoadInfo=(elfInfo_t*)EXEC_FILE_LOAD_INFO;
-KERNEL_DATA_SECTION int kExecLoadCount=0;
 KERNEL_DATA_SECTION int kSelectedDiskNum=-1; 
 KERNEL_DATA_SECTION int kSelectedPartNum=-1;
 KERNEL_DATA_SECTION volatile HBA_PORT* kAHCICurrentDisk;
 KERNEL_DATA_SECTION partEntry_t kAHCICurrentPart;
-KERNEL_DATA_SECTION volatile char* kKeyboardBufferBase = (char*)KEYBOARD_BUFFER_ADDRESS;
+KERNEL_DATA_SECTION volatile char* kKbdBuffCurrTop = (char*)KEYBOARD_BUFFER_ADDRESS;
 
 /*time.h*/
 KERNEL_DATA_SECTION int _daylight = 0;                  // Non-zero if daylight savings time is used
@@ -97,15 +95,17 @@ KERNEL_DATA_SECTION int ticksToWait;
 
 //NOTE: This is a temporary table in the .asm section.  It is copied to smap_table_ptr as soon as the E820 reading is complete
 KERNEL_DATA_SECTION struct gdt_ptr rmGdtp;
-KERNEL_DATA_SECTION struct GDT* rmGdt = (struct GDT*)GDT_PMODE_16BIT_TABLE_ADDRESS;
-KERNEL_DATA_SECTION struct GDT* gdt = (struct GDT*)INIT_GDT_TABLE_ADDRESS;
-KERNEL_DATA_SECTION struct gdt_ptr gdtp;
+KERNEL_DATA_SECTION sGDT* rmGdt = (sGDT*)GDT_PMODE_16BIT_TABLE_ADDRESS;
+KERNEL_DATA_SECTION sGDT* bootGdt = (sGDT*)INIT_GDT_TABLE_ADDRESS;
+KERNEL_DATA_SECTION struct gdt_ptr kernelGDT;
+KERNEL_DATA_SECTION volatile char* kKbdBuffCurrChar = (char*)KEYBOARD_BUFFER_ADDRESS;
 
+KERNEL_DATA_SECTION char kBootCmd[255];
 //AHCI
-KERNEL_DATA_SECTION HBA_MEM* ahciABAR = (struct HBA_MEM*)AHCI_ABAR_ADDRESS;
+KERNEL_DATA_SECTION HBA_MEM* ahciABAR = (HBA_MEM*)AHCI_ABAR_ADDRESS;
 
-
-
+KERNEL_DATA_SECTION task_t* kKernelTask;
+KERNEL_DATA_SECTION process_t* kKernelProcess;
 KERNEL_DATA_SECTION const char *_days[7] = {
   "Sunday", "Monday", "Tuesday", "Wednesday",
   "Thursday", "Friday", "Saturday"

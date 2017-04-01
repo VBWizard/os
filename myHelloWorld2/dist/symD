@@ -1,4 +1,4 @@
-pushd
+pushd ..
 ./make_debug
 popd
 objdump -x -t Debug/cross-Linux-x86/myhelloworld2 > myhelloworld2.sym

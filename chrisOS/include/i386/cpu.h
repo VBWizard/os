@@ -20,6 +20,7 @@
 #define ACS_WRITE       0x02            /* writable segment */
 #define ACS_IDT         ACS_DSEG        /* segment type is the same type */
 #define ACS_INT_GATE    0x0E            /* int gate for 386 */
+#define ACS_TRAP_GATE   0x0F            /* CLR: trap gate for 386 */
 #define ACS_INT         (ACS_PRESENT | ACS_INT_GATE) /* present int gate */
 #define ACS_TSS_GATE    0x09
 #define ACS_TSS         (ACS_PRESENT | ACS_TSS_GATE) /* present tss gate */
@@ -34,6 +35,10 @@
 #define ACS_CALL16      (ACS_PRESENT | ACS_CALL_GATE16) /* present 16-bit call gate */
 #define ACS_CALL_GATE32 0x0C
 #define ACS_CALL32      (ACS_PRESENT | ACS_CALL_GATE32) /* present 32-bit call gate */
+
+#define CLR_TSS_CODE    0x1
+#define CLR_TSS_CONFORM 0x2
+#define CLR_TSS_CODE_READ 0x4
 
 /* Ready-made values */
 #define ACS_CODE        (ACS_PRESENT | ACS_CSEG | ACS_READ)

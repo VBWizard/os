@@ -1,0 +1,67 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+#include "libChrisOS.h"
+
+#define READCHAR(c)     {asm("mov eax,0x3\ncall sysEnter_Vector\n":"=a" (c):"b" (1));}
+#define PUTSTRING(c) {asm("mov eax,0x4\ncall sysEnter_Vector\n"::"b" (1), "c" (c));}
+
+VISIBLE void puts(char* buffer)
+{
+    PUTSTRING(buffer)
+}
+
+VISIBLE void putc(char c)
+{
+    char buffer[2]={0};
+    
+    buffer[0]=c;
+    buffer[1]=0;
+    PUTSTRING(&buffer);
+}
+
+VISIBLE char getc()
+{
+    char c;
+    READCHAR(c)
+    return c;
+}
+
+VISIBLE void gets(char* buffer, int maxlen, int stream)
+{
+    char inchar;
+    int len=0;
+    char lbuf[2]={0,0};
+    
+    if (stream!=1)
+    {
+        print("Stream %u not implemented\n",stream);
+        getsError: goto getsError;
+    }
+    
+    while (1==1)
+    {
+        READCHAR(inchar)
+        if (inchar=='\b' && len>0)
+        {
+            buffer[len]=0;
+            len--;
+        }
+        else if (inchar>0)
+        {
+            lbuf[0]=inchar;
+            PUTSTRING(&lbuf);
+            buffer[len++]=inchar;
+            //Note: Written this way so that gets an be used as a getc which waits for the key
+            if ((len+1>=maxlen) || (inchar==0x0a)) //-1 because we need to leave the terminator (0x0) at the end of the string
+            
+                return;
+        }
+        else
+            asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
+
+    }
+}
+

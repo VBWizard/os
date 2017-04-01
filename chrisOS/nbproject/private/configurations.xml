@@ -15,6 +15,8 @@
         </gdb_interceptlist>
         <gdb_options>
           <DebugOptions>
+            <option name="debug_command"
+                    value="/home/yogi/src/binutils-gdb/gdb/gdb -x /home/yogi/src/chrisOS/dist/gdbcmds"/>
           </DebugOptions>
         </gdb_options>
         <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
@@ -25,11 +27,13 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>/home/yogi/src/os/chrisOS/dist/testisoD</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <runcommand>/home/yogi/src/os/chrisOS/dist/testisoD</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
-        <terminal-type>0</terminal-type>
+        <console-type>2</console-type>
+        <terminal-type>1</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>
         </environment>

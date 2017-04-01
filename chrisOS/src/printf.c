@@ -32,7 +32,11 @@
 
 #include <stdarg.h>
 #include "chrisos.h"
+#include "printf.h"
 #include <stdint.h>
+#include "io.h"
+#include "time_os.h"
+
 //extern bool pauseDisplay(bool offerToQuit);
 extern uint32_t kDebugLevel;
 uint8_t printDLineCount;
@@ -126,7 +130,7 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	return pc + prints (out, s, width, pad);
 }
 
-static int print(char **out, const char *format, va_list args )
+static int printI(char **out, const char *format, va_list args )
 {
 	register int width, pad;
 	register int pc = 0;
@@ -190,21 +194,50 @@ static int print(char **out, const char *format, va_list args )
 	return pc;
 }
 
+int printp_valist(const char *format, va_list args)
+{
+    char inString[1024];
+    char* in=inString;
+
+    printI(&in, format,args);
+    
+    for (int cnt=0;cnt<strlen(inString);cnt++)
+    {
+            outb(0x3f8,inString[cnt]);
+    }
+    
+}
+
+void printu(const char *format, va_list args)
+{
+        return printI(0, format, args);
+}
+
 int printk_valist(const char *format, va_list args)
 {
-    return print(0, format, args);
+    return printI(0, format, args);
 }
 
 int printk(const char *format, ...)
 {
         va_list args;
         va_start( args, format );
-        return printk_valist(format, args);
+        return printI(0, format, args);
+        //return printk_valist(format, args);
 }
 
 #ifdef DEBUG_NONE
 int printd() {}
 #else
+int printd_valist(uint32_t DebugLevel, const char *format, va_list args)
+{
+    if ((kDebugLevel & DebugLevel) == DebugLevel)    
+        if (kDebugLevel & DEBUG_PRINT_TO_PORT)
+            printp_valist(format,args);
+        else
+            return printk_valist(format, args);
+}
+
 int printd(uint32_t DebugLevel, const char *format, ...)
 {
     if ((kDebugLevel & DebugLevel) == DebugLevel)    
@@ -212,12 +245,11 @@ int printd(uint32_t DebugLevel, const char *format, ...)
         va_list args;
 
         va_start( args, format );
-//        if (++printDLineCount==SYS_VGA_HEIGHT-1)
-//        {
-//            pauseDisplay(false);
-//            printDLineCount=0;
-//        }
-        return printk_valist(format, args);
+        
+        if (kDebugLevel & DEBUG_PRINT_TO_PORT)
+            printp_valist(format,args);
+        else
+            return printk_valist(format, args);
     }
     return 0;
 }
@@ -228,7 +260,7 @@ int sprintf(char *out, const char *format, ...)
         va_list args;
         
         va_start( args, format );
-        return print( &out, format, args );
+        return printI( &out, format, args );
 }
 
 #ifdef TEST_PRINTF

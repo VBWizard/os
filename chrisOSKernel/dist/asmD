@@ -2,5 +2,6 @@
 pushd ..
 ./make_debug
 popd
-objdump -d -S -l Debug/cross-Linux/chrisoskernel -M intel-mnemonic > chrisoskernel_all_debug.asm
-vi chrisoskernel_all_debug.asm
+rm kernel_all_debug.asm
+objdump -d -S -l Debug/cross-Linux/kernel -M intel-mnemonic > kernel_all_debug.asm
+vi kernel_all_debug.asm

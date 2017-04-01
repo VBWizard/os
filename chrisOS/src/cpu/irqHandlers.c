@@ -27,6 +27,8 @@ extern int kTicksPerSecond;
 extern time_t kSystemCurrentTime;
 extern uint32_t exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR3, exceptionCR4;
 extern bool kPagingInitDone;
+extern bool kKbdHandlerActivateDebugger;
+extern volatile char* kKbdBuffCurrTop;
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
@@ -88,8 +90,6 @@ void kbd_handler()
     rawKey = inb(KEYB_DATA_PORT);
     kKeyChar = rawKey;//& 0x80;
 
-    __asm__("cli\n");
-    
     switch(rawKey)  
     {
         case KEY_SHIFT_DN: kKeyStatus[INDEX_SHIFT]=1;break;
@@ -107,11 +107,11 @@ void kbd_handler()
 //printk("%02X",rawKey);
            //changed from if rawkey & 0x80, so that keydown triggers the key being input
            if (rawKey==BREAK_RIGHT || rawKey==BREAK_LEFT || rawKey==BREAK_UP || rawKey==BREAK_DOWN)
-               if (kKeyboardBuffer<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
+               if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
                //CLR 01/10/2017: Increment the buffer pointer first
                {    
-                   kKeyboardBuffer++;
-                   *kKeyboardBuffer=rawKey;
+                   kKbdBuffCurrTop++;
+                   *kKbdBuffCurrTop=rawKey;
                }
            if (!(rawKey & 0x80))
            {
@@ -134,36 +134,42 @@ void kbd_handler()
                     printk("^");
                     translatedKeypress-=32;
                 }
-            if (kKeyboardBuffer<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
+            if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
             {
                 //CLR 01/10/2017: Increment the buffer pointer first
-                {   kKeyboardBuffer++;
-                    *kKeyboardBuffer=translatedKeypress;
+                {   
+                    kKbdBuffCurrTop++;
+                    *kKbdBuffCurrTop=translatedKeypress;
                 }
 #ifndef DEBUG_NONE
                  if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-                    printk("kbd_handler: %c-(%08X)\n",translatedKeypress, kKeyboardBuffer);
+                 {
+                    printk("kbd_handler: %c-(%08X)\n",translatedKeypress, kKbdBuffCurrTop);
+                    cursorSavePosition();
+                    cursorMoveTo(78,0);
+                    printk("%c",'k');
+                    cursorRestorePosition();
+                 }
 #endif
-                cursorSavePosition();
-                cursorMoveTo(78,0);
-                printk("%c",'k');
-                cursorRestorePosition();
             }
             else
             {
 #ifndef DEBUG_NONE
                 if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-                      printk("noRoomForKey: %c\n",kKeyboardBuffer);
+                {
+                    printk("noRoomForKey: %c\n",kKbdBuffCurrTop);
+                    cursorSavePosition();
+                    cursorMoveTo(78,0);
+                    printk("%c",'K');
+                    cursorRestorePosition();
+                }
 #endif
-                cursorSavePosition();
-                cursorMoveTo(78,0);
-                printk("%c",'K');
-                cursorRestorePosition();
             }
                  //Debug
                  if (kKeyStatus[INDEX_ALT] && translatedKeypress==0x6A)
                  {
-                     __asm("int 0x3");
+                     //__asm("int 0x3");
+                     kKbdHandlerActivateDebugger=true;
                  }
             if (kKeyStatus[INDEX_ALT] && kKeyStatus[INDEX_CTRL] && translatedKeypress==0xE0)
             {
@@ -238,11 +244,13 @@ void pagingExceptionHandler()
           printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
 #endif
+    if (lOldDebugLevel)
+        kDebugLevel=lOldDebugLevel;
     if ((exceptionCR2&0xFFFFF000)==0xC0000000 && (!kPagingInitDone))
     {
 #ifndef DEBUG_NONE
-        if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
-            printk("pagingExceptionHandler: Updating readonly flag for 0x%08X\n",exceptionCR2);
+        if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)
+            printk("\n\tpagingExceptionHandler: Updating 0x%08X to read/write for WP test ...\n\t",exceptionCR2);
 #endif
         kPagingSetPageReadOnlyFlag((uintptr_t*)lPTEAddress, false);
     }
@@ -255,8 +263,6 @@ void pagingExceptionHandler()
 //    }
 #endif
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
-    if (lOldDebugLevel)
-        kDebugLevel=lOldDebugLevel;
     if ((!kPagingInitDone) && exceptionCR2==0xC0000000)
     {
         exceptionCR2=0;
@@ -290,6 +296,8 @@ void defaultISRHandler()
 //    return;
     
 defaultHandlerLoop:
+    __asm__("cli");
+    __asm__("hlt");
     goto defaultHandlerLoop;
 }
 

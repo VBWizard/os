@@ -27,6 +27,7 @@
 #include "ahci.h"
 #include "kernelObjects.h"
 
+extern uint32_t storeGDT(struct gdt_ptr* gdtp);
 extern void set_gdt(struct gdt_ptr *);
 extern int detect_cpu();
 extern bool kInitDone;
@@ -37,12 +38,13 @@ extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 extern void pciInitialize();
 extern void kSetPhysicalRangeRO(uint32_t startAddy, uint32_t endPage, bool readOnly);
+extern void kUnMapPage(uintptr_t mapTo);
 extern uint64_t kE820MemoryBytes;
 extern struct mbr_t* kMBR;
 extern uint8_t* lowSmapTablePtr;
 extern uint32_t kOriginalAddressZeroValue;
 extern uint8_t smpBootCPUCount, smpBootCPUsStarted;
-extern void biShell();
+extern void bootShell();
 extern void AP_startup();
 extern int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count);
 extern int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count);
@@ -50,8 +52,8 @@ extern int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_
 bool ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char* cmdToFind, int paramCount);
 
 char kBootParams[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-char kBootCmd[150];
 int kBootParamCount;
+struct gdt_ptr lGDT;
 
 //CLR 04/27/2016: Even though we are working on our cross compiler env, somehow __linus is set
 //so unset it
@@ -78,16 +80,35 @@ int kBootParamCount;
  */
 void HIGH_CODE_SECTION gdt_init()
 {
-    gdtEntry(1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
+    gdtEntryApplication(0x1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,       //ring 0 starting at 0x00, always
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,
+    gdtEntryApplication(0x2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,       //ring 0 starting at 0x0, updated to 0xC0000000 when paging initialized
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(3, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,      //this will stay at base 0x0, never 0xc0000000
+    gdtEntryApplication(0x3, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //18 - ring 0 Kernel starting at 0x0 ***Need to change this to KERNEL_PAGED_BASE_ADDRESS base
+              GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryApplication(0x4, KERNEL_PAGED_BASE_ADDRESS , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - ring 0 Kernel starting at 0xC0000000
+              GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryApplication(0x5, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE /*| GDT_GROW_DOWN*/,       //28 - ring 0 starting at 0x0
+              GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryApplication(0x6, 0, 0xFFFFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE,    //30 (33) - ring 3 segment starting at 0x0
+              GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryApplication(0x7, 0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE ,       //38 (3b) - ring 3 starting at 0x0
+              GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryApplication(0x8, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE /*| GDT_GROW_DOWN*/,       //40 (43) - ring 3 starting at 0x0
           GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(4, KERNEL_PAGED_BASE_ADDRESS , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
+    gdtEntryApplication(0x10, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - ring 0 starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(5, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,       //this will always stay at base 0x0, never 0xC0000000
+
+    gdtEntryApplication(0x11, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE, //88 ring 0 starting at 0x0 - code used by sysEnter
+          GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryApplication(0x12, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //90 - ring 0 starting at 0x0 data used by sysEnter
               GDT_GRANULAR | GDT_32BIT,true);
+
+    gdtEntryApplication(0x13, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE, //88 ring 0 starting at 0x0 - code used by sysEnter
+          GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryApplication(0x14, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE,    //90 - ring 0 starting at 0x0 data used by sysEnter
+              GDT_GRANULAR | GDT_32BIT,true);
+
     
     gdtEntryRM(1, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
               GDT_GRANULAR | GDT_16BIT);
@@ -96,11 +117,11 @@ void HIGH_CODE_SECTION gdt_init()
     gdtEntryRM(3, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_WRITABLE,
               GDT_GRANULAR | GDT_32BIT);
 
-    gdtp.limit = sizeof(struct GDT) * GDT_ENTRIES - 1;
-    gdtp.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
-    rmGdtp.limit = sizeof(struct GDT) * GDT_ENTRIES - 1;
+    kernelGDT.limit = 0x7ff; // (sizeof(sGDT) * GDT_ENTRIES) - 1;
+    kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
+    rmGdtp.limit = sizeof(sGDT) * (GDT_TABLE_SIZE*8) - 1;
     rmGdtp.base = (unsigned int)rmGdt;
-    set_gdt(&gdtp);
+    set_gdt(&kernelGDT);
 }
 
 void HIGH_CODE_SECTION quietHardware()
@@ -187,13 +208,37 @@ bool HIGH_CODE_SECTION ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH]
             return true;
     return false;
 }
+void extern enableCR0_WP();
+
+void HIGH_CODE_SECTION testWPBit()
+{
+    enableCR0_WP();
+    printk("PAGING: Kernel paged base: 0x%08X\n",KERNEL_PAGED_BASE_ADDRESS);
+    printk("PAGING: Making page @ 0x00000000 read only\n");
+    kSetPhysicalRangeRO(0x0,0xFFF,true);
+    printk("PAGING: Testing whether CPU honors WP flag ... ");
+  __asm__("cli\n");
+  __asm__("mov %0,[0x0]\n":"=r" (kOriginalAddressZeroValue));
+  __asm__("mov eax,0xdeadbeef\n mov [0x0],eax\n");    //purposely write address 0 which we made "read only"
+  __asm__("mov eax,cr0\n":::"eax");
+  if (kPagingExceptionsSinceStart==1)
+    printk("WP bit works!\n");
+  else
+      printk("WP bit does not work\n");
+  //Can't unmap page 0x0 or the memory manager will see it as free space, so set it read-only again
+  __asm__("mov eax,0x0\n mov [0x0],eax\n");    //purposely write address 0 which we made "read only"
+  kSetPhysicalRangeRO(0x0,0xFFF,true);
+}
 
 void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/) {
     
 char currTime[150];
 struct tm theDateTime;
     //Zero out all of the memory we will be using as rebooting a computer doesn't necessarily clear memory
-    //memset(0x200000,0,0x1000000);
+    memset((void*)KERNEL_OBJECT_BASE_ADDRESS,0,0x2000000);
+    kBootCmd[0]=0x0;
+__asm__("cli\nsgdt [eax]\n"::"a" (&kernelGDT));
+gdt_init();
     kTicksPerSecond=TICKS_PER_SECOND;
     kTermInit();
     kInitDone=false;
@@ -201,8 +246,8 @@ struct tm theDateTime;
     kTicksPerMS=1000/kTicksPerSecond;
     kDebugStartsNow=false;
     memset(kATADeviceInfo,0x0,sizeof(struct ataDeviceInfo_t)*20);
-    memset(kGDTSlotAvailableInd,0xFA,0x4096);
-    memset(kTSSSlotAvailableInd,0xFA,TSS_TABLE_RECORD_COUNT*0x68);
+    memset(kGDTSlotAvailableInd,0xFF,GDT_TABLE_SIZE);
+    memset(kTaskSlotAvailableInd,0xFF,TASK_TABLE_SIZE);
 
     __asm__("mov esp,0xff00\n" /*\
             "mov eax,0\nmov dr6,eax":::"eax"*/);
@@ -211,7 +256,7 @@ struct tm theDateTime;
     identify_data_sizes(&kDataSizes);
     terminal_clear();
     printk("Booting ...\n");
-    gdt_init();
+
     quietHardware();
     int lLowMemKB = getInt12Memory();
     kE820Status = isE820Available(); //
@@ -225,6 +270,7 @@ struct tm theDateTime;
     PIC_remap(0x00+PIC_REMAP_OFFSET, 0x8+PIC_REMAP_OFFSET);
     IRQ_clear_mask(0);
     IRQ_clear_mask(1);
+    __asm__("sti\n");
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
     printk("Boot: ");
@@ -254,8 +300,8 @@ struct tm theDateTime;
         printk("\n\nE820: Either the available memory is less than the minimum required of %d MB\nor memory capacity cannot be determined\n.", MINIMUM_USABLE_MEMORY / 1024 / 1024);
         printk("3820: Ignore? ");
         
-        while (getKeyboardKey()!='y')
-        {__asm("hlt\n");}
+        while (waitForKeyboardKey()!='y')
+        {}
     }
     __asm__ ("mov eax,%0\n push eax\n pop esp\n"::"r" (STACK_BASE_ADDRESS):"eax");
     detect_cpu();
@@ -283,15 +329,8 @@ struct tm theDateTime;
     printk("PAGING: remapping APIC from 0x%08X to 0x%08X\n", kCPU[0].registerBase, kAPICRegisterRemapAddress);
     //map APIC address 0xFEE00000 to 0x825000
     kMapPage(kAPICRegisterRemapAddress, kCPU[0].registerBase,0x13);  //0x63 + cache disabled
-    printk("PAGING: Kernel paged base: 0x%08X\n",KERNEL_PAGED_BASE_ADDRESS);
-    printk("PAGING: Making page @ 0x00000000 read only\n");
     kSetPhysicalRangeRO(0x0,0xFFF,true);
-    printk("PAGING: Testing whether CPU honors WP flag ... ");
-  __asm__("cli\n");
-  __asm__("mov %0,[0x0]\n":"=r" (kOriginalAddressZeroValue));
-  __asm__("mov eax,0xdeadbeef\n mov [0x0],eax\n");    //purposely read address 0 which we made "read only"
-    printk("works\n");
-    kSetPhysicalRangeRO(0x0,0xFFF,true);
+    testWPBit();
     kPagingInitDone=true;
 #endif
     printk("CLOCK: tick frequency is %uhz\n",kTicksPerSecond);
@@ -323,8 +362,10 @@ struct tm theDateTime;
         printk("PCI: initialization complete ...\n");
     }
     doHDSetup();
+    __asm__("mov eax,0x28\nmov ss,eax\n":::"eax");
 kInitDone = true;
-    goto overStuff; /*******************************************/
+printk("Boot commandline: %s\n",kBootCmd);
+goto overStuff; /*******************************************/
     
     bool lRetVal=parseMBR(&kATADeviceInfo[4], (struct mbr_t*)&kMBR[0]);
     if (!lRetVal)
@@ -345,46 +386,17 @@ kInitDone = true;
     }
 
     printk("Media Attach=%u\n",lRetVal);
-    //cursorMoveTo(1,24);
-    //uint8_t buffer[512];
-    //ataBlockingRead28(0, 1, buffer, 1);
-    //strcpy(buffer,"I'm trying to write this to the disk ... wish me luck!!!");
-    //memset(buffer+56,0,512-56);
-    //ataBlockingWrite28(0, 2, buffer, 1);
 
-/*
-    if(lRetVal==0)
-    {
-        __asm__("cli\n");
-        //terminal_clear();
-        printk("Before myHelloWorld, system ticks=%u\n", *kTicksSinceStart);
-        //exec("/myHelloWorld");
-        printk("After myHelloWorld, system ticks=%u\n", *kTicksSinceStart);
-        //exec("/myHelloWorld2");
-        printk("about to execute testmainprogramentry\n");
-        int result=exec("/testmainprogramentry");
-        printk("back from testmainprogramentry, result=0x%08X\n", result);
-        printk("About to load chrisoskernel (pm)\n");
-        int result2=exec("/chrisoskernel");
-        printk("back from PM, result=0x%08X\n",result2);
-    }
-*/
 overStuff:
-        //__asm__("mov eax,0\nmov edx,0\ndiv eax\n"); //test divide by zero exception
-        //kpagingUpdatePresentFlagA(0x0,false);
-//    __asm__("mov eax,0xdeadbead\n mov [0x0100],eax\n");    //purposely read address 0 which we made "read only"
-        
-//        terminal_clear();
+       /*
+        if (kBootParamCount==0)
+        {
+        execInternalCommand("disk 4");
+        execInternalCommand("part 5");
+        execInternalCommand("exec /kernel");
+        }*/
 MAINLOOPv:
-        __asm__("nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n");
-//    char a[255];
-//    gets(a,255);
-//    if (!strncmp(a,"debug",5))
-        biShell();
-//    if (a>0)
-//        printk("%c",a);
-//    __asm__("hlt\n");
+        bootShell();
     goto MAINLOOPv;
-//  if (kDebugStartsNow)
     __asm__("cli\nhlt\n");
 }

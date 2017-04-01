@@ -38,8 +38,8 @@
       <itemPath>include/ahcicommands.h</itemPath>
       <itemPath>include/i386/apic.h</itemPath>
       <itemPath>include/init/ata_disk.h</itemPath>
-      <itemPath>include/bishell.h</itemPath>
       <itemPath>include/i386/bits/bits.h</itemPath>
+      <itemPath>include/bootShell.h</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/include/build_num.h</itemPath>
       <itemPath>include/charDev.h</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/include/chrisos.h</itemPath>
@@ -59,6 +59,7 @@
       <itemPath>include/kernelObjects.h</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/include/memory.h</itemPath>
       <itemPath>include/mpspec_def.h</itemPath>
+      <itemPath>include/i386/msr.h</itemPath>
       <itemPath>include/multiboot.h</itemPath>
       <itemPath>include/pci/pci.h</itemPath>
       <itemPath>include/pci_c_header.h</itemPath>
@@ -85,10 +86,10 @@
       <itemPath>asm/asmFunctions.s</itemPath>
       <itemPath>src/init/ata_disk.c</itemPath>
       <itemPath>src/char/console/basic_display.c</itemPath>
-      <itemPath>src/bishell.c</itemPath>
       <itemPath>src/cpu/bits.c</itemPath>
       <itemPath>asm/boot.s</itemPath>
       <itemPath>asm/bootCPU.s</itemPath>
+      <itemPath>src/bootShell.c</itemPath>
       <itemPath>src/init/cpudet-clean.c</itemPath>
       <itemPath>src/debugger/debugger.c</itemPath>
       <itemPath>src/init/e820.c</itemPath>
@@ -97,6 +98,7 @@
       <itemPath>src/cpu/idt.c</itemPath>
       <itemPath>src/init/init.c</itemPath>
       <itemPath>src/init/initPaging.c</itemPath>
+      <itemPath>src/iodugging.c</itemPath>
       <itemPath>src/cpu/irqHandlers.c</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/asm/isr.s</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/src/char/keyboard.c</itemPath>
@@ -147,7 +149,7 @@
       <toolsSet>
         <compilerSet>cross|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
-        <rebuildPropChanged>false</rebuildPropChanged>
+        <rebuildPropChanged>true</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <cTool>
@@ -157,8 +159,9 @@
           <incDir>
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
+            <pElem>include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <asmTool>
@@ -251,7 +254,7 @@
       </item>
       <item path="include/ahcicommands.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/bishell.h" ex="false" tool="3" flavor2="0">
+      <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -274,6 +277,8 @@
       <item path="include/i386/cpu.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/gdt.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/msr.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/smp.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -313,11 +318,11 @@
       </item>
       <item path="linker.ld" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/bishell.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/block/ahci.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/bootShell.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/char/console/basic_display.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -416,6 +421,8 @@
       </item>
       <item path="src/init/utility.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/iodugging.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/newloader.c" ex="false" tool="0" flavor2="0">
@@ -457,8 +464,9 @@
           <incDir>
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
+            <pElem>include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <ccTool>
@@ -481,7 +489,7 @@
             <linkerOptionItem>-static</linkerOptionItem>
             <linkerLibLibItem>cpuid</linkerLibLibItem>
           </linkerLibItems>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc -g</commandLine>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
       <item path="/home/yogi/src/os//chrisOS/asm/isr.s"
@@ -559,7 +567,7 @@
       </item>
       <item path="include/ahcicommands.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/bishell.h" ex="false" tool="3" flavor2="0">
+      <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -582,6 +590,8 @@
       <item path="include/i386/cpu.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/gdt.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/msr.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/smp.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -621,11 +631,11 @@
       </item>
       <item path="linker.ld" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/bishell.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/block/ahci.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/bootShell.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/char/console/basic_display.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -742,6 +752,8 @@
       <item path="src/init/initPaging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/init/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -784,8 +796,10 @@
           <incDir>
             <pElem>/usr/local/include</pElem>
             <pElem>/usr/local/include/libcpuid</pElem>
+            <pElem>include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <ccTool>
@@ -808,7 +822,7 @@
             <linkerOptionItem>-static</linkerOptionItem>
             <linkerLibLibItem>cpuid</linkerLibLibItem>
           </linkerLibItems>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc -g</commandLine>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
       <item path="/home/yogi/src/os//chrisOS/asm/isr.s"
@@ -886,7 +900,7 @@
       </item>
       <item path="include/ahcicommands.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/bishell.h" ex="false" tool="3" flavor2="0">
+      <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -909,6 +923,8 @@
       <item path="include/i386/cpu.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/gdt.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/msr.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/smp.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -948,11 +964,11 @@
       </item>
       <item path="linker.ld" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/bishell.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/block/ahci.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/bootShell.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/char/console/basic_display.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -1069,6 +1085,8 @@
       <item path="src/init/initPaging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/init/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>

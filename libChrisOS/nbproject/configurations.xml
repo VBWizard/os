@@ -4,6 +4,11 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>include/input.h</itemPath>
+      <itemPath>include/libChrisOS.h</itemPath>
+      <itemPath>include/malloc.h</itemPath>
+      <itemPath>/home/yogi/src/os/libChrisOS/include/memory.h</itemPath>
+      <itemPath>/home/yogi/src/os/libChrisOS/include/strings.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -12,8 +17,23 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>src/input.c</itemPath>
-      <itemPath>src/libcChrisOS.c</itemPath>
+      <logicalFolder name="f1" displayName="strings" projectFiles="true">
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strcat.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strcmp.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strcpy.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strlen.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strncmp.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strncpy.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/stroul.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strparts.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strtol.c</itemPath>
+        <itemPath>/home/yogi/src/os/libChrisOS/src/strings/strtrim.c</itemPath>
+      </logicalFolder>
+      <itemPath>src/input/input.c</itemPath>
+      <itemPath>src/libChrisOS.c</itemPath>
+      <itemPath>src/malloc.c</itemPath>
+      <itemPath>/home/yogi/src/os/libChrisOS/src/memcpy.c</itemPath>
+      <itemPath>/home/yogi/src/os/libChrisOS/src/memset.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -27,6 +47,11 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../chrisOS/src/strings</Elem>
+    <Elem>src</Elem>
+    <Elem>include</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="2">
@@ -36,13 +61,104 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <cTool>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
+            <pElem>../chrisOS/include</pElem>
+          </incDir>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,libc_init</commandLine>
+        </cTool>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}</output>
+          <commandlineTool>gcc</commandlineTool>
+          <commandLine>-nostdlib -T linker.ld -ffreestanding</commandLine>
+        </linkerTool>
       </compileType>
-      <item path="src/input.c" ex="false" tool="0" flavor2="0">
+      <item path="/home/yogi/src/os/libChrisOS/include/memory.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/libcChrisOS.c" ex="false" tool="0" flavor2="0">
+      <item path="/home/yogi/src/os/libChrisOS/include/strings.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/memcpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/memset.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strcat.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strcmp.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strcpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strlen.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strncmp.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strncpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/stroul.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strparts.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strtol.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strtrim.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="include/input.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
-    <conf name="Release" type="2">
+    <conf name="Release" type="3">
       <toolsSet>
         <compilerSet>cross|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
@@ -51,6 +167,12 @@
       <compileType>
         <cTool>
           <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
+            <pElem>../chrisOS/include</pElem>
+          </incDir>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,&lt;function name></commandLine>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
@@ -61,10 +183,90 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+        <archiverTool>
+        </archiverTool>
       </compileType>
-      <item path="src/input.c" ex="false" tool="0" flavor2="0">
+      <item path="/home/yogi/src/os/libChrisOS/include/memory.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="src/libcChrisOS.c" ex="false" tool="0" flavor2="0">
+      <item path="/home/yogi/src/os/libChrisOS/include/strings.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/memcpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/memset.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strcat.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strcmp.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strcpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strlen.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strncmp.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strncpy.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/stroul.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strparts.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strtol.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/libChrisOS/src/strings/strtrim.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="include/input.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

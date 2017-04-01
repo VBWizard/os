@@ -8,5 +8,10 @@
 #ifndef KERNEL_H
 #define	KERNEL_H
 
+#include <stdint.h>
+#include "chrisos.h"
+#include "io.h"
+#include "utility.h"
+
 #endif	/* KERNEL_H */
 

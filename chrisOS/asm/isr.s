@@ -4,21 +4,21 @@
 .align   4
 .code32
 
-.extern activateDebugger
+.extern activateDebugger, kStopDebugging
 .extern irq0_handler
 .extern	kbd_handler
 .extern call_gate_proc
-.extern kTicksSinceStart;
-.extern kRTCTicksSinceStart;
-.extern kISRsSinceStart;
-.extern defaultISRHandler;
+.extern kTicksSinceStart
+.extern kRTCTicksSinceStart
+.extern kISRsSinceStart
+.extern defaultISRHandler
 .extern kInitDone
 .extern doubleFaultHandler
 .extern pagingExceptionHandler
 .extern puts
 .extern kKbdHandlerActivateDebugger
 .extern exceptionCS, exceptionEIP, exceptionErrorCode, exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR1, exceptionCR4, exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionNumber, exceptionCR2, exceptionSavedESP, exceptionFlags, exceptionSavedStack
-.extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack
+.extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, exceptionTR
 
 irq13ESP: .WORD 0x00, 0x10, 0x10, 0x00
 irq13SavedESP: .WORD 0,0,0,0
@@ -57,6 +57,7 @@ _isr_03_wrapper:                #remapped to 0x0b
         mov     ebp, esp
         mov     ax, 0x3                  # save exception number
 */
+        #NOTE: This just sets the trap flag, next IRQ 1 gets called (IRQ 31 for us
         orw [esp+8],0x100
         pusha
         call activateDebugger
@@ -156,7 +157,7 @@ _isr_11_wrapper:
         mov exceptionAX,eax
         mov exceptionBP, ebp
         mov     ebp, esp
-        mov     ax, 0x8                  # save exception number
+        mov     ax, 0xb                  # save exception number
         jmp isr_My_Common
 .global _isr_12_wrapper        
 _isr_12_wrapper:                        #remapped to 0x14
@@ -168,7 +169,8 @@ _isr_12_wrapper:                        #remapped to 0x14
         jmp isr_My_Common
 .global _isr_13_wrapper                 #remapped to 0x15
 _isr_13_wrapper:
-cli;
+        mov ebp,0x10
+        mov ds,ebp
         mov exceptionSavedESP, esp
         mov exceptionAX,eax
         mov exceptionBP, ebp
@@ -177,13 +179,14 @@ cli;
         jmp isr_My_Common
 .global _isr_14_wrapper                 #remapped to 0x16
 _isr_14_wrapper:
-#cli;hlt;
+cli
 mov exceptionSavedESP, esp
         mov exceptionAX,eax
         mov exceptionBP, ebp
         mov     ebp, esp
         mov     ax, 0xe                  # save exception number
 isr_My_Common:
+cli
         mov exceptionNumber,ax
         pushad                          # other regs because its an ISR
         mov eax,ds
@@ -193,6 +196,7 @@ isr_My_Common:
         mov exceptionDX, edx
         mov exceptionSI, esi
         mov exceptionDI, edi
+        str exceptionTR
         mov eax, cr0
         mov exceptionCR0, eax
         mov eax, cr3
@@ -239,11 +243,11 @@ getExceptionDetailsWithError:
      mov exceptionErrorCode, bx
 
 saveTheStack:
-jmp overSaveTheStack
+#jmp overSaveTheStack
         mov esi, exceptionSavedESP
 //        add esi, 16 #drop the 4 dwords that are passed to the proc
         mov edi, exceptionSavedStack
-        mov cx, 30
+        mov ecx, 40
         cld
         rep movsd
 
@@ -252,12 +256,12 @@ overSaveTheStack:
         mov ax,exceptionNumber
         cmp ax,0xe
         jne notPagingHandler
-        call 0x08:pagingExceptionHandler
+        call pagingExceptionHandler
         jmp onTheWayOut
 
 notPagingHandler:
 toDefaultHandler:
-        call 0x08:defaultISRHandler
+        call defaultISRHandler
 onTheWayOut:
         popad                           # restoring the regs
         mov esp, exceptionSavedESP
@@ -322,7 +326,7 @@ _isr_19_wrapper:
         mov     ebp, esp
         mov     ax, 0x13                  # save exception number
         jmp isr_My_Common
-.global _isr_20_wrapper        #8 based exception 0x14
+.global _isr_20_wrapper        
 _isr_20_wrapper:
         mov exceptionSavedESP, esp
         mov exceptionAX,eax
@@ -437,8 +441,8 @@ cli
     mov debugDI, edi
     mov debugAX,eax
 
-    movw ax,ds
-    movw debugDS,eax
+    mov ax,ds
+    mov debugDS,eax
     mov eax, cr0
     mov debugCR0, eax
     mov eax, cr3
@@ -456,10 +460,20 @@ cli
 
     mov esi, debugSavedESP
     mov edi, debugSavedStack
-    mov cx, 30
+    mov ecx, 30
     cld
     rep movsd
     call debugStep
+    mov al,kStopDebugging
+    cmp al,1
+    jnz overStopDebugging
+    call activateDebugger
+    #reset the trap flag in the flags register.  20 bytes forward for the POPA and then 8 bytes for the CS/EIP
+    andw [esp+0x28],0xFEFF
+    mov eax,0
+    mov kStopDebugging,eax
+
+overStopDebugging:
     popa
     sti
     iretd
@@ -522,6 +536,7 @@ cli
         mov exceptionDX, edx
         mov exceptionSI, esi
         mov exceptionDI, edi
+        str exceptionTR
         mov exceptionBP, ebp
         mov eax, cr0
         mov exceptionCR0, eax
@@ -533,7 +548,7 @@ cli
         pushad
         pushf
         mov     ebp, esp
-        add ebp,4
+        add ebp,36
         mov ax,0x0001
 cld
 #cld #C code following the sysV ABI requires DF to be clear on function entry
@@ -543,11 +558,13 @@ cld
         mov exceptionCS, bx
         mov ebx, [ebp+0]
         mov exceptionEIP, ebx
+        mov ebx,ds
+        mov exceptionDS,ebx
         mov     bx, 0x10
         mov     ds, bx
-        mov     es, bx                  # load ds and es with valid selector
-	mov     gs, bx
         call    kbd_handler          # call actual ISR code
+        mov ebx,exceptionDS
+        mov ds,bx
         popf
         popad  
 mov al,0x20
@@ -562,7 +579,6 @@ out 0x20,al
 done:
         sti
         iretd
-
 
 
 .global _call_gate_wrapper

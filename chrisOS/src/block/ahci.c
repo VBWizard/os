@@ -1,5 +1,5 @@
 #include <stdbool.h>
-#include "chrisos.h"
+#include "../../../chrisOS/include/chrisos.h"
 #include "i386/kPaging.h"
 #include "pci/pci.h"
 #include "memory.h"
@@ -126,7 +126,7 @@ void ahciEnablePortMultiplier(volatile HBA_PORT* port) {
     port->cmd.ST = 0;
 
     //waitForPortIdle(port);
-
+    printk("Entered ahciEnablePortMultiplier, shouldn't be here?!?!?!\n");
     printd(DEBUG_AHCI, "AHCI: EnablePortMultipler: port=0x%08X\n", port);
     int slot = find_cmdslot(port);
     if (slot == -1)
@@ -620,7 +620,7 @@ bool ahciInit() {
             printd(DEBUG_AHCI, "AHCI: Found AHCI controller (D) (%02X/%02X/%02X) '%s'\n", cnt, kPCIDeviceHeaders[cnt].class, kPCIDeviceHeaders[cnt].subClass, getDeviceNameP(&kPCISATADevice, buffer));
             printd(DEBUG_AHCI, "ABAR is at: before/remapped - 0x%08X/", kPCISATADevice.baseAdd[5]);
             ahciABAR = (HBA_MEM*) AHCI_ABAR_REMAPPED_ADDRESS + (0x10 * ahciHostCount);
-                kMapPage((uintptr_t) ahciABAR, kPCISATADevice.baseAdd[5], 0x73); //0x63 + cache disabled
+                kMapPage((uintptr_t) ahciABAR, kPCISATADevice.baseAdd[5] , 0x73); //0x63 + cache disabled
                 kMapPage(kPCISATADevice.baseAdd[5],kPCISATADevice.baseAdd[5],0x73);
             RELOAD_CR3
             memcpy((void*) &ABARs[ahciHostCount++], (void*) ahciABAR, sizeof (HBA_MEM));

@@ -43,12 +43,12 @@
 //-----------------------------------------------------------------------------
 // Locals
 //-----------------------------------------------------------------------------
-static FL_FILE            _files[FATFS_MAX_OPEN_FILES];
-static int                _filelib_init = 0;
-static int                _filelib_valid = 0;
-static struct fatfs       _fs;
-static struct fat_list    _open_file_list;
-static struct fat_list    _free_file_list;
+__attribute__ ((section("kernelData"))) static FL_FILE _files[FATFS_MAX_OPEN_FILES];
+__attribute__ ((section("kernelData"))) static int                _filelib_init = 0;
+__attribute__ ((section("kernelData"))) static int                _filelib_valid = 0;
+__attribute__ ((section("kernelData"))) static struct fatfs       _fs;
+__attribute__ ((section("kernelData"))) static struct fat_list    _open_file_list;
+__attribute__ ((section("kernelData"))) static struct fat_list    _free_file_list;
 
 //-----------------------------------------------------------------------------
 // Macros

@@ -1,2 +1,2 @@
 #!/bin/bash
-gdb -tui --args qemu-system-i386 -args -m 1024 -kernel Debug/cross-Linux/chrisos  -hda ~/diskimage.img
+/home/yogi/src/binutils-gdb/gdb/gdb -x gdbcmds Debug/cross-Linux/chrisos

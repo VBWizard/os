@@ -16,6 +16,7 @@ int printk_valist(const char *format, va_list args);
 int printd();
 #else
 int printd(uint32_t DebugLevel, const char *format, ...);
+void printu(const char *format, va_list args);
 #endif
 
 #endif	/* PRINTF_H */

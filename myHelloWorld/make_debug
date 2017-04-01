@@ -2,5 +2,4 @@
 ./local_make
 make -j6 CONF=Debug clean
 make -j6 CONF=Debug build
-popd
 

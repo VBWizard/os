@@ -4,56 +4,55 @@
 #include "chrisos.h"
 #include "memory.h"
 #include "time_os.h"
+#include "kbd.h"
 
 extern volatile char kTranslatedKeypress;
 extern uint32_t kDebugLevel;
-extern volatile char* kKeyboardBuffer;
-extern volatile char* kKeyboardBufferBase;
-
+extern volatile char* kKbdBuffCurrTop;
+extern volatile char* kKbdBuffCurrChar;
 //Get a key from the keyboard buffer
 //Curr moves when a key is put into the buffer
 //Base moves when a key is taken from the buffer
 uint8_t keyboardGetKeyFromBuffer()
 {
     char lTemp=0;
-    //printd(DEBUG_KEYBOARD,"\nkKeyboardBuffer=0x%08X, kKeyboardBufferBase=0x%08X, &kKeyboardBufferBase=0x%08X\n",kKeyboardBuffer, kKeyboardBufferBase,&kKeyboardBufferBase);
-    if (kKeyboardBufferBase<=kKeyboardBuffer)
+    //If top > buffer address, there are new characters to be processed
+    if (kKbdBuffCurrTop>(char*)KEYBOARD_BUFFER_ADDRESS)
     {
-        __asm__("cli\n");
-        lTemp=*kKeyboardBufferBase++;
-        __asm__("sti\n");
-    }
-    if (kKeyboardBufferBase>kKeyboardBuffer)
-    {
-        __asm__("cli\n");
-        kKeyboardBufferBase=(char*)KEYBOARD_BUFFER_ADDRESS;
-        kKeyboardBuffer=(char*)KEYBOARD_BUFFER_ADDRESS-1;
-        __asm__("sti\n");
+        //increment the current character pointer
+        kKbdBuffCurrChar++;
+        //get the character from the buffer
+        lTemp=*kKbdBuffCurrChar;
+        //If we've reached top, reset both char and top
+        if (kKbdBuffCurrChar>=kKbdBuffCurrTop)
+        {
+            kKbdBuffCurrChar=(char*)KEYBOARD_BUFFER_ADDRESS;
+            kKbdBuffCurrTop=(char*)KEYBOARD_BUFFER_ADDRESS;
+        }
     }
     return lTemp;
 }
 
 char waitForKeyboardKey()
 {
-    printd(DEBUG_KEYBOARD,"gKbd-W, %04X\t", kKeyboardBuffer);
+    printd(DEBUG_KEYBOARD_DRIVER,"buffer=%08X, char=%08X, top=%08X\t", KEYBOARD_BUFFER_ADDRESS, kKbdBuffCurrChar, kKbdBuffCurrTop);
     char lTemp=0;
-    printd(DEBUG_KEYBOARD,"kKeyboardBuffer=%04X\n", kKeyboardBuffer);
-
-    while (kKeyboardBuffer==(char*)KEYBOARD_BUFFER_ADDRESS)
+    bool debugMsgPrinted=false;
+    //CLR 02/19/2017 - Had to change the conditon because of modifications I made to how buffer & bufferbase are used.
+    while (kKbdBuffCurrTop==(char*)KEYBOARD_BUFFER_ADDRESS)
     {
-        printd(DEBUG_KEYBOARD,"kKeyboardBuffer=%04X\n", kKeyboardBuffer);
-        __asm__("sti\n");
+        if (!debugMsgPrinted)
+        {
+            debugMsgPrinted=true;
+        }
+        __asm__("sti\nhlt\n");
         waitTicks(1);
     }
     lTemp=keyboardGetKeyFromBuffer();
-    printd(DEBUG_KEYBOARD,"got a key %u!\n", lTemp);
+    printd(DEBUG_KEYBOARD_DRIVER,"got a key %u!\n", lTemp);
     return lTemp;
 }
 
-char getKeyboardKey()
-{
-        return keyboardGetKeyFromBuffer();
-}
 void gets(char* buffer, int len)
 {
     volatile char inchar=0;
@@ -61,7 +60,7 @@ void gets(char* buffer, int len)
     memset(buffer,0,len);
     while (1==1)
     {
-        inchar=getKeyboardKey();
+        inchar=waitForKeyboardKey();
         if (inchar=='\b' && cnt>0)
         {
             buffer[cnt]=0;
@@ -86,12 +85,6 @@ void gets(char* buffer, int len)
 
 char getc()
 {
-   int inchar=getKeyboardKey();
-   
-   while (inchar==0)
-   {
-       inchar=getKeyboardKey();
-        inchar=getKeyboardKey();
-   }
+   int inchar=keyboardGetKeyFromBuffer();
    return inchar;
 }

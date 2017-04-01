@@ -7,6 +7,7 @@ extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
 extern struct idt_entry kInitialIDT[0x30];
 extern struct idt_ptr kInitialIDTReg;
+extern struct gdt_ptr kernelGDT;
 
 void initializeKernelPaging()
 {
@@ -24,26 +25,43 @@ void initializeKernelPaging()
         printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: (0x%04X page directory entries)\n", tempEntries);
         for (uint32_t cnt=0;cnt < tempEntries; cnt++)
         {
-                ptr[cnt] = (KERNEL_PAGE_TABLE_BASE_ADDRESS + (cnt*4096)) | 0x3;
+                ptr[cnt] = (KERNEL_PAGE_TABLE_BASE_ADDRESS + (cnt*4096)) | 0x7;
                 //Create a guest page table for each Page Directory
                 for (int cnt2=0;cnt2<1024;cnt2++)
                 {
-                    ptrT[cnt2] = ((0x400000 * cnt)  + ((cnt2) << 12)) | 0x3;
+                    ptrT[cnt2] = ((0x400000 * cnt)  + ((cnt2) << 12)) | 0x7;
                 }
                 ptrT += 0x400;
         }
         uint32_t pageDirEntrySize = 0x400000;
-        ptr2=(void*)KERNEL_PAGE_DIR_ADDRESS + (KERNEL_PAGED_BASE_ADDRESS / 0x400000)*4; //(((uint32_t)KERNEL_PAGED_BASE_ADDRESS / (uint32_t)0x400000) * 4);
+        ptr2=(void*)KERNEL_CR3 + (KERNEL_PAGED_BASE_ADDRESS / 0x400000)*4; //(((uint32_t)KERNEL_PAGED_BASE_ADDRESS / (uint32_t)0x400000) * 4);
         kKernelPageTables=(uint32_t*)KERNEL_PAGE_TABLE_BASE_ADDRESS;
         //Initialize Kernel Page Directory
         printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: Kernel page dir at 0x%08X, table at 0x%08x\n", ptr2, kKernelPageTables);
-        uint32_t pageDirEntryCount= 0x40;   //Map C0000000-CFFFFFFF=00000000-0FFFFFFF 
+        uint32_t pageDirEntryCount= 0x100;   //Map C0000000-FFFFFFFF=00000000-3FFFFFFF 
         printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: 0x%08X entries\n", pageDirEntryCount);
         for (uint32_t cnt=0;cnt <= pageDirEntryCount; cnt++)
         {
-                ptr2[cnt] = (KERNEL_PAGE_TABLE_BASE_ADDRESS + (cnt*4096)) | 0x3;
+                ptr2[cnt] = (KERNEL_PAGE_TABLE_BASE_ADDRESS + (cnt*4096)) | 0x7;
         }
-        __asm__("mov cr3,%0\n":: "a" (KERNEL_PAGE_DIR_ADDRESS));
+
+        //Map the kernel's view of the first gigabyte of space (0x00000000-0x3FFFFFFF==0xC0000000-0xFFFFFFFF)
+/*        ptr2=(void*)KERNEL_PAGE_DIR_ADDRESS + (KERNEL_PAGED_BASE_ADDRESS / 0x400000)*4; //Start at PD entry for 0xC0000000
+        //Initialize Kernel Page Directory
+        printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: Kernel DIR at 0x%08X, PT at 0x%08x\n", ptr2, ptrT);
+        uint32_t pageDirEntryCount= 0x100;   //Map C0000000-FFFFFFFF=00000000-3FFFFFFF 
+        printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: 0x%08X entries\n", pageDirEntryCount);
+        for (uint32_t cnt=0;cnt <= pageDirEntryCount; cnt++)
+        {
+            ptr2[cnt] = (uint32_t)ptrT;
+            ptr2[cnt] |= 0x3;
+            for (int cnt2=0;cnt2<1024;cnt2++)
+            {
+                ptrT[cnt2] = ((0x400000 * cnt)  + ((cnt2) << 12)) | 0x3;
+            }
+            ptrT += 0x400;
+*/
+            __asm__("mov cr3,%0\n":: "a" (KERNEL_CR3));
        __asm__("mov eax,cr0\n or eax,0x80000000\n mov cr0,eax\n");
         /*NOTE: Interrupts have been disabled so that we can update the IDT bases before non-presenting the temporary low page table entries*/
         //Update the base of GDT entry 0x08 (Code) and 0x10 (data) to our kernel base
@@ -53,9 +71,9 @@ void initializeKernelPaging()
  1 (0x08) - code @ 0x0
  2 (0x10) - data @ 0x0
 */
-       gdtEntry(1, KERNEL_PAGED_BASE_ADDRESS, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
+       gdtEntryApplication(1, KERNEL_PAGED_BASE_ADDRESS, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,
                   GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntry(2, KERNEL_PAGED_BASE_ADDRESS, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,
+    gdtEntryApplication(2, KERNEL_PAGED_BASE_ADDRESS, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,
                   GDT_GRANULAR | GDT_32BIT,true);
     /*AFTER:
  0 - blank
@@ -63,10 +81,9 @@ void initializeKernelPaging()
  2 (0x10) - data @ 0xC0000000
 */
 
-        struct gdt_ptr gdtp;
-        gdtp.limit = sizeof(struct GDT) * GDT_ENTRIES - 1;
-        gdtp.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
-        set_gdt(&gdtp);
+        kernelGDT.limit = sizeof(sGDT) * (GDT_TABLE_SIZE/8) - 1;
+        kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
+        set_gdt(&kernelGDT);
         idt_init(&kInitialIDTReg, PIC_REMAP_OFFSET);
         doPagingJump();
 

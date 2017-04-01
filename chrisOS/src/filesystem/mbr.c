@@ -26,7 +26,6 @@ bool parseMBR(struct ataDeviceInfo_t* devInfo, struct mbr_t* mbr)
     
     memset(mbr,0,sizeof(struct mbr_t));
     mbr->parts[0].partStartSector=0;
-    printd(DEBUG_HARDDRIVE,"devInfo->ABAR=0x%08X\n",devInfo->ABAR);
     if (devInfo->ABAR)
     {
         printd(DEBUG_HARDDRIVE,"Disk is SATA\n");
@@ -41,7 +40,8 @@ bool parseMBR(struct ataDeviceInfo_t* devInfo, struct mbr_t* mbr)
     else
     {
         printd(DEBUG_HARDDRIVE,"Disk is ATA\n");
-        int lResult=ataReadDisk(devInfo, mbr->parts, 0, mbrBuffer, 1);
+        //int lResult=ataReadDisk(devInfo, mbr->parts, 0, (uint8_t*)&mbrBuffer, 1);
+        int lResult=ataReadDisk(devInfo,0,(uint8_t*)&mbrBuffer,1);
         if (lResult!=512)
         {
             printk("Could not read ATA MBR (0x%08X)", lResult);
@@ -74,7 +74,7 @@ bool parseMBR(struct ataDeviceInfo_t* devInfo, struct mbr_t* mbr)
     mbr->parts[3].partTotalSectors = mbrBuffer[MBR_PART4_OFFSET+12] | (mbrBuffer[MBR_PART4_OFFSET+13]<<8) | (mbrBuffer[MBR_PART4_OFFSET+14]<<16) | (mbrBuffer[MBR_PART4_OFFSET+15]<<24);
     mbr->parts[3].partEndSector = mbr->parts[3].partStartSector + mbr->parts[3].partTotalSectors;
     mbr->partCount=4;
-    if (mbr->parts[0].systemID=0xEE)
+    if (mbr->parts[0].systemID==0xEE)
     {
         printd(DEBUG_HARDDRIVE,"Found GPT partition table\n");
         return parseGPT(port, mbr);

@@ -9,8 +9,16 @@
 #define	MM_H
 
 #include "kernel.h"
+#include "i386/kPaging.h"
+#include "charDev.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include "printf.h"
+#include "paging.h"
+#include "alloc.h"
 void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse);
 void mmKernelSetPageInUseFlag(uintptr_t address, bool inUse);
 void buildTaskPaging(uint32_t* cr3);
+
 #endif	/* MM_H */
 

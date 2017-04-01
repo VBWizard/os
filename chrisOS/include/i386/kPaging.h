@@ -5,9 +5,13 @@
  * Created on May 11, 2016, 7:31 PM
  */
 
-#ifndef PAGING_H
-#define	PAGING_H
+#ifndef KPAGING_H
+#define	KPAGING_H
 #include <stdbool.h>
+uint32_t kPagingGet4kPDEntryValueCR3(uintptr_t PageDirAddress, uint32_t address);
+uint32_t kPagingGet4kPDEntryAddressCR3(uintptr_t PageDirAddress, uint32_t address);
+uint32_t kPagingGet4kPTEntryAddress(uint32_t address);
+uint32_t kPagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address);
 uint32_t kPagingGet4kPDEntryValue(uint32_t address);
 uint32_t kPagingGet4kPDEntryAddress(uint32_t address);
 uint32_t kPagingGet4kPTEntryAddress(uint32_t address);
@@ -21,5 +25,5 @@ void kMapPage(uintptr_t mapTo, uintptr_t mapFrom, uint8_t flags);
 void mmKernelSetPageInUseFlag(uintptr_t address, bool inUse);
 void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse);
 #define RELOAD_CR3 __asm__("mov eax,cr3\nmov cr3,eax\n":::"eax");
-#endif	/* PAGING_H */
+#endif	/* KPAGING_H */
 

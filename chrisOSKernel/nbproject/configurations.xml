@@ -1,25 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="fat" displayName="fat" projectFiles="true">
+      <itemPath>../chrisOS/src/fat/API.txt</itemPath>
+      <itemPath>../chrisOS/src/fat/COPYRIGHT.txt</itemPath>
+      <itemPath>../chrisOS/src/fat/Configuration.txt</itemPath>
+      <itemPath>../chrisOS/src/fat/History.txt</itemPath>
+      <itemPath>../chrisOS/src/fat/License.txt</itemPath>
+      <itemPath>../chrisOS/src/fat/Media Access API.txt</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_access.c</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_access.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_cache.c</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_cache.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_defs.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_filelib.c</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_filelib.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_format.c</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_format.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_list.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_misc.c</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_misc.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_opts.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_string.c</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_string.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_table.c</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_table.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_types.h</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_write.c</itemPath>
+      <itemPath>../chrisOS/src/fat/fat_write.h</itemPath>
+      <itemPath>../chrisOS/src/fat/version.txt</itemPath>
+    </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>../chrisOS/include/ahci.h</itemPath>
       <itemPath>include/alloc.h</itemPath>
       <itemPath>../chrisOS/include/i386/bits/bits.h</itemPath>
       <itemPath>../chrisOS/include/chrisos.h</itemPath>
+      <itemPath>../chrisOS/include/i386/cpu.h</itemPath>
+      <itemPath>include/device.h</itemPath>
+      <itemPath>include/dllist.h</itemPath>
       <itemPath>include/drv_genKeyboard.h</itemPath>
+      <itemPath>include/elfLibraryTable.h</itemPath>
       <itemPath>../chrisOS/include/filesystem.h</itemPath>
+      <itemPath>include/kIRQHandlers.h</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/include/kInit.h</itemPath>
       <itemPath>../chrisOS/include/i386/kPaging.h</itemPath>
+      <itemPath>kbd.h</itemPath>
       <itemPath>include/kernel.h</itemPath>
       <itemPath>../chrisOS/include/kernelObjects.h</itemPath>
+      <itemPath>include/kernelVariables.h</itemPath>
+      <itemPath>include/kmalloc.h</itemPath>
       <itemPath>include/mm.h</itemPath>
       <itemPath>include/paging.h</itemPath>
+      <itemPath>../chrisOS/include/pci/pci.h</itemPath>
+      <itemPath>include/process.h</itemPath>
+      <itemPath>include/schedule.h</itemPath>
       <itemPath>../chrisOS/include/strings.h</itemPath>
       <itemPath>include/syscall.h</itemPath>
+      <itemPath>include/syscalls.h</itemPath>
       <itemPath>include/sysloader.h</itemPath>
       <itemPath>include/task.h</itemPath>
+      <itemPath>include/thesignals.h</itemPath>
       <itemPath>../chrisOS/include/time_os.h</itemPath>
       <itemPath>include/tss.h</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/include/x86idt.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -28,29 +73,51 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>../chrisOS/src/block/ahci.c</itemPath>
       <itemPath>src/mm/alloc.c</itemPath>
+      <itemPath>../chrisOS/asm/asmFunctions.s</itemPath>
       <itemPath>../chrisOS/src/init/ata_disk.c</itemPath>
       <itemPath>../chrisOS/src/char/console/basic_display.c</itemPath>
       <itemPath>../chrisOS/src/cpu/bits.c</itemPath>
+      <itemPath>src/device.c</itemPath>
+      <itemPath>src/dllist.c</itemPath>
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
+      <itemPath>src/exceptions.c</itemPath>
+      <itemPath>../chrisOS/src/cpu/gdt.c</itemPath>
+      <itemPath>../chrisOS/src/iodugging.c</itemPath>
+      <itemPath>src/kIRQHandlers.c</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/src/kInit.c</itemPath>
       <itemPath>src/kernel.c</itemPath>
+      <itemPath>src/kernelISR.s</itemPath>
       <itemPath>../chrisOS/src/char/keyboard.c</itemPath>
+      <itemPath>src/mm/kmalloc.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
       <itemPath>src/mm/mm.c</itemPath>
+      <itemPath>../chrisOS/src/cpu/msr.c</itemPath>
       <itemPath>src/paging.c</itemPath>
       <itemPath>../chrisOS/src/panic.c</itemPath>
+      <itemPath>../chrisOS/src/block/pci.c</itemPath>
       <itemPath>../chrisOS/src/printf.c</itemPath>
+      <itemPath>src/process.c</itemPath>
+      <itemPath>src/schedule.c</itemPath>
+      <itemPath>src/schedule_old.c</itemPath>
+      <itemPath>src/signals.c</itemPath>
+      <itemPath>../chrisOS/src/strings/strcat.c</itemPath>
       <itemPath>../chrisOS/src/strings/strcpy.c</itemPath>
+      <itemPath>../chrisOS/src/char/console/strftime.c</itemPath>
       <itemPath>../chrisOS/src/strings/strlen.c</itemPath>
       <itemPath>../chrisOS/src/strings/strncmp.c</itemPath>
       <itemPath>../chrisOS/src/strings/strncpy.c</itemPath>
+      <itemPath>../chrisOS/src/strings/stroul.c</itemPath>
       <itemPath>../chrisOS/src/strings/strparts.c</itemPath>
       <itemPath>src/syscall.c</itemPath>
       <itemPath>src/sysloader.c</itemPath>
+      <itemPath>src/task.c</itemPath>
       <itemPath>../chrisOS/src/time.c</itemPath>
-      <itemPath>src/tss.c</itemPath>
       <itemPath>../chrisOS/src/init/utility.c</itemPath>
+      <itemPath>src/x86.s</itemPath>
+      <itemPath>/home/yogi/src/os/chrisOSKernel/x86idt.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -73,18 +140,20 @@
       <toolsSet>
         <compilerSet>cross|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
-        <rebuildPropChanged>false</rebuildPropChanged>
+        <rebuildPropChanged>true</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <cTool>
+          <architecture>1</architecture>
           <standard>3</standard>
           <incDir>
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -O</commandLine>
+          <commandLine>-ffreestanding -Wall -masm=intel -ggdb</commandLine>
         </cTool>
         <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>
           <linkerAddLib>
             <pElem>/usr/local/lib</pElem>
             <pElem>/home/yogi/opt/cross/lib</pElem>
@@ -92,6 +161,10 @@
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../chrisOS/asm/asmFunctions.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="../chrisOS/include/ahci.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../chrisOS/include/chrisos.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/filesystem.h" ex="false" tool="3" flavor2="0">
@@ -101,15 +174,28 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="../chrisOS/include/i386/cpu.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../chrisOS/include/i386/kPaging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/kernelObjects.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/include/pci/pci.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/strings.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/time_os.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../chrisOS/src/block/ahci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../chrisOS/src/char/console/basic_display.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/char/console/strftime.c"
             ex="false"
             tool="0"
             flavor2="0">
@@ -118,17 +204,85 @@
       </item>
       <item path="../chrisOS/src/cpu/bits.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="../chrisOS/src/cpu/gdt.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/cpu/msr.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/COPYRIGHT.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/Configuration.txt"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/History.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/License.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/Media Access API.txt"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_access.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_access.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_cache.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_cache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_defs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_filelib.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_filelib.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_format.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_format.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_list.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_misc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_opts.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_string.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_string.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_table.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_table.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_write.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_write.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/version.txt" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../chrisOS/src/init/ata_disk.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/utility.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="../chrisOS/src/iodugging.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../chrisOS/src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/panic.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/printf.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/strings/strcat.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strcpy.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -138,41 +292,107 @@
       </item>
       <item path="../chrisOS/src/strings/strncpy.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="../chrisOS/src/strings/stroul.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../chrisOS/src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/include/kInit.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/include/x86idt.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/src/kInit.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/x86idt.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/device.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/dllist.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/process.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/schedule.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/syscalls.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/sysloader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/task.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/thesignals.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="kbd.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/device.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/dllist.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/kernel.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
+      </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/mm/kmalloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/mm.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/process.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/schedule.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/signals.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/tss.c" ex="false" tool="0" flavor2="0">
+      <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/task.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/x86.s" ex="false" tool="4" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -185,7 +405,11 @@
         <cTool>
           <developmentMode>5</developmentMode>
           <standard>3</standard>
-          <commandLine>-ffreestanding -Wall -Wextra -masm=intel -O</commandLine>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>../chrisOS/include</pElem>
+          </incDir>
+          <commandLine>-ffreestanding -Wall -masm=intel</commandLine>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
@@ -201,23 +425,13 @@
             <pElem>/usr/local/lib</pElem>
             <pElem>/home/yogi/opt/cross/lib</pElem>
           </linkerAddLib>
-          <linkerLibItems>
-            <linkerLibProjectItem>
-              <makeArtifact PL="../fatLib"
-                            CT="2"
-                            CN="Debug"
-                            AC="true"
-                            BL="true"
-                            WD="../fatLib"
-                            BC="${MAKE}  -f Makefile CONF=Debug"
-                            CC="${MAKE}  -f Makefile CONF=Debug clean"
-                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libfatLib.${CND_DLIB_EXT}">
-              </makeArtifact>
-            </linkerLibProjectItem>
-          </linkerLibItems>
           <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../chrisOS/asm/asmFunctions.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="../chrisOS/include/ahci.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../chrisOS/include/chrisos.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/filesystem.h" ex="false" tool="3" flavor2="0">
@@ -227,15 +441,28 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="../chrisOS/include/i386/cpu.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../chrisOS/include/i386/kPaging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/kernelObjects.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/include/pci/pci.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/strings.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../chrisOS/include/time_os.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../chrisOS/src/block/ahci.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/block/pci.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../chrisOS/src/char/console/basic_display.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/char/console/strftime.c"
             ex="false"
             tool="0"
             flavor2="0">
@@ -244,17 +471,85 @@
       </item>
       <item path="../chrisOS/src/cpu/bits.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="../chrisOS/src/cpu/gdt.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/cpu/msr.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/COPYRIGHT.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/Configuration.txt"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/History.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/License.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/Media Access API.txt"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_access.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_access.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_cache.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_cache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_defs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_filelib.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_filelib.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_format.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_format.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_list.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_misc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_opts.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_string.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_string.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_table.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_table.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_write.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/fat_write.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/fat/version.txt" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../chrisOS/src/init/ata_disk.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/utility.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="../chrisOS/src/iodugging.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../chrisOS/src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/panic.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/printf.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../chrisOS/src/strings/strcat.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strcpy.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -264,43 +559,107 @@
       </item>
       <item path="../chrisOS/src/strings/strncpy.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="../chrisOS/src/strings/stroul.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../chrisOS/src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/include/kInit.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/include/x86idt.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/src/kInit.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/yogi/src/os/chrisOSKernel/x86idt.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/device.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/dllist.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/process.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/schedule.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/syscalls.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/sysloader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/task.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/thesignals.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="kbd.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/device.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/dllist.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/kernel.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
+      </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/mm/kmalloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/mm.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/process.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/schedule.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/signals.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/tss.c" ex="false" tool="0" flavor2="0">
+      <item path="src/task.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/x86.s" ex="false" tool="4" flavor2="0">
       </item>
     </conf>
   </confs>

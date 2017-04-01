@@ -1,6 +1,6 @@
 .intel_syntax noprefix
 .section .asm
-
+.extern bootGdt
 .extern tos
 .extern kAPICRegisterRemapAddress
 
@@ -110,7 +110,7 @@ mov ax,0x10
 mov ds,ax
 mov es,ax
 mov gs,ax
-lgdt [gdtp]
+lgdt [kernelGDT]
 ljmp 0x8:reenterProtMode32Jmp
 reenterProtMode32Jmp:
 .code16
@@ -130,19 +130,17 @@ ret
 set_gdt:
 .code32
 push eax
-    mov eax, [esp + 0x8]
+    mov eax,[esp+8]
     lgdt [eax]
-    pop eax
     jmp 0x08:.reload_CS
 .reload_CS:
-.code16
-    mov ax, 0x10
+    mov eax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-.code32
+    pop eax
     ret
 hang:
     hlt
@@ -169,7 +167,6 @@ idt_load:
     //we always put our IDT in idtPtrToLoad before calling idt_load
 //    mov eax, word ptr idtPtrToLoad
     lidt [idtPtrToLoad]
-    sti
     pop ebx
     pop eax
     pop ebp
@@ -272,7 +269,6 @@ init_PIT:
  
     popad
     pop ebp
-    sti
     ret
 
  .globl getE820Memory_asm
@@ -382,12 +378,14 @@ ret
  .globl doNonPagingJump
 .type doNonPagingJump, @function
 doNonPagingJump:
+ljmp 0x88:pagingDisableJmp1
+pagingDisableJmp1:
 push eax
 mov eax,cr0
-and eax,0xEFFFFFFF
+and eax,0x7FFFFFFF
 mov cr0,eax
-ljmp 0x28:pagingDisableJmp
-pagingDisableJmp:
+ljmp 0x88:pagingDisableJmp2
+pagingDisableJmp2:
 mov ax, 0x18
 mov ds, ax
 mov es, ax
