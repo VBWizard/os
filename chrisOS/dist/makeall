@@ -12,6 +12,8 @@ cd $basePath/libChrisOS/dist
 ./makeit
 cd $basePath/kshell/dist
 ./makeit
+cd $basePath/time/dist
+./makeit
 #cd $basePath/fatLib/dist
 #./makeit
 #cd $pp

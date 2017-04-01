@@ -22,7 +22,6 @@ extern "C" {
 #include "malloc.h"
 #include "strings.h"
 #include "input.h"
-#include "syscalls.h"
 #include "/home/yogi/src/os/chrisOS/include/chrisos.h"
     
 #define VISIBLE __attribute__((visibility("default")))

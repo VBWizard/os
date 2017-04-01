@@ -66,9 +66,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 panic("_sysCall: sys_write for descriptor 0x%08X not implemented\n",param1);
             break;
         case 0x59:      //***exec: param1=program path
-            
             __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
-            process = createProcess((char*)param1, 2, (uint32_t)&testp, (process_t*)findTaskByCR3(processCR3)->process, false);
+            process = createProcess((char*)param1, param2, param3, (process_t*)findTaskByCR3(processCR3)->process, false);
             retVal=process->task->taskNum;
             __asm__("mov cr3,eax"::"a" (processCR3));
             break;

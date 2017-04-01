@@ -47,6 +47,7 @@ extern "C" {
         void* parent;
         bool kernelProcess;
         struct tm startTime, endTime;
+        uint32_t totalRunTicks;
     } process_t;
 
 

@@ -91,9 +91,9 @@ int main(int argc, char** argv) {
 
     //sys_sigaction(SIG_USLEEP,0,process->task->taskNum);
     kernelLoop:
-    //triggerScheduler(); 
-    goto kernelLoop;
+    triggerScheduler(); 
     //sys_sigaction(SIG_SLEEP,0,*kTicksSinceStart+(TICKS_PER_SECOND*3));
+    //__asm__("\hlt");
     goto kernelLoop;
     return (0xbad);
 }

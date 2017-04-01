@@ -11,7 +11,7 @@ qemu-system-i386 							\
 	-m 1536								\
 	-smp 4    							\
 	-usb                                            		\
-	-cdrom /home/yogi/src/os//chrisOS/dist/myos.iso 	\
+	-cdrom myos.iso 	\
 	-boot order=d							\
 	-drive file=./myos.iso,if=none,id=sata-cd-0 			\
 	-drive file=~/qemu-test-disk.img,if=none,id=sata-disk-0 	\

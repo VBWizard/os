@@ -226,9 +226,9 @@ newTaskLoaded:
     #reset the task switched indicator
     mov eax,0
     mov schedulerTaskSwitched,eax
-    mov eax,kTaskSwitchCount
-    inc eax
-    mov kTaskSwitchCount,eax
+#    mov eax,kTaskSwitchCount
+#    inc eax
+#    mov kTaskSwitchCount,eax
     #Restore the CR3 if it differs from the current one
 restoreCR3:
     mov eax,isrSavedCR3

@@ -458,7 +458,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
             fl_fseek(file, elfInfo->pgmHdrTable[pgmSectionNum].p_offset, SEEK_SET);
             
             //Get pages 
-            if (!putDataOnPages2(CR3, virtualLoadAddress, file, true, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 0, elfInfo->mapMemoryOnly))
+            if (!putDataOnPages(CR3, virtualLoadAddress, file, true, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 0, elfInfo->mapMemoryOnly))
                 return false;
             
             printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, virtualLoadAddress);
@@ -470,7 +470,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
                         elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 
                         virtualLoadAddress+elfInfo->pgmHdrTable[pgmSectionNum].p_filesz);
                 //CLR 02/20/2017 - Replaced memset
-                if (!putDataOnPages2(CR3,
+                if (!putDataOnPages(CR3,
                         virtualLoadAddress+elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
                         NULL,
                         false,
@@ -482,7 +482,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
         else if (elfInfo->pgmHdrTable[pgmSectionNum].p_memsz>0)
         {
             printd(DEBUG_ELF_LOADER,"Section %u not loadable (fsize=0,msize>0), zeroed 0x%08X bytes at 0x%08X\n",pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, virtualLoadAddress);
-            putDataOnPages2(CR3, virtualLoadAddress, NULL, false, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, 0, elfInfo->mapMemoryOnly);
+            putDataOnPages(CR3, virtualLoadAddress, NULL, false, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, 0, elfInfo->mapMemoryOnly);
             
         }
 #ifndef DEBUG_NONE

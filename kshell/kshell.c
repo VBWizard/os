@@ -241,7 +241,7 @@ void execp(char* cmdline)
             "push edx\n"
             "int 0x80\n"
             :"=a" (pid)
-            :"a" (0x59),"b" (params[0]),"c" (0),"d" (0));
+            :"a" (0x59),"b" (params[0]),"c" (paramCount-1),"d" (&params[1]));
     //print("Waiting on pid=0x%08X\n",pid);
     waitpid(pid);
     //print("pid=0x%08X returned\n",pid);

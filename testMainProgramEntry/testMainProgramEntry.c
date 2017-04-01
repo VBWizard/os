@@ -33,7 +33,7 @@ int main2(int argc, char** argv) {
     
     libc_init();
     char input[100];
-    print("Sleeping for 3 seconds");
+/*    print("Sleeping for 3 seconds");
     
     sleep(3);
     print("\n");
@@ -48,6 +48,7 @@ int main2(int argc, char** argv) {
     print("Getting one character: ");
     gets((char*)&t,1,1);
     print("\nGot character %c\n",t);
+*/
     print("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
     {

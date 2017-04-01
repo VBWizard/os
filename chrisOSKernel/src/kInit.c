@@ -46,7 +46,7 @@ void initKernelInternals()
     kKernelTask=getAvailableTask();
     kKernelProcess=(process_t*)allocPagesAndMap(sizeof(process_t));
     kKernelProcess->task=kKernelTask;
-    kKernelProcess->priority=20;    //Set kernel task to low priority
+    kKernelProcess->priority=16;    //Set kernel task to low priority
     kKernelTask->process=kKernelProcess;
      __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
     //Set up our kernel task

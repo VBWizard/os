@@ -39,6 +39,7 @@ typedef struct s_task
     uint32_t buffer;
     void* process;
     uint32_t buffer2;
+    uint32_t lastRunStartTicks, lastRunEndTicks;
 } task_t;
 
 task_t* createTask(bool kernelTSS);

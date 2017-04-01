@@ -20,6 +20,7 @@ uintptr_t *qExited;
 
 extern uint32_t* kTicksSinceStart;
 uint32_t kTaskSwitchCount;
+uint32_t kSchedulerCallCount;
 uint32_t NO_TASK=0xFFFFFFFF;
 
 uint32_t nextScheduleTicks;
@@ -296,16 +297,13 @@ task_t* findTaskToRun()
     {
         if (*queue!=0)
         {
-            if (((task_t*)*queue)->taskNum==0x1)
-                printd(DEBUG_PROCESS | DEBUG_DETAILED,"\t\tkKernelProcess address = 0x%08X\n",((process_t*)((task_t*)*queue)->process));
-    
             //This is where we increment all the runnable ticks, based on the process' priority
-            printd(DEBUG_PROCESS | DEBUG_DETAILED,"\t\tfindTaskToRun: task 0x%04X, priority=0x%08X, old ticks=0x%08X, new ticks=",
+            printd(DEBUG_PROCESS,"*\tfindTaskToRun: task 0x%04X, priority=%u, old ticks=%u, new ticks=",
                     ((task_t*)*queue)->taskNum,
                     ((process_t*)((task_t*)*queue)->process)->priority,
                     ((task_t*)*queue)->prioritizedTicksInRunnable);
             ((task_t*)*queue)->prioritizedTicksInRunnable+=(20-((process_t*)((task_t*)*queue)->process)->priority)+1;
-            printd(DEBUG_PROCESS | DEBUG_DETAILED,"0x%08X\n",((task_t*)*queue)->prioritizedTicksInRunnable);
+            printd(DEBUG_PROCESS,"%u\n",((task_t*)*queue)->prioritizedTicksInRunnable);
             if ( ((task_t*)*queue)->prioritizedTicksInRunnable > mostIdleTicks)
             {
                 taskToRun=(task_t*)*queue;
@@ -323,7 +321,7 @@ task_t* findTaskToRun()
 void removeFromQ(uintptr_t* queue, task_t* taskPtr)
 {
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"\tRemoving task 0x%04X (0x%08X) from queue %s\n",
+    printd(DEBUG_PROCESS,"*\t\tremoveFromQ: Removing task 0x%04X (0x%08X) from queue %s\n",
             taskPtr->taskNum,
             taskPtr,
             TASK_STATE_NAMES[taskPtr->taskState]);
@@ -343,7 +341,7 @@ void removeFromQ(uintptr_t* queue, task_t* taskPtr)
 void addToQ(uintptr_t* queue, task_t* taskPtr)
 {
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"\tAdding task 0x%04X to queue %s\n",taskPtr->taskNum,TASK_STATE_NAMES[taskPtr->taskState]);
+    printd(DEBUG_PROCESS,"*\t\taddToQ: Adding task 0x%04X to queue %s\n",taskPtr->taskNum,TASK_STATE_NAMES[taskPtr->taskState]);
 #endif
     while (*queue!=NO_NEXT)
     {
@@ -364,7 +362,7 @@ void changeTaskQueue(task_t* task, eTaskState newState)
     uintptr_t* oldQ=getQ(task->taskState);
 
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"\tchangeTaskQueue: Changing task state for 0x%04X from %s to %s\n",
+    printd(DEBUG_PROCESS,"*\tchangeTaskQueue: Changing task state for 0x%04X from %s to %s\n",
             task->taskNum,
             TASK_STATE_NAMES[task->taskState],
             TASK_STATE_NAMES[newState]);
@@ -374,10 +372,16 @@ void changeTaskQueue(task_t* task, eTaskState newState)
     if (newQ==NULL)
         panic("changeTaskQueue: Invalid queue newQ=0x%08X, state=%s",newQ,TASK_STATE_NAMES[newState]);
     removeFromQ(oldQ,task);
+    if (task->taskState==TASK_RUNNING)  //old state
+    {
+        ((process_t*)task->process)->totalRunTicks+=(*kTicksSinceStart-task->lastRunStartTicks);
+    }
     task->taskState=newState;
     addToQ(newQ,task);
     if (newState==TASK_RUNNABLE)
         task->prioritizedTicksInRunnable=0;
+    else if (newState==TASK_RUNNING)
+        task->lastRunStartTicks=*kTicksSinceStart;
 }
 
 void triggerScheduler()
@@ -388,15 +392,15 @@ void triggerScheduler()
 void runAnotherTask(bool schedulerRequested)
 {
     uint32_t oldCR3;
-
+    eTaskState stopQueue=TASK_NONE, startQueue=TASK_NONE;
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
             :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
-    printd(DEBUG_PROCESS,"\n****************************** TASK SWITCH *******************************\n");
+    printd(DEBUG_PROCESS,"\n****************************** SCHEDULER *******************************\n");
     //printd(DEBUG_PROCESS,"*Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
     //Get task to stop
     task_t* taskToStop=findRunningTaskToReplace();
     if (taskToStop==NULL)
-    panic("Can't find task to in the running queue ... not possible!!!\n");
+    panic("Can't find task to put in the running queue ... not possible!!!\n");
 
 #ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS,"*Found task 0x%04X to take off CPU @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
@@ -406,7 +410,7 @@ void runAnotherTask(bool schedulerRequested)
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Task (0x%04X) ended, removing it from %s list.\n",taskToStop->taskNum,TASK_STATE_NAMES[taskToStop->taskState]);
 #endif
-        changeTaskQueue(taskToStop,TASK_EXITED);
+        stopQueue=TASK_EXITED;
         gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
         //Look through the USleep looking for task that is waiting on this one to end
         uintptr_t* q=qUSleep;
@@ -436,23 +440,19 @@ void runAnotherTask(bool schedulerRequested)
         switch (((process_t*)(taskToStop->process))->signals.sigind)
         {
             case SIG_USLEEP:
-                changeTaskQueue(taskToStop,TASK_USLEEP);
-                storeISRSavedRegs(taskToStop);
+                stopQueue=TASK_USLEEP;
                 break;
             case SIG_SEGV:
-                changeTaskQueue(taskToStop,TASK_EXITED);
-                storeISRSavedRegs(taskToStop);
+                stopQueue=TASK_EXITED;
                 break;
             case SIG_STOP:
-                changeTaskQueue(taskToStop,TASK_STOPPED);
-                storeISRSavedRegs(taskToStop);
+                stopQueue=TASK_STOPPED;
 #ifdef SCHEDULER_DEBUG
                 printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
 #endif
                 break;
             case SIG_SLEEP:
-                changeTaskQueue(taskToStop,TASK_ISLEEP);
-                storeISRSavedRegs(taskToStop);
+                stopQueue=TASK_ISLEEP;
                 break;
             default:
                 panic("scheduler: Unhandled signal");
@@ -461,32 +461,44 @@ void runAnotherTask(bool schedulerRequested)
     }
     else
     {
-        changeTaskQueue(taskToStop,TASK_RUNNABLE);
-        storeISRSavedRegs(taskToStop);
+        stopQueue=TASK_RUNNABLE;
     }
     //Get task to start
+    changeTaskQueue(taskToStop,stopQueue);
+    printd(DEBUG_PROCESS,"*Finding task to run\n");
     task_t* taskToRun=findTaskToRun();
-    if (taskToRun!=NULL)
+
+    if (taskToRun!=NULL && taskToRun->taskNum==taskToStop->taskNum)
     {
-        printd(DEBUG_PROCESS,"*Found task 0x%04X move to CPU, prioritied ticks =  !\n",taskToRun->taskNum);
+        printd(DEBUG_PROCESS,"*No new task to run, continuing with the current task\n");
+        changeTaskQueue(taskToStop,TASK_RUNNING);   //switch it back to the running queue
+    }
+
+    if (taskToRun!=NULL && taskToRun->taskNum!=taskToStop->taskNum)
+    {
+        printd(DEBUG_PROCESS,"*Found task 0x%04X move to CPU\n",taskToRun->taskNum);
+        storeISRSavedRegs(taskToStop);              //we're taking it off the cpu so save the registers
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG
-        printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08X",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
+        printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08X\n",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
 #endif
+
+        printd(DEBUG_PROCESS,"*Total running ticks: 0x%04X: %u, 0x%04X: %u\n",
+                taskToStop->taskNum,
+                ((process_t*)taskToStop->process)->totalRunTicks,
+                taskToRun->taskNum,
+                ((process_t*)taskToRun->process)->totalRunTicks);
         schedulerTaskSwitched=true;
         kTaskSwitchCount++;
     }
     else
     {
         __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (oldCR3));
-#ifdef SCHEDULER_DEBUG
-        printd(DEBUG_PROCESS,"*No new process to run, continuing with the current process");
-#endif
     }
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"(Task switch count=%u, ticks=0x%08X)\n",kTaskSwitchCount,*kTicksSinceStart);
+    printd(DEBUG_PROCESS,"*Scheduler calls=%u, task switchs=%u, ticks=0x%08X\n",kSchedulerCallCount, kTaskSwitchCount,*kTicksSinceStart);
     printd(DEBUG_PROCESS,"**************************************************************************\n");
 #endif
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
@@ -497,5 +509,6 @@ void scheduler()
 {
     //NOTE: When this method is entered, it is time to reschedule.  The check for whether it is time is in kIRQ0_handler()
     runAnotherTask(true);
+    kSchedulerCallCount++;
 }
 

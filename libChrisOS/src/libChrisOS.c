@@ -5,6 +5,7 @@
  */
 
 #include "libChrisOS.h"
+#include "syscalls.h"
 
 extern void sysEnter_Vector();
 int a=123;int b=456; int c=789;
