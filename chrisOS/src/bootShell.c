@@ -340,6 +340,7 @@ void HIGH_CODE_SECTION selectHDNum (char* cmdline)
         printk("Error, selected disk number (%u) is not valid.  It must be >=0 and <= %u\n",lTemp,kATADeviceInfoCount);
     else
         kSelectedDiskNum=lTemp;
+    printd(DEBUG_HARDDRIVE,"Parsing MBR for disk %u\n",kSelectedDiskNum);
     parseMBR(&kATADeviceInfo[kSelectedDiskNum],&mbr);
     printk("Disk %u selected\n",kSelectedDiskNum);
 }

@@ -6,7 +6,7 @@
 
 #include "signals.h"
 #include "process.h"
-
+#include "thesignals.h"
 //TODO: ******************** Tie signals into scheduler ********************************
 extern void sigSleepReturn();
 extern void triggerScheduler();
@@ -166,7 +166,7 @@ scanSleep:
                 changeTaskQueue(task,TASK_RUNNABLE);
                 ((process_t*)(task->process))->signals.sigdata[SIG_SLEEP]=0;
                 ((process_t*)(task->process))->signals.sigind&=~SIG_SLEEP;
-                task->ticksSincePutInRunnable=1000000;  //Make this the next chosen task
+                task->prioritizedTicksInRunnable=1000000;  //Make this the next chosen task
             }
         }
         sleep++;

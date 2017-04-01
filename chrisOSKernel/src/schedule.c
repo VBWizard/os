@@ -291,15 +291,20 @@ task_t* findTaskToRun()
     {
         if (*queue!=0)
         {
-            //This is where we increment all the runnable ticks
-            ((task_t*)*queue)->ticksSincePutInRunnable++;
-            //if (((task_t*)*queue)->taskNum==1) 
-            //    ((task_t*)*queue)->ticksSincePutInRunnable++;   //Kernel task always gets extra priority.  This will usually allow the kernel to run 
-                                                                //every other tick.
-            if ( ((task_t*)*queue)->ticksSincePutInRunnable > mostIdleTicks)
+            if (((task_t*)*queue)->taskNum==0x1)
+                printd(DEBUG_PROCESS | DEBUG_DETAILED,"\t\tkKernelProcess address = 0x%08X\n",((process_t*)((task_t*)*queue)->process));
+    
+            //This is where we increment all the runnable ticks, based on the process' priority
+            printd(DEBUG_PROCESS | DEBUG_DETAILED,"\t\tfindTaskToRun: task 0x%04X, priority=0x%08X, old ticks=0x%08X, new ticks=",
+                    ((task_t*)*queue)->taskNum,
+                    ((process_t*)((task_t*)*queue)->process)->priority,
+                    ((task_t*)*queue)->prioritizedTicksInRunnable);
+            ((task_t*)*queue)->prioritizedTicksInRunnable+=(20-((process_t*)((task_t*)*queue)->process)->priority)+1;
+            printd(DEBUG_PROCESS | DEBUG_DETAILED,"0x%08X\n",((task_t*)*queue)->prioritizedTicksInRunnable);
+            if ( ((task_t*)*queue)->prioritizedTicksInRunnable > mostIdleTicks)
             {
                 taskToRun=(task_t*)*queue;
-                mostIdleTicks=((task_t*)*queue)->ticksSincePutInRunnable;
+                mostIdleTicks=((task_t*)*queue)->prioritizedTicksInRunnable;
             }
         }
         queue++;
@@ -370,7 +375,7 @@ void changeTaskQueue(task_t* task, eTaskState newState)
        addToQ(newQ,task);
     }
     if (newState==TASK_RUNNABLE)
-        task->ticksSincePutInRunnable=0;
+        task->prioritizedTicksInRunnable=0;
 }
 
 void triggerScheduler()
@@ -392,7 +397,7 @@ void runAnotherTask(bool schedulerRequested)
     panic("Can't find task to in the running queue ... not possible!!!\n");
 
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"*Found process (0x%04X) to take off CPU @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
+    printd(DEBUG_PROCESS,"*Found task 0x%04X to take off CPU @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
 #endif
     if (taskToStop->exited)
     {
@@ -460,7 +465,7 @@ void runAnotherTask(bool schedulerRequested)
     task_t* taskToRun=findTaskToRun();
     if (taskToRun!=NULL)
     {
-        printd(DEBUG_PROCESS,"*Found task move to CPU (0x%04X)!\n",taskToRun->taskNum);
+        printd(DEBUG_PROCESS,"*Found task 0x%04X move to CPU, prioritied ticks =  !\n",taskToRun->taskNum);
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
         //Move the new task onto the CPU

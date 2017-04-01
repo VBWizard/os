@@ -169,6 +169,8 @@ _isr_12_wrapper:                        #remapped to 0x14
         jmp isr_My_Common
 .global _isr_13_wrapper                 #remapped to 0x15
 _isr_13_wrapper:
+        mov ebp,0x10
+        mov ds,ebp
         mov exceptionSavedESP, esp
         mov exceptionAX,eax
         mov exceptionBP, ebp
@@ -241,7 +243,7 @@ getExceptionDetailsWithError:
      mov exceptionErrorCode, bx
 
 saveTheStack:
-jmp overSaveTheStack
+#jmp overSaveTheStack
         mov esi, exceptionSavedESP
 //        add esi, 16 #drop the 4 dwords that are passed to the proc
         mov edi, exceptionSavedStack

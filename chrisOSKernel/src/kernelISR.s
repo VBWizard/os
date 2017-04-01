@@ -13,7 +13,9 @@
 .extern kTicksSinceStart
 .extern nextScheduleTicks
 .extern kKernelCR3
-.extern keyboardHandlerRoutine;
+.extern keyboardHandlerRoutine
+.extern call defaultISRHandler
+
 
 isrNumber: .word 0,0
 tempEAX: .word 0,0
@@ -22,8 +24,12 @@ tempEAX: .word 0,0
 alltraps:
     #NOTE: CLI not necessary, Interrupt Gate
     push eax
+    push ebx
     mov eax,0x10
+    mov ebx,ds
     mov ds,eax
+    mov isrSavedDS,ebx
+    pop ebx
     pop eax
     mov isrSavedEAX,eax
     mov eax,[esp]
@@ -82,6 +88,7 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
+jmp overSaveTheStack
     mov eax,isrNumber
     cmp eax,0x20                
     jge overSaveTheStack        #CLR 03/26/2017: Changed (je to jge) to skip stack capture for 0x20 (IRQ0) & 0x21 (KBD) (not sure what else)
@@ -98,6 +105,12 @@ overSaveTheStack:
     call kIRQ0_handler
     jmp ckeckForIRQResponse
 notIRQ0Handler:
+    cmp eax,0xd
+    jne notGPF
+    call defaultISRHandler
+    cli
+    hlt
+notGPF:
     cmp eax,0xe
     jne notPagingHandler
 

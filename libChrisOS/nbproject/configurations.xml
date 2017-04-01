@@ -64,6 +64,8 @@
         <cTool>
           <incDir>
             <pElem>include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
+            <pElem>../chrisOS/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,libc_init</commandLine>
         </cTool>
@@ -167,6 +169,7 @@
           <developmentMode>5</developmentMode>
           <incDir>
             <pElem>include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,&lt;function name></commandLine>

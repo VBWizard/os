@@ -44,7 +44,7 @@ uint8_t ataWaitForIdle(struct ataDeviceInfo_t* devInfo)
 {
     ticks = 0;
     uint8_t lValue=0;
-    //printk("aaWaitForIdle: ticks(%u@0x%08X)=ATA_STANDARD_WAIT_MS(%d)*kTicksPerMS((%d@0x%08X))\n", ticks, &ticks, (ATA_STANDARD_WAIT_MS), kTicksPerMS, &kTicksPerMS);
+    //printd(DEBUG_HARDDRIVE,"aaWaitForIdle: ticks(%u@0x%08X)=ATA_STANDARD_WAIT_MS(%d)*kTicksPerMS((%d@0x%08X))\n", ticks, &ticks, (ATA_STANDARD_WAIT_MS), kTicksPerMS, &kTicksPerMS);
     lValue=inb(devInfo->ioPort+ATA_PORT_STATUS);
     if ((lValue & ATA_STATUS_DRQ) == ATA_STATUS_DRQ && ticks)
         inw(devInfo->ioPort+ATA_PORT_DATA);
@@ -91,7 +91,7 @@ uint8_t ataControllerIsReady(struct ataDeviceInfo_t* devInfo)
         lStatus=ATA_STATUS_READY;
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-            printk("ataControllerIsReady: returning %02X\n",lStatus);
+            printd(DEBUG_HARDDRIVE,"ataControllerIsReady: returning %02X\n",lStatus);
 #endif
     return true;
 }
@@ -120,7 +120,7 @@ bool ataSelectDrive(struct ataDeviceInfo_t* devInfo, uint8_t head)
     {
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-            printk("ataSelectDrive: Failed to select drive %u, bus %u, status=0x%02X is not ok\n", devInfo->driveNo, devInfo->bus, inb(devInfo->ioPort+ATA_PORT_STATUS));
+            printd(DEBUG_HARDDRIVE,"ataSelectDrive: Failed to select drive %u, bus %u, status=0x%02X is not ok\n", devInfo->driveNo, devInfo->bus, inb(devInfo->ioPort+ATA_PORT_STATUS));
 #endif
             return inb(devInfo->ioPort+ATA_PORT_STATUS);
     }
@@ -129,7 +129,7 @@ bool ataSelectDrive(struct ataDeviceInfo_t* devInfo, uint8_t head)
     {
         wait(10);
         unsigned lDrive=inb(devInfo->ioPort+ATA_DRIVE_SELECT);
-            printk("ataSelectDrive: Drive selected: %s (%u, 0x%02X), err=0x%02X\n", (lDrive & (1<<4)) == 1<<4?"Slave":"Master", devInfo->driveNo, lDrive, inb(devInfo->ioPort+ATA_PORT_ERROR));
+            printd(DEBUG_HARDDRIVE,"ataSelectDrive: Drive selected: %s (%u, 0x%02X), err=0x%02X\n", (lDrive & (1<<4)) == 1<<4?"Slave":"Master", devInfo->driveNo, lDrive, inb(devInfo->ioPort+ATA_PORT_ERROR));
     }
 #endif
         
@@ -167,13 +167,13 @@ static void ataResetController(struct ataDeviceInfo_t* devInfo)
         if (!ataControllerIsReady(devInfo))
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-            printk("HD-controller still busy\n");
+            printd(DEBUG_HARDDRIVE,"HD-controller still busy\n");
 #endif
         if ((hdError = inb(devInfo->ioPort+ATA_PORT_ERROR)) != 0 && (hdError = inb(devInfo->ioPort+ATA_PORT_ERROR)) != 4)
-            printk("Controller reset failed on %s bus: %02x\n",devInfo->bus==0?"Primary":"Secondary", hdError);
+            printd(DEBUG_HARDDRIVE,"Controller reset failed on %s bus: %02x\n",devInfo->bus==0?"Primary":"Secondary", hdError);
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-            printk("ataResetController: controller is ready\n");
+            printd(DEBUG_HARDDRIVE,"ataResetController: controller is ready\n");
 #endif
 }
 int ataInit(struct ataDeviceInfo_t* devInfo)
@@ -192,7 +192,7 @@ int ataInit(struct ataDeviceInfo_t* devInfo)
     {
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-            printk("Drive %02X, not ready(%02X)\n",devInfo->driveNo, cStatus);
+            printd(DEBUG_HARDDRIVE,"Drive %02X, not ready(%02X)\n",devInfo->driveNo, cStatus);
 #endif
         return false;
     }
@@ -201,7 +201,7 @@ int ataInit(struct ataDeviceInfo_t* devInfo)
         int err = inb(devInfo->ioPort+ATA_PORT_ERROR);
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-            printk("drive %02X, cStatus=%02X, errreg=%02X\n",devInfo->driveNo, cStatus,err);
+            printd(DEBUG_HARDDRIVE,"drive %02X, cStatus=%02X, errreg=%02X\n",devInfo->driveNo, cStatus,err);
 #endif
         if (err!=4)
             return false;
@@ -211,7 +211,7 @@ int ataInit(struct ataDeviceInfo_t* devInfo)
         {
 #ifndef DEBUG_NONE
             if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-                printk("Drive %02X, not ready(%02X)\n",devInfo->driveNo, cStatus);
+                printd(DEBUG_HARDDRIVE,"Drive %02X, not ready(%02X)\n",devInfo->driveNo, cStatus);
 #endif
             return false;
         }
@@ -229,7 +229,7 @@ int ataInit(struct ataDeviceInfo_t* devInfo)
     {
 #ifndef DEBUG_NONE
     if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-        printk("Cylinder port non-zero (%X,%X), device is non-ATA\n",inb(devInfo->ioPort+ATA_PORT_CYLINDER_LOW), inb(devInfo->ioPort+ATA_PORT_CYLINDER_HIGH));
+        printd(DEBUG_HARDDRIVE,"Cylinder port non-zero (%X,%X), device is non-ATA\n",inb(devInfo->ioPort+ATA_PORT_CYLINDER_LOW), inb(devInfo->ioPort+ATA_PORT_CYLINDER_HIGH));
 #endif
         if (useCDROMIdentify)
             return true;
@@ -276,7 +276,7 @@ int ataIdentify(struct ataDeviceInfo_t* devInfo)
     
 #ifndef DEBUG_NONE
     if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-        printk("drive %d, model=%s\n",devInfo->driveNo, devInfo->ATADeviceModel);
+        printd(DEBUG_HARDDRIVE,"drive %d, model=%s\n",devInfo->driveNo, devInfo->ATADeviceModel);
 #endif
     return 1;
 }
@@ -349,7 +349,7 @@ int ataScanForHarddrives()
 
 #ifndef DEBUG_NONE
     if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
-        printk("INIT: Disk1=%s  Disk2=%s\n", kATADeviceInfo[0].ATADeviceModel, kATADeviceInfo[1].ATADeviceModel);
+        printd(DEBUG_HARDDRIVE,"INIT: Disk1=%s  Disk2=%s\n", kATADeviceInfo[0].ATADeviceModel, kATADeviceInfo[1].ATADeviceModel);
 #endif
             return 0;
 }
@@ -372,8 +372,7 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
         {
-            printk("ataBlockingRead28: sec: 0x%08X, buf 0x%08X, cnt 0x%08X\n", lSector, bufp, sector_count);
-            waitForKeyboardKey();
+            printd(DEBUG_HARDDRIVE,"ataBlockingRead28: sec: 0x%08X, buf 0x%08X, cnt 0x%08X\n", lSector, bufp, sector_count);
         }
 #endif
     lResult=ataWaitForIdle(atablockingReadDev);
@@ -402,10 +401,10 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
         #ifndef DEBUG_NONE
             if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
             {
-                printk("ataBlockingRead28: Debugging: ");
+                printd(DEBUG_HARDDRIVE,"ataBlockingRead28: Debugging: ");
                 for (int cnt2=0;cnt2<20;cnt2++)
-                    printk("%02X ", bufp[cnt2]);
-                printk("\n");
+                    printd(DEBUG_HARDDRIVE,"%02X ", bufp[cnt2]);
+                printd(DEBUG_HARDDRIVE,"\n");
             }
         #endif
         if (--lSectorsLeft>0) //zero based vs 1 based
@@ -419,7 +418,7 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
 #ifndef DEBUG_NONE
         if ((kDebugLevel & DEBUG_HARDDRIVE) == DEBUG_HARDDRIVE)
         {
-            printk("ataBlockingRead28: sec=0x%08X, buf=0x%08X, rep=0x%08X    \n", lSector, bufp, lSectorsLeft);
+            printd(DEBUG_HARDDRIVE,"ataBlockingRead28: sec=0x%08X, buf=0x%08X, rep=0x%08X    \n", lSector, bufp, lSectorsLeft);
             waitForKeyboardKey();
         }
 #endif

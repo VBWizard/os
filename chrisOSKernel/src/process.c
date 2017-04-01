@@ -49,6 +49,13 @@ bool processRegExit(process_t* process, void* routineAddr)
     return false;
 }
 
+int sys_setpriority(process_t* process, int newpriority)
+{
+    int retVal=process->priority;
+    process->priority=newpriority;
+    return retVal;
+}
+
 process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
 {
 
@@ -74,8 +81,8 @@ process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess)
     process->task->process=process;
     process->processSyscallESP=process->task->tss->ESP1;
    
-process->pageDirPtr=process->task->tss->CR3;
-    
+    process->pageDirPtr=process->task->tss->CR3;
+    process->priority=PROCESS_DEFAULT_PRIORITY;
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
     pagingMapPage(process->task->tss->CR3,PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000,0x7); //FIX ME!!!  Had to change this for sys_sigaction2 USLEEP
 
@@ -115,8 +122,8 @@ process->pageDirPtr=process->task->tss->CR3;
     }
     else
     {
-        gdtFlags |= GDT_DPL3;
-        tssFlags |= ACS_DPL_3;
+        gdtFlags |= GDT_DPL0;
+        tssFlags |= ACS_DPL_0;
     }
     gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
     if (!taskRegInitialized)
@@ -127,7 +134,7 @@ process->pageDirPtr=process->task->tss->CR3;
         taskRegInitialized=true;
     }
     submitNewTask(process->task);
-    printk("Submitted process 0x%04X to be run\n",process->task->taskNum);
+    printd(DEBUG_PROCESS,"Submitted process 0x%04X to be run\n",process->task->taskNum);
     return process;
 }
 

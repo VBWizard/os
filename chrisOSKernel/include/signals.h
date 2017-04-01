@@ -21,15 +21,6 @@ extern "C" {
 #include "task.h"
 #include "kernel.h"
     
-    typedef enum esignals
-    {
-        SIG_HALT = 1,
-        SIG_SLEEP = 2,
-        SIG_USLEEP = 4,
-        SIG_SEGV = 0x800,
-        SIG_STOP = 0x2000,
-    } eSignals;
-    
     typedef struct ssignal
     {
         void* sighandler[32];

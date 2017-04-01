@@ -67,7 +67,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kshell: ${OBJECTFILES}
 ${OBJECTDIR}/kshell.o: kshell.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I/home/yogi/src/os/libChrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/kshell.o kshell.c
+	$(COMPILE.c) -O2 -Iinclude -I/home/yogi/src/os/libChrisOS/include -I../chrisOSKernel/include -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/kshell.o kshell.c
 
 # Subprojects
 .build-subprojects:

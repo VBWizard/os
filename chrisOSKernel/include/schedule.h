@@ -27,6 +27,7 @@ extern "C" {
 #include "paging.h"
 #include "process.h"
 #include "kernel.h"
+#include "thesignals.h"
     
     extern uint32_t* kTaskSlotAvailableInd;
     extern tss_t* kTSSTable;

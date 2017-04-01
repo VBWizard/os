@@ -21,13 +21,13 @@ qemu-system-i386 							\
 	-device ich9-ahci,id=ahci1 					\
 	-device ide-drive,drive=sata-disk-1,bus=ahci0.0			\
 	-device ide-cd,drive=sata-cd-0,bus=ahci0.1			\
-       	-device ide-drive,drive=sata-disk-2,bus=ahci1.0 		\
         -device ide-drive,drive=sata-disk-0,bus=ahci1.1 		\
 	-serial file:"qemu_port.log"					\
 	-d int,cpu_reset,pcall,guest_errors                        		\
+	-hda ~/qemu-test-disk2.img                                      \
 	$@ 
 #	--enable-kvm
 
 #drive=/home/yogi/qemu-usb-mass-storage.dsk
 #-hda ~/diskimage.img
-
+#-device ide-drive,drive=sata-disk-2,bus=ahci1.0                \

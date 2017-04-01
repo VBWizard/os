@@ -34,7 +34,7 @@ typedef struct s_task
     uint32_t next, prev;
     bool kernel;
     eTaskState taskState;
-    int32_t ticksSinceLastInterrupted, ticksSincePutInRunnable;
+    int32_t ticksSinceLastInterrupted, prioritizedTicksInRunnable;
     bool exited;
     uint32_t buffer;
     void* process;

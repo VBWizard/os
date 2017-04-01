@@ -155,6 +155,7 @@ int ahciRead(volatile HBA_PORT* port, int sector, uint8_t* buffer, int sector_co
 bool ataSelectDrive(struct ataDeviceInfo_t* devInfo, uint8_t head);
 void ahciSetCurrentPart(partEntry_t part);
 void ahciSetCurrentDisk(volatile HBA_PORT* port);
+int ataReadDisk(struct ataDeviceInfo_t* devInfo, uint32_t sector, uint8_t *buffer, uint32_t sector_count);
 
 extern uint32_t kDebugLevel;
 extern struct ataDeviceInfo_t* kATADeviceInfo;

@@ -41,6 +41,8 @@
           <incDir>
             <pElem>include</pElem>
             <pElem>/home/yogi/src/os/libChrisOS/include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
+            <pElem>../chrisOS/include</pElem>
           </incDir>
           <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
@@ -81,6 +83,8 @@
           <incDir>
             <pElem>include</pElem>
             <pElem>/home/yogi/src/os/libChrisOS/include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
+            <pElem>../chrisOS/include</pElem>
           </incDir>
           <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
         </cTool>

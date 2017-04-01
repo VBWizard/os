@@ -58,8 +58,10 @@
       <itemPath>include/schedule.h</itemPath>
       <itemPath>../chrisOS/include/strings.h</itemPath>
       <itemPath>include/syscall.h</itemPath>
+      <itemPath>include/syscalls.h</itemPath>
       <itemPath>include/sysloader.h</itemPath>
       <itemPath>include/task.h</itemPath>
+      <itemPath>include/thesignals.h</itemPath>
       <itemPath>../chrisOS/include/time_os.h</itemPath>
       <itemPath>include/tss.h</itemPath>
       <itemPath>/home/yogi/src/os/chrisOSKernel/include/x86idt.h</itemPath>
@@ -344,9 +346,13 @@
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/syscalls.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/sysloader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/task.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/thesignals.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -607,9 +613,13 @@
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/syscalls.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/sysloader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/task.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/thesignals.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
       </item>

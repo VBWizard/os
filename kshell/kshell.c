@@ -236,7 +236,7 @@ void execp(char* cmdline)
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     uint32_t pid=0;
 
-    print("Executing %s\n",params[0]);
+    //print("Executing %s\n",params[0]);
     __asm__("push eax\n"
             "push ebx\n"
             "push ecx\n"
@@ -244,9 +244,9 @@ void execp(char* cmdline)
             "int 0x80\n"
             :"=a" (pid)
             :"a" (0x59),"b" (params[0]),"c" (0),"d" (0));
-    print("Waiting on pid=0x%08X\n",pid);
+    //print("Waiting on pid=0x%08X\n",pid);
     waitpid(pid);
-    print("pid=0x%08X returned\n",pid);
+    //print("pid=0x%08X returned\n",pid);
     //exec(params[0],0,0);
     //strcpy(sExecutingProgram,params[0]+1);
 }
@@ -261,10 +261,22 @@ void kSleep(char *cmdline)
         print("Requires 1 parameter which is the number of seconds to sleep\n");
         return;
     }
-    print("Sleeping for %u seconds\n",strtoul(params[0],0,10));
+    //print("Sleeping for %u seconds\n",strtoul(params[0],0,10));
     sleep(strtoul(params[0],0,10));
 }
 
+void kExit(char *cmdline)
+{
+    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
+
+    if (parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT))
+    {
+        exitCode = strtoul(params[0],0,10);
+    }
+    else
+        exitCode = 0;
+    timeToExit=true;
+}
 
 int kShell(int argc, char** argv)
 {
@@ -277,11 +289,12 @@ int kShell(int argc, char** argv)
     int commandWasFromThisBufferPtr=0;
     char ansiSeq[20];
 
+    libc_init();
     ansiSeq[0]=0x1b;
     sKShellProgramName=malloc(1024);
     strcpy(sKShellProgramName,"kShell");
     strcpy(sExecutingProgram,sKShellProgramName);
-    puts("\nWelcome to kShell ... hang a while!\n");
+    //puts("\nWelcome to kShell ... hang a while!\n");
 
     while (!timeToExit)
     {
@@ -391,17 +404,4 @@ doneGettingKeys:
         }
     }
     return exitCode;
-}
-
-void kExit(char *cmdline)
-{
-    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-
-    if (parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT))
-    {
-        exitCode = strtoul(params[0],0,10);
-    }
-    else
-        exitCode = 0;
-    timeToExit=true;
 }

@@ -12,8 +12,8 @@ int a=123;int b=456; int c=789;
 VISIBLE void libc_init(void)
 {
     initmalloc();
-    asm("mov eax,0\ncall sysEnter_Vector\n");
-    asm("mov eax,0x163\ncall sysEnter_Vector\n"::"b" (&libc_cleanup));
+    SYSCALL1(SYSCALL_INVALID)
+    SYSCALL2(SYSCALL_REGEXITHANDLER,&libc_cleanup)
 }
 
 void libc_cleanup(void)
@@ -25,7 +25,7 @@ VISIBLE int print(const char *format, ...)
 {
     va_list args;
     va_start( args, format );
-    asm("mov eax,0x300\ncall sysEnter_Vector\n"::"b" (format), "c" (args));
+    SYSCALL3(SYSCALL_PRINT,format,args);
     return 0;
 }
 
@@ -45,12 +45,12 @@ VISIBLE unsigned int sleep (unsigned int __seconds)
 
 void stop()
 {
-        asm("call sysEnter_Vector\n"::"a" (0x168));
+    SYSCALL1(SYSCALL_STOP)
 }
 
 void modifySignal(int signal, void* sigHandler, int sigData)
 {
-    asm("call sysEnter_Vector\n"::"a" (0x167), "b" (signal), "c" (sigHandler), "d" (sigData));
+    SYSCALL4(SYSCALL_SETSIGACTION,signal,sigHandler,sigData)
 }
 
 VISIBLE void exec(char* path, int argc, char** argv)
@@ -62,5 +62,5 @@ VISIBLE void exec(char* path, int argc, char** argv)
 
 VISIBLE void waitpid(uint32_t pid)
 {
-    asm("call sysEnter_Vector\n"::"a" (0x61),"b" (pid));    //waitForPID
+    SYSCALL2(SYSCALL_WAITFORPID,pid)
 }

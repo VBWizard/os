@@ -81,77 +81,77 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibchrisos.a: ${OBJECTFILES}
 ${OBJECTDIR}/_ext/117d59b5/memcpy.o: /home/yogi/src/os/libChrisOS/src/memcpy.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/117d59b5
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/117d59b5/memcpy.o /home/yogi/src/os/libChrisOS/src/memcpy.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/117d59b5/memcpy.o /home/yogi/src/os/libChrisOS/src/memcpy.c
 
 ${OBJECTDIR}/_ext/117d59b5/memset.o: /home/yogi/src/os/libChrisOS/src/memset.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/117d59b5
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/117d59b5/memset.o /home/yogi/src/os/libChrisOS/src/memset.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/117d59b5/memset.o /home/yogi/src/os/libChrisOS/src/memset.c
 
 ${OBJECTDIR}/_ext/85a4b428/strcat.o: /home/yogi/src/os/libChrisOS/src/strings/strcat.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strcat.o /home/yogi/src/os/libChrisOS/src/strings/strcat.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strcat.o /home/yogi/src/os/libChrisOS/src/strings/strcat.c
 
 ${OBJECTDIR}/_ext/85a4b428/strcmp.o: /home/yogi/src/os/libChrisOS/src/strings/strcmp.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strcmp.o /home/yogi/src/os/libChrisOS/src/strings/strcmp.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strcmp.o /home/yogi/src/os/libChrisOS/src/strings/strcmp.c
 
 ${OBJECTDIR}/_ext/85a4b428/strcpy.o: /home/yogi/src/os/libChrisOS/src/strings/strcpy.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strcpy.o /home/yogi/src/os/libChrisOS/src/strings/strcpy.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strcpy.o /home/yogi/src/os/libChrisOS/src/strings/strcpy.c
 
 ${OBJECTDIR}/_ext/85a4b428/strlen.o: /home/yogi/src/os/libChrisOS/src/strings/strlen.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strlen.o /home/yogi/src/os/libChrisOS/src/strings/strlen.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strlen.o /home/yogi/src/os/libChrisOS/src/strings/strlen.c
 
 ${OBJECTDIR}/_ext/85a4b428/strncmp.o: /home/yogi/src/os/libChrisOS/src/strings/strncmp.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strncmp.o /home/yogi/src/os/libChrisOS/src/strings/strncmp.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strncmp.o /home/yogi/src/os/libChrisOS/src/strings/strncmp.c
 
 ${OBJECTDIR}/_ext/85a4b428/strncpy.o: /home/yogi/src/os/libChrisOS/src/strings/strncpy.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strncpy.o /home/yogi/src/os/libChrisOS/src/strings/strncpy.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strncpy.o /home/yogi/src/os/libChrisOS/src/strings/strncpy.c
 
 ${OBJECTDIR}/_ext/85a4b428/stroul.o: /home/yogi/src/os/libChrisOS/src/strings/stroul.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/stroul.o /home/yogi/src/os/libChrisOS/src/strings/stroul.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/stroul.o /home/yogi/src/os/libChrisOS/src/strings/stroul.c
 
 ${OBJECTDIR}/_ext/85a4b428/strparts.o: /home/yogi/src/os/libChrisOS/src/strings/strparts.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strparts.o /home/yogi/src/os/libChrisOS/src/strings/strparts.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strparts.o /home/yogi/src/os/libChrisOS/src/strings/strparts.c
 
 ${OBJECTDIR}/_ext/85a4b428/strtol.o: /home/yogi/src/os/libChrisOS/src/strings/strtol.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strtol.o /home/yogi/src/os/libChrisOS/src/strings/strtol.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strtol.o /home/yogi/src/os/libChrisOS/src/strings/strtol.c
 
 ${OBJECTDIR}/_ext/85a4b428/strtrim.o: /home/yogi/src/os/libChrisOS/src/strings/strtrim.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/85a4b428
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strtrim.o /home/yogi/src/os/libChrisOS/src/strings/strtrim.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/85a4b428/strtrim.o /home/yogi/src/os/libChrisOS/src/strings/strtrim.c
 
 ${OBJECTDIR}/src/input/input.o: src/input/input.c 
 	${MKDIR} -p ${OBJECTDIR}/src/input
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input/input.o src/input/input.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input/input.o src/input/input.c
 
 ${OBJECTDIR}/src/libChrisOS.o: src/libChrisOS.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libChrisOS.o src/libChrisOS.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libChrisOS.o src/libChrisOS.c
 
 ${OBJECTDIR}/src/malloc.o: src/malloc.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/malloc.o src/malloc.c
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/malloc.o src/malloc.c
 
 # Subprojects
 .build-subprojects:

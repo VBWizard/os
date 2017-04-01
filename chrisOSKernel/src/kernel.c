@@ -23,6 +23,7 @@
 #include "../include/task.h"
 #include "io.h"
 #include "kbd.h"
+#include "thesignals.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -36,7 +37,6 @@ uint32_t kKernelCR3=KERNEL_CR3;
 void* keyboardHandlerRoutine=NULL;
 
 int main(int argc, char** argv) {
-    init_serial();
     printk("\nkernel loaded ... \n");
 /*    printk("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
@@ -90,7 +90,11 @@ int main(int argc, char** argv) {
 */
 
     //sys_sigaction(SIG_USLEEP,0,process->task->taskNum);
-    kernelLoop: triggerScheduler(); goto kernelLoop;
+    kernelLoop:
+    //triggerScheduler(); 
+    goto kernelLoop;
+    //sys_sigaction(SIG_SLEEP,0,*kTicksSinceStart+(TICKS_PER_SECOND*3));
+    goto kernelLoop;
     return (0xbad);
 }
 

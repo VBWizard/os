@@ -18,9 +18,9 @@
 extern "C" {
 #endif
 
-#include "kernel.h"
 #include <stdarg.h>
 #include "signals.h"
+#include "syscalls.h"
     
 extern volatile uint32_t* kTicksSinceStart;
 void syscall169();

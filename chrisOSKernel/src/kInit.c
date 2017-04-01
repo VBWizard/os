@@ -13,6 +13,7 @@
 
 extern void _sysCall();
 extern void _sysEnter();
+extern void vector13();
 extern void vector14();
 extern void vector32();
 extern void vector128();
@@ -38,6 +39,7 @@ void initKernelInternals()
     kKernelTask=getAvailableTask();
     kKernelProcess=(process_t*)allocPagesAndMap(sizeof(process_t));
     kKernelProcess->task=kKernelTask;
+    kKernelProcess->priority=20;    //Set kernel task to low priority
     kKernelTask->process=kKernelProcess;
      __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
     //Set up our kernel task
@@ -71,6 +73,7 @@ void initKernelInternals()
     //idt_set_gate (&idtTable[0x80], 0x8, (int)&_sysCall, ACS_INT | ACS_DPL_3);
     idt_set_gate (&idtTable[0x80], 0x8, (int)&vector128, ACS_INT | ACS_DPL_3);
     idt_set_gate (&idtTable[0xe], 0x8, (int)&vector14, ACS_INT);   //paging exception
+    //idt_set_gate (&idtTable[0xd], 0x8, (int)&vector13, ACS_INT); //Move this out of the way of the exception handlers
 
     //Configure SysEnter/SysExit
     if (!kCPUFeatures.cpuid_feature_bits.sep)

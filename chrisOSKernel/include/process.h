@@ -41,6 +41,7 @@ extern "C" {
         uint32_t retVal;
         signal_t signals;
         uint32_t heapStart, heapEnd;
+        short priority;           //-20=highest, 20=lowest
         void* exitHandler[PROCESS_MAX_EXIT_HANDLERS];
     } process_t;
 
@@ -48,7 +49,9 @@ extern "C" {
     process_t* createProcess(char* path,int argc,uint32_t argv, bool kernelProcess);
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
-    
+    int sys_setpriority(process_t* process, int newpriority);
+
+#define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus
 }
 #endif

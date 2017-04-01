@@ -13,6 +13,7 @@
 #include "utility.h"
 #include "signals.h"
 #include "process.h"
+#include "thesignals.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
