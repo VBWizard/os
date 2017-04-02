@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/time.o
+	${OBJECTDIR}/testtime.o
 
 
 # C Compiler Flags
@@ -64,10 +64,10 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc -T linker.ld
 
-${OBJECTDIR}/time.o: time.c 
+${OBJECTDIR}/testtime.o: testtime.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../libChrisOS/include/libChrisOS.h -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/time.o time.c
+	$(COMPILE.c) -g -I../libChrisOS/include/libChrisOS.h -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/testtime.o testtime.c
 
 # Subprojects
 .build-subprojects:

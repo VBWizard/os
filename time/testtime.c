@@ -18,10 +18,16 @@
  */
 int main(int argc, char** argv) {
 
-    print("Hello!\n");
     print("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
         print("Param %u=%s\n",cnt,argv[cnt]);
+
+//    char* execpgm=malloc(512);
+    
+//    strcpy(execpgm,argv[1]);
+    
+    
+//    free (execpgm);
     return (0);
 }
 

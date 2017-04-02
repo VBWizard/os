@@ -43,6 +43,7 @@
       <itemPath>/home/yogi/src/os//chrisOS/include/build_num.h</itemPath>
       <itemPath>include/charDev.h</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/include/chrisos.h</itemPath>
+      <itemPath>include/config.h</itemPath>
       <itemPath>include/i386/cpu.h</itemPath>
       <itemPath>include/debugger.h</itemPath>
       <itemPath>include/init/diskPartition.h</itemPath>
@@ -257,6 +258,8 @@
       <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/config.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/debugger.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -570,6 +573,8 @@
       <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/config.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/debugger.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -903,6 +908,8 @@
       <item path="include/bootShell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/config.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/debugger.h" ex="false" tool="3" flavor2="0">
       </item>

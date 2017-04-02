@@ -11,17 +11,14 @@
 #include "i386/cpu.h"
 #include "memory.h"
 #include "../../chrisOSKernel/include/task.h"
+#include "config.h"
 
-#define TICKS_PER_SECOND 100
-#define TICKS_PER_SCHEDULER_RUN 10
-#define TICKS_PER_SIGNAL_CHECK 6
 //2
 //* 3
 
 //kernelDataLoadAddress is defined in kernelData2.ld.  It is the address of kernelData
 extern char* kernelDataLoadAddress;
 //KERNEL_DATA_LOAD_ADDRESS is used by our loader to skip loading of kernel data by programs which are loaded.
-#define PAGE_SIZE 0x1000
 #define KERNEL_DATA_LOAD_ADDRESS kernelDataLoadAddress         //Change this if the kernelData1.ld kernelData load address changes
 #define KERNEL_DATA_NAME "kernelData"
 //#define KERNEL_DATA_NAME ".data"
@@ -96,41 +93,7 @@ extern char* kernelDataLoadAddress;
 
 #define PIC_REMAP_OFFSET 32
 
-/* ***NOTE: If DEBUG_NONE is defined then there will be no debugging*** */
-//#define DEBUG_NONE 0
-#define DEBUG_TICK 1 << 1
-#define DEBUG_EXPANDED_TICK 1 << 2
-#define DEBUG_HARDDRIVE 1 << 3
-#define DEBUG_KEYBOARD 1 << 4
-#define DEBUG_PAGING_CONFIG 1 << 5
-#define DEBUG_PAGING 1 << 6
-#define DEBUG_TIMER 1 << 7
-#define DEBUG_PCI_DISCOVERY 1 << 8
-#define DEBUG_ELF_LOADER 1 << 9
-#define DEBUG_ACPI 1<<10
-#define DEBUG_MP 1<<11
-#define DEBUG_EXCEPTIONS 1<<12
-#define DEBUG_AHCI 1<<13
-#define DEBUG_TASK 1<<14
-#define DEBUG_KERNEL_PAGING 1<<15
-#define DEBUG_MEMORY_MANAGEMENT 1<<16
-#define DEBUG_LOADER 1<<17
-#define DEBUG_PROCESS 1<<18
-#define DEBUG_KMALLOC 1<<19
-#define DEBUG_KEYBOARD_DRIVER 1<<20
-#define DEBUG_PRINT_TO_PORT 1<<21
-#define DEBUG_DETAILED 1<<22
-#define DEBUG_SIGNALS 1<<23
-#define DEBUG_MALLOC 1<<24
-#define DEBUG_LIBC 1<<25
-#define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT | DEBUG_PROCESS  | DEBUG_TASK | DEBUG_ELF_LOADER
-//| DEBUG_ELF_LOADER
-
 #define SCREEN_SPACES_PER_TAB 5
-
-#define MAX_PARAM_COUNT 10
-#define MAX_PARAM_WIDTH 50
 
 #define PAGING_IN_USE_FLAG_MASK 0x800
 

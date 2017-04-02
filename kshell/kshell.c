@@ -19,6 +19,10 @@ bool timeToExit=false;
 uint32_t exitCode=0;
 
 extern int kATADeviceInfoCount;
+void execInternalCommand(char lCommand[256]);
+int findCommand(char* command);
+char **buildargv (const char *input);
+void helpMe();
 
 void execInternalCommand(char lCommand[256])
 {
@@ -330,7 +334,7 @@ getAKey:
             gets(&lCurrKey,1,1);
         }
         //print("key='%08X'",lCurrKey);
-        if((byte)lCurrKey==0xc8) //up
+        if((unsigned short)lCurrKey==0xc8) //up
         {
             if (commandBuffPtr>=0)
             {/*

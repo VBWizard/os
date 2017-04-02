@@ -60,6 +60,17 @@ int sys_setpriority(process_t* process, int newpriority)
     return retVal;
 }
 
+void processCopyArgV(char** dest, char** src, uint32_t dVirt, int pcount)
+{
+    for (int cnt=0;cnt<pcount;cnt++)
+    {
+        //Make the dest pointer [cnt] point to the same offset within the page as the source [cnt]
+        dest[cnt]=(char*)(((uintptr_t)dest & 0xFFFFF000) | ((uintptr_t)src[cnt] & 0x00000FFF));
+        memcpy(dest[cnt],src[cnt],50);
+        dest[cnt]=(char*)((dVirt & 0xFFFFF000) | ((uint32_t)dest[cnt] & 0x00000FFF));
+    }
+}
+
 process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool isKernelProcess)
 {
 
@@ -90,21 +101,20 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     process->task=createTask(isKernelProcess);
 
     process->argv=argv;
+    uint32_t argvVirt=0x6f000000;
     if (process->parent!=NULL)
     {
-        //Map a page from the parent process to expose the argv of the parent
-        uint32_t parentCR3=((process_t*)process->parent)->pageDirPtr;
-        uint32_t parentArgv=pagingGet4kPTEntryValueCR3(parentCR3,argv);
-        pagingMapPageCount(process->task->tss->CR3,argv,parentArgv,((argc*50)/PAGE_SIZE)+1,0x5); //Map
-        printd(DEBUG_PROCESS,"Exposed parent argv pages @ p=0x%08X/v=0x%08X (r/o)\n",parentArgv,argv);
+        //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
+        process->argv=allocPages(50*argc);
+        pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(KERNEL_CR3,process->argv,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
+        processCopyArgV((char**)process->argv,(char**)argv,argvVirt,argc);
     }
     else
     {
         argv=NULL;
         argc=0;
     }
-    memcpy((void*)process->argv,(void*)argv,50*argc);
-    
     process->task->process=process;
     process->processSyscallESP=process->task->tss->ESP1;
     process->pageDirPtr=process->task->tss->CR3;
@@ -131,10 +141,10 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,8);
     
     //Per the above, the stack will start at -0x100 from where we write the CS/EIP/FLAGS/SS/ESP, so put our params around there
-    memcpy((void*)process->task->tss->ESP-0x104,&process,4);
+    memcpy((void*)process->task->tss->ESP-0x104,process,4);
     memcpy((void*)process->task->tss->ESP-0x100,&var,4);
     memcpy((void*)process->task->tss->ESP-0xfc,&argc,4);
-    memcpy((void*)process->task->tss->ESP-0xf8,&process->argv,4);
+    memcpy((void*)process->task->tss->ESP-0xf8,&argvVirt,4);
     //Set the return point since the task will simply ret to exit
     printd(DEBUG_PROCESS,"Return point for process is 0x%08X\n",&processExit);
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);

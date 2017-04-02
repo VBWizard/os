@@ -12,7 +12,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>time.c</itemPath>
+      <itemPath>testtime.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -62,7 +62,7 @@
           <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
-      <item path="time.c" ex="false" tool="0" flavor2="0">
+      <item path="testtime.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -109,7 +109,7 @@
           <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
-      <item path="time.c" ex="false" tool="0" flavor2="0">
+      <item path="testtime.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

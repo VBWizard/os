@@ -10,11 +10,39 @@
 extern void sysEnter_Vector();
 int a=123;int b=456; int c=789;
 
+int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3)
+{
+    int retVal=0;
+    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1), "c" (param2), "d" (param3));
+    return retVal;
+}
+
+int do_syscall3(int callnum, uint32_t param1, uint32_t param2)
+{
+    int retVal=0;
+    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1), "c" (param2));
+    return retVal;
+}
+
+int do_syscall2(int callnum, uint32_t param1)
+{
+    int retVal=0;
+    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1));
+    return retVal;
+}
+
+int do_syscall1(int callnum)
+{
+    int retVal=0;
+    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum));
+    return retVal;
+}
+
 VISIBLE void libc_init(void)
 {
     initmalloc();
-    SYSCALL1(SYSCALL_INVALID)
-    SYSCALL2(SYSCALL_REGEXITHANDLER,&libc_cleanup)
+    do_syscall1(SYSCALL_INVALID);
+    do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
 }
 
 void libc_cleanup(void)
@@ -26,7 +54,7 @@ VISIBLE int print(const char *format, ...)
 {
     va_list args;
     va_start( args, format );
-    SYSCALL3(SYSCALL_PRINT,format,args);
+    do_syscall3(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
     return 0;
 }
 
@@ -46,12 +74,12 @@ VISIBLE unsigned int sleep (unsigned int __seconds)
 
 void stop()
 {
-    SYSCALL1(SYSCALL_STOP)
+    do_syscall1(SYSCALL_STOP);
 }
 
 void modifySignal(int signal, void* sigHandler, int sigData)
 {
-    SYSCALL4(SYSCALL_SETSIGACTION,signal,sigHandler,sigData)
+    do_syscall4(SYSCALL_SETSIGACTION,signal,(uint32_t)sigHandler,sigData);
 }
 
 VISIBLE void exec(char* path, int argc, char** argv)
@@ -63,5 +91,5 @@ VISIBLE void exec(char* path, int argc, char** argv)
 
 VISIBLE void waitpid(uint32_t pid)
 {
-    SYSCALL2(SYSCALL_WAITFORPID,pid)
+    do_syscall2(SYSCALL_WAITFORPID,pid);
 }

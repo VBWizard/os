@@ -20,12 +20,15 @@
 #define bit(n) (1<<(n)) /* Set bit n to 1 */
 #define check_flag(flags, n) ((flags) & bit(n))
 
+extern int kTimeZone;
+
 //NOTE: Upon entering _sysCall, the process' CR3 is still being used
 void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
 {
     uint32_t processCR3;
     va_list ap;
-    uint32_t retVal;
+    uint32_t retVal, retVal2;
+    void* parentProcess;
     process_t* process;
     char test[2][50];
     char* testp[2];
@@ -67,7 +70,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case 0x59:      //***exec: param1=program path
             __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
-            process = createProcess((char*)param1, param2, param3, (process_t*)findTaskByCR3(processCR3)->process, false);
+            parentProcess=(process_t*)(findTaskByCR3(processCR3))->process;
+            printd(DEBUG_PROCESS,"_sysCall: createProcess(0x%08X,0x%08X,0x%08X,0x%08X,false)\n",param1,param2,param3,parentProcess);
+            process = createProcess((char*)param1, param2, param3, parentProcess, false);
             retVal=process->task->taskNum;
             __asm__("mov cr3,eax"::"a" (processCR3));
             break;
@@ -112,6 +117,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case 0x170:     //***ticks - return current system ticks
             retVal=*kTicksSinceStart;
+            //retVal2=kTimeZone;
             break;
         case 0x300:     //sys_print (prints to screen)
             va_copy(ap,(va_list*)(param2));

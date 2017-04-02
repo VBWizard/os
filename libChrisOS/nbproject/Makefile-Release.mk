@@ -49,11 +49,12 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/85a4b428/strtrim.o \
 	${OBJECTDIR}/src/input/input.o \
 	${OBJECTDIR}/src/libChrisOS.o \
-	${OBJECTDIR}/src/malloc.o
+	${OBJECTDIR}/src/malloc.o \
+	${OBJECTDIR}/src/time.o
 
 
 # C Compiler Flags
-CFLAGS=-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,<function name>
+CFLAGS=-m32 -ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,<function name>
 
 # CC Compiler Flags
 CCFLAGS=
@@ -152,6 +153,11 @@ ${OBJECTDIR}/src/malloc.o: src/malloc.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/malloc.o src/malloc.c
+
+${OBJECTDIR}/src/time.o: src/time.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/time.o src/time.c
 
 # Subprojects
 .build-subprojects:
