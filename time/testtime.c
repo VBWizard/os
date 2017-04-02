@@ -22,9 +22,9 @@ int main(int argc, char** argv) {
     for (int cnt=0;cnt<argc;cnt++)
         print("Param %u=%s\n",cnt,argv[cnt]);
 
-//    char* execpgm=malloc(512);
-    
-//    strcpy(execpgm,argv[1]);
+    char* execpgm=malloc(512);
+    strcpy(execpgm,argv[1]);
+
     
     
 //    free (execpgm);

@@ -104,6 +104,8 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     uint32_t argvVirt=0x6f000000;
     if (process->parent!=NULL)
     {
+        //Map the parent's heap into our paging table
+        pagingMapPageIntoKernel(((process_t*)process->parent)->pageDirPtr,argv,0x7);
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
         process->argv=allocPages(50*argc);
         pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);

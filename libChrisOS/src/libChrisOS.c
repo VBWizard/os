@@ -82,11 +82,13 @@ void modifySignal(int signal, void* sigHandler, int sigData)
     do_syscall4(SYSCALL_SETSIGACTION,signal,(uint32_t)sigHandler,sigData);
 }
 
-VISIBLE void exec(char* path, int argc, char** argv)
+VISIBLE int exec(char* path, int argc, char** argv)
 {
-    print("libc_exec: Not implemented, see 0x80 call in kshell");
-    execError: goto execError;
-    
+    int pid=0;
+    __asm__("int 0x80\n"
+            :"=a" (pid)
+            :"a" (0x59),"b" (path),"c" (argc),"d" (argv));
+    return pid;
 }
 
 VISIBLE void waitpid(uint32_t pid)

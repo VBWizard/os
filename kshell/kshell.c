@@ -260,14 +260,8 @@ void execp(char* cmdline)
     char** prms=(uint32_t)paramsToArgv(paramCount,&params[0][0]);
     
     //print("Executing %s\n",params[0]);
-    __asm__("push eax\n"
-            "push ebx\n"
-            "push ecx\n"
-            "push edx\n"
-            "int 0x80\n"
-            :"=a" (pid)
-            :"a" (0x59),"b" (params[0]),"c" (paramCount),"d" (prms));
     //print("Waiting on pid=0x%08X\n",pid);
+    pid=exec(params[0],paramCount,prms);
     waitpid(pid);
     //print("pid=0x%08X returned\n",pid);
     //exec(params[0],0,0);
