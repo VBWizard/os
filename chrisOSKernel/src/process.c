@@ -13,6 +13,7 @@
 #include "kmalloc.h"
 #include "sysloader.h"
 #include "strings.h"
+#include "paging.h"
 
 extern time_t kSystemCurrentTime;
 
@@ -87,6 +88,23 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
         process->kernelProcess=isKernelProcess;
        
     process->task=createTask(isKernelProcess);
+
+    process->argv=argv;
+    if (process->parent!=NULL)
+    {
+        //Map a page from the parent process to expose the argv of the parent
+        uint32_t parentCR3=((process_t*)process->parent)->pageDirPtr;
+        uint32_t parentArgv=pagingGet4kPTEntryValueCR3(parentCR3,argv);
+        pagingMapPageCount(process->task->tss->CR3,argv,parentArgv,((argc*50)/PAGE_SIZE)+1,0x5); //Map
+        printd(DEBUG_PROCESS,"Exposed parent argv pages @ p=0x%08X/v=0x%08X (r/o)\n",parentArgv,argv);
+    }
+    else
+    {
+        argv=NULL;
+        argc=0;
+    }
+    memcpy((void*)process->argv,(void*)argv,50*argc);
+    
     process->task->process=process;
     process->processSyscallESP=process->task->tss->ESP1;
     process->pageDirPtr=process->task->tss->CR3;
@@ -113,10 +131,10 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,8);
     
     //Per the above, the stack will start at -0x100 from where we write the CS/EIP/FLAGS/SS/ESP, so put our params around there
-    memcpy((void*)process->task->tss->ESP-0x104,process,4);
+    memcpy((void*)process->task->tss->ESP-0x104,&process,4);
     memcpy((void*)process->task->tss->ESP-0x100,&var,4);
     memcpy((void*)process->task->tss->ESP-0xfc,&argc,4);
-    memcpy((void*)process->task->tss->ESP-0xf8,&argv,4);
+    memcpy((void*)process->task->tss->ESP-0xf8,&process->argv,4);
     //Set the return point since the task will simply ret to exit
     printd(DEBUG_PROCESS,"Return point for process is 0x%08X\n",&processExit);
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);

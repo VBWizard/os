@@ -110,6 +110,7 @@ void* allocPages(uint32_t size)
     return lRetVal;
 }
 
+//Allocates pages and maps both into the process' mapping and the kernel's
 void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
 {
     uintptr_t* phys;

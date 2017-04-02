@@ -130,7 +130,7 @@ extern char* kernelDataLoadAddress;
 #define SCREEN_SPACES_PER_TAB 5
 
 #define MAX_PARAM_COUNT 10
-#define MAX_PARAM_WIDTH 512
+#define MAX_PARAM_WIDTH 50
 
 #define PAGING_IN_USE_FLAG_MASK 0x800
 

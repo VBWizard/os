@@ -1,10 +1,10 @@
 #dashboard -enabled off
 symbol-file Debug/cross-Linux/chrisos
-#break kernel_main
 add-symbol-file /home/yogi/src/os/chrisOSKernel/dist/Debug/cross-Linux/kernel 0x01000000
 add-symbol-file /home/yogi/src/os/testMainProgramEntry/dist/Debug/cross-Linux/testmainprogramentry 0x02000000
 add-symbol-file /home/yogi/src/os/libChrisOS/dist/Debug/cross-Linux/libc.so 0x30000000 
 add-symbol-file /home/yogi/src/os/kshell/dist/Debug/cross-Linux/kshell 0x03100000
+add-symbol-file /home/yogi/src/os/time/dist/Debug/cross-Linux/time 0x03200000
 alias sv = set variable 
 #dashboard assembly
 #dashboard history -output /dev/pts/6

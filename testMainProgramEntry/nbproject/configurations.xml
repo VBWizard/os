@@ -52,7 +52,7 @@
             <pElem>../libChrisOS/dist/Debug/cross-Linux</pElem>
           </linkerAddLib>
           <commandlineTool>gcc</commandlineTool>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lc</commandLine>
+          <commandLine>-ffreestanding -nostdlib -lc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
       <item path="testMainProgramEntry.c" ex="false" tool="0" flavor2="0">

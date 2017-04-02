@@ -228,12 +228,33 @@ void helpMe()
         print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
 }
 
+char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH])
+{
+    char** pptr=malloc(sizeof(char*)*pcount);
+    
+    for (int cnt=0;cnt<pcount;cnt++)
+    {
+        pptr[cnt]=malloc(MAX_PARAM_WIDTH);
+        memcpy(pptr[cnt],&params[cnt],MAX_PARAM_WIDTH);
+    }
+    return pptr;
+}
+
+void freeArgV(int pcount, char **params)
+{
+    for (int cnt=0;cnt<pcount;cnt++)
+        free(*params);
+    free(params);
+}
+
 void execp(char* cmdline)
 {
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     uint32_t pid=0;
 
+    char** prms=(uint32_t)paramsToArgv(paramCount,&params[0][0]);
+    
     //print("Executing %s\n",params[0]);
     __asm__("push eax\n"
             "push ebx\n"
@@ -241,12 +262,13 @@ void execp(char* cmdline)
             "push edx\n"
             "int 0x80\n"
             :"=a" (pid)
-            :"a" (0x59),"b" (params[0]),"c" (paramCount-1),"d" (&params[1]));
+            :"a" (0x59),"b" (params[0]),"c" (paramCount),"d" (prms));
     //print("Waiting on pid=0x%08X\n",pid);
     waitpid(pid);
     //print("pid=0x%08X returned\n",pid);
     //exec(params[0],0,0);
     //strcpy(sExecutingProgram,params[0]+1);
+    freeArgV(paramCount, (char**)prms);
 }
 
 void kSleep(char *cmdline)

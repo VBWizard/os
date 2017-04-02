@@ -39,7 +39,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-m32
+CFLAGS=-m32 -masm=intel -ffreestanding -nostdlib
 
 # CC Compiler Flags
 CCFLAGS=
@@ -62,7 +62,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time: ../libChrisOS/dist/Debug/cross-
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc -T linker.ld
 
 ${OBJECTDIR}/time.o: time.c 
 	${MKDIR} -p ${OBJECTDIR}

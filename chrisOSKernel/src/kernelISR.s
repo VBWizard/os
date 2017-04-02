@@ -88,12 +88,12 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
-jmp overSaveTheStack
+#jmp overSaveTheStack
     mov eax,isrNumber
     cmp eax,0x20                
     jge overSaveTheStack        #CLR 03/26/2017: Changed (je to jge) to skip stack capture for 0x20 (IRQ0) & 0x21 (KBD) (not sure what else)
-    mov esi, isrSavedESP
-    add esi,12                  #drop the eip/cs/flags from the call to this proc
+    mov esi, isrSavedEBP
+#    add esi,12                  #drop the eip/cs/flags from the call to this proc
     mov edi, isrSavedStack
     mov ecx, 40       #NOTE: This can cause an exception if the target's esp is within 40 bytes of non-mapped memory
     cld

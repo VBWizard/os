@@ -41,6 +41,7 @@
           <incDir>
             <pElem>../libChrisOS/include/libChrisOS.h</pElem>
           </incDir>
+          <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <linkerTool>
@@ -58,7 +59,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>-ffreestanding -nostdlib -lgcc</commandLine>
+          <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
       <item path="time.c" ex="false" tool="0" flavor2="0">
@@ -78,6 +79,7 @@
           <incDir>
             <pElem>../libChrisOS/include/libChrisOS.h</pElem>
           </incDir>
+          <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <ccTool>
@@ -104,7 +106,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>-ffreestanding -nostdlib -lgcc</commandLine>
+          <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
       <item path="time.c" ex="false" tool="0" flavor2="0">

@@ -20,7 +20,8 @@ int main(int argc, char** argv) {
 
     print("Hello!\n");
     print("Param count=%u\n",argc);
-    print("param 1=%s",argv);
+    for (int cnt=0;cnt<argc;cnt++)
+        print("Param %u=%s\n",cnt,argv[cnt]);
     return (0);
 }
 

@@ -48,6 +48,8 @@ extern "C" {
         bool kernelProcess;
         struct tm startTime, endTime;
         uint32_t totalRunTicks;
+        int argc;
+        char* argv;
     } process_t;
 
 

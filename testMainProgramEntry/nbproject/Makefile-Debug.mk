@@ -60,7 +60,7 @@ LDLIBSOPTIONS=-L../libChrisOS/dist/Debug/cross-Linux
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	gcc -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lc
+	gcc -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lc -T linker.ld
 
 ${OBJECTDIR}/testMainProgramEntry.o: testMainProgramEntry.c 
 	${MKDIR} -p ${OBJECTDIR}
