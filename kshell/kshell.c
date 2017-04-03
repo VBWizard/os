@@ -374,13 +374,13 @@ getAKey:
         }
         if (lCurrKey=='\b')
         {
+            lCurrKeyCount--;
+            lCommand[lCurrKeyCount]='\0';
             if (lCurrKeyCount>0)
             {
-                putc('\b');
+                //putc('\b');
                 /*int lTemp=cursorGetPosY();
 
-                lCommand[lCurrKeyCount]=' ';
-                lCurrKeyCount--;
                 cursorMoveTo(cursorGetPosX()-1,lTemp);
                 putc('\t');
                 cursorMoveTo(cursorGetPosX()-1,lTemp);*/
