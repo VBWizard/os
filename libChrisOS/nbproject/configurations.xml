@@ -8,6 +8,8 @@
       <itemPath>include/libChrisOS.h</itemPath>
       <itemPath>include/malloc.h</itemPath>
       <itemPath>include/memory.h</itemPath>
+      <itemPath>include/rusage.h</itemPath>
+      <itemPath>include/rusage_1.h</itemPath>
       <itemPath>/home/yogi/src/os/libChrisOS/include/strings.h</itemPath>
       <itemPath>include/time.h</itemPath>
     </logicalFolder>
@@ -150,6 +152,10 @@
       </item>
       <item path="include/memory.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/rusage.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/rusage_1.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/time.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
@@ -262,6 +268,10 @@
       <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/memory.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/rusage.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/rusage_1.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/time.h" ex="false" tool="3" flavor2="0">
       </item>

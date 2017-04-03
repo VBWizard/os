@@ -259,13 +259,11 @@ void execp(char* cmdline)
 
     char** prms=(uint32_t)paramsToArgv(paramCount,&params[0][0]);
     
-    //print("Executing %s\n",params[0]);
-    //print("Waiting on pid=0x%08X\n",pid);
     pid=exec(params[0],paramCount,prms);
-    waitpid(pid);
-    //print("pid=0x%08X returned\n",pid);
-    //exec(params[0],0,0);
-    //strcpy(sExecutingProgram,params[0]+1);
+    if (pid>0)
+        waitpid(pid);
+    else
+        print("Error executing %s\n",params[0]);
     freeArgV(paramCount, (char**)prms);
 }
 

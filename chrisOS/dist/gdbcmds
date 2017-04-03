@@ -5,6 +5,7 @@ add-symbol-file /home/yogi/src/os/testMainProgramEntry/dist/Debug/cross-Linux/te
 add-symbol-file /home/yogi/src/os/libChrisOS/dist/Debug/cross-Linux/libc.so 0x30000000 
 add-symbol-file /home/yogi/src/os/kshell/dist/Debug/cross-Linux/kshell 0x03100000
 add-symbol-file /home/yogi/src/os/time/dist/Debug/cross-Linux/time 0x03200000
+set disassembly-flavor intel
 alias sv = set variable 
 #dashboard assembly
 #dashboard history -output /dev/pts/6

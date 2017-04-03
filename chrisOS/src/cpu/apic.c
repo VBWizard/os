@@ -3,6 +3,8 @@
 #include <cpuid.h>
 #include "i386/apic.h"
 #include "utility.h"
+#include "config.h"
+
 /** returns a 'true' value if the CPU supports APIC
  *  and if the local APIC hasn't been disabled in MSRs
  *  note that this requires CPUID to be supported.
@@ -129,6 +131,6 @@ uint32_t apicGetHZ() {
 int tscGetTicksPerSecond()
 {
     uint64_t ticksBefore=rdtsc();
-    wait(1000);
+    wait(TICKS_PER_SECOND);
     return rdtsc()-ticksBefore;
 }

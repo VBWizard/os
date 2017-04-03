@@ -67,7 +67,6 @@ void mmMapKernelIntoTask(task_t* task)
 
     uint32_t kla=(uint32_t)&kernelLoadAddress;
     uint32_t kle1=(uint32_t)&kernelLoadEnd;
-    uint32_t kdla=(uint32_t)&kernelDataLoadAddress;
     uint32_t kle=kla+(kle1-kla);
 
     //printd(DEBUG_TASK,"kla=0x%08X, kle=0x%08X, klda=0x%08X\n",kla,kle,kdla);

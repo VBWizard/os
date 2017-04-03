@@ -15,6 +15,7 @@
 #include "../../chrisOS/include/i386/gdt.h"
 #include "../../chrisOS/include/elfloader.h"
 #include "time_os.h"
+#include "rusage.h"
 
 #ifndef PROCESS_H
 #define PROCESS_H
@@ -49,7 +50,8 @@ extern "C" {
         struct tm startTime, endTime;
         uint32_t totalRunTicks;
         int argc;
-        char* argv;
+        uintptr_t argv;
+        struct rusage usage;
     } process_t;
 
 

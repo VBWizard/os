@@ -6,6 +6,7 @@
 
 #include "libChrisOS.h"
 #include "syscalls.h"
+#include "time.h"
 
 extern void sysEnter_Vector();
 int a=123;int b=456; int c=789;
@@ -40,6 +41,7 @@ int do_syscall1(int callnum)
 
 VISIBLE void libc_init(void)
 {
+    libcTZ=-4;
     initmalloc();
     do_syscall1(SYSCALL_INVALID);
     do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
@@ -94,4 +96,12 @@ VISIBLE int exec(char* path, int argc, char** argv)
 VISIBLE void waitpid(uint32_t pid)
 {
     do_syscall2(SYSCALL_WAITFORPID,pid);
+}
+
+VISIBLE struct tm* gettime()
+{
+    uint32_t ticks=0;
+    struct tm theTime;
+    do_syscall2(SYSCALL_GETTICKS,ticks);
+    return gmtime_r((time_t*)&ticks,&theTime);
 }

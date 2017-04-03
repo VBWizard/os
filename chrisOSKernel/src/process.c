@@ -16,11 +16,12 @@
 #include "paging.h"
 
 extern time_t kSystemCurrentTime;
+extern task_t* submitNewTask(task_t *task);
 
 void processWrapup();
 bool taskRegInitialized=false;
 
-//This runs as the program.  We're just calling cleanup procedures and passing on the return value.
+//This runs in user space.  We're just calling cleanup procedures and passing on the return value.
 void processExit()
 {
     uint32_t lRetVal=0;
@@ -38,7 +39,9 @@ void processExit()
     gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
 
      __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (0x1), "b" (lRetVal));
-    //freeMemory(process);
+    //Free memory allocated to the process
+     
+     //freeMemory(process);
 }
 
 bool processRegExit(process_t* process, void* routineAddr)
@@ -105,16 +108,16 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     if (process->parent!=NULL)
     {
         //Map the parent's heap into our paging table
-        pagingMapPageIntoKernel(((process_t*)process->parent)->pageDirPtr,argv,0x7);
+        pagingMapProcessPageIntoKernel(((process_t*)process->parent)->pageDirPtr,argv,0x7);
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
-        process->argv=allocPages(50*argc);
+        process->argv=(uintptr_t)allocPages(50*argc);
         pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
         pagingMapPageCount(KERNEL_CR3,process->argv,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
         processCopyArgV((char**)process->argv,(char**)argv,argvVirt,argc);
     }
     else
     {
-        argv=NULL;
+        argv=0;
         argc=0;
     }
     process->task->process=process;
@@ -128,7 +131,6 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     process->elf=sysLoadElf(process->path,process->elf,process->task->tss->CR3);
     if (!process->elf->loadCompleted)
     {
-        printk("SysLoadElf error, failed to load program\n");
         return NULL;
     }
     process->task->tss->EIP=process->elf->hdr.e_entry;

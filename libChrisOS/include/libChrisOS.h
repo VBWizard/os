@@ -24,7 +24,7 @@ extern "C" {
 #include "input.h"
 #include "/home/yogi/src/os/chrisOS/include/config.h"
 #include "time.h"
-    
+#include <bits/time.h>
 #ifndef NULL
 #define NULL ((void *) 0)
 #endif
@@ -48,6 +48,9 @@ extern "C" {
     void waitpid(uint32_t pid);
     void *memset(void *d1, int val, size_t len);
     void * memcpy(void *dest, const void *src, size_t n);
+    struct tm* gettime();
+
+    time_t libcTZ;
 
 #ifdef __cplusplus
 }

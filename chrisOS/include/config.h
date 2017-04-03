@@ -19,8 +19,14 @@ extern "C" {
 #endif
 
 #define TICKS_PER_SECOND 100
-#define TICKS_PER_SCHEDULER_RUN 10
-#define TICKS_PER_SIGNAL_CHECK 6
+//How many ticks expire between scheduler runs
+#define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 10
+//How many ticks expire between signal checks
+#define TICKS_PER_SIGNAL_CHECK TICKS_PER_SECOND / 6
+//MS=Milliseconds or thousands of a second
+#define MS_PER_TICK 1000 / TICKS_PER_SECOND
+//IS=Microseconds or millionths of a second
+#define MIS_PER_TICK 1000000 / TICKS_PER_SECOND
 
 #define PAGE_SIZE 0x1000
 

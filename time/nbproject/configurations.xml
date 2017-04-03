@@ -39,9 +39,12 @@
           <architecture>1</architecture>
           <standard>3</standard>
           <incDir>
-            <pElem>../libChrisOS/include/libChrisOS.h</pElem>
+            <pElem>../libChrisOS/include</pElem>
           </incDir>
           <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <linkerTool>
@@ -77,7 +80,7 @@
           <architecture>1</architecture>
           <standard>3</standard>
           <incDir>
-            <pElem>../libChrisOS/include/libChrisOS.h</pElem>
+            <pElem>../libChrisOS/include</pElem>
           </incDir>
           <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>

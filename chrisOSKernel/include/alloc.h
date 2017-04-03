@@ -26,7 +26,7 @@ typedef struct smeminfo
 
 void* allocPages(uint32_t size);
 void* allocPagesAndMap(uint32_t size);
-void freeMemory(void* address);
+void freeA(void* address);
 uint32_t memAvailable();
 
 #endif	/* ALLOC_H */

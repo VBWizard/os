@@ -280,6 +280,7 @@ gdt_init();
     //wait(50);
     printk("chrisOS %s booting @%s",  COMPLETE_VERSION, &currTime);
 #ifndef DEBUG_NONE
+    printd(0,"chrisOS %s booting @%s\n",  COMPLETE_VERSION, &currTime);
     if (kDebugLevel > 0)
         printk ("(debug=%X)", kDebugLevel);
 #endif
@@ -318,10 +319,16 @@ gdt_init();
             printk("enabled ... ");
         printk("done\n");
         printk("APIC: Timer running at %u hz.\n",kCPU[0].ticksPerSecond);
+#ifndef DEBUG_NONE
+        printd(0,"APIC: Timer running at %u hz.\n",kCPU[0].ticksPerSecond);
+#endif
     }
     else
         printk("APIC: not found\n");
     printk("TSC: ticks per 10 = %u\n", tscGetTicksPerSecond());
+#ifndef DEBUG_NONE
+    printd(0,"TSC: ticks per 10 = %u\n", tscGetTicksPerSecond());
+#endif
 #ifndef DISABLE_PAGING
     kCPU[0].registerBase=apicGetAPICBase();
     printk("PAGING: enabling 4k paging\n");
@@ -334,6 +341,9 @@ gdt_init();
     kPagingInitDone=true;
 #endif
     printk("CLOCK: tick frequency is %uhz\n",kTicksPerSecond);
+#ifndef DEBUG_NONE
+    printd(0,"CLOCK: tick frequency is %uhz\n",kTicksPerSecond);
+#endif
     printk("CLOCK: testing ... "); wait(100); printk("works\n");
 
 #ifdef __SMP__

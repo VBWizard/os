@@ -102,6 +102,10 @@ void allocateMemoryToProcess(heapPtr* ptr, size_t size, bool isKernel)
    ptr->address=virtualAddress;
 }
 
+void kFree(void* address)
+{
+    freeA(address);
+}
 
 void* kMalloc(size_t size)
 {

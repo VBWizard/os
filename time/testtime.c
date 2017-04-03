@@ -11,23 +11,51 @@
  * Created on April 1, 2017, 9:08 AM
  */
 
-#include "../libChrisOS/include/libChrisOS.h"
+#include "libChrisOS.h"
 
 /*
  * 
  */
 int main(int argc, char** argv) {
 
+    int pid=0;
+    struct tm *totalTime;
+    time_t startTime, endTime, elapsed;
+    int retVal=0;
+    
+#ifdef DEBUG
     print("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
         print("Param %u=%s\n",cnt,argv[cnt]);
-
+#endif
+    if (argc<2)
+    {
+        print("Error: Not enough parameters supplied, must pass path to program to be run\n");
+        retVal=-1;
+    }
     char* execpgm=malloc(512);
     strcpy(execpgm,argv[1]);
-
-    
-    
+    startTime=time();
+    pid=exec(execpgm,0,NULL);
+    if (pid==0)
+    {
+        print("Error executing %s\n",argv[1]);
+        retVal=-2;
+    }
+    else
+    {
+        waitpid(pid);
+        endTime=time();
+        elapsed=(endTime-startTime);
+        totalTime=malloc(sizeof(totalTime));    
+        print("Elapsed ticks = %u\n",elapsed);
+        int ms=elapsed%TICKS_PER_SECOND;
+        elapsed/= TICKS_PER_SECOND;
+        gmtime_r(&elapsed,totalTime);
+        print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
+    }
+    free(execpgm);
 //    free (execpgm);
-    return (0);
+    return (retVal);
 }
 

@@ -295,7 +295,7 @@ void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uint
 }
 
 //Can only be called by kernel code
-bool pagingMapPageIntoKernel(uintptr_t processCR3, uintptr_t virtualAddress, uint8_t flags)
+bool pagingMapProcessPageIntoKernel(uintptr_t processCR3, uintptr_t virtualAddress, uint8_t flags)
 {
     
     pagingMapPage(KERNEL_CR3, virtualAddress, pagingGet4kPTEntryValueCR3(processCR3,virtualAddress), flags);

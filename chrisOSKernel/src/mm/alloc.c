@@ -150,7 +150,7 @@ void* allocPagesAndMap(uint32_t size)
     return allocPagesAndMapI(CURRENT_CR3, size);
 }
 
-void freeMemory(void* address)
+void freeA(void* address)
 {
     sMemInfo* mInfo = findBlockByMemoryAddress(address);
     if (mInfo!=NULL)

@@ -67,7 +67,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time: ${OBJECTFILES}
 ${OBJECTDIR}/testtime.o: testtime.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -I../libChrisOS/include/libChrisOS.h -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/testtime.o testtime.c
+	$(COMPILE.c) -O2 -I../libChrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/testtime.o testtime.c
 
 # Subprojects
 .build-subprojects:

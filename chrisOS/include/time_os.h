@@ -14,12 +14,12 @@
 extern "C" {
 #endif
 
-void initSystemDate();
-void __attribute__((noinline))waitTicks();
-void wait(int msToWait);
-struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf);
-struct tm *localtime_r(const time_t *timer, struct tm *tmbuf);
-struct tm *localtime(const time_t *timer);
+    void initSystemDate();
+    void __attribute__((noinline))waitTicks();
+    void wait(int msToWait);
+    struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf);
+    struct tm *localtime_r(const time_t *timer, struct tm *tmbuf);
+    struct tm *localtime(const time_t *timer);
 #ifdef	__cplusplus
 }
 #endif

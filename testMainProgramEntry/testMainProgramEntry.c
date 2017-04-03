@@ -49,6 +49,7 @@ int main2(int argc, char** argv) {
     gets((char*)&t,1,1);
     print("\nGot character %c\n",t);
 */
+    print("\nWelcome to tmpe!\n");
     print("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
     {

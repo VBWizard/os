@@ -55,6 +55,7 @@
       <itemPath>include/paging.h</itemPath>
       <itemPath>../chrisOS/include/pci/pci.h</itemPath>
       <itemPath>include/process.h</itemPath>
+      <itemPath>include/rusage.h</itemPath>
       <itemPath>include/schedule.h</itemPath>
       <itemPath>../chrisOS/include/strings.h</itemPath>
       <itemPath>include/syscall.h</itemPath>
@@ -342,6 +343,8 @@
       </item>
       <item path="include/process.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/rusage.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/schedule.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/syscall.h" ex="false" tool="3" flavor2="0">
@@ -608,6 +611,8 @@
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/process.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/rusage.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/schedule.h" ex="false" tool="3" flavor2="0">
       </item>

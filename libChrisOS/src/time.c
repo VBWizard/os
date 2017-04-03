@@ -9,8 +9,6 @@
 #include "time.h"
 #include "strings.h"
 
-time_t libcTZ=0;
-
 int _daylight=1;                  // Non-zero if daylight savings time is used
 long _dstbias=0;                  // Offset for Daylight Saving Time
 char *_tzname[2] = {"GMT", "GMT"};  // Standard/daylight savings time zone names
@@ -48,7 +46,7 @@ const int _ytab[2][12] = {
 VISIBLE time_t time(/*time_t* arg*/)
 {
     uint32_t retVal=0;
-    __asm__("call sysEnter_Vector\n":"=a" (retVal),"=b" (libcTZ):"a" (SYSCALL_GETTICKS));
+    __asm__("call sysEnter_Vector\n":"=a" (retVal):"a" (SYSCALL_GETTICKS));
     return (time_t)retVal;
 }
 

@@ -86,7 +86,7 @@ task_t* findTaskByCR3(uint32_t cr3)
         taskList++;
     } while (taskList->next!=NO_NEXT);
 
-    if (taskList->taskNum==0x0)
+    if (taskList->taskNum==0x0 || (uint32_t)taskList->pageDir!=cr3)
     {
         printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Could not find task with CR3=0x%08X\n",cr3);
         return NULL;
@@ -124,7 +124,7 @@ void markTaskEnded(uint32_t cr3, uint32_t retval)
     task_t* taskList=findTaskByCR3(cr3);
 
     ((process_t*)taskList)->retVal=retval;
-    if (taskList->tss->CR3!=cr3)
+    if ((uint32_t)taskList->pageDir!=cr3)
         panic("markTaskEnded: Could not find task for CR3=0x%08X to end\n",cr3);
     taskList->exited=true;
     //If the task being ended is running, trigger a schedule on the next tick to get rid of it
