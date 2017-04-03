@@ -51,13 +51,26 @@ int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH
     {
     int x=0,y=0;
     int lRetVal=0,parsedChars=0;
+    bool needDoubleQuotetoEndParam=0;
     
     memset(params,0, size);
     //print("commandLine=%s\n",cmdLine);
     for (unsigned cnt=0;cnt<strlen(cmdLine);cnt++)
     {
-        //print("c=%c\n", cmdLine[cnt]);
-        if ( (cmdLine[cnt]==' ' || cmdLine[cnt]=='-') || cmdLine[cnt]==',')
+        if(cmdLine[cnt]=='"')
+        {
+            if (!needDoubleQuotetoEndParam)
+            {
+                needDoubleQuotetoEndParam=true;
+            }
+            else
+            {
+                params[y][x]='\0';
+                {x=0;y++;lRetVal++;}
+                needDoubleQuotetoEndParam=false;
+            }
+        }
+        else if ( ((cmdLine[cnt]==' ' || cmdLine[cnt]=='-') || cmdLine[cnt]==',') && !needDoubleQuotetoEndParam)
         {
             //print("Found a delimiter (%c), incrementing y to %u, setting x to 0\n",cmdLine[cnt],y+1);
             if (cmdLine[cnt]=='-' || cmdLine[cnt]=='/')
@@ -253,15 +266,26 @@ void freeArgV(int pcount, char **params)
 
 void execp(char* cmdline)
 {
+    bool background=false;
+    int programParamNum=0;
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     uint32_t pid=0;
 
     char** prms=(uint32_t)paramsToArgv(paramCount,&params[0][0]);
     
-    pid=exec(params[0],paramCount,prms);
+    if (strcmp(params[0],"/b")==0)
+    {
+        background=true;
+        programParamNum++;
+    }
+    
+    pid=exec(params[programParamNum],paramCount-programParamNum,prms);
     if (pid>0)
-        waitpid(pid);
+    {
+        if (!background)
+            waitpid(pid);
+    }
     else
         print("Error executing %s\n",params[0]);
     freeArgV(paramCount, (char**)prms);

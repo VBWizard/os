@@ -85,6 +85,9 @@ void kbd_handler_generic()
                     printk("^");
                     translatedKeypress-=32;
                 }
+                 
+                 if (translatedKeypress==124)
+                     translatedKeypress=34;
             if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
             {
                 //CLR 01/10/2017: Increment the buffer pointer first

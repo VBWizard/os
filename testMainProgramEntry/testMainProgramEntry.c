@@ -30,6 +30,7 @@ void HandleSEGV();
 }
 */
 int main2(int argc, char** argv) {
+    int num=0;
     
     libc_init();
     char input[100];
@@ -56,14 +57,13 @@ int main2(int argc, char** argv) {
         print("Param %u=%s\n",cnt,argv[cnt]);
     }
     print("\n");
-    for (int cnt=0;cnt<0x5;cnt++)
+    while (1==1)
     {
-        char* test=malloc(25);
-        free(test);
-        if (!(cnt%0x1000))
-            print("Malloc%x returned 0x%08X\n",cnt,test);
+        sleep(1);
+        num++;
+        if (num%10==0)
+            print("Still here!!!\n");
     }
-    
     //crashFail(argv);
     return 0x1234;
 }
