@@ -17,6 +17,7 @@
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
+extern uint64_t kIdleTicks;
 
 void processWrapup();
 bool taskRegInitialized=false;
@@ -74,6 +75,20 @@ void processCopyArgV(char** dest, char** src, uint32_t dVirt, int pcount)
     }
 }
 
+void processIdleLoop()
+{
+    uint32_t cr3=0;
+    
+    __asm__("mov eax,cr3\n":"=a" (cr3));
+    process_t* process=findTaskByCR3(cr3)->process;
+    sys_setpriority(process,20);
+    while (1==1)
+    {
+        kIdleTicks++;
+        __asm__("sti;hlt;");
+    }   
+}
+
 process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool isKernelProcess)
 {
 
@@ -127,13 +142,20 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
     pagingMapPage(process->task->tss->CR3,PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000,0x7); //FIX ME!!!  Had to change this for sys_sigaction2 USLEEP
 
-    //CR3 was set and PDir created by createTask.  Page tables will be created by the load process
-    process->elf=sysLoadElf(process->path,process->elf,process->task->tss->CR3);
-    if (!process->elf->loadCompleted)
+    //Take care of the special "idle" task 
+    if (strncmp(process->path,"/sbin/idle",50)!=0)
     {
-        return NULL;
+        process->elf=sysLoadElf(process->path,process->elf,process->task->tss->CR3);
+        if (!process->elf->loadCompleted)
+        {
+            return NULL;
+        }
+        process->task->tss->EIP=process->elf->hdr.e_entry;
     }
-    process->task->tss->EIP=process->elf->hdr.e_entry;
+    else    //Configure the idle process
+    {
+        process->task->tss->EIP=&processIdleLoop;
+    }
 
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
     void* var=&processExit;
@@ -166,14 +188,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
         tssFlags |= ACS_DPL_0;
     }
     gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
-    if (!taskRegInitialized)
-    {
-        __asm__("mov eax,%[taskTSS]\n"                                    //Load task register with user process TSS entry
-                "ltr ax\n"
-                ::[taskTSS] "r" (process->task->taskNum<<3));
-        taskRegInitialized=true;
-    }
-    submitNewTask(process->task);
+    process->task=submitNewTask(process->task);
     printd(DEBUG_PROCESS,"Submitted process 0x%04X to be run\n",process->task->taskNum);
     return process;
 }

@@ -32,6 +32,9 @@ bool schedulerTaskSwitched=0;
 
 process_t* kKernelProcess;
 task_t* kKernelTask;
+process_t* kIdleProcess;
+task_t* kIdleTask;
+uint64_t kIdleTicks=0;
 uint32_t saveESP;
 uint32_t kKernelCR3=KERNEL_CR3;
 void* keyboardHandlerRoutine=NULL;
@@ -63,6 +66,10 @@ int main(int argc, char** argv) {
     printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
 
+    kIdleTicks=0;
+    kIdleProcess=createProcess("/sbin/idle",0,NULL,NULL,true);
+    kIdleTask=kIdleProcess->task;
+
     char program[40]="/kshell";
     printk("Loading and executing %s\n",program);
     /*NOTE: This is how to create argv!!!*/
@@ -89,9 +96,10 @@ int main(int argc, char** argv) {
     }
 */
 
-    //sys_sigaction(SIG_USLEEP,0,process->task->taskNum);
+    waitTicks(3);
+    sys_sigaction(SIG_USLEEP,0,process->task->taskNum);
     kernelLoop:
-    triggerScheduler(); 
+    //triggerScheduler(); 
     //sys_sigaction(SIG_SLEEP,0,*kTicksSinceStart+(TICKS_PER_SECOND*3));
     //__asm__("\hlt");
     goto kernelLoop;

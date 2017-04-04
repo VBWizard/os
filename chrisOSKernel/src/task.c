@@ -21,7 +21,6 @@ extern uint32_t* sysEnter_Vector;
 //TODO: Replace current list with dllist_t!
 
 uint32_t firstTaskTSS=0,firstTaskESP0=0;
-
 void taskInit()
 {
     for (int cnt=0;cnt<TSS_TABLE_RECORD_COUNT/32;cnt++)
@@ -60,7 +59,7 @@ task_t* getAvailableTask()
     return NULL;
 }
 
-void mmMapKernelIntoTask(task_t* task)
+void mmMapKernelIntoTask(task_t* task, bool kernelTSS)
 {
     uint32_t oldDebugLevel=kDebugLevel;
     kDebugLevel &= (~DEBUG_PAGING);  //Temporarily turn off paging debug if it is on or this takes forever and produces copious output
@@ -68,6 +67,13 @@ void mmMapKernelIntoTask(task_t* task)
     uint32_t kla=(uint32_t)&kernelLoadAddress;
     uint32_t kle1=(uint32_t)&kernelLoadEnd;
     uint32_t kle=kla+(kle1-kla);
+
+    if (kernelTSS)
+        pagingMapPageRange(task->tss->CR3,
+                KERNEL_PAGED_BASE_ADDRESS,
+                KERNEL_PAGED_BASE_ADDRESS+0xFFFFFFF, 
+                0,
+                0x7);
 
     //printd(DEBUG_TASK,"kla=0x%08X, kle=0x%08X, klda=0x%08X\n",kla,kle,kdla);
 
@@ -116,10 +122,8 @@ void mmMapKernelIntoTask(task_t* task)
 task_t* createTask(bool kernelTSS)
 {
     printd(DEBUG_TASK,"createTask: calling getTaskSlot\n");
-    task_t* task=getAvailableTask();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
-
-    if (task==0)
-        return NULL;
+    task_t* task;
+    task=getAvailableTask();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
     
     task->tss->CR3=(uint32_t)pagingAllocatePagingTablePage();
     //Configure the task registers
@@ -131,13 +135,9 @@ task_t* createTask(bool kernelTSS)
 
     //TODO: Fix this.  At the minimum, this will break when we start free()ing stuff.
     //Map TSS of task 0 since we are always using it
-    if (!firstTaskTSS)
-        firstTaskTSS=task->tss;
-    pagingMapPage(task->tss->CR3,(uintptr_t)firstTaskTSS,(uintptr_t)firstTaskTSS,0x7);
-    pagingMapPage(KERNEL_CR3,(uintptr_t)firstTaskTSS,(uintptr_t)firstTaskTSS,0x7);
-    printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08X) into task and kernel\n", firstTaskTSS);
+    pagingMapPage(task->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
     
-    mmMapKernelIntoTask(task);
+    mmMapKernelIntoTask(task,kernelTSS);
     
     //Map our CR3 into program's memory space, needed before the iRet
     printd(DEBUG_TASK,"Mapping our CR3 into program, v=0x%08X, p=0x%08X\n",KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS);
@@ -151,8 +151,8 @@ task_t* createTask(bool kernelTSS)
     if (kernelTSS)
     {
         task->tss->SS=0x18;
-        task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x28;
-        task->tss->CS=0x10;
+        task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x10;
+        task->tss->CS=0x08;
     }
     else
     {

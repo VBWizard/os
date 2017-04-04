@@ -42,6 +42,7 @@ void initKernelInternals()
     getDateTimeString((char*)currTime);
     printk("Kernel init time is: %s\n",currTime);
     
+__asm__("cli\n");
     uint32_t oldCR3=0;
     kKernelTask=getAvailableTask();
     kKernelProcess=(process_t*)allocPagesAndMap(sizeof(process_t));
@@ -50,15 +51,14 @@ void initKernelInternals()
     kKernelTask->process=kKernelProcess;
      __asm__("mov ebx,cr3\n":[oldCR3] "=b" (oldCR3));
     //Set up our kernel task
-    kKernelTask->taskNum=0x1;
     kKernelTask->kernel=true;
     kKernelTask->pageDir=(uint32_t*)oldCR3;
     kKernelTask->tss->EIP=(uint32_t)0xBADBADBA;
-    kKernelTask->tss->CS=0x10;
-    kKernelTask->tss->DS=getDS();
-    kKernelTask->tss->ES=getES();
-    kKernelTask->tss->FS=getFS();
-    kKernelTask->tss->GS=getGS();
+    kKernelTask->tss->CS=0x20;
+    kKernelTask->tss->DS=0x10;
+    kKernelTask->tss->ES=0x10;
+    kKernelTask->tss->FS=0x10;
+    kKernelTask->tss->GS=0x10;
     kKernelTask->tss->SS=0x18;
     kKernelTask->tss->CR3=oldCR3;
     kKernelTask->tss->SS0=0x18;
@@ -72,10 +72,19 @@ void initKernelInternals()
     kKernelTask->tss->ESP1+=0x15000;
     kKernelTask->tss->EFLAGS=0x200207;
     kKernelTask->tss->ESP=allocPages(0x16000);
-    pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP1 | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP1,16,0x7);
+    pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP,16,0x7);
     kKernelTask->tss->LINK=0x0;
-    kKernelTask->tss->IOPB=sizeof(tss_t);
+    kKernelTask->tss->IOPB=0;
+
+    pagingMapPage(kKernelTask->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
+    pagingMapPage(KERNEL_CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
+    printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08X) into task and kernel\n", kKernelTask->tss);
     
+    gdtEntryOS(kKernelTask->taskNum,(uint32_t)kKernelTask->tss,sizeof(tss_t), ACS_TSS | ACS_DPL_0,GDT_GRANULAR | GDT_32BIT,true);
+    __asm__("mov eax,%[taskTSS]\n"                                    //Load task register with user process TSS entry
+            "ltr ax\n"
+            ::[taskTSS] "r" (kKernelTask->taskNum<<3));
+
     
     //idt_set_gate (&idtTable[0x80], 0x8, (int)&_sysCall, ACS_INT | ACS_DPL_3);
     idt_set_gate (&idtTable[0x80], 0x8, (int)&vector128, ACS_INT | ACS_DPL_3);
@@ -94,4 +103,6 @@ void initKernelInternals()
 
     printk("Installing new IRQ0 handler\n");
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
+__asm__("sti\n");
+
 }

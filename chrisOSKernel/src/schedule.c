@@ -28,6 +28,7 @@ uint32_t nextScheduleTicks;
 const char* TASK_STATE_NAMES[] = {"Zombie","Running","Runnable","Stopped","Uninterruptable Sleep","Interruptable Sleep","Exited","None"};
 extern bool schedulerTaskSwitched;
 extern task_t* kKernelTask;
+extern task_t* kIdleTask;
 
 void changeTaskQueue(task_t* task, eTaskState newState);
 
@@ -302,7 +303,8 @@ task_t* findTaskToRun()
                     ((task_t*)*queue)->taskNum,
                     ((process_t*)((task_t*)*queue)->process)->priority,
                     ((task_t*)*queue)->prioritizedTicksInRunnable);
-            ((task_t*)*queue)->prioritizedTicksInRunnable+=(20-((process_t*)((task_t*)*queue)->process)->priority)+1;
+            if ( (task_t*)*queue!=kIdleTask)
+                ((task_t*)*queue)->prioritizedTicksInRunnable+=(20-((process_t*)((task_t*)*queue)->process)->priority)+1;
             printd(DEBUG_PROCESS,"%u\n",((task_t*)*queue)->prioritizedTicksInRunnable);
             if ( ((task_t*)*queue)->prioritizedTicksInRunnable > mostIdleTicks)
             {
