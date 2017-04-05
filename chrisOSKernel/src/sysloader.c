@@ -49,6 +49,7 @@ uintptr_t previousCR3=0,newCR3;
 
 void _sysCall(uint32_t CallNum, uint32_t param1, uint32_t param2, uint32_t param3);
 static int elf_relocate(elfInfo_t* elf);
+void elfDumpSymbols(elfInfo_t* elf);
 
 char* strTabEntry(int tableNum, elfInfo_t* elf, int index)
 {
@@ -677,7 +678,8 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         elfInfo->loadCompleted=false;
         return elfInfo;
      }
-     elf_relocate(elfInfo);
+    elfDumpSymbols(elfInfo);
+    elf_relocate(elfInfo);
      fl_fclose(fPtr);
         elfInfo->loadCompleted=true;
         return elfInfo;
@@ -779,6 +781,19 @@ uint32_t elfLookUpSymVal(elfInfo_t* elf, char* symName)
         }
         panic("elfLookupSymVal: Could not find symbol '%s'",symName);
     }
+}
+
+void elfDumpSymbols(elfInfo_t* elf)
+{
+    Elf32_Sym* symToFind;
+    
+    printd(DEBUG_ELF_LOADER,"Dumping ELF Symbol Table\n");
+    for (int symNum=0;symNum<elf->symTableRecordCount;symNum++)
+    {
+        symToFind=&elf->symTable[symNum];
+        printd(DEBUG_ELF_LOADER,"\t%u: %s @ 0x%08X (size=0x%08X)\n",symNum,strTabEntry(elf->symStrTabLink, elf, symToFind->st_name),symToFind->st_value, symToFind->st_size);
+    }
+    printd(DEBUG_ELF_LOADER,"Done dumping ELF Symbol Table\n");
 }
 
 static int elf_relocate(elfInfo_t* elf) {

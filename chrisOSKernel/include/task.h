@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include "tss.h"
 
-#define RESERVED_TASKS 20
+#define RESERVED_TASKS 32
 
 typedef enum etaskstate
 {
@@ -40,6 +40,7 @@ typedef struct s_task
     void* process;
     uint32_t buffer2;
     uint32_t lastRunStartTicks, lastRunEndTicks;
+    uint32_t esp0Base, esp0Size;
 } task_t;
 
 task_t* createTask(bool kernelTSS);

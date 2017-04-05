@@ -8,8 +8,12 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/yogi/src/os/chrisOSKernel/src/syscall.c</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/kInit.c</file>
             <file>file:/home/yogi/src/os/chrisOSKernel/src/sysloader.c</file>
             <file>file:/home/yogi/src/os/chrisOSKernel/src/process.c</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/x86.s</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/task.c</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/kernel.c</file>
             <file>file:/home/yogi/src/os/chrisOSKernel/src/schedule.c</file>
         </group>
     </open-files>

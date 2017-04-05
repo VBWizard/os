@@ -104,9 +104,9 @@ void HIGH_CODE_SECTION gdt_init()
     gdtEntryApplication(0x12, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //90 - ring 0 starting at 0x0 data used by sysEnter
               GDT_GRANULAR | GDT_32BIT,true);
 
-    gdtEntryApplication(0x13, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE, //88 ring 0 starting at 0x0 - code used by sysEnter
+    gdtEntryApplication(0x13, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_CODE | GDT_READABLE, //98 ring 0 starting at 0x0 - code used by sysEnter
           GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntryApplication(0x14, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE,    //90 - ring 0 starting at 0x0 data used by sysEnter
+    gdtEntryApplication(0x14, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE,    //A0 - ring 0 starting at 0x0 data used by sysEnter
               GDT_GRANULAR | GDT_32BIT,true);
 
     

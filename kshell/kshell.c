@@ -272,14 +272,14 @@ void execp(char* cmdline)
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     uint32_t pid=0;
 
-    char** prms=(uint32_t)paramsToArgv(paramCount,&params[0][0]);
+    char** prms=paramsToArgv(paramCount,&params[0][0]);
     
     if (strcmp(params[0],"/b")==0)
     {
         background=true;
         programParamNum++;
     }
-    
+    print ("Executing %s\n",params[programParamNum]);
     pid=exec(params[programParamNum],paramCount-programParamNum,prms);
     if (pid>0)
     {
@@ -287,7 +287,7 @@ void execp(char* cmdline)
             waitpid(pid);
     }
     else
-        print("Error executing %s\n",params[0]);
+        print("Error executing %s\n",params[programParamNum]);
     freeArgV(paramCount, (char**)prms);
 }
 

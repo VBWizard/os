@@ -23,13 +23,11 @@ extern uint32_t* sysEnter_Vector;
 uint32_t firstTaskTSS=0,firstTaskESP0=0;
 void taskInit()
 {
-    for (int cnt=0;cnt<TSS_TABLE_RECORD_COUNT/32;cnt++)
+    for (int cnt=1;cnt<TSS_TABLE_RECORD_COUNT/32;cnt++)
     {
         kTaskSlotAvailableInd[cnt]=0xFFFFFFFF;
     }
-    for (int cnt=0;cnt<RESERVED_TASKS;cnt++)
-        bitsReset(kTaskSlotAvailableInd, cnt);
-    
+    kTaskSlotAvailableInd[0]=0x0;
     //There is padding at the end of the task table.  Make sure the padding is 0's so that we don's BSF past the end
     kTaskSlotAvailableInd[TSS_TABLE_RECORD_COUNT]=0x0;
 }
@@ -39,23 +37,27 @@ task_t* getAvailableTask()
 {
    int cnt=1,slot=0; //The first slot will ALWAYS be blank, so start with slot 1
     uint32_t* ptr=kTaskSlotAvailableInd;     //don't touch the first 32 tasks
-    slot=bitsScanF(ptr);
-    if (slot>-1)
+    while (cnt<TSS_TABLE_RECORD_COUNT/32)
     {
-        printd(DEBUG_TASK,"getAvailableTask: Found free slot for task (0x%04X)\n",slot);
-        task_t* task=(task_t*)kMalloc(sizeof(task_t));//&kTaskTable[slot];
-        task->taskNum=slot;
-        printd(DEBUG_TASK,"getAvailableTask: Marking TSS %u used\n",slot);
-        bitsReset(ptr,slot);
-        task->tss=allocPages(PAGE_SIZE); //&kTSSTable[slot];
-        pagingMapPage(KERNEL_CR3,(uint32_t)task->tss | KERNEL_PAGED_BASE_ADDRESS,task->tss,0x3);
-        (task-1)->next=task;
-        task->prev=(task-1);
-        printd(DEBUG_TASK,"getAvailableTask: Using task %u @ 0x%08X, set TSS to 0x%08X\n",slot, task,task->tss);
-        return task;
-    }
+        slot=bitsScanF(ptr+cnt);
+        if (slot>-1)
+        {
+            slot=slot+(cnt*32);
+            printd(DEBUG_TASK,"getAvailableTask: Found free slot for task (0x%04X)\n",slot);
+            task_t* task=(task_t*)kMalloc(sizeof(task_t));//&kTaskTable[slot];
+            task->taskNum=slot;
+            printd(DEBUG_TASK,"getAvailableTask: Marking TSS %u used\n",slot);
+            bitsReset(ptr,slot);
+            task->tss=allocPages(PAGE_SIZE); //&kTSSTable[slot];
+            pagingMapPage(KERNEL_CR3,(uint32_t)task->tss | KERNEL_PAGED_BASE_ADDRESS,task->tss,0x3);
+            (task-1)->next=task;
+            task->prev=(task-1);
+            printd(DEBUG_TASK,"getAvailableTask: Using task %u @ 0x%08X, set TSS to 0x%08X\n",slot, task,task->tss);
+            return task;
+        }
         ptr++;cnt++;
-    printk("tssUseAvailable: Cannot allocate TSS for new task");
+    }
+    printk("tssUseAvailable: Cannot allocate TSS for new task, slot=0x%08X\n",slot);
     return NULL;
 }
 
@@ -170,7 +172,22 @@ task_t* createTask(bool kernelTSS)
     pagingMapPageCount(KERNEL_CR3,task->tss->ESP0,task->tss->ESP0,0x16,0x7);
     task->tss->ESP0+=0x15000;
     printd(DEBUG_TASK,"createTask: ESP0 set to 0x%08X\n", task->tss->ESP0);
-
+    
+    printd(DEBUG_TASK,"createTask: Mapping kernel ESP0 v=0x%08X/p=0x%08X into process, CR3=0x%08X, 0x%02X pages\n",
+            kKernelTask->esp0Base,
+            kKernelTask->esp0Base,
+            task->tss->CR3,
+            kKernelTask->esp0Size/PAGE_SIZE);
+    pagingMapPageCount(task->tss->CR3,
+            kKernelTask->esp0Base,
+            kKernelTask->esp0Base,
+            kKernelTask->esp0Size/PAGE_SIZE,0x7);
+    printd(DEBUG_TASK,"createTask: Mapping kernel ESP0 v=0x%08X/p=0x%08X into process, CR3=0x%08X, 0x%02X pages\n",
+            kKernelTask->esp0Base | KERNEL_PAGED_BASE_ADDRESS,
+            kKernelTask->esp0Base,
+            task->tss->CR3,
+            kKernelTask->esp0Size/PAGE_SIZE);
+    pagingMapPageCount(task->tss->CR3,kKernelTask->esp0Base| KERNEL_PAGED_BASE_ADDRESS,kKernelTask->esp0Base,kKernelTask->esp0Size/PAGE_SIZE,0x7);
     task->tss->ESP=(uint32_t)allocPages(0x16000);
     printd(DEBUG_TASK,"createTask: ESP for task allocated at 0x%08X\n",task->tss->ESP);
     pagingMapPageCount(task->tss->CR3,task->tss->ESP,task->tss->ESP,0x16,0x7);
