@@ -39,6 +39,8 @@
 
 //extern bool pauseDisplay(bool offerToQuit);
 extern uint32_t kDebugLevel;
+extern uint32_t* kTicksSinceStart;
+
 uint8_t printDLineCount;
 
 static void printchar(char **str, int c)
@@ -240,16 +242,20 @@ int printd_valist(uint32_t DebugLevel, const char *format, va_list args)
 
 int printd(uint32_t DebugLevel, const char *format, ...)
 {
+    char formatI[1024];
+    
     if ((kDebugLevel & DebugLevel) == DebugLevel)    
     {
         va_list args;
 
         va_start( args, format );
         
+        sprintf(formatI,"0x%08X: %s",*kTicksSinceStart,format);
+
         if (kDebugLevel & DEBUG_PRINT_TO_PORT)
-            printp_valist(format,args);
+            printp_valist(formatI,args);
         else
-            return printk_valist(format, args);
+            return printk_valist(formatI, args);
     }
     return 0;
 }

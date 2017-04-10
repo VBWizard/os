@@ -117,6 +117,13 @@ void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     
 }
 
+//Pass a signal to the currently running task
+void sys_sigactionC(int signal, uintptr_t* sigAction, uint32_t sigData)
+{
+    __asm__("cli\n");
+    
+    __asm__("sti\n");
+}
 
 //Iterate the running, runnable and sleeping queues, looking for new signals
 void processSignals()

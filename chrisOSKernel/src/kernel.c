@@ -29,6 +29,7 @@ extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
 extern bool schedulerEnabled;
 bool schedulerTaskSwitched=0;
+extern file_t console_file;
 
 process_t* kKernelProcess;
 task_t* kKernelTask;
@@ -38,6 +39,7 @@ uint64_t kIdleTicks=0;
 uint32_t saveESP;
 uint32_t kKernelCR3=KERNEL_CR3;
 void* keyboardHandlerRoutine=NULL;
+extern void keyboardInit();
 
 int main(int argc, char** argv) {
     printk("\nkernel loaded ... \n");
@@ -66,6 +68,9 @@ int main(int argc, char** argv) {
     printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
 
+    keyboardInit();
+    console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);
+    
     kIdleTicks=0;
     kIdleProcess=createProcess("/sbin/idle",0,NULL,NULL,true);
     kIdleTask=kIdleProcess->task;

@@ -40,7 +40,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/734293bf/pci.o \
 	${OBJECTDIR}/_ext/7450142c/basic_display.o \
 	${OBJECTDIR}/_ext/7450142c/strftime.o \
-	${OBJECTDIR}/_ext/f33415e4/keyboard.o \
 	${OBJECTDIR}/_ext/101a755a/bits.o \
 	${OBJECTDIR}/_ext/101a755a/gdt.o \
 	${OBJECTDIR}/_ext/101a755a/msr.o \
@@ -76,6 +75,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/kIRQHandlers.o \
 	${OBJECTDIR}/src/kernel.o \
 	${OBJECTDIR}/src/kernelISR.o \
+	${OBJECTDIR}/src/keyboard.o \
 	${OBJECTDIR}/src/mm/alloc.o \
 	${OBJECTDIR}/src/mm/kmalloc.o \
 	${OBJECTDIR}/src/mm/mm.o \
@@ -136,11 +136,6 @@ ${OBJECTDIR}/_ext/7450142c/strftime.o: ../chrisOS/src/char/console/strftime.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/7450142c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7450142c/strftime.o ../chrisOS/src/char/console/strftime.c
-
-${OBJECTDIR}/_ext/f33415e4/keyboard.o: ../chrisOS/src/char/keyboard.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/f33415e4
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/f33415e4/keyboard.o ../chrisOS/src/char/keyboard.c
 
 ${OBJECTDIR}/_ext/101a755a/bits.o: ../chrisOS/src/cpu/bits.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
@@ -315,6 +310,11 @@ ${OBJECTDIR}/src/kernel.o: src/kernel.c
 ${OBJECTDIR}/src/kernelISR.o: src/kernelISR.s 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/src/kernelISR.o src/kernelISR.s
+
+${OBJECTDIR}/src/keyboard.o: src/keyboard.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/keyboard.o src/keyboard.c
 
 ${OBJECTDIR}/src/mm/alloc.o: src/mm/alloc.c 
 	${MKDIR} -p ${OBJECTDIR}/src/mm

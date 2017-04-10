@@ -367,7 +367,7 @@ getAKey:
             else
                 goto getAKey;
         }
-        if (lCurrKey==0xD0)  //down
+        else if (lCurrKey==0xD0)  //down
         {
             if (commandBuffPtr<=commandsPtr)
             {
@@ -385,18 +385,20 @@ getAKey:
                 goto getAKey;
             
         }   
-        if (lCurrKey==0xcb) //left
+        else if (lCurrKey==0xcb) //left
         {
-            /*
-            if (cursorGetPosX()>4)
+            if (lCurrKeyCount>0)
             {
-                cursorMoveTo(cursorGetPosX()-1,cursorGetPosY());
+                print("\033[1D");
                 lCurrKeyCount--;
             }
-             */
+             
             goto getAKey;
         }
-        if (lCurrKey=='\b')
+        else if (lCurrKey==0xcd) //right
+        {
+        }
+        else if (lCurrKey=='\b') //backspace
         {
             lCurrKeyCount--;
             lCommand[lCurrKeyCount]='\0';
@@ -412,7 +414,7 @@ getAKey:
             else
                 goto getAKey;
         }
-        else if (lCurrKey==0xa)
+        else if (lCurrKey==0xa) //Enter
         {
             goto doneGettingKeys;
         }

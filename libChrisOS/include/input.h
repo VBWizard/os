@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
     char getc();
-    void gets(char* buffer, int maxlen, int stream);
+    int gets(char* buffer, int maxlen, int stream);
     void putc(char c);
     void puts(char* buffer);
 

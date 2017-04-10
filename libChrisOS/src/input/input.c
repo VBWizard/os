@@ -4,9 +4,11 @@
  * and open the template in the editor.
  */
 #include "libChrisOS.h"
+#include "syscalls.h"
+#include "stdio.h"
 
-#define READCHAR(c)     {asm("mov eax,0x3\ncall sysEnter_Vector\n":"=a" (c):"b" (1));}
-#define PUTSTRING(c) {asm("mov eax,0x4\ncall sysEnter_Vector\n"::"b" (1), "c" (c));}
+#define READCHAR(c)     {asm("call sysEnter_Vector\n":"=a" (c):"a" (SYSCALL_READ), "b" (STDIN_FILE));}
+#define PUTSTRING(c) {asm("call sysEnter_Vector\n"::"a" (SYSCALL_WRITE), "b" (STDOUT_FILE), "c" (c));}
 
 VISIBLE void puts(char* buffer)
 {
@@ -29,7 +31,7 @@ VISIBLE char getc()
     return c;
 }
 
-VISIBLE void gets(char* buffer, int maxlen, int stream)
+VISIBLE int gets(char* buffer, int maxlen, int stream)
 {
     char inchar;
     int len=0;
@@ -49,7 +51,7 @@ VISIBLE void gets(char* buffer, int maxlen, int stream)
             buffer[len]=0;
             len--;
         }
-        else if (inchar>0)
+        else if (inchar!=0)
         {
             lbuf[0]=inchar;
             PUTSTRING(&lbuf);
@@ -57,7 +59,7 @@ VISIBLE void gets(char* buffer, int maxlen, int stream)
             //Note: Written this way so that gets an be used as a getc which waits for the key
             if ((len+1>=maxlen) || (inchar==0x0a)) //-1 because we need to leave the terminator (0x0) at the end of the string
             
-                return;
+                return len;
         }
         else
             asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt

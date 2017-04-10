@@ -10,6 +10,7 @@
 #include "kmalloc.h"
 #include "process.h"
 #include "thesignals.h"
+#include "fs.h"
 
 #define KBRD_INTRFC 0x64
 /* keyboard interface bits */
@@ -54,13 +55,13 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
             break;
         case 0x3:       //***read from descriptor, param1 = descriptor #
-            if (param1==0x1)
+            if (param1==STDIN_FILE)
                 retVal=getc();
             else
                 panic("_sysCall: sys_read for descriptor 0x%08X not implemented\n",param1);
             break;
         case 0x4:       //***write to descriptor, param1 = descriptor #, param2 = string to write
-            if (param1==0x1)
+            if (param1==STDOUT_FILE)
             {
                 //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
                 printu((const char*)param2, NULL);

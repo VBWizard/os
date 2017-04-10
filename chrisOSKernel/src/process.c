@@ -112,12 +112,22 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     
     process->parent=parentProcessPtr;
     if (process->parent!=NULL)
+    {
         process->kernelProcess=((process_t*)process->parent)->kernelProcess;
+//        process->stdin=((process_t*)parentProcessPtr)->stdin;
+//        process->stdin=((process_t*)parentProcessPtr)->stdout;
+//        process->stdin=((process_t*)parentProcessPtr)->stderr;
+    }
     else
+    {
         process->kernelProcess=isKernelProcess;
-       
+//        process->stdin=((process_t*)parentProcessPtr)->stdin=STDIN_FILE;
+//        process->stdin=((process_t*)parentProcessPtr)->stdout=STDOUT_FILE;
+//        process->stdin=((process_t*)parentProcessPtr)->stderr=STDERR_FILE;
+    }  
     process->task=createTask(isKernelProcess);
 
+    
     process->argv=argv;
     uint32_t argvVirt=0x6f000000;
     if (process->parent!=NULL)

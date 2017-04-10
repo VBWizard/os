@@ -10,9 +10,7 @@
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects/>
             <sourceRootList>
-                <sourceRootElem>../chrisOS/src/strings</sourceRootElem>
                 <sourceRootElem>src</sourceRootElem>
-                <sourceRootElem>include</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

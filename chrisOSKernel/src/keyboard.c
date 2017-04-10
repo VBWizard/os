@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "time_os.h"
 #include "kbd.h"
+#include "fs.h"
 
 extern volatile char kTranslatedKeypress;
 extern uint32_t kDebugLevel;
@@ -12,8 +13,29 @@ extern volatile char* kKbdBuffCurrTop;
 extern volatile char* kKbdBuffCurrChar;
 
 char getc();
-void gets(char* buffer, int len);
+int gets(char* buffer, int len);
 
+file_operations_t fops;
+inode_t console_node={.i_dev=1,.i_mode=0};
+file_t console_file;
+
+size_t readConsole (struct file * fptr, char *buffer, size_t size, uint64_t* whatever) 
+{
+    return gets(buffer,size);
+}
+
+size_t writeConsole(struct file * fptr, const char *buffer, size_t size, uint64_t *whatever)
+{
+    return printk(buffer);
+}
+
+void keyboardInit()
+{
+    console_file.f_inode=&console_node;
+    fops.read=readConsole;
+    fops.write=writeConsole;
+    console_file.fops=fops;
+}
 
 
 //Get a key from the keyboard buffer
@@ -59,7 +81,7 @@ char waitForKeyboardKey()
     return lTemp;
 }
 
-void gets(char* buffer, int len)
+int gets(char* buffer, int len)
 {
     volatile char inchar=0;
     int cnt=0;

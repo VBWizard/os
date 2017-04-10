@@ -10,6 +10,7 @@
       <itemPath>include/memory.h</itemPath>
       <itemPath>include/rusage.h</itemPath>
       <itemPath>include/rusage_1.h</itemPath>
+      <itemPath>include/stdio.h</itemPath>
       <itemPath>/home/yogi/src/os/libChrisOS/include/strings.h</itemPath>
       <itemPath>include/time.h</itemPath>
     </logicalFolder>
@@ -37,6 +38,7 @@
       <itemPath>src/malloc.c</itemPath>
       <itemPath>/home/yogi/src/os/libChrisOS/src/memcpy.c</itemPath>
       <itemPath>/home/yogi/src/os/libChrisOS/src/memset.c</itemPath>
+      <itemPath>src/stdio.c</itemPath>
       <itemPath>src/time.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -52,9 +54,7 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../chrisOS/src/strings</Elem>
     <Elem>src</Elem>
-    <Elem>include</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -68,8 +68,8 @@
         <cTool>
           <incDir>
             <pElem>include</pElem>
-            <pElem>../chrisOSKernel/include</pElem>
             <pElem>../chrisOS/include</pElem>
+            <pElem>../chrisOSKernel/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -Wall -Wextra -masm=intel -fvisibility=hidden -Wl,-init,libc_init</commandLine>
         </cTool>
@@ -156,6 +156,8 @@
       </item>
       <item path="include/rusage_1.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/stdio.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/time.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
@@ -163,6 +165,8 @@
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/stdio.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/time.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -273,6 +277,8 @@
       </item>
       <item path="include/rusage_1.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/stdio.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/time.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
@@ -280,6 +286,8 @@
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/stdio.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/time.c" ex="false" tool="0" flavor2="0">
       </item>

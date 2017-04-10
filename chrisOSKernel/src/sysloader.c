@@ -19,21 +19,6 @@
 #include "../../chrisOS/include/printf.h"
 #include "dllist.h"
 
-extern struct ataDeviceInfo_t* kATADeviceInfo;
-extern tss_t* kTSSTable;
-uint32_t cr3BeforeExec;
-extern int kAHCISelectedDiskNum; 
-extern int kAHCISelectedPartNum;
-extern int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count);
-extern int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count);
-extern uint32_t getCS();
-extern uint32_t getDS();
-extern uint32_t getES();
-extern uint32_t getFS();
-extern uint32_t getGS();
-extern uint32_t getSS();
-extern uint32_t getESP();
-extern sGDT* bootGdt;
 extern dllist_t* kLoadedElfInfo;
 
 uint32_t libLoadOffset=LIBRARY_BASE_LOAD_ADDRESS;
@@ -706,58 +691,8 @@ static inline char *elf_lookup_string(Elf32_Ehdr *hdr, int offset) {
 	return strtab + offset;
 }
 
-
-static inline char *elf_lookup_symbol(Elf32_Ehdr *elf, const char* name)
-{
-}
-
 # define ELF_RELOC_ERR -1
 
-static int elf_get_symval(elfInfo_t *elfInfo, uint32_t idx) {
-//	if(table == SHN_UNDEF || idx == SHN_UNDEF) return 0;
-	Elf32_Shdr *symtab = elfInfo->symTable;
- 
-	uint32_t symtab_entries = elfInfo->symTableRecordCount;
-//	if(idx >= symtab_entries) {
-//		printd(DEBUG_ELF_LOADER,"Symbol Index out of Range (%d:%u).\n", table, idx);
-//		return ELF_RELOC_ERR;
-//	}
- 
-	Elf32_Sym *symbol = &elfInfo->symTable[idx];
-        if(symbol->st_shndx == SHN_UNDEF) 
-        {
-            // External symbol, lookup value
-            const char *name = strTabEntry(elfInfo->symStrTabLink,elfInfo,elfInfo->symTable[idx].st_name);
-
-            void *target = elfInfo->symTable[idx].st_value;
-
-            if(target == NULL) 
-            {
-                // Extern symbol not found
-                if(ELF32_ST_BIND(symbol->st_info) & STB_WEAK) {
-                        // Weak symbol initialized as 0
-                        return 0;
-                } else {
-                        printd(DEBUG_ELF_LOADER,"Undefined External Symbol : %s.\n", name);
-                        return ELF_RELOC_ERR;
-                }
-            } 
-            else 
-            {
-                    return (int)target;
-            }
-        }
-        else if(symbol->st_shndx == SHN_ABS) {
-            // Absolute symbol
-            return symbol->st_value;
-	} 
-        else 
-        {
-		// Internally defined symbol
-		Elf32_Shdr *target = &elfInfo->secHdrTable[symbol->st_shndx];
-		return symbol->st_value + target->sh_offset; //?
-	}
-}
 
 # define DO_386_32(S, A)	((S) + (A))
 # define DO_386_PC32(S, A, P)	((S) + (A) - (P))
@@ -781,6 +716,7 @@ uint32_t elfLookUpSymVal(elfInfo_t* elf, char* symName)
         }
         panic("elfLookupSymVal: Could not find symbol '%s'",symName);
     }
+    return 0;
 }
 
 void elfDumpSymbols(elfInfo_t* elf)

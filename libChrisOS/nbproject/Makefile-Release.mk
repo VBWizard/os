@@ -50,6 +50,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/input/input.o \
 	${OBJECTDIR}/src/libChrisOS.o \
 	${OBJECTDIR}/src/malloc.o \
+	${OBJECTDIR}/src/stdio.o \
 	${OBJECTDIR}/src/time.o
 
 
@@ -153,6 +154,11 @@ ${OBJECTDIR}/src/malloc.o: src/malloc.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/malloc.o src/malloc.c
+
+${OBJECTDIR}/src/stdio.o: src/stdio.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOSKernel/include -I../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/stdio.o src/stdio.c
 
 ${OBJECTDIR}/src/time.o: src/time.c 
 	${MKDIR} -p ${OBJECTDIR}/src

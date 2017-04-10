@@ -43,6 +43,7 @@
       <itemPath>include/drv_genKeyboard.h</itemPath>
       <itemPath>include/elfLibraryTable.h</itemPath>
       <itemPath>../chrisOS/include/filesystem.h</itemPath>
+      <itemPath>include/fs.h</itemPath>
       <itemPath>include/kIRQHandlers.h</itemPath>
       <itemPath>/home/yogi/src/os/chrisOSKernel/include/kInit.h</itemPath>
       <itemPath>../chrisOS/include/i386/kPaging.h</itemPath>
@@ -90,7 +91,7 @@
       <itemPath>/home/yogi/src/os/chrisOSKernel/src/kInit.c</itemPath>
       <itemPath>src/kernel.c</itemPath>
       <itemPath>src/kernelISR.s</itemPath>
-      <itemPath>../chrisOS/src/char/keyboard.c</itemPath>
+      <itemPath>src/keyboard.c</itemPath>
       <itemPath>src/mm/kmalloc.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
@@ -201,8 +202,6 @@
             tool="0"
             flavor2="0">
       </item>
-      <item path="../chrisOS/src/char/keyboard.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/cpu/bits.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/cpu/gdt.c" ex="false" tool="0" flavor2="0">
@@ -329,6 +328,8 @@
       </item>
       <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/fs.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
@@ -374,6 +375,8 @@
       <item path="src/kernel.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="src/keyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -470,8 +473,6 @@
             tool="0"
             flavor2="0">
       </item>
-      <item path="../chrisOS/src/char/keyboard.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/cpu/bits.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/cpu/gdt.c" ex="false" tool="0" flavor2="0">
@@ -598,6 +599,8 @@
       </item>
       <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/fs.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
@@ -643,6 +646,8 @@
       <item path="src/kernel.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="src/keyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>

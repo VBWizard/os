@@ -24,14 +24,16 @@
 extern "C" {
 #endif
 
+#include "fs.h"
 #include "signals.h"
 #define PROCESS_HEAP_START 0x70000000
 #define PROCESS_HEAP_END   0xBFFFFFFF
 #define PROCESS_MAX_EXIT_HANDLERS 20    
 #define PROCESS_STRUCT_VADDR 0xF000F000
+
     
     typedef void exitHandler(void);
-    
+
     typedef struct sprocess
     {
         uint32_t processSyscallESP;         //NOTE: this must be the first item in the struct, as it is mapped into the process later
@@ -52,6 +54,7 @@ extern "C" {
         int argc;
         uintptr_t argv;
         struct rusage usage;
+        file_t* stdin, *stdout, *stderr;
     } process_t;
 
 

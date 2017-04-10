@@ -7,6 +7,7 @@
 #include "libChrisOS.h"
 #include "syscalls.h"
 #include "time.h"
+#include "stdio.h"
 
 extern void sysEnter_Vector();
 int a=123;int b=456; int c=789;

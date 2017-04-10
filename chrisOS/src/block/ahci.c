@@ -593,7 +593,7 @@ int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count) 
         return false;
     }
 
-    return sector_count;
+    return true;
 }
 
 int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count) {
