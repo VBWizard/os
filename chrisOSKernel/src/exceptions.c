@@ -12,8 +12,11 @@
 #include "i386/kPaging.h"
 #include "utility.h"
 #include "signals.h"
+#include "elfloader.h"
 #include "process.h"
 #include "thesignals.h"
+#include "alloc.h"
+#include "paging.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
@@ -54,28 +57,72 @@ void kPagingExceptionHandler()
 
     __asm__("mov cr3,eax\n"::"a"(KERNEL_CR3));
     
-    if (exceptionNumber==0x0e)
-        //Get the address of the page table entry for the exception
-        lPTEAddress=kPagingGet4kPTEntryAddress(exceptionCR2);
+    lPTEAddress=kPagingGet4kPTEntryAddressCR3(exceptionCR3,exceptionCR2);
 
-#ifndef DEBUG_NONE
+    //During paging init a paging exception is purposely triggered, so turn off debugging for that
     if (!kPagingInitDone)
     {
         lOldDebugLevel=kDebugLevel;
         kDebugLevel&=!DEBUG_EXCEPTIONS;
     }
+    lPDEAddress=kPagingGet4kPDEntryAddressCR3(exceptionCR3,exceptionCR2);
+    lPDEValue=kPagingGet4kPDEntryValueCR3(exceptionCR3,exceptionCR2);
+    kDebugLevel |= DEBUG_PAGING;
+    lPTEValue=kPagingGet4kPTEntryValueCR3(exceptionCR3,exceptionCR2);
+    kDebugLevel &= ~DEBUG_PAGING;
+    //Check for CoW pages in libraries
+    printd(DEBUG_EXCEPTIONS,"Paging exception START: for 0x%08X\n",exceptionCR2);
+    process_t* process=findTaskByCR3(exceptionCR3)->process;
+    elfInfo_t* elf=process->elf;
+    bool isCow=false;
+    printd(DEBUG_EXCEPTIONS,"\tProcess=%s, checking for CoW bss/data in libraries\n",process->path);
+    for (int cnt=0;cnt<process->elf->libraryElfCount;cnt++)
+    {
+        elfInfo_t* lib=elf->libraryElfPtr[cnt];
+        printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08X, bss=0x%08X/0x%08X, data=0x%08X/0x%08X\n",
+                lib,
+                lib->libBSSAddress,
+                lib->libBSSSize,
+                lib->libDataAddress,
+                lib->libDataSize);
+        if (lib->libBSSAddress<=exceptionCR2 && lib->libBSSAddress+lib->libBSSSize>exceptionCR2)
+        {
+            printd(DEBUG_EXCEPTIONS,"\t\tThe page with address 0x%08X is a CoW .bss page from library %s\n",exceptionCR2,lib->fileName);
+            isCow=true;
+            break;
+        }
+        else if (lib->libDataAddress<=exceptionCR2 && lib->libDataAddress+lib->libDataSize>exceptionCR2)
+        {
+            printd(DEBUG_EXCEPTIONS,"\t\tPage (0x%08X) is CoW .data page from library %s\n",exceptionCR2,lib->fileName);
+            isCow=true;
+            break;
+        }
+    }
+
+    if (isCow)
+    {
+        uintptr_t mappedCR2=pagingGet4kPTEntryValueCR3(exceptionCR3,exceptionCR2) & 0xFFFFF000;
+        uint32_t newPhys=(uint32_t)allocPages(PAGE_SIZE);
+        pagingMapPage(exceptionCR3,exceptionCR2 & 0xFFFFF000,newPhys,0x7);
+        pagingMapPage(KERNEL_CR3,exceptionCR2 & 0xFFFFF000,newPhys,0x7);
+        pagingMapPage(KERNEL_CR3,newPhys,newPhys,0x7);
+        kDebugLevel |= DEBUG_PAGING;
+        kDebugLevel &= ~DEBUG_PAGING;
+        memcpy((void*)newPhys,(void*)(mappedCR2),PAGE_SIZE);
+        printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08X with writable page 0x%08X (contents copied)\n",exceptionCR2&0xFFFFF000,newPhys);
+        __asm__("xor ebx,ebx\nmov cr2,ebx\nmov cr3,eax\n"::"a" (exceptionCR3));
+        return;
+    }
+    
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
-        lPDEValue=kPagingGet4kPDEntryValue(exceptionCR2);
-        lPTEValue=kPagingGet4kPTEntryValue(exceptionCR2);
-        lPDEAddress=kPagingGet4kPDEntryAddress(exceptionCR2);
         if (exceptionNumber==0x0e)
           printk("\nPaging handler called for virtual address 0x%02X\n",exceptionCR2);
           printk("PDE@0x%08X=0x%08X, PTE@0x%08X=0x%08X\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
           printDumpedRegs();
           //printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
-#endif
+    //Setting debugging back to what it was previously
     if (lOldDebugLevel)
         kDebugLevel=lOldDebugLevel;
     

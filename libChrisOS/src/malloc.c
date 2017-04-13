@@ -40,27 +40,29 @@ VISIBLE void*  malloc(size_t size)
     uint32_t needed;
     uint32_t allocatedPtr;
     heaprec_t* heapPtr;
+    printdI(DEBUG_MALLOC,"malloc(0x%08X)\n",size);
     needed = newHeapRequiredToFulfillRequest(size);
-    //printDebug(DEBUG_MALLOC,"libc_malloc: needed=0x%08X\n",needed);
+    printdI(DEBUG_MALLOC,"libc_malloc: needed=0x%08X\n",needed);
     if (needed!=0)      //No new heap required
     {
         asm("mov eax,0x165\ncall sysEnter_Vector\n":"=a" (allocatedPtr):"b" (needed));
         //This is needed to keep in sync with what the kernel thinks
-        //printDebug(DEBUG_MALLOC,"libc_malloc: heaEnd=0x%08X\n",heapEnd);
+        printdI(DEBUG_MALLOC,"libc_malloc: heaEnd=0x%08X\n",heapEnd);
         heapEnd=allocatedPtr+needed;
-        //printDebug(DEBUG_MALLOC,"libc_malloc: Req 0x%08X bytes, ret was 0x%08X, heapEnd=0x%08X, heapBase=0x%08X\n",needed,allocatedPtr,heapEnd);
+        printdI(DEBUG_MALLOC,"libc_malloc: Req 0x%08X bytes, ret was 0x%08X, heapEnd=0x%08X\n",needed,allocatedPtr,heapEnd);
         if (heapBase==0)    //Hasn't been initialized yet!
         {
             heapCurr=allocatedPtr;
             heapBase=allocatedPtr;
-            //(DEBUG_MALLOC,"libc_malloc: Initialized heapCurr and heapBase to 0x%08X\n",heapCurr);
+            printdI(DEBUG_MALLOC,"libc_malloc: Initialized heapCurr and heapBase to 0x%08X\n",heapCurr);
         }
     }
+    printdI(DEBUG_MALLOC,"libc_malloc:creating heap rec @ 0x%08X\n",heapCurr);
     heapPtr = (heaprec_t*)heapCurr;
     heapPtr->marker=ALLOC_MARKER_VALUE;
     heapPtr->len=size;
     heapPtr->inUse=true;
-    //printDebug(DEBUG_MALLOC,"libc_malloc: heapCurr=0x%08X, sizeof(heaprec_t)=0x%08X\n",heapCurr,sizeof(heaprec_t));
+    printdI(DEBUG_MALLOC,"libc_malloc: heapCurr=0x%08X, sizeof(heaprec_t)=0x%08X\n",heapCurr,sizeof(heaprec_t));
     retVal=(void*)(heapCurr+sizeof(heaprec_t));
     heapCurr+=size+(sizeof(heaprec_t));
     //printDebug(DEBUG_MALLOC,"\n");

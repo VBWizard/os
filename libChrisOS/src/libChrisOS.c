@@ -42,7 +42,9 @@ int do_syscall1(int callnum)
 
 VISIBLE void libc_init(void)
 {
+    printdI(DEBUG_LIBC,"***Initializing libc(&tz=0x%08X)\n***",&libcTZ);
     libcTZ=-4;
+    printdI(DEBUG_LIBC,"***Initializing libc 2(&tz=0x%08X)\n***",&libcTZ);
     initmalloc();
     do_syscall1(SYSCALL_INVALID);
     do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
@@ -61,7 +63,7 @@ VISIBLE int print(const char *format, ...)
     return 0;
 }
 
-VISIBLE int printDebug(uint32_t DebugLevel, const char *format, ...)
+int printdI(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
     va_start( args, format );

@@ -154,11 +154,12 @@ void storeISRSavedRegs(task_t* task)
     task->tss->GS=isrSavedGS;
     task->tss->CR3=isrSavedCR3;
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tSave: ");
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\tSave: ");
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X,",task->tss->CR3);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%04X,",task->tss->SS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%04X,",task->tss->DS);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
@@ -168,7 +169,6 @@ void storeISRSavedRegs(task_t* task)
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X\n",task->tss->CR3);
 #endif
 }
 
@@ -192,11 +192,12 @@ void loadISRSavedRegs(task_t* task)
     isrSavedGS=task->tss->GS;
     isrSavedCR3=task->tss->CR3;
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tLoad: ");
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\tLoad: ");
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X,",task->tss->CR3);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%04X,",task->tss->SS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%04X,",task->tss->DS);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
@@ -206,7 +207,6 @@ void loadISRSavedRegs(task_t* task)
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X\n",task->tss->CR3);
 #endif
 }
 
@@ -391,6 +391,28 @@ void triggerScheduler()
      nextScheduleTicks=*kTicksSinceStart-1;
 }
 
+void checkUSleepTasks(task_t* taskToStop)
+{
+    uintptr_t* q=qUSleep;
+    task_t* task;
+    process_t* process;
+    printd(DEBUG_PROCESS,"checkUSleepTasks: Looking through USLEEP queue for tasks to wake up\n");
+    while (*q!=NO_NEXT)
+    {
+        task=(task_t*)*q;
+        process=task->process;
+        if (process->signals.sigdata[SIG_USLEEP]==taskToStop->taskNum)
+        {
+            printd(DEBUG_PROCESS,"checkUSleepTasks: Found process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
+            process->signals.sigdata[SIG_USLEEP]=0;
+            process->signals.sigind &=~SIG_USLEEP;
+            printd(DEBUG_PROCESS,"checkUSleepTasks: Process 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
+            changeTaskQueue(task,TASK_RUNNABLE);
+        }
+        q++;
+    }
+}
+
 void runAnotherTask(bool schedulerRequested)
 {
     uint32_t oldCR3;
@@ -415,24 +437,7 @@ void runAnotherTask(bool schedulerRequested)
         stopQueue=TASK_EXITED;
         gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
         //Look through the USleep looking for task that is waiting on this one to end
-        uintptr_t* q=qUSleep;
-        task_t* task;
-        process_t* process;
-        printd(DEBUG_PROCESS,"Looking through USLEEP queue for tasks to wake up\n");
-        while (*q!=NO_NEXT)
-        {
-            task=(task_t*)*q;
-            process=task->process;
-            if (process->signals.sigdata[SIG_USLEEP]==taskToStop->taskNum)
-            {
-                printd(DEBUG_PROCESS,"scheduler: Found process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
-                process->signals.sigdata[SIG_USLEEP]=0;
-                process->signals.sigind &=~SIG_USLEEP;
-                printd(DEBUG_PROCESS,"scheduler: Process 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
-                changeTaskQueue(task,TASK_RUNNABLE);
-            }
-            q++;
-        }
+        checkUSleepTasks(taskToStop);
     }
     else if (/*(taskToStop->taskNum!=1) && */((process_t*)(taskToStop->process))->signals.sigind)
     {
@@ -446,6 +451,7 @@ void runAnotherTask(bool schedulerRequested)
                 break;
             case SIG_SEGV:
                 stopQueue=TASK_EXITED;
+                checkUSleepTasks(taskToStop);
                 break;
             case SIG_STOP:
                 stopQueue=TASK_STOPPED;

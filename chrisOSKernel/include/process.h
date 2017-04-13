@@ -16,6 +16,8 @@
 #include "../../chrisOS/include/elfloader.h"
 #include "time_os.h"
 #include "rusage.h"
+#include "fs.h"
+#include "signals.h"
 
 #ifndef PROCESS_H
 #define PROCESS_H
@@ -24,8 +26,6 @@
 extern "C" {
 #endif
 
-#include "fs.h"
-#include "signals.h"
 #define PROCESS_HEAP_START 0x70000000
 #define PROCESS_HEAP_END   0xBFFFFFFF
 #define PROCESS_MAX_EXIT_HANDLERS 20    

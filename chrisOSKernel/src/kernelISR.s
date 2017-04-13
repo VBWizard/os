@@ -155,7 +155,7 @@ pagingHandler:
     mov ebx,isrSavedEBX
     mov exceptionBX,ebx
     call kPagingExceptionHandler
-    jmp ckeckForIRQResponse
+    jmp noIRQResponseRequired
 notPagingHandler:
     cmp eax,0x80
     jne notSysCallHandler
@@ -209,10 +209,7 @@ noIRQResponseRequired:
     #Adjust the stack if the exception had an error code (get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. )
     mov esp, isrSavedESP
     mov ebx,isrNumber
-    mov bl,[_isr_has_errorCode+ebx]
-    cmp bl,1
-    jnz overCorrection
-    add esp, 4 #get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. 
+    #CLR 04/12/2017: Removed stack correction code (pop 1 dword to get rid of error) because vector functionality takes care of that
 overCorrection:
     mov al,schedulerTaskSwitched
     cmp al,0

@@ -250,12 +250,12 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 
         va_start( args, format );
         
-        sprintf(formatI,"0x%08X: %s",*kTicksSinceStart,format);
+        //sprintf(formatI,"0x%08X: %s",*kTicksSinceStart,format);
 
         if (kDebugLevel & DEBUG_PRINT_TO_PORT)
-            printp_valist(formatI,args);
+            printp_valist(format/*I*/,args);
         else
-            return printk_valist(formatI, args);
+            return printk_valist(format/*I*/, args);
     }
     return 0;
 }

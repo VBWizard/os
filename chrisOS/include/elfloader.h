@@ -17,6 +17,11 @@ extern "C" {
     
 extern uint32_t kDebugLevel;
 
+typedef struct sElfPageInfo
+{
+    uint32_t startVirt, startPhys, pages;
+} elfPageInfo_t;
+
 typedef struct sElfDynamicInfo
 {
     char neededName[10][256];
@@ -33,8 +38,10 @@ typedef struct sElfDynamicInfo
 
 typedef struct sElfInfo
 {
+    dllist_t loadedListItem;
     int libraryElfCount;
     void* libraryElfPtr[10];
+    uint32_t libBSSAddress, libBSSSize, libDataAddress, libDataSize;
     Elf32_Ehdr hdr;
     Elf32_Shdr secHdrTable[50];
     Elf32_Phdr pgmHdrTable[50];
@@ -46,7 +53,7 @@ typedef struct sElfInfo
     bool loadCompleted,isLibrary;
     int sectionNameStringTable, dynamicNameStringTable, generalNameStringTable;
     char* fileName;
-    dllist_t loadList;
+    elfPageInfo_t* elfLoadedPages;
     bool mapMemoryOnly; //set to true if library is already loaded, and we only want to map it into the new process
 } elfInfo_t;
 

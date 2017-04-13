@@ -22,6 +22,7 @@ uint32_t pagingGet4kPTEntryValueCR3(uintptr_t pageDirAddress, uint32_t address);
 uint32_t pagingGet4kPTEntryValue(uint32_t address);
 bool isPageMapped(uintptr_t pageDirAddress, uintptr_t Address);
 bool pagingMapProcessPageIntoKernel(uintptr_t processCR3, uintptr_t virtualAddress, uint8_t flags);
+void pagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly);
 #define RELOAD_CR3 __asm__("mov eax,cr3\nmov cr3,eax\n":::"eax");
 
 #endif	/* PAGING_H */

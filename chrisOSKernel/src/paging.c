@@ -165,9 +165,12 @@ uint32_t pagingGet4kPDEntryAddress(uint32_t address)
 
 uint32_t pagingGet4kPTEntryAddressCR3(uintptr_t pageDirAddress, uint32_t address)
 {
+    uint32_t retVal=0;
     address&=0xFFFFF000;
     uintptr_t pDirPtr=pagingGet4kPDEntryValueCR3(pageDirAddress,address) & 0xFFFFF000;
-    return ((address & 0x3FF000) >> 12) << 2 | pDirPtr;
+    retVal=((address & 0x3FF000) >> 12) << 2 | pDirPtr;
+    printd(DEBUG_PAGING,"pagingGet4kPTEntryAddressCR3: returning 0x%08X for address 0x%08X (CR3=0x%08X)\n",retVal,address,pageDirAddress);
+    return retVal;
 }
 
 uint32_t pagingGet4kPTEntryAddress(uint32_t address)
@@ -200,6 +203,19 @@ void pagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
        *ptEntry|=2; 
     RELOAD_CR3
     printd(DEBUG_PAGING,"0x%08X\n", *ptEntry);
+}
+
+void pagingSetAddressReadOnlyFlag(uintptr_t CR3, uintptr_t address, bool readOnly)
+{
+    uintptr_t ptEntryToUpdate = pagingGet4kPTEntryAddressCR3(CR3,address);
+    uintptr_t* ptEntry=(uintptr_t*)ptEntryToUpdate;
+    
+    printd(DEBUG_PAGING,"pagingSetAddressReadOnlyFlag: pt entry address to update=0x%08X, value before=0x%08X\n",ptEntryToUpdate, *ptEntry);
+    if (readOnly)
+       *ptEntry&=0xFFFFFFFD;
+    else
+       *ptEntry|=2; 
+    printd(DEBUG_PAGING,"pagingSetAddressReadOnlyFlag: value after=0x%08X\n",*ptEntry);
 }
 
 void pagingUpdatePTEPresentFlag(uintptr_t* ptEntry, bool present)

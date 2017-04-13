@@ -69,11 +69,67 @@ void restoreCR3()
     __asm__("mov cr3,eax\n"::[previousCR3] "a" (INIT_GDT_TABLE_ADDRESS));
 }
 
+void elfMakePagesCOW(uint32_t cr3, uint32_t address, uint32_t size)
+{
+    kDebugLevel |= DEBUG_PAGING;
+    address &= 0xFFFFF000;
+    for (int cnt=0;cnt<(size/PAGE_SIZE)+(size%PAGE_SIZE?1:0);cnt++)
+    {
+        pagingSetAddressReadOnlyFlag(cr3,address+(PAGE_SIZE*cnt),true);
+        pagingSetPageInUseFlag(cr3,address,false);
+    }
+    kDebugLevel &= ~DEBUG_PAGING;
+}
+
+void elfSetupCopyOnPages(uint32_t cr3, elfInfo_t* elf)
+{
+	printd(DEBUG_ELF_LOADER,"elfSetupCopyOnPages: Scanning section header table for .data and .bss\n");
+	for (int cnt=0;cnt<elf->secHdrRecordCount;cnt++)
+	{
+            if (elf->secHdrTable[cnt].sh_type==SHT_NOBITS || elf->secHdrTable[cnt].sh_type==SHT_PROGBITS)
+            {
+                bool sectionIsCOW=false;
+                if (strncmp(strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),".bss",255)==0)
+                {
+                    printd(DEBUG_ELF_LOADER,"Found bss segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    if (elf->isLibrary)
+                        sectionIsCOW=true;
+
+                }
+                else if (strncmp(strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),".data",255)==0)
+                {
+                    printd(DEBUG_ELF_LOADER,"Found data segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    if (elf->isLibrary)
+                        sectionIsCOW=true;
+                }
+                else
+                    printd(DEBUG_ELF_LOADER,"Found (%s) (NOBITS) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),elf->secHdrTable[cnt].sh_type,elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+
+                if (sectionIsCOW)
+                {
+                    printd(DEBUG_ELF_LOADER,"\tsegment belongs to a library, marking pages as CoW (moo)\n");
+                    elf->libBSSAddress=elf->secHdrTable[cnt].sh_addr;
+                    elf->libBSSSize=elf->secHdrTable[cnt].sh_size;
+                    elfMakePagesCOW(cr3,elf->libBSSAddress,elf->libBSSSize);
+                }
+            }
+	}
+}
+
+void mapLibraryIntoProcess(uint32_t CR3,elfInfo_t* searchElf)
+{
+    elfPageInfo_t* pt=searchElf->elfLoadedPages;
+    while (pt->pages!=0)
+    {
+        pagingMapPageCount(CR3,pt->startVirt,pt->startPhys,pt->pages,0x7);
+        printd(DEBUG_ELF_LOADER,"mapLibraryIntoProcess: V=0x%08X mapped to P=0x%08X, 0x%04X pages (CR3=0x%08X)\n",pt->startVirt,pt->startPhys,pt->pages,CR3);
+        pt++;
+    }
+}
 
 uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
 {
     Elf32_Dyn* dyn=(Elf32_Dyn*)elfInfo->dynamicSectionAddress;
-
     printd(DEBUG_ELF_LOADER,"Processing ELF Dynamic section at 0x%08X, %u records\n",elfInfo->dynamicSectionAddress,elfInfo->dynamicRecordCount);
     //Next process the rest of the dynamic section entries
     elfInfo->dynamicInfo.neededCount=0;
@@ -95,25 +151,30 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                 strcat(fileName,elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount]);
                 printd(DEBUG_ELF_LOADER,"Found NEEDED, library name='%s', checking to see if it is already loaded.\n",
                         fileName);
-                
+                elfInfo_t* foundElf=NULL;
                 dllist_t* theList=kLoadedElfInfo;
                 do
                 {
                     elfInfo_t* searchElf=theList->payload;
-                    printd(DEBUG_ELF_LOADER,"\tFound loaded module %s ... ",searchElf->fileName);
+                    printd(DEBUG_ELF_LOADER,"\tFound loaded module %s ...\n",searchElf->fileName);
                     if (searchElf->isLibrary)
                     {
                         if (strncmp(searchElf->fileName,fileName,1024)==0)
                         {
-                            printd(DEBUG_ELF_LOADER,"\tthis is the module we want ... mapping into program's vm.\n",searchElf->fileName);
-                            //TODO: Implement this when ready to test again: searchElf->mapMemoryOnly=true;
-                            //DO STUFF HERE
+                            printd(DEBUG_ELF_LOADER,"\t\tthis is the module we want ... mapping into program's vm.\n",searchElf->fileName);
+                            searchElf->mapMemoryOnly=true;
+                            foundElf=searchElf;
+                            mapLibraryIntoProcess(targetCR3,searchElf);
+                            printd(DEBUG_ELF_LOADER,"\t\tDone mapping %s into program's vm.\n",searchElf->fileName);
+                            printd(DEBUG_ELF_LOADER,"\t\tSetting up CopyOn pages\n");
+                            elfSetupCopyOnPages(targetCR3,searchElf);
                             break;
                         }
+                        printd(DEBUG_ELF_LOADER,"\t\tThis is not the module we want, skipping to the next\n");
                     }
                     else
                     {
-                        printd(DEBUG_ELF_LOADER,"Not a library, skipping to the next\n");
+                        printd(DEBUG_ELF_LOADER,"\t\tNot a library, skipping to the next\n");
                     }
                     theList=theList->next;
                 } while (theList->next!=theList);
@@ -122,14 +183,20 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                 {
                     printd(DEBUG_ELF_LOADER,"loadElf: Calling loadElf again to load '%s'\n",&fileName);
                 }
-                elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=sysLoadElf(fileName,NULL,targetCR3);
+                if (foundElf!=NULL)
+                    elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=foundElf; //sysLoadElf(fileName, foundElf, targetCR3, true);
+                else
+                    elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=sysLoadElf(fileName, NULL, targetCR3, false);
+                
                 ((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount])->isLibrary=true;
-                if (! ((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount++])->loadCompleted)
+                //libraryElfCount is incremented here
+                if (((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount++])->loadCompleted==false)
                 {
                     printd(DEBUG_ELF_LOADER,"EXEC: processELFDynamicSection ... loading library failed.");
                     elfInfo->loadCompleted=false;
                     return -1;
                 }
+            elfInfo->dynamicInfo.neededCount++;
                 break;
             case DT_PLTRELSZ:
                 elfInfo->dynamicInfo.pltGOTTableTableSize=dyn[cnt].d_un.d_val;
@@ -232,9 +299,20 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
     return 0;
 }
 
+void addElfLoadInfo(elfInfo_t* elf, uint32_t startVirt, uint32_t startPhys, uint32_t pages)
+{
+    printd(DEBUG_ELF_LOADER,"addElfLoadInfo(0x%08X, 0x%08X, 0x%08X, 0x%08X)\n",elf, startPhys, startVirt, pages);
+    if (pages==0)
+        pages=1;
+    elfPageInfo_t* pi=elf->elfLoadedPages;
+    while (pi->pages>0) pi++;
+    pi->startPhys=startPhys;
+    pi->startVirt=startVirt;
+    pi->pages=pages;
+}
 
 //Read the data from the file and write it to the virtual addresses, mapping new pages as necessary
-bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue, _Bool mapOnly)
+bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue, _Bool mapOnly, elfInfo_t* elf)
 {
     int startVirtAddr=virtAddr;
     int startPhysAddr=0;
@@ -274,6 +352,7 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
             pagingMapPage(previousCR3,startVirtAddr,startPhysAddr,0x7);
             pagingMapPage(previousCR3,startPhysAddr,startPhysAddr,0x7);
             printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08X also mapped to KP=0x%08X (CR3=0x%08X)\n",startVirtAddr,startPhysAddr,previousCR3);
+            addElfLoadInfo(elf, startVirtAddr & 0xFFFFF000, startPhysAddr & 0xFFFFF000, countToWrite/PAGE_SIZE);
         }
         //if page is not mapped, map it!
         printd(DEBUG_ELF_LOADER,"putDataOnPages: Reading %u bytes to 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
@@ -291,7 +370,7 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
     return true;
 }
 
-bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue, _Bool mapOnly)
+bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFromFile, int size, byte nonFileWriteValue, _Bool mapOnly, elfInfo_t* elf)
 {
     //New strategy.  
     //  1) If enter function with page aligned virtAddr, see if virtAddr is mapped.  
@@ -329,7 +408,7 @@ bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFr
         else
         {
             printd(DEBUG_ELF_LOADER,"putDataOnPages2: Entire area starting at 0x%08X for 0x%08X bytes isn't mapped, falling back to putDataOnPages\n",startVirtAddr,size);
-            return putDataOnPages(CR3, virtAddr, file, writeFromFile, size, nonFileWriteValue, mapOnly);   //Everything is not mapped, fallback to page-at-a-time strategy
+            return putDataOnPages(CR3, virtAddr, file, writeFromFile, size, nonFileWriteValue, mapOnly, elf);   //Everything is not mapped, fallback to page-at-a-time strategy
         }
     }
     else        //alloc, map, write
@@ -341,6 +420,7 @@ bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFr
         pagingMapPageCount(KERNEL_CR3,startPhysAddr,startPhysAddr,(size/PAGE_SIZE)+1,0x7);
         pagingMapPageCount(KERNEL_CR3,startVirtAddr,startPhysAddr,(size/PAGE_SIZE)+1,0x7);
         printd(DEBUG_ELF_LOADER,"putDataOnPages2: %s 0x%08X bytes to v=0x%08X/p=0x%08X\n",writeFromFile?"Writing":"Zeroing",size, startVirtAddr,startPhysAddr);
+        addElfLoadInfo(elf, startVirtAddr & 0xFFFFF000, startPhysAddr & 0xFFFFF000, size+(PAGE_SIZE-(size%PAGE_SIZE)));
         if (writeFromFile)
             fl_fread((void*)startPhysAddr, 1, size, file);
         else
@@ -380,7 +460,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
         return false;
     }
     
-    if (elfInfo->hdr.e_type!=ET_DYN)
+    if (elfInfo->hdr.e_type==ET_DYN)
         elfInfo->isLibrary=true;
             
     printd(DEBUG_ELF_LOADER,"ELF file type %u, machine type %u\n",elfInfo->hdr.e_type,elfInfo->hdr.e_machine);
@@ -444,7 +524,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
             fl_fseek(file, elfInfo->pgmHdrTable[pgmSectionNum].p_offset, SEEK_SET);
             
             //Get pages 
-            if (!putDataOnPages(CR3, virtualLoadAddress, file, true, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 0, elfInfo->mapMemoryOnly))
+            if (!putDataOnPages(CR3, virtualLoadAddress, file, true, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 0, elfInfo->mapMemoryOnly, elfInfo))
                 return false;
             
             printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, virtualLoadAddress);
@@ -461,14 +541,14 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
                         NULL,
                         false,
                         elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
-                        0, elfInfo->mapMemoryOnly))
+                        0, elfInfo->mapMemoryOnly, elfInfo))
                     return false;
             }
         }
         else if (elfInfo->pgmHdrTable[pgmSectionNum].p_memsz>0)
         {
             printd(DEBUG_ELF_LOADER,"Section %u not loadable (fsize=0,msize>0), zeroed 0x%08X bytes at 0x%08X\n",pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, virtualLoadAddress);
-            putDataOnPages(CR3, virtualLoadAddress, NULL, false, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, 0, elfInfo->mapMemoryOnly);
+            putDataOnPages(CR3, virtualLoadAddress, NULL, false, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, 0, elfInfo->mapMemoryOnly, elfInfo);
             
         }
 #ifndef DEBUG_NONE
@@ -486,7 +566,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
     return true;
 }
 
-elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
+elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool alreadyLoaded)
 {
     GET_OLD_CR3;
             
@@ -501,20 +581,23 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     }
     
     //Initialize the structs we will be using
-    memset(elfInfo,0,sizeof(elfInfo_t));
-    memset(&elfInfo->dynamicInfo,0,sizeof(elfDynamic_t));
+    if (!alreadyLoaded)
+    {
+        memset(elfInfo,0,sizeof(elfInfo_t));
+        memset(&elfInfo->dynamicInfo,0,sizeof(elfDynamic_t));
+        elfInfo->elfLoadedPages=allocPagesAndMap(PAGE_SIZE);
+        memset(elfInfo->elfLoadedPages,0,PAGE_SIZE);
+        printd(DEBUG_ELF_LOADER,"alloc'd elfLoadPages @ 0x%08X\n",elfInfo->elfLoadedPages);
+        //NOTE: Any elfInfo_t added to the kLoadedElfInfo list must exist (not be free()d until after it is removed from the list!
+        if (kLoadedElfInfo->next==0)
+            kLoadedElfInfo=listInit(&elfInfo->loadedListItem,elfInfo);
+        else
+            listAdd(kLoadedElfInfo,&elfInfo->loadedListItem,elfInfo);
 
-    //NOTE: Any elfInfo_t added to the kLoadedElfInfo list must exist (not be free()d until after it is removed from the list!
-    if (kLoadedElfInfo==NULL)
-        kLoadedElfInfo=listInit(&elfInfo->loadList,elfInfo);
-    else if (elfInfo->loadList.next==0)
-        listAdd(kLoadedElfInfo,&elfInfo->loadList,elfInfo);
-    
-    printd(DEBUG_ELF_LOADER,"Added elfInfo to kLoadedElfInfo list\n");
-    
-
-    elfInfo->fileName=kMalloc(strlen(fileName));
-    strcpy(elfInfo->fileName,fileName);
+        printd(DEBUG_ELF_LOADER,"Added elfInfo to kLoadedElfInfo list\n");
+        elfInfo->fileName=kMalloc(strlen(fileName));
+        strcpy(elfInfo->fileName,fileName);
+    }
 
     printd(DEBUG_ELF_LOADER,"Opening image file %s\n",elfInfo->fileName);
     void* fPtr=fopen(elfInfo->fileName, "r");
@@ -526,151 +609,179 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         return elfInfo;
     }   
 
-    elfInfo->loadCompleted=true;
     //Load all of the sections in the file to memory
-    if (!elfLoadSections(fPtr,elfInfo,CR3))
-    {
-        elfInfo->loadCompleted=false;
-        return elfInfo;
-    }
-
-    //First iterate the sections to find the string & symbol tables
-    printd(DEBUG_ELF_LOADER,"Scanning section header entries (%u)\n",elfInfo->secHdrRecordCount);
-    //First find the string table
-    uint32_t tabCount=0;
-    for (int cnt=0;cnt<elfInfo->secHdrRecordCount;cnt++)
-    {
-        if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
+    if (!alreadyLoaded)
+        if (!elfLoadSections(fPtr,elfInfo,CR3))
         {
-            fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            elfInfo->dynamicInfo.strTableAddress[cnt]=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
-            printd(DEBUG_ELF_LOADER,"Mapping string table @ 0x%08X (0x%08X) for 0x%08X bytes into kernel\n",
-                    elfInfo->dynamicInfo.strTableAddress[cnt], 
-                    (uint32_t)(elfInfo->dynamicInfo.strTableAddress[cnt]) | KERNEL_PAGED_BASE_ADDRESS,
-                    elfInfo->secHdrTable[cnt].sh_size/0x1000+0x1000);
-            elfInfo->dynamicInfo.strTableName[cnt]=elfInfo->secHdrTable[cnt].sh_name;
-            uint32_t lResult=fl_fread((char*)elfInfo->dynamicInfo.strTableAddress[cnt],1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
-            printd(DEBUG_ELF_LOADER,"Reading string table to 0x%08X, 0x%08X bytes, result=0x%08X\n",elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,lResult);
-            elfInfo->dynamicInfo.strTableFilePtr[cnt]=elfInfo->secHdrTable[cnt].sh_offset;
-            elfInfo->dynamicInfo.strTableSize[cnt]=elfInfo->secHdrTable[cnt].sh_size;
-            tabCount++;
-            //break;
-        }
-    }    
-    printd(DEBUG_ELF_LOADER,"Found %u string tables, index of section header table=0x%08X\n",tabCount,elfInfo->sectionNameStringTable);
-    for (int cnt=0;cnt<50;cnt++)
-    {
-        if (elfInfo->dynamicInfo.strTableName[cnt])
-        {
-                printd(DEBUG_ELF_LOADER,"Found string (STRTAB) table 0x%04X named %s, read to address 0x%08X, size=0x%08X\n",
-                cnt,
-                strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),
-                elfInfo->dynamicInfo.strTableAddress[cnt], elfInfo->dynamicInfo.strTableSize[cnt]);
-                if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),".dynstr",7)==0)
-                {
-                    elfInfo->dynamicNameStringTable=cnt;
-                    printd(DEBUG_ELF_LOADER,"Dynamic string table entry = 0x%04X\n",cnt);
-                }
-                else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),".strtab",7)==0)
-                {
-                    elfInfo->generalNameStringTable=cnt;
-                    printd(DEBUG_ELF_LOADER,"General string table entry = 0x%04X\n",cnt);
-                }
-        }
-    }
-    printd(DEBUG_ELF_LOADER,"Scanning section header table, %u records\n",elfInfo->secHdrRecordCount);
-    for (int cnt=0;cnt<elfInfo->secHdrRecordCount;cnt++)
-    {
-        if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
-        {printd(DEBUG_ELF_LOADER,"Found (STRTAB), already processed string tables, skipping\n");}
-        else if (elfInfo->secHdrTable[cnt].sh_type==SHT_SYMTAB)
-        {
-            elfInfo->symTable=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
-            fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            fl_fread(elfInfo->symTable,elfInfo->secHdrTable[cnt].sh_size,1,fPtr);
-            elfInfo->symTableRecordCount=(elfInfo->secHdrTable[cnt].sh_size / sizeof(Elf32_Sym));
-            elfInfo->symStrTabLink=elfInfo->secHdrTable[cnt].sh_link;
-            printd(DEBUG_ELF_LOADER,"Found symbol table (SYMTAB) using string table 0x%02X, read %u bytes to 0x%08X\n",elfInfo->symStrTabLink,elfInfo->secHdrTable[cnt].sh_size, elfInfo->symTable);
-        }
-        else if (elfInfo->secHdrTable[cnt].sh_type==SHT_DYNAMIC)
-        {
-            elfInfo->dynamicSectionAddress=elfInfo->secHdrTable[cnt].sh_addr;
-            elfInfo->dynamicRecordCount=elfInfo->secHdrTable[cnt].sh_size/sizeof(Elf32_Dyn);
-            printd(DEBUG_ELF_LOADER,"Found section %s (DYNAMIC) table address 0x%08X.\n",
-                    strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
-                    elfInfo->dynamicSectionAddress);
-        }
-        else if (elfInfo->secHdrTable[cnt].sh_type==SHT_DYNSYM)
-        {
-            elfInfo->dynamicSymbolAddress=elfInfo->secHdrTable[cnt].sh_addr;
-            elfInfo->dynamicSymbolRecordCount=elfInfo->secHdrTable[cnt].sh_size/sizeof(Elf32_Dyn);
-            printd(DEBUG_ELF_LOADER,"Found %s (DYNSYM) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
-        }
-        else if (elfInfo->secHdrTable[cnt].sh_type==SHT_RELA)
-        {
-            fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            elfInfo->dynamicInfo.relATable=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
-            elfInfo->dynamicInfo.relATableSize=elfInfo->secHdrTable[cnt].sh_size;
-            fl_fread(elfInfo->dynamicInfo.relATable,1,elfInfo->dynamicInfo.relATableSize,fPtr);
-            printd(DEBUG_ELF_LOADER,"Found %s (RELA) section, read %u bytes to 0x%08X.\n",
-                    strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
-                    elfInfo->dynamicInfo.relATableSize,
-                    elfInfo->dynamicInfo.relATable);
-        }
-        else if (elfInfo->secHdrTable[cnt].sh_type==SHT_REL)
-        {
-            fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            elfInfo->dynamicInfo.relTableSize=elfInfo->secHdrTable[cnt].sh_size;
-            elfInfo->dynamicInfo.relTable=kMalloc(elfInfo->dynamicInfo.relTableSize+0x1000);
-            elfInfo->dynamicInfo.relTable_symTableLink=elfInfo->secHdrTable[cnt].sh_link;
-            fl_fread(elfInfo->dynamicInfo.relTable,1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
-            printd(DEBUG_ELF_LOADER,"Found %s (REL) section, read %u bytes to 0x%08X.\n",
-                    strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
-                    elfInfo->dynamicInfo.relTableSize,
-                    elfInfo->dynamicInfo.relTable);
-        }
-        else if (elfInfo->secHdrTable[cnt].sh_type==SHT_HASH)
-        {
-            printd(DEBUG_ELF_LOADER,"Found %s (HASH) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
-        }
-        else if (elfInfo->secHdrTable[cnt].sh_type==SHT_NOTE)
-        {
-            printd(DEBUG_ELF_LOADER,"Found %s (NOTE) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
-        }
-        else
-        {
-            printd(DEBUG_ELF_LOADER,"Found (%s) section (type=0x%08X)address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr);
+            elfInfo->loadCompleted=false;
+            return elfInfo;
         }
 
-    }
-    printd(DEBUG_ELF_LOADER,"Done processing the section header table\n");
-    printd(DEBUG_ELF_LOADER  | DEBUG_DETAILED,"Iterating the symbol table, %u records\n",elfInfo->symTableRecordCount);
-    printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Using string table 0x%04X\n",elfInfo->symStrTabLink);
-    for (int cnt=0;cnt<elfInfo->symTableRecordCount;cnt++)
+    if (!alreadyLoaded)
     {
-        Elf32_Sym* sym=&elfInfo->symTable[cnt];
-        printd(DEBUG_ELF_LOADER | DEBUG_DETAILED, "Name: %s, Value: %08X, Size: %04X, B/T: %02X/%02X, SecIdx: %04X\n",
-                strTabEntry(elfInfo->symStrTabLink, elfInfo, sym->st_name), sym->st_value, sym->st_size,
-                ELF32_ST_BIND(sym->st_info), 
-                ELF32_ST_TYPE(sym->st_info), 
-                sym->st_other, sym->st_shndx);
+        //First iterate the sections to find the string & symbol tables
+        printd(DEBUG_ELF_LOADER,"Scanning section header entries (%u)\n",elfInfo->secHdrRecordCount);
+        //First find the string table
+        uint32_t tabCount=0;
+        for (int cnt=0;cnt<elfInfo->secHdrRecordCount;cnt++)
+        {
+            if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
+            {
+                fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
+                elfInfo->dynamicInfo.strTableAddress[cnt]=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
+                printd(DEBUG_ELF_LOADER,"Mapping string table @ 0x%08X (0x%08X) for 0x%08X bytes into kernel\n",
+                        elfInfo->dynamicInfo.strTableAddress[cnt], 
+                        (uint32_t)(elfInfo->dynamicInfo.strTableAddress[cnt]) | KERNEL_PAGED_BASE_ADDRESS,
+                        elfInfo->secHdrTable[cnt].sh_size/0x1000+0x1000);
+                elfInfo->dynamicInfo.strTableName[cnt]=elfInfo->secHdrTable[cnt].sh_name;
+                uint32_t lResult=fl_fread((char*)elfInfo->dynamicInfo.strTableAddress[cnt],1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
+                printd(DEBUG_ELF_LOADER,"Reading string table to 0x%08X, 0x%08X bytes, result=0x%08X\n",elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,lResult);
+                elfInfo->dynamicInfo.strTableFilePtr[cnt]=elfInfo->secHdrTable[cnt].sh_offset;
+                elfInfo->dynamicInfo.strTableSize[cnt]=elfInfo->secHdrTable[cnt].sh_size;
+                tabCount++;
+                //break;
+            }
+        }    
+        printd(DEBUG_ELF_LOADER,"Found %u string tables, index of section header table=0x%08X\n",tabCount,elfInfo->sectionNameStringTable);
+        for (int cnt=0;cnt<50;cnt++)
+        {
+            if (elfInfo->dynamicInfo.strTableName[cnt])
+            {
+                    printd(DEBUG_ELF_LOADER,"Found string (STRTAB) table 0x%04X named %s, read to address 0x%08X, size=0x%08X\n",
+                    cnt,
+                    strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),
+                    elfInfo->dynamicInfo.strTableAddress[cnt], elfInfo->dynamicInfo.strTableSize[cnt]);
+                    if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),".dynstr",7)==0)
+                    {
+                        elfInfo->dynamicNameStringTable=cnt;
+                        printd(DEBUG_ELF_LOADER,"Dynamic string table entry = 0x%04X\n",cnt);
+                    }
+                    else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),".strtab",7)==0)
+                    {
+                        elfInfo->generalNameStringTable=cnt;
+                        printd(DEBUG_ELF_LOADER,"General string table entry = 0x%04X\n",cnt);
+                    }
+            }
+        }
+        printd(DEBUG_ELF_LOADER,"Scanning section header table, %u records\n",elfInfo->secHdrRecordCount);
+        for (int cnt=0;cnt<elfInfo->secHdrRecordCount;cnt++)
+        {
+            if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
+            {printd(DEBUG_ELF_LOADER,"Found (STRTAB), already processed string tables, skipping\n");}
+            else if (elfInfo->secHdrTable[cnt].sh_type==SHT_SYMTAB)
+            {
+                elfInfo->symTable=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
+                fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
+                fl_fread(elfInfo->symTable,elfInfo->secHdrTable[cnt].sh_size,1,fPtr);
+                elfInfo->symTableRecordCount=(elfInfo->secHdrTable[cnt].sh_size / sizeof(Elf32_Sym));
+                elfInfo->symStrTabLink=elfInfo->secHdrTable[cnt].sh_link;
+                printd(DEBUG_ELF_LOADER,"Found symbol table (SYMTAB) using string table 0x%02X, read %u bytes to 0x%08X\n",elfInfo->symStrTabLink,elfInfo->secHdrTable[cnt].sh_size, elfInfo->symTable);
+            }
+            else if (elfInfo->secHdrTable[cnt].sh_type==SHT_DYNAMIC)
+            {
+                elfInfo->dynamicSectionAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                elfInfo->dynamicRecordCount=elfInfo->secHdrTable[cnt].sh_size/sizeof(Elf32_Dyn);
+                printd(DEBUG_ELF_LOADER,"Found section %s (DYNAMIC) table address 0x%08X.\n",
+                        strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
+                        elfInfo->dynamicSectionAddress);
+            }
+            else if (elfInfo->secHdrTable[cnt].sh_type==SHT_DYNSYM)
+            {
+                elfInfo->dynamicSymbolAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                elfInfo->dynamicSymbolRecordCount=elfInfo->secHdrTable[cnt].sh_size/sizeof(Elf32_Dyn);
+                printd(DEBUG_ELF_LOADER,"Found %s (DYNSYM) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
+            }
+            else if (elfInfo->secHdrTable[cnt].sh_type==SHT_RELA)
+            {
+                fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
+                elfInfo->dynamicInfo.relATable=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
+                elfInfo->dynamicInfo.relATableSize=elfInfo->secHdrTable[cnt].sh_size;
+                fl_fread(elfInfo->dynamicInfo.relATable,1,elfInfo->dynamicInfo.relATableSize,fPtr);
+                printd(DEBUG_ELF_LOADER,"Found %s (RELA) section, read %u bytes to 0x%08X.\n",
+                        strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
+                        elfInfo->dynamicInfo.relATableSize,
+                        elfInfo->dynamicInfo.relATable);
+            }
+            else if (elfInfo->secHdrTable[cnt].sh_type==SHT_REL)
+            {
+                fl_fseek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
+                elfInfo->dynamicInfo.relTableSize=elfInfo->secHdrTable[cnt].sh_size;
+                elfInfo->dynamicInfo.relTable=kMalloc(elfInfo->dynamicInfo.relTableSize+0x1000);
+                elfInfo->dynamicInfo.relTable_symTableLink=elfInfo->secHdrTable[cnt].sh_link;
+                fl_fread(elfInfo->dynamicInfo.relTable,1,elfInfo->secHdrTable[cnt].sh_size,fPtr);
+                printd(DEBUG_ELF_LOADER,"Found %s (REL) section, read %u bytes to 0x%08X.\n",
+                        strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
+                        elfInfo->dynamicInfo.relTableSize,
+                        elfInfo->dynamicInfo.relTable);
+            }
+            else if (elfInfo->secHdrTable[cnt].sh_type==SHT_HASH)
+            {
+                printd(DEBUG_ELF_LOADER,"Found %s (HASH) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
+            }
+            else if (elfInfo->secHdrTable[cnt].sh_type==SHT_NOTE)
+            {
+                printd(DEBUG_ELF_LOADER,"Found %s (NOTE) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
+            }
+            else if (elfInfo->secHdrTable[cnt].sh_type==SHT_NOBITS || elfInfo->secHdrTable[cnt].sh_type==SHT_PROGBITS)
+            {
+                bool sectionIsCOW=false;
+                if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".bss",255)==0)
+                {
+                    printd(DEBUG_ELF_LOADER,"Found bss segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                    if (elfInfo->isLibrary)
+                        sectionIsCOW=true;
+
+                }
+                else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".data",255)==0)
+                {
+                    printd(DEBUG_ELF_LOADER,"Found data segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                    if (elfInfo->isLibrary)
+                        sectionIsCOW=true;
+                }
+                else
+                    printd(DEBUG_ELF_LOADER,"Found (%s) (NOBITS) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+
+                if (sectionIsCOW)
+                {
+                    printd(DEBUG_ELF_LOADER,"\tsegment belongs to a library, marking pages as CoW (moo)\n");
+                    elfInfo->libBSSAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                    elfInfo->libBSSSize=elfInfo->secHdrTable[cnt].sh_size;
+                    elfMakePagesCOW(CR3,elfInfo->libBSSAddress,elfInfo->libBSSSize);
+                }
+            }
+            else
+            {
+                printd(DEBUG_ELF_LOADER,"Found (%s) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+            }
+
+        }
+        printd(DEBUG_ELF_LOADER,"Done processing the section header table\n");
+        printd(DEBUG_ELF_LOADER  | DEBUG_DETAILED,"Iterating the symbol table, %u records\n",elfInfo->symTableRecordCount);
+        printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Using string table 0x%04X\n",elfInfo->symStrTabLink);
+        for (int cnt=0;cnt<elfInfo->symTableRecordCount;cnt++)
+        {
+            Elf32_Sym* sym=&elfInfo->symTable[cnt];
+            printd(DEBUG_ELF_LOADER | DEBUG_DETAILED, "Name: %s, Value: %08X, Size: %04X, B/T: %02X/%02X, SecIdx: %04X\n",
+                    strTabEntry(elfInfo->symStrTabLink, elfInfo, sym->st_name), sym->st_value, sym->st_size,
+                    ELF32_ST_BIND(sym->st_info), 
+                    ELF32_ST_TYPE(sym->st_info), 
+                    sym->st_other, sym->st_shndx);
+        }
+        uint32_t err=processELFDynamicSection(elfInfo,CR3);
+         if (err)
+         {
+             printd(DEBUG_ELF_LOADER,"Failed to process ELF dynamic section, error=0x%08X\n",err);
+            fl_fclose(fPtr);
+            elfInfo->loadCompleted=false;
+            return elfInfo;
+         }
     }
-    uint32_t err=processELFDynamicSection(elfInfo,CR3);
-     if (err)
-     {
-         printd(DEBUG_ELF_LOADER,"Failed to process ELF dynamic section, error=0x%08X\n",err);
-        fl_fclose(fPtr);
-        elfInfo->loadCompleted=false;
-        return elfInfo;
-     }
     elfDumpSymbols(elfInfo);
     elf_relocate(elfInfo);
-     fl_fclose(fPtr);
-        elfInfo->loadCompleted=true;
-        return elfInfo;
+    fl_fclose(fPtr);
+    elfInfo->loadCompleted=true;
+    return elfInfo;
 }
-
-
 
 static inline Elf32_Shdr *elf_sheader(Elf32_Ehdr *hdr) {
 	return (Elf32_Shdr *)((int)hdr + hdr->e_shoff);

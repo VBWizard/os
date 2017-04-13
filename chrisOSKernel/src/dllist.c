@@ -10,8 +10,8 @@ dllist_t* listInit(dllist_t* firstItem, void* payload)
 {
     firstItem->next=firstItem;
     firstItem->prev=firstItem;
-    return firstItem;
     firstItem->payload=payload;
+    return firstItem;
 }
 
 void listAdd(dllist_t* list, dllist_t* item, void* payload)

@@ -155,7 +155,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     //Take care of the special "idle" task 
     if (strncmp(process->path,"/sbin/idle",50)!=0)
     {
-        process->elf=sysLoadElf(process->path,process->elf,process->task->tss->CR3);
+        process->elf=sysLoadElf(process->path, process->elf, process->task->tss->CR3, false);
         if (!process->elf->loadCompleted)
         {
             return NULL;
