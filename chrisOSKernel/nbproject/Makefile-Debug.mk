@@ -79,6 +79,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/mm/alloc.o \
 	${OBJECTDIR}/src/mm/kmalloc.o \
 	${OBJECTDIR}/src/mm/mm.o \
+	${OBJECTDIR}/src/mm/mmap.o \
 	${OBJECTDIR}/src/paging.o \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/schedule.o \
@@ -330,6 +331,11 @@ ${OBJECTDIR}/src/mm/mm.o: nbproject/Makefile-${CND_CONF}.mk src/mm/mm.c
 	${MKDIR} -p ${OBJECTDIR}/src/mm
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/mm.o src/mm/mm.c
+
+${OBJECTDIR}/src/mm/mmap.o: nbproject/Makefile-${CND_CONF}.mk src/mm/mmap.c 
+	${MKDIR} -p ${OBJECTDIR}/src/mm
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/mmap.o src/mm/mmap.c
 
 ${OBJECTDIR}/src/paging.o: nbproject/Makefile-${CND_CONF}.mk src/paging.c 
 	${MKDIR} -p ${OBJECTDIR}/src

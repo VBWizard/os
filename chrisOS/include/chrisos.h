@@ -29,6 +29,9 @@ extern char* kernelDataLoadAddress;
 #define HIGH_CODE_SECTION __attribute__ ((section(HIGH_CODE_NAME)))
 ///Base address for library loading
 #define LIBRARY_BASE_LOAD_ADDRESS 0x0
+
+#define MMAP_VIRT_START 0xA0000000
+
 /***************************************** CONFIG ****************************************/
 //#define DISABLE_PAGING 1
 #define __SMP__

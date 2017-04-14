@@ -34,9 +34,12 @@ extern "C" {
     
     typedef void exitHandler(void);
 
+    //NOTE: Any code can use PROCESS_STRUCT_VADDR for access to the process r/o
+    //NOTE: Kernel code can use PROCESS_STRUCT_VADDR+4 for a pointer to the process which will be r/w
     typedef struct sprocess
     {
         uint32_t processSyscallESP;         //NOTE: this must be the first item in the struct, as it is mapped into the process later
+        uintptr_t this;                     //NOTE: This must remain the second item in the struct at offset +4
         uint32_t pageDirPtr;
         task_t* task;
         sGDT* gdtEntry;
@@ -55,6 +58,8 @@ extern "C" {
         uintptr_t argv;
         struct rusage usage;
         file_t* stdin, *stdout, *stderr;
+        dllist_t* mmaps;
+        int errno;
     } process_t;
 
 

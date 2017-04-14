@@ -126,7 +126,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
 //        process->stdin=((process_t*)parentProcessPtr)->stderr=STDERR_FILE;
     }  
     process->task=createTask(isKernelProcess);
-
+    process->mmaps=kMalloc(sizeof(dllist_t));
     
     process->argv=argv;
     uint32_t argvVirt=0x6f000000;
@@ -146,11 +146,12 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
         argc=0;
     }
     process->task->process=process;
+    process->this=&process;
     process->processSyscallESP=process->task->tss->ESP1;
     process->pageDirPtr=process->task->tss->CR3;
     process->priority=PROCESS_DEFAULT_PRIORITY;
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
-    pagingMapPage(process->task->tss->CR3,PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000,0x7); //FIX ME!!!  Had to change this for sys_sigaction2 USLEEP
+    pagingMapPage(process->task->tss->CR3,PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000,0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
 
     //Take care of the special "idle" task 
     if (strncmp(process->path,"/sbin/idle",50)!=0)

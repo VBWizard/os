@@ -42,6 +42,7 @@
       <itemPath>include/dllist.h</itemPath>
       <itemPath>include/drv_genKeyboard.h</itemPath>
       <itemPath>include/elfLibraryTable.h</itemPath>
+      <itemPath>include/errors.h</itemPath>
       <itemPath>../chrisOS/include/filesystem.h</itemPath>
       <itemPath>include/fs.h</itemPath>
       <itemPath>include/kIRQHandlers.h</itemPath>
@@ -53,6 +54,7 @@
       <itemPath>include/kernelVariables.h</itemPath>
       <itemPath>include/kmalloc.h</itemPath>
       <itemPath>include/mm.h</itemPath>
+      <itemPath>include/mmap.h</itemPath>
       <itemPath>include/paging.h</itemPath>
       <itemPath>../chrisOS/include/pci/pci.h</itemPath>
       <itemPath>include/process.h</itemPath>
@@ -96,6 +98,7 @@
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
       <itemPath>src/mm/mm.c</itemPath>
+      <itemPath>src/mm/mmap.c</itemPath>
       <itemPath>../chrisOS/src/cpu/msr.c</itemPath>
       <itemPath>src/paging.c</itemPath>
       <itemPath>../chrisOS/src/panic.c</itemPath>
@@ -328,6 +331,8 @@
       </item>
       <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/errors.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
@@ -339,6 +344,8 @@
       <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/mmap.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -383,6 +390,8 @@
       <item path="src/mm/kmalloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/mm.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/mm/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -599,6 +608,8 @@
       </item>
       <item path="include/elfLibraryTable.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/errors.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
@@ -610,6 +621,8 @@
       <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/mmap.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/paging.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -654,6 +667,8 @@
       <item path="src/mm/kmalloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/mm.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/mm/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
       </item>

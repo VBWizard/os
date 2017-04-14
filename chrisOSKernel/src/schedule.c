@@ -124,7 +124,7 @@ void markTaskEnded(uint32_t cr3, uint32_t retval)
     int listNum=0;
     task_t* taskList=findTaskByCR3(cr3);
 
-    ((process_t*)taskList)->retVal=retval;
+    ((process_t*)taskList->process)->retVal=retval;
     if ((uint32_t)taskList->pageDir!=cr3)
         panic("markTaskEnded: Could not find task for CR3=0x%08X to end\n",cr3);
     taskList->exited=true;

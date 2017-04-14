@@ -139,3 +139,16 @@ void mmInit()
 //    for (int cnt=KERNEL_VIRTUAL_EXEC_ADDRESS;cnt<KERNEL_VIRTUAL_EXEC_ADDRESS+0x10000000;cnt+=4096)
 //        pagingMapPage
 }
+
+uintptr_t mmGetFirstFreeVirtAddress(uintptr_t cr3, uintptr_t startVirt)
+{
+    uintptr_t ptValue=0xFFFFFFFF;
+    
+    while (ptValue && startVirt<0xEFFFFFFF)
+        ptValue=pagingGet4kPTEntryAddressCR3(cr3,startVirt+=PAGE_SIZE);
+    
+    if ((ptValue) || startVirt>=0xEFFFFFFF)
+        return NULL;
+    else
+        return startVirt;
+}

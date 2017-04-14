@@ -16,9 +16,9 @@
 #include "printf.h"
 #include "paging.h"
 #include "alloc.h"
-void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse);
-void mmKernelSetPageInUseFlag(uintptr_t address, bool inUse);
-void buildTaskPaging(uint32_t* cr3);
+    void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse);
+    void mmKernelSetPageInUseFlag(uintptr_t address, bool inUse);
+    uintptr_t mmGetFirstFreeVirtAddress(uintptr_t cr3, uintptr_t startVirt);
 
 #endif	/* MM_H */
 

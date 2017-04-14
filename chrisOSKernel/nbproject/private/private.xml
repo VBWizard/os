@@ -7,9 +7,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/yogi/src/os/chrisOSKernel/src/syscall.c</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/include/paging.h</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/mm/mm.c</file>
             <file>file:/home/yogi/src/os/chrisOSKernel/src/paging.c</file>
-            <file>file:/home/yogi/src/os/chrisOSKernel/src/exceptions.c</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/include/process.h</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/dllist.c</file>
+            <file>file:/home/yogi/src/os/chrisOSKernel/src/mm/kmalloc.c</file>
             <file>file:/home/yogi/src/os/chrisOSKernel/src/schedule.c</file>
         </group>
     </open-files>
