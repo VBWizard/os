@@ -71,14 +71,12 @@ void restoreCR3()
 
 void elfMakePagesCOW(uint32_t cr3, uint32_t address, uint32_t size)
 {
-    kDebugLevel |= DEBUG_PAGING;
     address &= 0xFFFFF000;
     for (int cnt=0;cnt<(size/PAGE_SIZE)+(size%PAGE_SIZE?1:0);cnt++)
     {
         pagingSetAddressReadOnlyFlag(cr3,address+(PAGE_SIZE*cnt),true);
         pagingSetPageInUseFlag(cr3,address,false);
     }
-    kDebugLevel &= ~DEBUG_PAGING;
 }
 
 void elfSetupCopyOnPages(uint32_t cr3, elfInfo_t* elf)

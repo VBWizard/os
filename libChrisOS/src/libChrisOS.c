@@ -42,10 +42,9 @@ int do_syscall1(int callnum)
 
 VISIBLE void libc_init(void)
 {
-    printdI(DEBUG_LIBC,"***Initializing libc(&tz=0x%08X)\n***",&libcTZ);
-    libcTZ=-4;
-    printdI(DEBUG_LIBC,"***Initializing libc 2(&tz=0x%08X)\n***",&libcTZ);
+    printdI(DEBUG_LIBC,"***Initializing libc\n***");
     initmalloc();
+    libcTZ=-4;
     do_syscall1(SYSCALL_INVALID);
     do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
 }

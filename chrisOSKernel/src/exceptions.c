@@ -67,9 +67,7 @@ void kPagingExceptionHandler()
     }
     lPDEAddress=kPagingGet4kPDEntryAddressCR3(exceptionCR3,exceptionCR2);
     lPDEValue=kPagingGet4kPDEntryValueCR3(exceptionCR3,exceptionCR2);
-    kDebugLevel |= DEBUG_PAGING;
     lPTEValue=kPagingGet4kPTEntryValueCR3(exceptionCR3,exceptionCR2);
-    kDebugLevel &= ~DEBUG_PAGING;
     //Check for CoW pages in libraries
     printd(DEBUG_EXCEPTIONS,"Paging exception START: for 0x%08X\n",exceptionCR2);
     process_t* process=findTaskByCR3(exceptionCR3)->process;
@@ -106,8 +104,6 @@ void kPagingExceptionHandler()
         pagingMapPage(exceptionCR3,exceptionCR2 & 0xFFFFF000,newPhys,0x7);
         pagingMapPage(KERNEL_CR3,exceptionCR2 & 0xFFFFF000,newPhys,0x7);
         pagingMapPage(KERNEL_CR3,newPhys,newPhys,0x7);
-        kDebugLevel |= DEBUG_PAGING;
-        kDebugLevel &= ~DEBUG_PAGING;
         memcpy((void*)newPhys,(void*)(mappedCR2),PAGE_SIZE);
         printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08X with writable page 0x%08X (contents copied)\n",exceptionCR2&0xFFFFF000,newPhys);
         __asm__("xor ebx,ebx\nmov cr2,ebx\nmov cr3,eax\n"::"a" (exceptionCR3));
@@ -136,7 +132,7 @@ void kPagingExceptionHandler()
     if (p->task->taskNum!=1)      //retval=1 is Kernel, so don't return.
     {
         printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Returning\n");
-        __asm__("\sti\nnop\nnop\nnop\nmov cr3,eax\n":"=a"(exceptionCR3));
+        __asm__("\nsti\nnop\nnop\nnop\nmov cr3,eax\n":"=a"(exceptionCR3));
         return;
     }
 pagingExceptionStop: 
