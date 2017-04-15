@@ -13,6 +13,7 @@
 //Reserved page represented by bit 9 of the PTE being set
 //Reserved page won't have any other bits set in the PTE
 #define PAGING_RESERVED_PAGE 0x200
+#define ALIGN_TO_PAGE_SIZE(size) {size=(size/PAGE_SIZE)+(size%PAGE_SIZE?0:1)};
 
     void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, uint8_t flags);
     void pagingMapPageRange(uintptr_t pageDirAddress, uintptr_t startVirtualAddress, uintptr_t endVirtualAddress, uintptr_t startPhysicalAddress,uint8_t flags);

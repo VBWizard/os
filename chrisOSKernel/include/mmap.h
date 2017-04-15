@@ -29,9 +29,9 @@ extern "C" {
 #define MAP_FAILED -1;
     typedef enum epageprotection
     {
-        PROT_READ = 0,
-        PROT_WRITE = 1,
-        PROT_EXEC = 2
+        PROT_READ = 1,
+        PROT_WRITE = 2,
+        PROT_EXEC = 3
     } ePageProtection;
     
     typedef enum emapflags
@@ -40,6 +40,14 @@ extern "C" {
         MAP_SHARED = 2,
         MAP_FIXED = 3
     } eMapFlags;
+
+    typedef struct smmappedpage
+    {
+        uintptr_t offset;   //file offset
+        uintptr_t address;  //memory offset
+        bool loaded;        //Is page loaded?
+        dllist_t listItem;
+    } mmappedPage_t;
     
     struct smemorymapping
     {
@@ -51,6 +59,7 @@ extern "C" {
         int flags;
         int fd;
         dllist_t listItem;
+        mmappedPage_t* mmappedPages;
     };
 
     typedef struct smemorymapping memmap_t;

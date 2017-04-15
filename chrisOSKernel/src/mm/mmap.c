@@ -31,11 +31,11 @@ void mmapRemoveFromGlobalList(memmap_t* map)
     listRemove(&map->listItem);
 }
 
-void* mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset)
+void* mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memory map pages either to a file or anonymously
 {
     memmap_t* map;
     process_t* p=(process_t*)PROCESS_STRUCT_VADDR+4;
-    uintptr_t virtAddress=0;
+    uintptr_t virtStartAddress=0;
     uintptr_t currMapping=0;
     
     p->errno=0;
@@ -58,7 +58,7 @@ void* mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset)
     if (!(flags&MAP_PRIVATE) && !(flags&MAP_SHARED))
         ERROR_EXIT(ERROR_MMAP_FLAGS_INVALID)
 
-    virtAddress=(uintptr_t)addr;
+    virtStartAddress=(uintptr_t)addr;
     currMapping=pagingGet4kPTEntryAddressCR3(p->pageDirPtr,(uintptr_t)addr);
     if (currMapping!=0 || (uintptr_t)addr<0x1100000)
     {
@@ -71,7 +71,7 @@ void* mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset)
         else
         {
             //mm needs to suggest a virtual address to map to, starting at MMAP_VIRT_START 0xA0000000
-            virtAddress=mmGetFirstFreeVirtAddress(p->pageDirPtr,MMAP_VIRT_START);
+            virtStartAddress=mmGetFreeVirtAddress(p->pageDirPtr,MMAP_VIRT_START,(prot&PROT_WRITE)==PROT_WRITE);
         }
     }
     //Page align the length of the mapping
@@ -82,24 +82,40 @@ void* mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset)
     //At this point we are sure we want to create the mapping so allocate memory for the map struct
     map=kMalloc(sizeof(memmap_t));
     map->process=p;
-    map->startAddress=(uintptr_t)virtAddress;
+    map->startAddress=(uintptr_t)virtStartAddress;
     map->startFileOffset=offset;
     map->protection=prot;
     map->flags=flags;
     map->fd=fd;
     map->len=len;
+    //Add to the global list of memory maps
     mmapAddToGlobalList(map);
+    //Add to the process' list of memmory maps
     if (p->mmaps->prev==0)
         listInit(p->mmaps,map);
     else
         listAdd(p->mmaps,&map->listItem,map);
-    /*    if (p->mmaps->prev==0)
-        listInit(p->mmaps,0);
-    else
-        listAdd(p->mmaps,p->mmaps,0);
-*/
 
-
+    //Initialize the mmap page list and add first item to it
+    map->mmappedPages=kMalloc(sizeof(mmappedPage_t));
+    dllist_t* mapList=&map->mmappedPages->listItem;
+    listInit(mapList,map);
+    
+    int mappedPageCount=1;
+    
+    //Set up the virtual memory for the mmap
+    mmInitMMapPages(map->process->pageDirPtr,
+            map->startAddress,
+            map->len/PAGE_SIZE,
+            (map->protection&PROT_WRITE)==PROT_WRITE);
+    
+    //Now we have an area of virtual memory that is mmapped (each phys=0x0)
+    //Reads/write to any of the memory will trigger paging exceptions at which time
+    //physical pages will be assigned, and read to from the file (if fd!=NULL)
+    //and create a mmappedPages entry for the address' page
+    
+    
+    
     
 mmap_exit:
     if (p->errno)

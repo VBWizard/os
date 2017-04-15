@@ -140,15 +140,41 @@ void mmInit()
 //        pagingMapPage
 }
 
-uintptr_t mmGetFirstFreeVirtAddress(uintptr_t cr3, uintptr_t startVirt)
+///Find a free virtual address of size
+uintptr_t mmGetFreeVirtAddress(uintptr_t cr3, uintptr_t startVirt, int size)
 {
     uintptr_t ptValue=0xFFFFFFFF;
+    int pagesNeeded=ALIGN_TO_PAGE_SIZE(size);
+    int pagesFound=0;
+    int firstVirt=0;
     
-    while (ptValue && startVirt<0xEFFFFFFF)
-        ptValue=pagingGet4kPTEntryAddressCR3(cr3,startVirt+=PAGE_SIZE);
-    
-    if ((ptValue) || startVirt>=0xEFFFFFFF)
-        return NULL;
+    while (pagesFound<pagesNeeded && startVirt<0xEFFFFFFF)
+    {
+        ptValue=pagingGet4kPTEntryValueCR3(cr3,startVirt);
+        if (ptValue==0)
+        {
+            if (firstVirt==0)
+                firstVirt=startVirt;
+            pagesFound++;
+        }
+        else
+        {
+            pagesFound=0;
+            firstVirt=0;
+        }
+        startVirt+=PAGE_SIZE;
+    }
+    if ((pagesFound<pagesNeeded) || startVirt>=0xEFFFFFFF)
+        return ERROR_MM_CANNOT_ALLOCATE;
     else
-        return startVirt;
+        return firstVirt;
+}
+
+bool mmInitMMapPages(uintptr_t cr3, uintptr_t startVirt, int count, bool writable)
+{
+    //Set up not present mapping for each virtual page in the mmap
+    //Set the user and write flags, but omit the present flag
+    //Later the paging exception code will fill in the physical address
+    pagingMapPageCount(cr3,startVirt,0x0,count,0x4 | writable<<1);
+    return true;
 }
