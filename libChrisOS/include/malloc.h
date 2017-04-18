@@ -45,6 +45,7 @@ extern "C" {
         uint32_t marker;
         uint32_t len;
         bool inUse;
+        struct sheap* prev;
     } heaprec_t;
 
 uint32_t heapBase;    

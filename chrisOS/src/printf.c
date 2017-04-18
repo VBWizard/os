@@ -203,7 +203,9 @@ int printp_valist(const char *format, va_list args)
 
     printI(&in, format,args);
     
-    for (int cnt=0;cnt<strlen(inString);cnt++)
+    int len=strlen(inString);
+    
+    for (int cnt=0;cnt<len;cnt++)
     {
             outb(0x3f8,inString[cnt]);
     }

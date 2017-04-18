@@ -7,6 +7,8 @@
 #include "malloc.h"
 #include "libChrisOS.h"
 
+#define HEAP_NEXT(s,t) {t=s+s->len+sizeof(heaprec_t);}
+#define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
 void initmalloc()
 {
     heapBase=0;
@@ -39,7 +41,7 @@ VISIBLE void*  malloc(size_t size)
 
     uint32_t needed;
     uint32_t allocatedPtr;
-    heaprec_t* heapPtr;
+    heaprec_t* heapPtr, *heapPtrNext;
     printdI(DEBUG_MALLOC,"malloc(0x%08X)\n",size);
     needed = newHeapRequiredToFulfillRequest(size);
     printdI(DEBUG_MALLOC,"libc_malloc: needed=0x%08X\n",needed);
@@ -64,6 +66,9 @@ VISIBLE void*  malloc(size_t size)
     heapPtr->inUse=true;
     printdI(DEBUG_MALLOC,"libc_malloc: heapCurr=0x%08X, sizeof(heaprec_t)=0x%08X\n",heapCurr,sizeof(heaprec_t));
     retVal=(void*)(heapCurr+sizeof(heaprec_t));
+    HEAP_NEXT(heapPtr,heapPtrNext);
+    heapPtrNext=heapPtr+heapPtr->len+sizeof(heaprec_t);
+    heapPtrNext->prev=heapPtr;
     heapCurr+=size+(sizeof(heaprec_t));
     //printDebug(DEBUG_MALLOC,"\n");
     return retVal;
@@ -71,8 +76,8 @@ VISIBLE void*  malloc(size_t size)
 
 VISIBLE void free(void* fpointer)
 {
-    heaprec_t* mp=fpointer;  //-1 means back up to the heaprec_t struct
-    mp-=1;
+    heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
+    HEAP_CURR(fpointer,mp);
     
     //printDebug(DEBUG_MALLOC,"libc_free: Freeing heap @ fp=0x%08X (mp=0x%08X)\n",fpointer,mp);
     if (mp->marker!=ALLOC_MARKER_VALUE)
