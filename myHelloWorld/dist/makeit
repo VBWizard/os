@@ -1,8 +1,0 @@
-#!/bin/bash
-pushd ../
-./make_debug
-popd
-sudo mount /dev/disk/by-id/ata-ST31000528AS_5VP8R4ME-part6 /mnt/loop/
-sudo cp ../../myHelloWorld/dist/Debug/cross-Linux/myhelloworld /mnt/loop/
-cp ../../myHelloWorld/dist/Debug/cross-Linux/myhelloworld ~/src/os/build_dir/isodir/ 
-sudo umount /mnt/loop

@@ -1,0 +1,24 @@
+#!/bin/bash
+echo ">>> MAKING KERNEL PROJECTS <<<"
+basePath=/home/yogi/src/os/kproj/
+cd $basePath/chrisOS/dist
+./makeit
+cd $basePath/chrisOSKernel/dist
+./makeit
+echo ">>> MAKING APPLICATION PROJECTS <<<"
+basePath=/home/yogi/src/os/aproj/
+cd $basePath/myHelloWorld/dist
+./makeit
+cd $basePath/myHelloWorld2/dist
+./makeit
+cd $basePath/testMainProgramEntry/dist
+./makeit
+cd $basePath/libChrisOS/dist
+./makeit
+cd $basePath/kshell/dist
+./makeit
+cd $basePath/time/dist
+./makeit
+cd $basePath/testMMap/dist
+./makeit
+

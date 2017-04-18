@@ -1,5 +1,0 @@
-pushd ..
-./make_debug
-popd
-objdump -x -t Debug/cross-Linux/myhelloworld > myhelloworld.sym
-vi myhelloworld.sym
