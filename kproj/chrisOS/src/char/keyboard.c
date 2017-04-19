@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "time_os.h"
 #include "kbd.h"
+#include "charDev.h"
 
 extern volatile char kTranslatedKeypress;
 extern uint32_t kDebugLevel;

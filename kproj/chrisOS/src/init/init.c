@@ -26,6 +26,9 @@
 #include "i386/apic.h"
 #include "ahci.h"
 #include "kernelObjects.h"
+#include "strings.h"
+#include "charDev.h"
+#include "i386/smp.h"
 
 extern uint32_t storeGDT(struct gdt_ptr* gdtp);
 extern void set_gdt(struct gdt_ptr *);
@@ -48,6 +51,9 @@ extern void bootShell();
 extern void AP_startup();
 extern int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count);
 extern int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count);
+extern void acpiFindTables();
+extern void HIGH_CODE_SECTION gdtEntryRM(int entryNo, int base, int limit, char access, char flags);
+extern void enableCR0_WP();
 
 bool ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char* cmdToFind, int paramCount);
 
@@ -119,7 +125,7 @@ void HIGH_CODE_SECTION gdt_init()
 
     kernelGDT.limit = 0x7ff; // (sizeof(sGDT) * GDT_ENTRIES) - 1;
     kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
-    rmGdtp.limit = sizeof(sGDT) * (GDT_TABLE_SIZE*8) - 1;
+    rmGdtp.limit = (unsigned short)(sizeof(sGDT) * (GDT_TABLE_SIZE*8) - 1);
     rmGdtp.base = (unsigned int)rmGdt;
     set_gdt(&kernelGDT);
 }
@@ -138,7 +144,7 @@ void doHDSetup()
     memset(p1,0,512);
     
     *p1=kATADeviceInfo[0].ATADeviceModel;
-    printk("ATA: \tMaster: %s", kATADeviceInfo[0].ATADeviceAvailable==1?strtrim(&p1):"none\n");
+    printk("ATA: \tMaster: %s", kATADeviceInfo[0].ATADeviceAvailable==1?strtrim(p1):"none\n");
     if (kATADeviceInfo[0].ATADeviceAvailable)
     {
         printk("\t%uMB (%ubps%s%s%s)\n", (kATADeviceInfo[0].totalSectorCount*kATADeviceInfo[0].sectorSize) / (1024*1024),
@@ -148,7 +154,7 @@ void doHDSetup()
                 kATADeviceInfo[0].dmaSupported?",DMA":"");
     }
     *p1=kATADeviceInfo[1].ATADeviceModel;
-    printk("ATA: \tSlave:  %s", kATADeviceInfo[1].ATADeviceAvailable==1?strtrim(&p1):"none\n");
+    printk("ATA: \tSlave:  %s", kATADeviceInfo[1].ATADeviceAvailable==1?strtrim(p1):"none\n");
     if (kATADeviceInfo[1].ATADeviceAvailable)
     {
         printk("\t%uMB (%ubps %s%s%s)\n", (kATADeviceInfo[1].totalSectorCount*kATADeviceInfo[1].sectorSize) / (1024*1024),
@@ -159,7 +165,7 @@ void doHDSetup()
     }
     printk("ATA: Scanning for hard drives on secondary bus ...\n");
     *p1=kATADeviceInfo[2].ATADeviceModel;
-    printk("ATA: \tMaster: %s", kATADeviceInfo[2].ATADeviceAvailable==1?strtrim(&p1):"none\n");
+    printk("ATA: \tMaster: %s", kATADeviceInfo[2].ATADeviceAvailable==1?strtrim(p1):"none\n");
     if (kATADeviceInfo[2].ATADeviceAvailable)
     {
         printk("\t%uMB (%ubps%s%s%s)\n", (kATADeviceInfo[2].totalSectorCount*kATADeviceInfo[2].sectorSize) / (1024*1024),
@@ -169,7 +175,7 @@ void doHDSetup()
                 kATADeviceInfo[2].dmaSupported?",DMA":"");
     }
     *p1=kATADeviceInfo[3].ATADeviceModel;
-    printk("ATA: \tSlave:  %s", kATADeviceInfo[3].ATADeviceAvailable==1?strtrim(&p1):"none\n");
+    printk("ATA: \tSlave:  %s", kATADeviceInfo[3].ATADeviceAvailable==1?strtrim(p1):"none\n");
     if (kATADeviceInfo[3].ATADeviceAvailable)
     {
         printk("\t%uMB (%ubps %s%s%s)\n", (kATADeviceInfo[3].totalSectorCount*kATADeviceInfo[3].sectorSize) / (1024*1024),
@@ -190,7 +196,7 @@ void doHDSetup()
             if (kATADeviceInfo[cnt].ATADeviceAvailable)
             {
                 *p1=kATADeviceInfo[cnt].ATADeviceModel;
-                printk("AHCI: Device %u:  %s", cnt,kATADeviceInfo[cnt].ATADeviceAvailable==1?strtrim(&p1):"none\n");
+                printk("AHCI: Device %u:  %s", cnt,kATADeviceInfo[cnt].ATADeviceAvailable==1?strtrim(p1):"none\n");
                 printk("\t%uMB (%ubps %s%s%s)\n", 
                         (kATADeviceInfo[cnt].totalSectorCount*kATADeviceInfo[cnt].sectorSize) / (1024*1024),
                         kATADeviceInfo[cnt].sectorSize,
@@ -204,12 +210,10 @@ void doHDSetup()
 bool HIGH_CODE_SECTION ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char* cmdToFind, int paramCount)
 {
     for (int cnt=0;cnt<paramCount+1;cnt++)
-        if (!strcmp(params[cnt],cmdToFind))
+        if (!strncmp(params[cnt],cmdToFind,512))
             return true;
     return false;
 }
-void extern enableCR0_WP();
-
 void HIGH_CODE_SECTION testWPBit()
 {
     enableCR0_WP();
@@ -285,6 +289,7 @@ gdt_init();
         printk ("(debug=%X)", kDebugLevel);
 #endif
     printk("\n");
+    acpiFindTables();
     if (kE820Status==0x534d4150)
     {
         printk("E820: available (%08X), translating ...", kE820Status);

@@ -11,6 +11,7 @@
 #include "i386/bits/types.h"
 #include <stddef.h>
 #include <stdbool.h>
+#include "config.h"
 
 #define KBRD_INTRFC 0x64
 /* keyboard interface bits */
@@ -23,12 +24,6 @@
 #define check_flag(flags, n) ((flags) & bit(n))
 
 
-void reverse(char s[]);
-int atoi(char *str);
-void itoa(int n, char s[]);
-void itox(unsigned int i, char *s);
-void itoha(unsigned int n, char *buf);
-
 struct cpuinfo_t
 {
     int family, model, stepping, type, brand, extended_family;
@@ -40,16 +35,30 @@ typedef struct sizeof_type
     word shortSize, intSize, longSize, longLongSize, longLongIntSize;
 } sizeof_t;
 
+void reverse(char s[]);
+int atoi(char *str);
+void itoa(int n, char s[]);
+void itox(unsigned int i, char *s);
+void itoha(unsigned int n, char *buf);
+void* mallocTemp(int size); //Only used during boot
+int convert(int s);
 void identify_data_sizes(sizeof_t* sizes);
-void __attribute__((noinline))panic(const char *format, ...);
 void *memset(void *d1, int val, size_t len);
-void dumpKernelAddresses();
+uint8_t bcdToDec(uint8_t val);
+uint8_t decToBcd(uint8_t val);
 void initSystemDate();
-void displayPause();
+char * strtoupper(char* pointerToString);
 void printDumpedRegs();
+void printDebugRegs();
 void reboot(bool waitFirst);
+void dumpKernelAddresses();
 bool pauseDisplay(bool offerToQuit);
-void displayGDTTable();
+void dumpGDTTable();
+void dumpIDTTable();
+void displayTSS(int tssAddress);
+void dumpP(char* cmdline);
+int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size);
+
 
 #if defined(__i386__)
 

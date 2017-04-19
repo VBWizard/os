@@ -1,6 +1,4 @@
 #include "utility.h"
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdarg.h>
 #include <time.h>
 #include "io.h"
@@ -12,6 +10,8 @@
 #include "i386/gdt.h"
 #include "../../../chrisOSKernel/include/tss.h"
 #include "strings.h"
+#include "charDev.h"
+#include "i386/kPaging.h"
 
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
@@ -23,6 +23,8 @@ extern uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, d
 extern uint32_t  *debugSavedStack;
 extern struct gdt_ptr kernelGDT;
 extern sGDT* bootGdt;
+extern void doNonPagingJump();
+extern void doPagingJump();
 
 //#include <string.h>
 
@@ -113,7 +115,7 @@ void *memset(void *d1, int val, size_t len)
 {
     uint8_t *d = d1;
     uint16_t*e = d1;
-    uint16_t eVal=(val << 16) | (val << 8) | val;
+    uint16_t eVal=(val << 8) | val; //CLR 04/17/2017: Removed "(val << 16) |"
     uint32_t*f = d1;
     uint32_t fVal=(val << 24) | (val << 16) | (val << 8) | val;
     
@@ -127,7 +129,7 @@ void *memset(void *d1, int val, size_t len)
     }
     else
     while (len--) {
-        *d++ = val;
+        *d++ = (uint8_t)val;
     }
     return d1;
 }
@@ -187,10 +189,8 @@ char * strtoupper(char* pointerToString)
 void printDumpedRegs()
 {
     uint32_t esp = exceptionSavedESP;
-    uint8_t* lCSIPPtr;
 
 LOAD_ZERO_BASED_DS    
-    lCSIPPtr=(uint8_t*)(exceptionEIP);
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
     printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
@@ -317,7 +317,7 @@ bool pauseDisplay(bool offerToQuit)
 }
 
 int memPtr=0xe00000;
-uintptr_t* mallocTemp(int size)
+void* mallocTemp(int size)
 {
     uintptr_t lRetVal = memPtr;
     memPtr+=size;

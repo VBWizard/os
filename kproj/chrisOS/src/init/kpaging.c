@@ -20,7 +20,7 @@ extern uint32_t kDebugLevel;
 uint32_t kPagingGet4kPDEntryValueCR3(uintptr_t PageDirAddress, uint32_t address)
 {
     address&=0xFFFFF000;
-    uintptr_t*pageDirEntry=((PageDirAddress + (((address & 0xFFC00000) >> 22) << 2)));
+    //uintptr_t*pageDirEntry=(uintptr_t*)((PageDirAddress + (((address & 0xFFC00000) >> 22) << 2)));
     uintptr_t* lTemp=(uint32_t*)((PageDirAddress + (((address & 0xFFC00000) >> 22) << 2)));
 #ifndef DEBUG_NONE
          if ((kDebugLevel & DEBUG_PAGING) == DEBUG_PAGING)

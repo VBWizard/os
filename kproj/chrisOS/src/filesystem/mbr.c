@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "utility.h"
 #include "gpt.h"
+#include "printf.h"
 
 uint8_t mbrBuffer[512]; //20480
 uint8_t partBuffer[512*20]; //10240
@@ -87,7 +88,9 @@ bool parseGPT(HBA_PORT* port, struct mbr_t* mbr)
 int readLen=0;
 
     bool lResult=ahciRead(port,mbr->parts[0].partStartSector,mbrBuffer,1);
-    gptHdr=mbrBuffer;
+    if (!lResult)
+        panic("parseGPT: ahciRead error\n");
+    gptHdr=(gptHeader_t*)mbrBuffer;
 
     printd(DEBUG_HARDDRIVE,"GPT PT LBA=%u, PT entries=%04x, PT entry len=%04x, last usable LBA=%08x\n",
             gptHdr->partEntryLBAL,
@@ -98,8 +101,10 @@ int readLen=0;
     
     printd(DEBUG_HARDDRIVE,"Reading GPT partition table @ lba %u for %u sectors\n",gptHdr->partEntryLBAL,readLen);
     lResult=ahciRead(port,gptHdr->partEntryLBAL,partBuffer,10);
+    if (!lResult)
+        panic("parseGPT: ahciRead error\n");
     
-    gptPart=partBuffer;
+    gptPart=(gptPartEntry_t*)partBuffer;
     mbr->partCount=0;
     for (int cnt=0;cnt<20;cnt++)
     {

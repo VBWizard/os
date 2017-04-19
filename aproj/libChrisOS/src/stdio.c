@@ -5,7 +5,7 @@
  */
 
 #include "stdio.h"
-extern int print(const char *format, ...);
+extern int printI(const char *format, ...);
 extern int gets(char* buffer, int maxlen, int stream);
 
 file_operations_t fops;
@@ -19,7 +19,7 @@ size_t readConsole (struct file * fptr, char *buffer, size_t size, uint64_t* wha
 
 size_t writeConsole(struct file * fptr, const char *buffer, size_t size, uint64_t *whatever)
 {
-    return print(buffer);
+    return printI(buffer);
 }
 
 void ioInit()

@@ -12,6 +12,7 @@
 int printk(const char *format, ...);
 int sprintf(char *out, const char *format, ...);
 int printk_valist(const char *format, va_list args);
+void __attribute__((noinline))panic(const char *format, ...);
 #ifdef DEBUG_NONE
 int printd();
 #else

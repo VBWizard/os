@@ -62,6 +62,14 @@ VISIBLE int print(const char *format, ...)
     return 0;
 }
 
+int printI(const char *format, ...)
+{
+    va_list args;
+    va_start( args, format );
+    do_syscall3(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
+    return 0;
+}
+
 int printdI(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;

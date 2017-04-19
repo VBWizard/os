@@ -23,6 +23,7 @@ extern int kATADeviceInfoCount;
 extern void dumpRegs();
 extern void doNonPagingJump();
 extern void doPagingJump();
+extern int exec(char* fileName,int argc,char** argv);
 
 extern int kSelectedDiskNum; 
 extern int kSelectedPartNum;
@@ -175,12 +176,12 @@ char **buildargv (const char *input)
   return (argv);
 }
 
-void HIGH_CODE_SECTION displayGDTTable(char *cmdline)
+void HIGH_CODE_SECTION displayGDTTable()
 {
     dumpGDTTable();
 }
 
-void HIGH_CODE_SECTION displayIDTTable(char *cmdline)
+void HIGH_CODE_SECTION displayIDTTable()
 {
     dumpIDTTable();
 }
@@ -403,7 +404,7 @@ void HIGH_CODE_SECTION selectPart(char* cmdline)
 void HIGH_CODE_SECTION attach(char* cmdline)
 {
      char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-    int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
+    /*int paramCount=*/parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
 
     if (kSelectedDiskNum < 0 || kSelectedPartNum < 0)
     {
@@ -425,7 +426,7 @@ void HIGH_CODE_SECTION attach(char* cmdline)
 void HIGH_CODE_SECTION listDir(char* cmdline)
 {
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-    int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
+    /*int paramCount=*/parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     
     //printk("Kernel Debug: Listing of directory %s + %s\n",params[0],params[1]);
     

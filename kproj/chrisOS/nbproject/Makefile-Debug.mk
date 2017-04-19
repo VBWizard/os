@@ -91,7 +91,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-m32 -pipe -ffreestanding -Wall -Wextra -masm=intel
+CFLAGS=-m32 -pipe -ffreestanding -masm=intel -Wno-unused-function
 
 # CC Compiler Flags
 CCFLAGS=

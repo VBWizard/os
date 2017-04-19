@@ -40,6 +40,7 @@
           <standard>3</standard>
           <incDir>
             <pElem>../libChrisOS/include</pElem>
+            <pElem>../../kproj/chrisOS/include</pElem>
           </incDir>
           <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
           <preprocessorList>
@@ -54,10 +55,10 @@
                             CT="2"
                             CN="Debug"
                             AC="true"
-                            BL="false"
+                            BL="true"
                             WD="../libChrisOS"
-                            BC="${MAKE}  -f Makefile CONF=Debug"
-                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            BC="${MAKE} -j 8 -f Makefile CONF=Debug"
+                            CC="${MAKE} -j 8 -f Makefile CONF=Debug clean"
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}">
               </makeArtifact>
             </linkerLibProjectItem>
@@ -81,8 +82,12 @@
           <standard>3</standard>
           <incDir>
             <pElem>../libChrisOS/include</pElem>
+            <pElem>../../kproj/chrisOS/include</pElem>
           </incDir>
           <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <ccTool>
@@ -101,10 +106,10 @@
                             CT="2"
                             CN="Debug"
                             AC="true"
-                            BL="false"
+                            BL="true"
                             WD="../libChrisOS"
-                            BC="${MAKE}  -f Makefile CONF=Debug"
-                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            BC="${MAKE} -j 8 -f Makefile CONF=Debug"
+                            CC="${MAKE} -j 8 -f Makefile CONF=Debug clean"
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}">
               </makeArtifact>
             </linkerLibProjectItem>

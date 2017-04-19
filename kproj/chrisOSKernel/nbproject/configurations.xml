@@ -162,7 +162,7 @@
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -masm=intel -ggdb</commandLine>
+          <commandLine>-ffreestanding -masm=intel</commandLine>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>
@@ -439,7 +439,7 @@
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
           </incDir>
-          <commandLine>-ffreestanding -Wall -masm=intel</commandLine>
+          <commandLine>-ffreestanding -masm=intel</commandLine>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>

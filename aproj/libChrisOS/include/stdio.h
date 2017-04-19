@@ -17,7 +17,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "../../chrisOSKernel/include/dllist.h"
+#include "dllist.h"
 #include <stdint.h>    
 
 #define STDIN_FILE 0

@@ -189,10 +189,10 @@ void loadSections(void* file,elfInfo_t* elfInfo, bool isLibrary)
         if (isLibrary)
         {
             loadAddress+=libLoadOffset;
-            elfInfo->pgmHdrTable[cnt].p_vaddr=loadAddress;
+            elfInfo->pgmHdrTable[cnt].p_vaddr=(Elf32_Addr)loadAddress;
         }
 
-        if (elfInfo->pgmHdrTable[cnt].p_vaddr==KERNEL_DATA_LOAD_ADDRESS)
+        if (elfInfo->pgmHdrTable[cnt].p_vaddr==(Elf32_Addr)KERNEL_DATA_LOAD_ADDRESS)
         {
             printd(DEBUG_ELF_LOADER,"Section %u load address is kernel data base address (0x%08X), skipping load\n",cnt,loadAddress);
             continue;
@@ -257,7 +257,7 @@ void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary)
         printd(DEBUG_ELF_LOADER,"Table\t     MemAddr\t\tFileAddr\t\tSize\ttype\n");
         for (int cnt=0;cnt<elfInfo->hdr.e_shentsize;cnt++)
         {
-            if ((uint8_t*)*(sectStringTable+elfInfo->secHdrTable[cnt].sh_name)>0)
+            if (*(sectStringTable+elfInfo->secHdrTable[cnt].sh_name)>0)
                 printd(DEBUG_ELF_LOADER,"%-10s\t0x%08X\t0x%08X\t0x%08X\t0x%08X\n",
                         sectStringTable+elfInfo->secHdrTable[cnt].sh_name,
                         elfInfo->secHdrTable[cnt].sh_addr,
@@ -279,7 +279,7 @@ void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary)
         {
             if (dyn[cnt].d_tag==DT_STRTAB)
             {
-                elfInfo->dynamicInfo.strTableAddress[0]=dyn[cnt].d_un.d_ptr;
+                elfInfo->dynamicInfo.strTableAddress[0]=(uintptr_t*)dyn[cnt].d_un.d_ptr;
                 if (isLibrary)
                     elfInfo->dynamicInfo.strTableAddress[0]+=libLoadOffset;
                 printd(DEBUG_ELF_LOADER,"Found dynamic string table address 0x%08X\n",elfInfo->dynamicInfo.strTableAddress);

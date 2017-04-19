@@ -39,6 +39,7 @@ extern "C" {
 
     void libc_init(void);
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
+    int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
     unsigned int VISIBLE sleep (unsigned int __seconds);
     void stop();

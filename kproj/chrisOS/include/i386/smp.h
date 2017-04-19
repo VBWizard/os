@@ -34,5 +34,9 @@ typedef struct mpConfig
     
 } __attribute__((packed))mpConfig_t;
 
+bool mpScanForConfig(int start, int length);
+bool mpFindTables();
+void printMPTable();
+unsigned mpInit();
 #endif	/* MP_H */
 

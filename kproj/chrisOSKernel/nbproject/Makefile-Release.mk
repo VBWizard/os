@@ -95,7 +95,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-ffreestanding -Wall -masm=intel
+CFLAGS=-ffreestanding -masm=intel
 
 # CC Compiler Flags
 CCFLAGS=

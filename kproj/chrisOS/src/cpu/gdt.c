@@ -82,6 +82,7 @@ sGDT HIGH_CODE_SECTION getGDTEntry(int entryNo)
 //    gdtEntry.base_middle=bootGdt[entryNo].base_middle;
 //    gdtEntry.flags_and_limit=bootGdt[entryNo].flags_and_limit;
 //    gdtEntry.limit_low=bootGdt[entryNo].limit_low;
+    return gdtEntry;
 }
 
 bool HIGH_CODE_SECTION gdtIsEntryInUse(int entryNo)

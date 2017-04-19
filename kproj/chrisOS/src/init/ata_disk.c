@@ -429,6 +429,7 @@ int ataBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count)
 
 int ataBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count)
 {
+    return 0;
 /*    int drive=0;
     int lResult=0;
     uint32_t lSector=sector+partOffset; //temporarily add 2048 sectors to adjust to first partition

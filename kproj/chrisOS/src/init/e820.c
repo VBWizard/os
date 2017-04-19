@@ -2,6 +2,7 @@
 #include "memory.h"
 #include "printf.h"
 #include "kbd.h"
+#include "charDev.h"
 
 extern word kE820RecordCount;
 extern SMAP_entry* KERNEL_DATA_SECTION smap_table;

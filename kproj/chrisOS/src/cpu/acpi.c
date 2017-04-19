@@ -1,6 +1,8 @@
 #include "chrisos.h"
 #include "acpi.h"
 #include "i386/bits/types.h"
+#include "printf.h"
+#include "strings.h"
 
 extern uint32_t kDebugLevel;
 
@@ -28,7 +30,7 @@ acpiFADT_t *acpiFindTable(void *RootSDT, char* tableSignature)
     for (int i = 0; i < entries; i++)
     {
         acpiRSDT_t *nextRSDT = (acpiRSDT_t*)rsdt->PointerToOtherSDT[i];
-        printk("***tableSignature=%s, header sig=%s***\n", tableSignature, nextRSDT->header.Signature);
+        printd(DEBUG_ACPI,"***tableSignature=%s, header sig=%s***\n", tableSignature, nextRSDT->header.Signature);
         if (!strncmp(nextRSDT->header.Signature, tableSignature, 4))
             return (acpiFADT_t*)nextRSDT;
     }
@@ -44,7 +46,7 @@ void *acpiFindTable2(void *RootSDT, char* tableSignature)
     for (int i = 0; i < entries; i++)
     {
         acpiRSDT_t *nextRSDT = (acpiRSDT_t *) rsdt->PointerToOtherSDT[i];
-        printk("***tableSignature=%s, header sig=%s***\n", tableSignature, nextRSDT->header.Signature);
+        printd(DEBUG_ACPI,"***tableSignature=%s, header sig=%s***\n", tableSignature, nextRSDT->header.Signature);
         if (!strncmp(nextRSDT->header.Signature, tableSignature, 4))
             return (void *) nextRSDT;
     }
@@ -57,12 +59,10 @@ void acpiFindTables()
     acpiRSDPHeader_t* lRSDPTable;
     acpiRSDT_t* lRootSDP;
     acpiFADT_t* lFADTSDP;
-#ifndef DEBUG_NONE
-         if ((kDebugLevel & DEBUG_ACPI) == DEBUG_ACPI)
-             printk("acpiFindTables: Looking for ACPI tables\n");
-#endif
+     printd(DEBUG_ACPI,"acpiFindTables: Looking for ACPI tables\n");
              uint16_t* lEBDABIOSPtr=(uint16_t*)0x40e;
-    int32_t lRSDPPtr, lRSDPBaseAddress=0xFFFFFFFF;
+    int32_t lRSDPPtr;
+    uint32_t lRSDPBaseAddress=0xFFFFFFFF;
     
     //Start by looking in the bios for the extended bios data area (EBDA) segment address, and search there
     if (lEBDABIOSPtr != 0)
@@ -75,45 +75,35 @@ void acpiFindTables()
     {
         lRSDPBaseAddress=doRSDPSearch(0xE0000, 0x1FFFF);
     }
-    if (lRSDPBaseAddress==-1)
+    if (lRSDPBaseAddress==0xFFFFFFFF)
     {
-#ifndef DEBUG_NONE
-        if ((kDebugLevel & DEBUG_ACPI) == DEBUG_ACPI)
-           printk(" table not found\n", lRSDPPtr);
-#endif
+           printd(DEBUG_ACPI," table not found\n", lRSDPPtr);
         return;
     }
     lRSDPTable=(acpiRSDPHeader_t*)lRSDPBaseAddress;
-#ifndef DEBUG_NONE
-    if ((kDebugLevel & DEBUG_ACPI) == DEBUG_ACPI)
-    {
-        printk(" table found at 0x%08X\n", lRSDPBaseAddress);
-        printk("ACPI version %s, RSPD OEM Id: %s\n", lRSDPTable->firstPart.Revision==0?"1.0":"2+", lRSDPTable->firstPart.OEMID);
-    }
+    printd(DEBUG_ACPI," table found at 0x%08X\n", lRSDPBaseAddress);
+    printk("ACPI version %s, RSPD OEM Id: %s\n", lRSDPTable->firstPart.Revision==0?"1.0":"2+", lRSDPTable->firstPart.OEMID);
     if (lRSDPTable->firstPart.Revision==0)
     {
         lRootSDP=(acpiRSDT_t*)lRSDPTable->firstPart.RsdtAddress;
-        printk("RSDP is at 0x%08X, OEM Id: %s, OSDT=0x%08X\n", lRootSDP, lRootSDP->header.OEMID, lRootSDP->PointerToOtherSDT);
+        printd(DEBUG_ACPI,"RSDP is at 0x%08X, OEM Id: %s, OSDT=0x%08X\n", lRootSDP, lRootSDP->header.OEMID, lRootSDP->PointerToOtherSDT);
     }
     else
     {
-        lRootSDP=(acpiRSDT_t*)lRSDPTable->XsdtAddress;
-        printk("RSDP is at 0x%08X, OEM Id: %s, OSDT=0x%08X\n", lRootSDP, lRootSDP->header.OEMID, lRootSDP->PointerToOtherSDT);
+        lRootSDP=(acpiRSDT_t*)(uint32_t)lRSDPTable->XsdtAddress;  //CLR 04/18/2017: Re-casting to 32-bit pointer
+        printd(DEBUG_ACPI,"RSDP is at 0x%08X, OEM Id: %s, OSDT=0x%08X\n", lRootSDP, lRootSDP->header.OEMID, lRootSDP->PointerToOtherSDT);
     }
     lFADTSDP=acpiFindTable(lRootSDP,"FACP");
     if (lFADTSDP!=NULL)
     {
-        printk("FACP found at 0x%08X. resetReg=0x%08X\n", lFADTSDP, lFADTSDP->ResetReg);
+        printd(DEBUG_ACPI,"FACP found at 0x%08X. resetReg=0x%08X\n", lFADTSDP, lFADTSDP->ResetReg);
     }
     else
     {
-        printk("Failed to find FACP table, cannot continue ACPI discovery.\n");
+        printd(DEBUG_ACPI,"Failed to find FACP table, cannot continue ACPI discovery.\n");
     }
-    uint32_t* ltemp=acpiFindTable(lFADTSDP,"DSDT");
-    printk("lTemp=0x%08X\n", ltemp);
-    
-#endif
-    
+    acpiFADT_t* ltemp=acpiFindTable(lFADTSDP,"DSDT");
+    printd(DEBUG_ACPI,"lTemp=0x%08X\n", ltemp);
    
 }
     

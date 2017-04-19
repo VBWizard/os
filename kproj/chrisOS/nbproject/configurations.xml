@@ -42,7 +42,7 @@
       <itemPath>include/bootShell.h</itemPath>
       <itemPath>/home/yogi/src/os//chrisOS/include/build_num.h</itemPath>
       <itemPath>include/charDev.h</itemPath>
-      <itemPath>/home/yogi/src/os//chrisOS/include/chrisos.h</itemPath>
+      <itemPath>include/chrisos.h</itemPath>
       <itemPath>include/config.h</itemPath>
       <itemPath>include/i386/cpu.h</itemPath>
       <itemPath>include/debugger.h</itemPath>
@@ -54,11 +54,11 @@
       <itemPath>include/gpt.h</itemPath>
       <itemPath>include/init/initVars.h</itemPath>
       <itemPath>include/io.h</itemPath>
-      <itemPath>/home/yogi/src/os//chrisOS/include/i386/irqHandlers.h</itemPath>
-      <itemPath>/home/yogi/src/os//chrisOS/include/i386/kPaging.h</itemPath>
+      <itemPath>include/i386/irqHandlers.h</itemPath>
+      <itemPath>include/i386/kPaging.h</itemPath>
       <itemPath>include/kbd.h</itemPath>
       <itemPath>include/kernelObjects.h</itemPath>
-      <itemPath>/home/yogi/src/os//chrisOS/include/memory.h</itemPath>
+      <itemPath>include/memory.h</itemPath>
       <itemPath>include/mpspec_def.h</itemPath>
       <itemPath>include/i386/msr.h</itemPath>
       <itemPath>include/multiboot.h</itemPath>
@@ -162,7 +162,7 @@
             <pElem>/usr/local/include/libcpuid</pElem>
             <pElem>include</pElem>
           </incDir>
-          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -masm=intel -Wno-unused-function</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <asmTool>
@@ -181,26 +181,6 @@
         </linkerTool>
       </compileType>
       <item path="/home/yogi/src/os//chrisOS/include/build_num.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/chrisos.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/i386/irqHandlers.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/i386/kPaging.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/memory.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -231,6 +211,8 @@
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/chrisos.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/config.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/debugger.h" ex="false" tool="3" flavor2="0">
@@ -253,6 +235,10 @@
       </item>
       <item path="include/i386/gdt.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/i386/irqHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/kPaging.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/i386/msr.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/smp.h" ex="false" tool="3" flavor2="0">
@@ -268,6 +254,8 @@
       <item path="include/kbd.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kernelObjects.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/memory.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mpspec_def.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -451,7 +439,7 @@
             <pElem>/usr/local/include/libcpuid</pElem>
             <pElem>include</pElem>
           </incDir>
-          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -masm=intel -Wno-unused-function</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <ccTool>
@@ -482,26 +470,6 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/src/os//chrisOS/include/chrisos.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/i386/irqHandlers.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/i386/kPaging.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/memory.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="asm/asmFunctions.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="asm/boot.s" ex="false" tool="4" flavor2="0">
@@ -528,6 +496,8 @@
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/chrisos.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/config.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/debugger.h" ex="false" tool="3" flavor2="0">
@@ -550,6 +520,10 @@
       </item>
       <item path="include/i386/gdt.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/i386/irqHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/kPaging.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/i386/msr.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/smp.h" ex="false" tool="3" flavor2="0">
@@ -565,6 +539,8 @@
       <item path="include/kbd.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kernelObjects.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/memory.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mpspec_def.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -768,7 +744,7 @@
             <pElem>include</pElem>
             <pElem>../../chrisOSKernel/include</pElem>
           </incDir>
-          <commandLine>-pipe -ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <commandLine>-pipe -ffreestanding -masm=intel -Wno-unused-function</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
         </cTool>
         <ccTool>
@@ -799,26 +775,6 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/yogi/src/os//chrisOS/include/chrisos.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/i386/irqHandlers.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/i386/kPaging.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/yogi/src/os//chrisOS/include/memory.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="asm/asmFunctions.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="asm/boot.s" ex="false" tool="4" flavor2="0">
@@ -845,6 +801,8 @@
       </item>
       <item path="include/charDev.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/chrisos.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/config.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/debugger.h" ex="false" tool="3" flavor2="0">
@@ -867,6 +825,10 @@
       </item>
       <item path="include/i386/gdt.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/i386/irqHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/i386/kPaging.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/i386/msr.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/i386/smp.h" ex="false" tool="3" flavor2="0">
@@ -882,6 +844,8 @@
       <item path="include/kbd.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kernelObjects.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/memory.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mpspec_def.h" ex="false" tool="3" flavor2="0">
       </item>

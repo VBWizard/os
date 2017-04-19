@@ -8,6 +8,8 @@
 #include "utility.h"
 #include "debugger.h"
 #include "kbd.h"
+#include "printf.h"
+#include "charDev.h"
 
 bool kDebuggerActive = false,kKbdHandlerActivateDebugger;
 bool kStopDebugging = false;

@@ -33,8 +33,8 @@ void * memcpy(void *dest, const void *src, size_t n)
     else if (dw)
     {
         n /=2;
-        const uint32_t *f = src;
-        uint32_t *t = dest;
+        const uint16_t *f = src;    //clr 04/17/2017: Changed 2 lines from uint32_t* to uint16_t*
+        uint16_t *t = dest;
 
         if (f < t) {
                 f += n;

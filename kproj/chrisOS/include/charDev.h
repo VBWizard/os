@@ -37,6 +37,7 @@ int printf1(const char *format, ...);
 int sprintf1(char *out, const char *format, ...);
 void terminal_putchar(char c);
 void terminal_clear();
+void terminal_clear_line(unsigned lineNo);
 void cursorSavePosition();
 void cursorRestorePosition();
 void cursorMoveTo(uint8_t x, uint8_t y);

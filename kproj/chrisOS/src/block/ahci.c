@@ -9,6 +9,8 @@
 #include "ahcicommands.h"
 #include "kbd.h"
 #include "init/diskPartition.h"
+#include "charDev.h"
+#include "strings.h"
 
 #define PCI_CLASS_SATA 1
 #define PCI_SUBCLASS_SATA 6
@@ -335,7 +337,7 @@ void printAHCICaps() {
                     kATADeviceInfo[cnt].ioPort);
             volatile HBA_PORT* port = (HBA_PORT*) kATADeviceInfo[cnt].ioPort;
             HBA_CMD_HEADER* cmdheader = (HBA_CMD_HEADER*) port->clb;
-            HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*) cmdheader->ctba;
+            //HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*) cmdheader->ctba;
             printk("\t\tCLB=0x%08X, FB=0x%08X\n",port->clb,port->fb);
             printk("\t\tCMDHeader=0x%08X, CMDTable=0x%08X\n", port->clb, cmdheader->ctba);
         }
@@ -534,7 +536,7 @@ int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count) 
     printd(DEBUG_AHCI, "AHCI: read on port=0x%08X,sector=0x%08X,buffer=0x%08X,sector_count=%u\n", kAHCICurrentDisk,sector,buffer,sector_count);
 
     kAHCICurrentDisk->pxis.AsUlong = (uint32_t) - 1; // Clear pending interrupt bits
-    int spin = 0; // Spin lock timeout counter
+    //int spin = 0; // Spin lock timeout counter
 
     HBA_CMD_HEADER* cmdhdr = (HBA_CMD_HEADER*) kAHCICurrentDisk->clb;
     int slot = find_cmdslot(kAHCICurrentDisk);

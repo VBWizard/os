@@ -10,10 +10,7 @@
             <file>file:/home/yogi/src/os/chrisOSKernel/src/syscall.c</file>
             <file>file:/home/yogi/src/os/chrisOSKernel/src/kernel.c</file>
         </group>
-        <group name="kproj">
-            <file>file:/home/yogi/src/os/kproj/chrisOS/src/cpu/gdt.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/src/block/ahci.c</file>
-        </group>
         <group/>
+        <group name="kproj"/>
     </open-files>
 </project-private>

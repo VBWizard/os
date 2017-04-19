@@ -4,6 +4,7 @@
 #include "i386/apic.h"
 #include "utility.h"
 #include "config.h"
+#include "time_os.h"
 
 /** returns a 'true' value if the CPU supports APIC
  *  and if the local APIC hasn't been disabled in MSRs

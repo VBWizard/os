@@ -10,6 +10,8 @@
 #define READCHAR(c)     {asm("call sysEnter_Vector\n":"=a" (c):"a" (SYSCALL_READ), "b" (STDIN_FILE));}
 #define PUTSTRING(c) {asm("call sysEnter_Vector\n"::"a" (SYSCALL_WRITE), "b" (STDOUT_FILE), "c" (c));}
 
+extern int printI(const char *format, ...);
+
 VISIBLE void puts(char* buffer)
 {
     PUTSTRING(buffer)
@@ -39,7 +41,7 @@ VISIBLE int gets(char* buffer, int maxlen, int stream)
     
     if (stream!=1)
     {
-        print("Stream %u not implemented\n",stream);
+        printI("Stream %u not implemented\n",stream);
         getsError: goto getsError;
     }
     

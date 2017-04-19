@@ -7,6 +7,7 @@
 #include "i386/irqHandlers.h"
 #include "i386/kPaging.h"
 #include "utility.h"
+#include "charDev.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;

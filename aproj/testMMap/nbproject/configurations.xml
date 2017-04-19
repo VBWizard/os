@@ -40,6 +40,8 @@
           <standard>3</standard>
           <incDir>
             <pElem>../libChrisOS/include</pElem>
+            <pElem>../../kproj/chrisOSKernel/include</pElem>
+            <pElem>../../kproj/chrisOS/include</pElem>
           </incDir>
           <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
           <useLinkerLibraries>false</useLinkerLibraries>
@@ -77,6 +79,8 @@
           <standard>3</standard>
           <incDir>
             <pElem>../libChrisOS/include</pElem>
+            <pElem>../../kproj/chrisOSKernel/include</pElem>
+            <pElem>../../kproj/chrisOS/include</pElem>
           </incDir>
           <commandLine>-masm=intel -ffreestanding -nostdlib</commandLine>
         </cTool>

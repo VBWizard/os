@@ -67,10 +67,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time: ${OBJECTFILES}
 ${OBJECTDIR}/testtime.o: testtime.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DDEBUG -I../libChrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/testtime.o testtime.c
+	$(COMPILE.c) -g -DDEBUG -I../libChrisOS/include -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/testtime.o testtime.c
 
 # Subprojects
 .build-subprojects:
+	cd ../libChrisOS && ${MAKE} -j 8 -f Makefile CONF=Debug
 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
@@ -79,6 +80,7 @@ ${OBJECTDIR}/testtime.o: testtime.c
 
 # Subprojects
 .clean-subprojects:
+	cd ../libChrisOS && ${MAKE} -j 8 -f Makefile CONF=Debug clean
 
 # Enable dependency checking
 .dep.inc: .depcheck-impl

@@ -1,6 +1,7 @@
 #include "chrisos.h"
 #include "i386/kPaging.h"
 #include "i386/gdt.h"
+#include "printf.h"
 
 extern uint32_t*  kKernelPageDir;
 extern uint64_t kE820MemoryBytes;
@@ -8,7 +9,8 @@ extern uint32_t kDebugLevel;
 extern struct idt_entry kInitialIDT[0x30];
 extern struct idt_ptr kInitialIDTReg;
 extern struct gdt_ptr kernelGDT;
-
+extern void set_gdt(struct gdt_ptr *);
+extern void doPagingJump();
 void initializeKernelPaging()
 {
         uint32_t *ptr;
@@ -33,7 +35,7 @@ void initializeKernelPaging()
                 }
                 ptrT += 0x400;
         }
-        uint32_t pageDirEntrySize = 0x400000;
+        //uint32_t pageDirEntrySize = 0x400000;
         ptr2=(void*)KERNEL_CR3 + (KERNEL_PAGED_BASE_ADDRESS / 0x400000)*4; //(((uint32_t)KERNEL_PAGED_BASE_ADDRESS / (uint32_t)0x400000) * 4);
         kKernelPageTables=(uint32_t*)KERNEL_PAGE_TABLE_BASE_ADDRESS;
         //Initialize Kernel Page Directory

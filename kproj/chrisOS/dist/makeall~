@@ -1,22 +1,84 @@
 #!/bin/bash
-echo ">>> MAKING KERNEL PROJECTS <<<"
+echo "Initiating builds"
+if [ "$1" != "" ]
+then
+	buildType=$1
+else
+	buildType="debug"
+fi
+
+pathMid=dist/${buildType^}/cross-Linux
+
+declare -a kernProgArray=("chrisOS" "chrisOSKernel")
+declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")
+declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap")
+declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap")
+
+sudo mount /dev/disk/by-id/ata-ST31000528AS_5VP8R4ME-part6 /mnt/loop/
 basePath=/home/yogi/src/os/kproj/
-cd $basePath/chrisOSKernel/dist
-./makeit
-echo ">>> MAKING APPLICATION PROJECTS <<<"
+
+tabs 5,36,50,70
+
+echo "Build environment: ${buildType^^}"
+echo
+echo "Making kernel projects"
+for i in "${kernProgArray[@]}"
+do
+	cd $basePath/$i/
+	echo "  Make $i"
+	./make_$buildType > /dev/null
+	if [ $? -eq 0 ] 
+	then
+		echo -en "\tMake $i ... \tsuccess!\n"
+	else
+		echo -en "\tMake $i ... \tfailed"
+		echo 
+		echo 
+		sudo umount /mnt/loop
+		tabs -8
+		exit -1
+	fi
+done
+
+echo
+echo "Making application projects"
 basePath=/home/yogi/src/os/aproj/
-cd $basePath/myHelloWorld/dist
-./makeit
-cd $basePath/myHelloWorld2/dist
-./makeit
-cd $basePath/testMainProgramEntry/dist
-./makeit
-cd $basePath/libChrisOS/dist
-./makeit
-cd $basePath/kshell/dist
-./makeit
-cd $basePath/time/dist
-./makeit
-cd $basePath/testMMap/dist
-./makeit
+for i in "${appProgArray[@]}"
+do
+	cd $basePath/$i/
+	echo "  Make $i"
+	./make_$buildType > /dev/null
+	if [ $? -eq 0 ] 
+	then
+		echo -en "\tMake $i ... \tsuccess!\n"
+	else
+		echo "\tMake $i ... \tfailed"
+		echo 
+		echo 
+		sudo umount /mnt/loop
+		tabs -8
+		exit -2
+	fi
+done
+
+echo "Done making projects"
+echo "Copying output to disk and ISO directory"
+basePath=/home/yogi/src/os/kproj
+for i in "${kernOutputArray[@]}"
+do
+	sudo cp $basePath/$i /mnt/loop/
+	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
+	echo -en "\t$i ...done\n"
+done
+basePath=/home/yogi/src/os/aproj
+for i in "${appOutputArray[@]}"
+do
+	sudo cp $basePath/$i /mnt/loop/
+	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
+	echo -en "\t$i ... done\n"
+done
+echo "Copying done"
+echo "Builds complete"
+tabs -8
+sudo umount /mnt/loop
 
