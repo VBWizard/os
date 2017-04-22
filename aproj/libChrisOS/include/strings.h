@@ -20,7 +20,6 @@
 #define ISUPPER(c)  ((c) >= 'A' && (c) <= 'Z')
 
 size_t strlen(const char* str);
-char * strcpy(char *s1, const char *s2);
 /* This routine should be optimized. */
 
 /* ANSI sez:
@@ -34,17 +33,20 @@ char * strcpy(char *s1, const char *s2);
  */
 //int strcmp (const char *p1, const char *p2);
 //int strncmp(const char *s1, const char *s2, size_t n);
-char* strcat (char *dest, const char *src);
-int strcmp (const char *p1, const char *p2);
-char * strcpy(char *s1, const char *s2);
-char * strcpyc(char *s1, const char *s2, unsigned count);
-char* strleft(char* val, int cnt);
-size_t strlen(const char* str);
-int strncmp(const char *s1, const char *s2, size_t n);
-char * strncpy(char *s1, const char *s2, size_t n);
-long strtol(const char *nptr, char **endptr, register int base);
-unsigned long strtoul(const char *nptr, char **endptr, register int base);
-char * strtrim(char * *pointerToString);
+    char* strcat (char *dest, const char *src);
+    int strcmp (const char *p1, const char *p2);
+    char * strcpy(char *s1, const char *s2);
+    char * strcpyc(char *s1, const char *s2, unsigned count);
+    char* strleft(char* val, int cnt);
+    size_t strlen(const char* str);
+    int strncmp(const char *s1, const char *s2, size_t n);
+    char * strncpy(char *s1, const char *s2, size_t n);
+    long strtol(const char *nptr, char **endptr, register int base);
+    unsigned long strtoul(const char *nptr, char **endptr, register int base);
+    char * strtrim(char * *pointerToString);
+    char * strtok(char* s, /*const*/ char* delim);
+    char *strchr(const char *s, int c);
+    int strcspn(char* string, char* chars);
 
 #endif	/* STRINGS_H */
 

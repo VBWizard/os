@@ -14,10 +14,99 @@
 #include "sysloader.h"
 #include "strings.h"
 #include "paging.h"
+#include "kutility.h"
+#include "errors.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
 extern uint64_t kIdleTicks;
+
+#define PAGE_USER_READABLE 0x4
+#define PAGE_USER_WRITABLE 0x6           //0x4 for "User" | 0x2 for "Writable"
+#define PAGE_PRESENT 0x1
+#define GET_PROCESS_POINTER(process) {process=(process_t*)(PROCESS_STRUCT_VADDR);process=(process_t*)process->this;} //Use the process' virtual process pointer to get the kernel friendly pointer to the process
+
+uintptr_t userCR3=0;
+
+void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size) //Copy memory from kernel to user space (assumes dest is user page)
+{
+    uintptr_t srcCR3=KERNEL_CR3, destCR3=process->pageDirPtr;
+    uintptr_t workingDestAddr=0, workingSrcAddr=0;
+    unsigned long bytesLeft=size,loopBytesLeft=0;
+    uintptr_t destPagedAddress, srcPagedAddress;
+
+    //Initialize the source and destination addresses
+    workingSrcAddr=(uintptr_t)src;
+    workingDestAddr=(uintptr_t)dest;
+
+    //Loop until nothing left to copy, subtracting the local "copied bytes" amount from bytesLeft every iteration
+    while (bytesLeft)
+    {
+        //Get the page table entries for the source and destination
+        destPagedAddress=pagingGet4kPTEntryValueCR3(destCR3,(uintptr_t)workingDestAddr);
+        srcPagedAddress=pagingGet4kPTEntryValueCR3(srcCR3,(uintptr_t)workingSrcAddr);
+        
+        //Verify the page table entry for the source is present and allows reading by the kernel
+        if (!srcPagedAddress&PAGE_PRESENT)
+            process->errno=ERROR_SOURCE_ADDRESS_NOT_PRESENT;
+        if (!srcPagedAddress&PAGE_USER_READABLE)
+            process->errno=ERROR_SOURCE_ADDRESS_NOT_READABLE;
+
+        //Verify the page table entry for the destination is present, allows reading by the user and allows writing by the kernel
+        if (!destPagedAddress&PAGE_PRESENT)
+            process->errno=ERROR_DEST_ADDRESS_NOT_PRESENT;
+        if (!destPagedAddress&PAGE_USER_WRITABLE)
+            process->errno=ERROR_DEST_ADDRESS_NOT_WRITABLE;
+        if (process->errno)
+            return NULL;
+        
+        destPagedAddress=(destPagedAddress&0xFFFFF000) | (workingDestAddr&0x00000FFF);
+        srcPagedAddress=(srcPagedAddress&0xFFFFF000) | (workingSrcAddr&0x00000FFF);
+        
+        if ((workingDestAddr%PAGE_SIZE!=0) || (bytesLeft < PAGE_SIZE))  //If not page aligned write or bytes left < an entire page
+        {
+            if (bytesLeft>PAGE_SIZE-(workingDestAddr%PAGE_SIZE))        //If bytes left greater than 
+                loopBytesLeft=PAGE_SIZE-(workingDestAddr%PAGE_SIZE);
+            else
+                loopBytesLeft=bytesLeft;
+        }
+        else
+            loopBytesLeft=PAGE_SIZE;
+        
+        memcpy((void*)destPagedAddress,(void*)srcPagedAddress,loopBytesLeft);
+        //Decrement the total bytes left by the loop bytes left
+        bytesLeft-=loopBytesLeft;
+        //Increment the source and destination addresses
+        workingDestAddr+=loopBytesLeft;
+        workingSrcAddr+=loopBytesLeft;
+    }
+    return dest;
+}
+
+char* processGetCWD(char* buf, unsigned long size) //NOTE buf required to be not NULL
+{
+    char* retVal=0, cwdSize=0;
+    SAVE_CURRENT_CR3(userCR3);
+    //Get the process from 
+    process_t* process;
+    //GET_PROCESS_POINTER(process);
+    process=(process_t*)PROCESS_STRUCT_VADDR;
+    process=(process_t*)process->this;
+    LOAD_KERNEL_CR3;
+    cwdSize=strlen(process->cwd)+1;
+    if (buf==NULL)
+        process->errno=ERROR_INVALID_DEST;
+    else if (size<cwdSize)
+        process->errno=ERROR_SIZE_TOO_SMALL;
+    else
+        copyFromKernel(process,buf,process->cwd,cwdSize);
+    if (process->errno)
+        retVal=NULL;
+    else
+        retVal=buf;
+    LOAD_CR3(userCR3);
+    return retVal;
+}
 
 void processWrapup();
 bool taskRegInitialized=false;
@@ -110,6 +199,11 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     process->elf=NULL;
     gmtime_r((time_t*)&kSystemCurrentTime,&process->startTime);
     
+    //Initialize the current working directory and set it to '/'
+    process->cwd=allocPagesAndMap(PAGE_SIZE);
+    memset(process->cwd,0,PAGE_SIZE);
+    strcpy(process->cwd,"/");
+    
     process->parent=parentProcessPtr;
     if (process->parent!=NULL)
     {
@@ -146,7 +240,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
         argc=0;
     }
     process->task->process=process;
-    process->this=&process;
+    process->this=process;
     process->processSyscallESP=process->task->tss->ESP1;
     process->pageDirPtr=process->task->tss->CR3;
     process->priority=PROCESS_DEFAULT_PRIORITY;
@@ -165,7 +259,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     }
     else    //Configure the idle process
     {
-        process->task->tss->EIP=&processIdleLoop;
+        process->task->tss->EIP=(uintptr_t)&processIdleLoop;
     }
 
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);

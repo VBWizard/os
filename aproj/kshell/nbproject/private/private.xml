@@ -10,5 +10,12 @@
         <group name="Application Group">
             <file>file:/home/yogi/src/os/kshell/kshell.c</file>
         </group>
+        <group name="aproj">
+            <file>file:/home/yogi/src/os/aproj/kshell/kshell.c</file>
+        </group>
+        <group name="os">
+            <file>file:/home/yogi/src/os/aproj/kshell/include/kshell.h</file>
+            <file>file:/home/yogi/src/os/aproj/kshell/kshell.c</file>
+        </group>
     </open-files>
 </project-private>

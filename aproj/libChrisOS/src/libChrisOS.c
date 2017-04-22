@@ -117,3 +117,8 @@ VISIBLE struct tm* gettime()
     do_syscall2(SYSCALL_GETTICKS,ticks);
     return gmtime_r((time_t*)&ticks,&theTime);
 }
+
+VISIBLE char* getcwd(char* buf, size_t size)
+{
+    return (char*)do_syscall3(SYSCALL_GETCWD,(uint32_t)buf,size);
+}

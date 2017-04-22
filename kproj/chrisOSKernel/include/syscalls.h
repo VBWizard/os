@@ -18,27 +18,28 @@
 extern "C" {
 #endif
 
-typedef enum esyscalls
-{
-SYSCALL_INVALID                 = 0x0,
-SYSCALL_ENDPROCESS 		= 0x1,
-SYSCALL_READ 			= 0x3,
-SYSCALL_WRITE 			= 0x4,
-SYSCALL_EXEC			= 0x59,
-SYSCALL_WAITFORPID		= 0x61,
-SYSCALL_SETPRIORITY             = 0x97,
-SYSCALL_REGEXITHANDLER          = 0x163,
-SYSCALL_FREE			= 0x164,
-SYSCALL_ALLOC			= 0x165,
-SYSCALL_SLEEP			= 0x166,
-SYSCALL_SETSIGACTION            = 0x167,
-SYSCALL_STOP			= 0x168,
-SYSCALL_REBOOT			= 0x169,
-SYSCALL_GETTICKS		= 0x170,
-SYSCALL_PRINT			= 0x300,
-SYSCALL_PRINTD			= 0x301,
-SYSCALL_HLT			= 0x302
-} E_SYSCALLS;
+    typedef enum esyscalls
+    {
+        SYSCALL_INVALID                 = 0x0,
+        SYSCALL_ENDPROCESS 		= 0x1,
+        SYSCALL_READ 			= 0x3,
+        SYSCALL_WRITE 			= 0x4,
+        SYSCALL_GETCWD                  = 0x4f,
+        SYSCALL_EXEC			= 0x59,
+        SYSCALL_WAITFORPID		= 0x61,
+        SYSCALL_SETPRIORITY             = 0x97,
+        SYSCALL_REGEXITHANDLER          = 0x163,
+        SYSCALL_FREE			= 0x164,
+        SYSCALL_ALLOC			= 0x165,
+        SYSCALL_SLEEP			= 0x166,
+        SYSCALL_SETSIGACTION            = 0x167,
+        SYSCALL_STOP			= 0x168,
+        SYSCALL_REBOOT			= 0x169,
+        SYSCALL_GETTICKS		= 0x170,
+        SYSCALL_PRINT			= 0x300,
+        SYSCALL_PRINTD			= 0x301,
+        SYSCALL_HLT			= 0x302
+    } E_SYSCALLS;
 
 
 

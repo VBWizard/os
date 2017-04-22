@@ -22,13 +22,16 @@
                    projectFiles="true">
       <logicalFolder name="strings" displayName="strings" projectFiles="true">
         <itemPath>src/strings/strcat.c</itemPath>
+        <itemPath>../../kproj/chrisOS/src/strings/strchr.c</itemPath>
         <itemPath>src/strings/strcmp.c</itemPath>
         <itemPath>src/strings/strcpy.c</itemPath>
+        <itemPath>../../kproj/chrisOS/src/strings/strcspn.c</itemPath>
         <itemPath>src/strings/strlen.c</itemPath>
         <itemPath>src/strings/strncmp.c</itemPath>
         <itemPath>src/strings/strncpy.c</itemPath>
         <itemPath>src/strings/stroul.c</itemPath>
         <itemPath>src/strings/strparts.c</itemPath>
+        <itemPath>../../kproj/chrisOS/src/strings/strtok.c</itemPath>
         <itemPath>src/strings/strtol.c</itemPath>
         <itemPath>src/strings/strtrim.c</itemPath>
       </logicalFolder>
@@ -79,6 +82,21 @@
           <commandLine>-nostdlib -T linker.ld -ffreestanding</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../../kproj/chrisOS/src/strings/strchr.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../kproj/chrisOS/src/strings/strcspn.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../kproj/chrisOS/src/strings/strtok.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
       <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
@@ -159,6 +177,21 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../../kproj/chrisOS/src/strings/strchr.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../kproj/chrisOS/src/strings/strcspn.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../kproj/chrisOS/src/strings/strtok.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
       <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">

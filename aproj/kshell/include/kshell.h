@@ -23,17 +23,19 @@ typedef struct
     int paramCount;
 } command_table_t;
 
-void helpMe();
+void helpMe(char *cmdline);
 void kExit(char *cmdline);
 void execp(char* cmdline);
 void kSleep(char *cmdline);
+void pwd();
 
 char sExecutingProgram[512];
 char* sKShellProgramName;
 command_table_t cmds[] = { 
-        {"help","Get help (this information)",helpMe,0},
+        {"help","Get help (this information)",helpMe,1},
         {"exec","Execute a program",execp,1},
         {"exit","Exit kshell",kExit,1},
+        {"pwd","Print working directory",pwd,0},
         {"sleep","Sleep for x seconds",kSleep,1}
     };
 void (*command_function)(void);

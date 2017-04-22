@@ -35,6 +35,9 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/4459a81c/strchr.o \
+	${OBJECTDIR}/_ext/4459a81c/strcspn.o \
+	${OBJECTDIR}/_ext/4459a81c/strtok.o \
 	${OBJECTDIR}/src/input/input.o \
 	${OBJECTDIR}/src/libChrisOS.o \
 	${OBJECTDIR}/src/malloc.o \
@@ -79,6 +82,21 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibchrisos.a: ${OBJECTFILES}
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibchrisos.a
 	${AR} -rv ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibchrisos.a ${OBJECTFILES} 
 	$(RANLIB) ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/liblibchrisos.a
+
+${OBJECTDIR}/_ext/4459a81c/strchr.o: ../../kproj/chrisOS/src/strings/strchr.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/4459a81c
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../../chrisOSKernel/include -I../../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/4459a81c/strchr.o ../../kproj/chrisOS/src/strings/strchr.c
+
+${OBJECTDIR}/_ext/4459a81c/strcspn.o: ../../kproj/chrisOS/src/strings/strcspn.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/4459a81c
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../../chrisOSKernel/include -I../../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/4459a81c/strcspn.o ../../kproj/chrisOS/src/strings/strcspn.c
+
+${OBJECTDIR}/_ext/4459a81c/strtok.o: ../../kproj/chrisOS/src/strings/strtok.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/4459a81c
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../../chrisOSKernel/include -I../../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/4459a81c/strtok.o ../../kproj/chrisOS/src/strings/strtok.c
 
 ${OBJECTDIR}/src/input/input.o: src/input/input.c 
 	${MKDIR} -p ${OBJECTDIR}/src/input

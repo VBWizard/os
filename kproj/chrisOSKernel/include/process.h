@@ -30,7 +30,7 @@ extern "C" {
 #define PROCESS_HEAP_END   0xBFFFFFFF
 #define PROCESS_MAX_EXIT_HANDLERS 20    
 #define PROCESS_STRUCT_VADDR 0xF000F000
-
+#define PROCESS_STRUCT_VADDR_THIS_OFFSET 0x4
     
     typedef void exitHandler(void);
 
@@ -39,7 +39,7 @@ extern "C" {
     typedef struct sprocess
     {
         uint32_t processSyscallESP;         //NOTE: this must be the first item in the struct, as it is mapped into the process later
-        uintptr_t this;                     //NOTE: This must remain the second item in the struct at offset +4
+        struct sprocess* this;                     //NOTE: This must remain the second item in the struct at offset +4
         uint32_t pageDirPtr;
         task_t* task;
         sGDT* gdtEntry;
@@ -57,9 +57,10 @@ extern "C" {
         int argc;
         uintptr_t argv;
         struct rusage usage;
-        file_t* stdin, *stdout, *stderr;
+        file_t* stdin, *stdout, *stderr;        //standard input/output/error pointers
         dllist_t* mmaps;
         int errno;
+        char* cwd;                              //Current working directory for the process
     } process_t;
 
 
@@ -67,7 +68,8 @@ extern "C" {
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);
-
+    char* processGetCWD(char* buf, unsigned long size);
+    
 #define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus
 }

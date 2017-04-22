@@ -1,10 +1,12 @@
 #dashboard -enabled off
 symbol-file Debug/cross-Linux/chrisos
-add-symbol-file /home/yogi/src/os/chrisOSKernel/dist/Debug/cross-Linux/kernel 0x01000000
-add-symbol-file /home/yogi/src/os/testMainProgramEntry/dist/Debug/cross-Linux/testmainprogramentry 0x02000000
-add-symbol-file /home/yogi/src/os/libChrisOS/dist/Debug/cross-Linux/libc.so 0x30000000 
-add-symbol-file /home/yogi/src/os/kshell/dist/Debug/cross-Linux/kshell 0x03100000
-add-symbol-file /home/yogi/src/os/time/dist/Debug/cross-Linux/time 0x03200000
+symbol-file /home/yogi/src/os/kproj/chrisOS/dist/Debug/cross-Linux/chrisos
+add-symbol-file /home/yogi/src/os/kproj/chrisOSKernel/dist/Debug/cross-Linux/kernel 0x01000000
+add-symbol-file /home/yogi/src/os/aproj/testMainProgramEntry/dist/Debug/cross-Linux/testmainprogramentry 0x02000000
+add-symbol-file /home/yogi/src/os/aproj/libChrisOS/dist/Debug/cross-Linux/libc.so 0x30000000 
+add-symbol-file /home/yogi/src/os/aproj/kshell/dist/Debug/cross-Linux/kshell 0x03100000
+add-symbol-file /home/yogi/src/os/aproj/time/dist/Debug/cross-Linux/time 0x03200000
+add-symbol-file /home/yogi/src/os/aproj/testMMap/dist/Debug/cross-Linux/testmmap 0x08048000
 set disassembly-flavor intel
 alias sv = set variable 
 #dashboard assembly

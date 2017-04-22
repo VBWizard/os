@@ -18,11 +18,17 @@
 extern "C" {
 #endif
 
-#define ERROR_MMAP_ADDRESS_INVALID      -100
-#define ERROR_MMAP_OFFSET_INVALID       -101
-#define ERROR_MMAP_PROT_INVALID         -102
-#define ERROR_MMAP_FLAGS_INVALID         -103
-#define ERROR_MMAP_ADDRESS_IN_USE       -104
+#define ERROR_MMAP_ADDRESS_INVALID          -100
+#define ERROR_MMAP_OFFSET_INVALID           -101
+#define ERROR_MMAP_PROT_INVALID             -102
+#define ERROR_MMAP_FLAGS_INVALID            -103
+#define ERROR_MMAP_ADDRESS_IN_USE           -104
+#define ERROR_SOURCE_ADDRESS_NOT_PRESENT    -105
+#define ERROR_SOURCE_ADDRESS_NOT_READABLE   -106
+#define ERROR_DEST_ADDRESS_NOT_PRESENT      -107
+#define ERROR_DEST_ADDRESS_NOT_WRITABLE     -108
+#define ERROR_INVALID_DEST                  -109
+#define ERROR_SIZE_TOO_SMALL                -110
 
 #ifdef __cplusplus
 }

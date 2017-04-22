@@ -5,6 +5,7 @@
  */
 
 #include "syscall.h"
+#include "syscalls.h"
 #include "printf.h"
 #include "signals.h"
 #include "kmalloc.h"
@@ -22,6 +23,7 @@
 #define check_flag(flags, n) ((flags) & bit(n))
 
 extern int kTimeZone;
+char* processGetCWD(char* buf, unsigned long size);
 
 //NOTE: Upon entering _sysCall, the process' CR3 is still being used
 void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
@@ -68,6 +70,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             }
             else
                 panic("_sysCall: sys_write for descriptor 0x%08X not implemented\n",param1);
+            break;
+        case SYSCALL_GETCWD:    //param1=buffer *, param2=size of buffer
+            retVal=processGetCWD(param1,param2);
             break;
         case 0x59:      //***exec: param1=program path
             __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));

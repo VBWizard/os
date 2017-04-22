@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 echo "Initiating builds"
 if [ "$1" != "" ]
 then
@@ -31,7 +32,7 @@ do
 	then
 		echo -en "\tMake $i ... \tsuccess!\n"
 	else
-		echo -en "\tMake $i ... \tfailed"
+		echo -en "\tMake $i ... \tfailed\n"
 		echo 
 		echo 
 		sudo umount /mnt/loop
@@ -52,7 +53,7 @@ do
 	then
 		echo -en "\tMake $i ... \tsuccess!\n"
 	else
-		echo "\tMake $i ... \tfailed"
+		echo -en "\tMake $i ... \tfailed"
 		echo 
 		echo 
 		sudo umount /mnt/loop

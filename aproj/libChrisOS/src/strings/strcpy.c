@@ -6,6 +6,7 @@ strcpy(char *s1, const char *s2)
     char *s = s1;
     while ((*s++ = *s2++) != 0)
 	;
+    *s=0;       //CLR 04/20/2017: Added terminating null character to returned string
     return (s1);
 }
 

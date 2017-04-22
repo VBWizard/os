@@ -17,12 +17,11 @@
 
 bool timeToExit=false;
 uint32_t exitCode=0;
+char delim[6] = " \t\n-,";
 
-extern int kATADeviceInfoCount;
 void execInternalCommand(char lCommand[256]);
 int findCommand(char* command);
 char **buildargv (const char *input);
-void helpMe();
 
 void execInternalCommand(char lCommand[256])
 {
@@ -38,7 +37,7 @@ void execInternalCommand(char lCommand[256])
             command_function();
         else
         {
-            command_function_p(&lCommand[strlen(cmds[i].name)+1]);  
+            command_function_p(&lCommand[strlen(cmds[i].name)+1]);  //NOTE: Remove & and "[strlen(cmds[i].name)+1]" to add command to the parameters
         }
     }
     else
@@ -238,11 +237,27 @@ char **buildargv (const char *input)
   return (argv);
 }
 
-void helpMe()
+void helpMe(char *cmdline)
 {
-    print("Help:\n");
+    char* tok;
+    
+    tok=strtok(cmdline,delim);
+/*    while (tok!=NULL)
+    {
+        print("\t%s",tok);
+        tok=strtok(0,delim);
+    }
+*/    
+    print("Help: %s\n",tok);
     for (unsigned cnt=0;cnt<sizeof(cmds)/sizeof(command_table_t);cnt++)
-        print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
+        if (tok!=NULL)
+        {
+            if (strncmp(tok,cmds[cnt].name,100)==0)
+                print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
+        }
+        else
+            print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
+        
 }
 
 char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH])
@@ -267,28 +282,46 @@ void freeArgV(int pcount, char **params)
 void execp(char* cmdline)
 {
     bool background=false;
-    int programParamNum=0;
+    uint32_t pid=0;
+    char* tok;
+    char* pgm=NULL;
+
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
-    uint32_t pid=0;
-
-    char** prms=paramsToArgv(paramCount,&params[0][0]);
+    int execParamCount=0;
+    int pcount=1;
     
-    if (strcmp(params[0],"/b")==0)
+    tok=strtok(cmdline,delim);
+    while (tok!=NULL)
     {
-        background=true;
-        programParamNum++;
+        if (strncmp(tok,"b",2)==0)
+        {
+            background=true;
+            execParamCount++;
+        }
+        else if (pgm==NULL)
+        {
+            pgm=malloc(strlen(tok)+1);  //NOTE: +1 is for the terminating \0
+            strcpy(pgm,tok);
+        }
+        pcount++;
+        tok=strtok(0,delim);
     }
-    print ("Executing %s\n",params[programParamNum]);
-    pid=exec(params[programParamNum],paramCount-programParamNum,prms);
+    
+    char** prms=paramsToArgv(paramCount-execParamCount,&params[execParamCount][0]);
+
+    print ("Executing %s\n",pgm);
+    pid=exec(pgm,paramCount-execParamCount,prms);
     if (pid>0)
     {
         if (!background)
             waitpid(pid);
     }
     else
-        print("Error executing %s\n",params[programParamNum]);
-    freeArgV(paramCount, (char**)prms);
+        print("Error executing %s\n",pgm);
+    //Its ok to free arguments now because they are copied by the kernel to pgm's memory
+    freeArgV(paramCount-1, (char**)prms);       
+    free(pgm);
 }
 
 void kSleep(char *cmdline)
@@ -316,6 +349,13 @@ void kExit(char *cmdline)
     else
         exitCode = 0;
     timeToExit=true;
+}
+
+void pwd()
+{
+    char* buf=malloc(512);
+    print("%s\n",getcwd(buf,512));
+    free(buf);
 }
 
 int kShell(int argc, char** argv)
@@ -445,5 +485,6 @@ doneGettingKeys:
             commandBuffPtr=commandsPtr;
         }
     }
+    free(sKShellProgramName);
     return exitCode;
 }

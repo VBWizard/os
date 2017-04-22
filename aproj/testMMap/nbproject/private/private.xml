@@ -9,8 +9,6 @@
         <group name="Application Group">
             <file>file:/home/yogi/src/os/testMMap/main.c</file>
         </group>
-        <group name="aproj">
-            <file>file:/home/yogi/src/os/aproj/testMMap/main.c</file>
-        </group>
+        <group name="aproj"/>
     </open-files>
 </project-private>

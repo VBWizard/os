@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 echo "Initiating builds"
 if [ "$1" != "" ]
 then
@@ -19,7 +20,7 @@ basePath=/home/yogi/src/os/kproj/
 
 tabs 5,36,50,70
 
-echo "Build environment: ${buildType^^}"
+echo "Build environment: ${buildType^}"
 echo
 echo "Making kernel projects"
 for i in "${kernProgArray[@]}"
@@ -31,7 +32,7 @@ do
 	then
 		echo -en "\tMake $i ... \tsuccess!\n"
 	else
-		echo -en "\tMake $i ... \tfailed"
+		echo -en "\tMake $i ... \tfailed\n"
 		echo 
 		echo 
 		sudo umount /mnt/loop

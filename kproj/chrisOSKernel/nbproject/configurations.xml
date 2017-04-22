@@ -54,6 +54,7 @@
       <itemPath>../../chrisOS/include/kernelObjects.h</itemPath>
       <itemPath>include/kernelVariables.h</itemPath>
       <itemPath>include/kmalloc.h</itemPath>
+      <itemPath>include/kutility.h</itemPath>
       <itemPath>include/mm.h</itemPath>
       <itemPath>include/mmap.h</itemPath>
       <itemPath>include/paging.h</itemPath>
@@ -354,6 +355,8 @@
       </item>
       <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/kutility.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mmap.h" ex="false" tool="3" flavor2="0">
@@ -638,6 +641,8 @@
       <item path="include/kernelVariables.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kutility.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
