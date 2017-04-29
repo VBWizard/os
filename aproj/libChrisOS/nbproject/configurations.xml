@@ -12,6 +12,7 @@
       <itemPath>include/stdio.h</itemPath>
       <itemPath>include/strings.h</itemPath>
       <itemPath>include/time.h</itemPath>
+      <itemPath>include/types.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -40,6 +41,7 @@
       <itemPath>src/malloc.c</itemPath>
       <itemPath>src/memcpy.c</itemPath>
       <itemPath>src/memset.c</itemPath>
+      <itemPath>src/mmap.c</itemPath>
       <itemPath>src/stdio.c</itemPath>
       <itemPath>src/time.c</itemPath>
     </logicalFolder>
@@ -113,6 +115,8 @@
       </item>
       <item path="include/time.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/types.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
@@ -122,6 +126,8 @@
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/stdio.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -208,6 +214,8 @@
       </item>
       <item path="include/time.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/types.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
@@ -217,6 +225,8 @@
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/stdio.c" ex="false" tool="0" flavor2="0">
       </item>

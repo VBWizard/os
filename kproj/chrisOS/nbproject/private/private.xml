@@ -8,9 +8,9 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="Kernel Projects"/>
         <group/>
-        <group name="kproj"/>
         <group name="os">
             <file>file:/home/yogi/src/os/kproj/chrisOS/include/config.h</file>
         </group>
+        <group name="kproj"/>
     </open-files>
 </project-private>

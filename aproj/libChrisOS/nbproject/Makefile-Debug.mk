@@ -43,6 +43,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/malloc.o \
 	${OBJECTDIR}/src/memcpy.o \
 	${OBJECTDIR}/src/memset.o \
+	${OBJECTDIR}/src/mmap.o \
 	${OBJECTDIR}/src/stdio.o \
 	${OBJECTDIR}/src/strings/strcat.o \
 	${OBJECTDIR}/src/strings/strcmp.o \
@@ -120,6 +121,11 @@ ${OBJECTDIR}/src/memset.o: src/memset.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/memset.o src/memset.c
+
+${OBJECTDIR}/src/mmap.o: src/mmap.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mmap.o src/mmap.c
 
 ${OBJECTDIR}/src/stdio.o: src/stdio.c 
 	${MKDIR} -p ${OBJECTDIR}/src

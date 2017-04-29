@@ -6,6 +6,7 @@
 #include "time_os.h"
 #include "kbd.h"
 #include "fs.h"
+#include "strings.h"
 
 extern volatile char kTranslatedKeypress;
 extern uint32_t kDebugLevel;
@@ -27,6 +28,12 @@ size_t readConsole (struct file * fptr, char *buffer, size_t size, uint64_t* wha
 size_t writeConsole(struct file * fptr, const char *buffer, size_t size, uint64_t *whatever)
 {
     return printk(buffer);
+}
+
+void consoleWriteString(const char* buffer)
+{
+    size_t size=strlen(buffer);
+    writeConsole(NULL,buffer,size,NULL);
 }
 
 void keyboardInit()
@@ -100,7 +107,7 @@ int gets(char* buffer, int len)
             if (inchar==0x0a)
             {
                 printk("%c",inchar);
-                return;
+                return cnt;
             }
             if (cnt<len-2)
             {

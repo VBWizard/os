@@ -27,7 +27,7 @@ extern volatile uint32_t exceptionCR2;
 extern volatile uint32_t *exceptionSavedStack;
 extern volatile uint32_t exceptionSavedESP;
 extern volatile uint32_t* kTicksSinceStart;
-extern void* keyboardHandlerRoutine;
+extern void* kKeyboardHandlerRoutine;
 extern struct idt_entry* idtTable;
 extern void vector21();
 uint32_t kbdTop=KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE;
@@ -168,7 +168,7 @@ void kbd_handler_generic()
 
 void kbd_handler_generic_init()
 {
-    keyboardHandlerRoutine=&kbd_handler_generic;
+    kKeyboardHandlerRoutine=&kbd_handler_generic;
     idt_set_gate (&idtTable[0x21], 0x08, (int)&vector21, ACS_INT); //Keyboard IRQ
     
 }

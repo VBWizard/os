@@ -35,7 +35,7 @@ uint32_t newHeapRequiredToFulfillRequest(size_t size)
         return 0;
 }
 
-VISIBLE void*  malloc(size_t size)
+__attribute__((visibility("default"))) void*  malloc(size_t size)
 {
     void* retVal;
 
@@ -70,11 +70,11 @@ VISIBLE void*  malloc(size_t size)
     HEAP_GET_NEXT(heapPtr,heapPtrNext);
     ((heaprec_t*)heapPtrNext)->prev=heapPtr;
     heapCurr+=size+(sizeof(heaprec_t));
-    //printDebug(DEBUG_MALLOC,"\n");
+    printdI(DEBUG_MALLOC,"returning 0x%08X\n",retVal);
     return retVal;
 }
 
-VISIBLE void free(void* fpointer)
+__attribute__((visibility("default"))) void free(void* fpointer)
 {
     heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
     

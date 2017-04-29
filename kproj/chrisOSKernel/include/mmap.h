@@ -64,9 +64,7 @@ extern "C" {
 
     typedef struct smemorymapping memmap_t;
 
-    void * mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset);
-
-    dllist_t* kMemoryMapsList=NULL;
+    void * sys_mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset);
     
 #ifdef __cplusplus
 }

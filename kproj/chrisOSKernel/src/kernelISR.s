@@ -13,7 +13,7 @@
 .extern kTicksSinceStart
 .extern nextScheduleTicks
 .extern kKernelCR3
-.extern keyboardHandlerRoutine
+.extern kKeyboardHandlerRoutine
 .extern call defaultISRHandler
 
 
@@ -176,7 +176,7 @@ sysCallHandler:
 notSysCallHandler:
     cmp ax,21
     jne notKbdHandler
-    mov eax,keyboardHandlerRoutine
+    mov eax,kKeyboardHandlerRoutine
     cmp eax,0
     je  kbdError
     call eax

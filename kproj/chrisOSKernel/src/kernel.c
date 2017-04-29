@@ -38,7 +38,7 @@ task_t* kIdleTask;
 uint64_t kIdleTicks=0;
 uint32_t saveESP;
 uint32_t kKernelCR3=KERNEL_CR3;
-void* keyboardHandlerRoutine=NULL;
+void* kKeyboardHandlerRoutine=NULL;
 extern void keyboardInit();
 
 int main(int argc, char** argv) {
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     }
 */
     kbd_handler_generic_init();
-    printk("Hello kernel world!!!\n");
+    printk("Kernel loaded...\n");
     schedulerEnabled=false;
     schedulerTaskSwitched=false;
     printk("Initializing memory management ...\n");

@@ -29,17 +29,25 @@ extern "C" {
     //  change properties   USB/HD/Mouse/Keyboard/Display/Timer
     //  
 
-    typedef struct sport
+    typedef enum sdevicemode
+    {
+        DEVMODE_CHARACTER,
+        DEVMODE_BLOCK
+    } eDeviceMode;
+    
+    typedef struct sdeviceport
     {
         uint64_t port_num;
         bool readable, writable;
-    } port_t;
+        dllist_t listItem;
+    } devicePort_t;
     
     typedef struct sinterrupt
     {
         int interrupt_num;
         void (*handler_high)();
         void (*handler_low)();
+        dllist_t listItem;
     } interrupt_t;
     
     typedef enum eseektype
@@ -51,13 +59,14 @@ extern "C" {
     
     typedef struct sdevice
     {
+        dllist_t listItem;
+        eDeviceMode devType;
         uint64_t node_id;
         char* device_id;
-        uint64_t port;
+        devicePort_t* ports;
         int (*read) (uint64_t node, uint64_t targetAddress, void* buffer, uint64_t count);          //Function prototype for reading
         int (*write) (uint64_t node, uint64_t targetAddress, void* buffer, uint64_t count);          //Function prototype for writing
         int (*seek) (uint64_t node, uint64_t targetAddress, eSeekType seek_type);          //Function prototype for seeking
-        dllist_t listItem;
     } device_t;
 
     dllist_t* kDevList;

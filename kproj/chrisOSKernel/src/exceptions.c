@@ -17,6 +17,7 @@
 #include "thesignals.h"
 #include "alloc.h"
 #include "paging.h"
+#include "mmap.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
@@ -38,6 +39,7 @@ extern time_t kSystemCurrentTime;
 extern uint32_t exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR3, exceptionCR4;
 extern bool kPagingInitDone;
 extern volatile char* kKbdBuffCurrTop;
+extern void* kMalloc(size_t size);
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
@@ -54,26 +56,64 @@ void kPagingExceptionHandler()
     uint32_t lPTEValue=0;
     uint32_t lPDEAddress=0, lPTEAddress=0;
     uint32_t lOldDebugLevel=0;
-
+    bool isCow=false;
+    uint32_t pagePhysAddr=lPTEValue&0xFFFFF000;
+    uint32_t pageFlags=lPTEValue&0x00000FFF;
+    uint32_t pageVirtAddress;
+    
     __asm__("mov cr3,eax\n"::"a"(KERNEL_CR3));
     
     lPTEAddress=kPagingGet4kPTEntryAddressCR3(exceptionCR3,exceptionCR2);
-
-    //During paging init a paging exception is purposely triggered, so turn off debugging for that
-    if (!kPagingInitDone)
-    {
-        lOldDebugLevel=kDebugLevel;
-        kDebugLevel&=!DEBUG_EXCEPTIONS;
-    }
     lPDEAddress=kPagingGet4kPDEntryAddressCR3(exceptionCR3,exceptionCR2);
     lPDEValue=kPagingGet4kPDEntryValueCR3(exceptionCR3,exceptionCR2);
     lPTEValue=kPagingGet4kPTEntryValueCR3(exceptionCR3,exceptionCR2);
     //Check for CoW pages in libraries
-    printd(DEBUG_EXCEPTIONS,"Paging exception START: for 0x%08X\n",exceptionCR2);
+    printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X) in %s\n",exceptionCR2,exceptionCR3);
     process_t* process=findTaskByCR3(exceptionCR3)->process;
     elfInfo_t* elf=process->elf;
-    bool isCow=false;
-    printd(DEBUG_EXCEPTIONS,"\tProcess=%s, checking for CoW bss/data in libraries\n",process->path);
+
+
+    printd(DEBUG_EXCEPTIONS,"\tProcess=%s\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",process->path,lPTEValue);
+    //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
+    pageVirtAddress=lPTEValue&0xFFFFF000;
+    if ( (pageVirtAddress==(exceptionCR2&0xFFFFF000)) 
+            && (pageFlags&4==4) 
+            && (lPTEValue&1==0) )
+    {
+        printd(DEBUG_EXCEPTIONS,"\t\tFound uninitialized mmap page\n",process->path,lPTEValue);
+        dllist_t* mmaps=process->mmaps;
+        memmap_t* mmap=NULL;
+        if (pageVirtAddress==exceptionCR2&0xFFFFF000)
+        if (mmaps!=NULL)
+        {
+            while (mmaps->next!=mmaps)
+            {
+                mmap=mmaps->payload;
+                if (mmap->startAddress<exceptionCR2 && mmap->startAddress+mmap->len>exceptionCR2)
+                    break;
+                mmaps=mmaps->next;
+            }
+            if (mmap==NULL)
+                panic("kPagingExceptionHandler: Could not find mmap for address 0x%08X\n",exceptionCR2);
+            printd(DEBUG_EXCEPTIONS,"\t\tFound corrrect mmap.  Will map this page and add to mmap->mmappedPages\n");
+            pagePhysAddr=(uint32_t)allocPages(PAGE_SIZE);
+            pagingMapPage(exceptionCR3,pageVirtAddress,pagePhysAddr,0x7);  //Map page read/write
+            mmappedPage_t* mappedPage=kMalloc(sizeof(mmappedPage_t));
+            mappedPage->address=pageVirtAddress;
+            mappedPage->loaded=true;
+            dllist_t* mapList=&mmap->mmappedPages->listItem;
+            listAdd(mapList,&mappedPage->listItem,mappedPage);
+            printd(DEBUG_EXCEPTIONS,"\tMapped v=0x%08X to p=0x%08X (CR3=0x%08X)\n",pageVirtAddress,pagePhysAddr,exceptionCR3);
+            //NOTE: Later we'll add loading from a file if one is defined in the mmap
+            __asm__("xor ebx,ebx\nmov cr2,ebx\nmov cr3,eax\n"::"a" (exceptionCR3));
+        }
+        else
+            printd(DEBUG_EXCEPTIONS,"\t\tProcess has no mmaps, skipping mmap check\n",process->path,lPTEValue);
+    }
+    else
+        printd(DEBUG_EXCEPTIONS,"\t\tNot mmap page\n",process->path,lPTEValue);
+    
+    printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bss/data in libraries\n",process->path);
     for (int cnt=0;cnt<process->elf->libraryElfCount;cnt++)
     {
         elfInfo_t* lib=elf->libraryElfPtr[cnt];
@@ -118,9 +158,6 @@ void kPagingExceptionHandler()
           printDumpedRegs();
           //printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
-    //Setting debugging back to what it was previously
-    if (lOldDebugLevel)
-        kDebugLevel=lOldDebugLevel;
     
     kPagingExceptionsSinceStart++;
     printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08X\n",exceptionCR3);
@@ -129,14 +166,14 @@ void kPagingExceptionHandler()
 
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
 
-    if (p->task->taskNum!=1)      //retval=1 is Kernel, so don't return.
+    if (p->task->taskNum!=1)
     {
         printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Returning\n");
         __asm__("\nsti\nnop\nnop\nnop\nmov cr3,eax\n":"=a"(exceptionCR3));
         return;
     }
 pagingExceptionStop: 
-    printk("Exception was in kernel, halting system\n");
+    printk("Exception was not handled (taskNum=0x%04X), halting system\n",p->task->taskNum);
     __asm__("cli");
     __asm__("hlt");
     goto pagingExceptionStop;

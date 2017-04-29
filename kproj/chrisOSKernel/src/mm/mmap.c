@@ -13,6 +13,8 @@
 
 #define ERROR_EXIT(a) {p->errno=a;goto mmap_exit;}
 
+dllist_t* kMemoryMapsList=NULL;
+
 void mmapAddToGlobalList(memmap_t* map)
 {
     if (kMemoryMapsList==NULL)
@@ -31,7 +33,7 @@ void mmapRemoveFromGlobalList(memmap_t* map)
     listRemove(&map->listItem);
 }
 
-void* mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memory map pages either to a file or anonymously
+void* sys_mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memory map pages either to a file or anonymously
 {
     memmap_t* map;
     process_t* p=(process_t*)PROCESS_STRUCT_VADDR+4;
@@ -98,9 +100,9 @@ void* mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memo
 
     //Initialize the mmap page list and add first item to it
     map->mmappedPages=kMalloc(sizeof(mmappedPage_t));
+    memset(map->mmappedPages,0,sizeof(mmappedPage_t));  //First entry will always be 0
     dllist_t* mapList=&map->mmappedPages->listItem;
     listInit(mapList,map);
-    
     int mappedPageCount=1;
     
     //Set up the virtual memory for the mmap

@@ -25,8 +25,64 @@ extern uint64_t kIdleTicks;
 #define PAGE_USER_WRITABLE 0x6           //0x4 for "User" | 0x2 for "Writable"
 #define PAGE_PRESENT 0x1
 #define GET_PROCESS_POINTER(process) {process=(process_t*)(PROCESS_STRUCT_VADDR);process=(process_t*)process->this;} //Use the process' virtual process pointer to get the kernel friendly pointer to the process
+#define PATH_MAX 512
 
 uintptr_t userCR3=0;
+
+void* copyToKernel(process_t* process, void* dest, const void* src, unsigned long size) //Copy memory from user space to kernel (assumes dest is kernel page)
+{
+    uintptr_t srcCR3=process->pageDirPtr, destCR3=KERNEL_CR3;
+    uintptr_t workingDestAddr=0, workingSrcAddr=0;
+    unsigned long bytesLeft=size,loopBytesLeft=0;
+    uintptr_t destPagedAddress, srcPagedAddress;
+
+    //Initialize the source and destination addresses
+    workingSrcAddr=(uintptr_t)src;
+    workingDestAddr=(uintptr_t)dest;
+
+    //Loop until nothing left to copy, subtracting the local "copied bytes" amount from bytesLeft every iteration
+    while (bytesLeft)
+    {
+        //Get the page table entries for the source and destination
+        destPagedAddress=pagingGet4kPTEntryValueCR3(destCR3,(uintptr_t)workingDestAddr);
+        srcPagedAddress=pagingGet4kPTEntryValueCR3(srcCR3,(uintptr_t)workingSrcAddr);
+        
+        //Verify the page table entry for the source is present and allows reading by the kernel
+        if (!srcPagedAddress&PAGE_PRESENT)
+            process->errno=ERROR_SOURCE_ADDRESS_NOT_PRESENT;
+        if (!srcPagedAddress&PAGE_USER_READABLE)
+            process->errno=ERROR_SOURCE_ADDRESS_NOT_READABLE;
+
+        //Verify the page table entry for the destination is present, allows reading by the user and allows writing by the kernel
+        if (!destPagedAddress&PAGE_PRESENT)
+            process->errno=ERROR_DEST_ADDRESS_NOT_PRESENT;
+        if (!destPagedAddress&PAGE_USER_WRITABLE)
+            process->errno=ERROR_DEST_ADDRESS_NOT_WRITABLE;
+        if (process->errno)
+            return NULL;
+        
+        destPagedAddress=(destPagedAddress&0xFFFFF000) | (workingDestAddr&0x00000FFF);
+        srcPagedAddress=(srcPagedAddress&0xFFFFF000) | (workingSrcAddr&0x00000FFF);
+        
+        if ((workingDestAddr%PAGE_SIZE!=0) || (bytesLeft < PAGE_SIZE))  //If not page aligned write or bytes left < an entire page
+        {
+            if (bytesLeft>PAGE_SIZE-(workingDestAddr%PAGE_SIZE))        //If bytes left greater than 
+                loopBytesLeft=PAGE_SIZE-(workingDestAddr%PAGE_SIZE);
+            else
+                loopBytesLeft=bytesLeft;
+        }
+        else
+            loopBytesLeft=PAGE_SIZE;
+        
+        memcpy((void*)destPagedAddress,(void*)srcPagedAddress,loopBytesLeft);
+        //Decrement the total bytes left by the loop bytes left
+        bytesLeft-=loopBytesLeft;
+        //Increment the source and destination addresses
+        workingDestAddr+=loopBytesLeft;
+        workingSrcAddr+=loopBytesLeft;
+    }
+    return dest;
+}
 
 void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size) //Copy memory from kernel to user space (assumes dest is user page)
 {
@@ -190,11 +246,20 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     process=allocPagesAndMap(sizeof(process_t));
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process\n",process);
     memset(process,0,sizeof(process_t));
+    process->task=createTask(isKernelProcess);
+    process->pageDirPtr=process->task->tss->CR3;
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;
     process->path=(char*)kMalloc(0x1000);
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
-    strcpy(process->path,path);
+    //strcpy(process->path,path);
+    if (parentProcessPtr!=NULL)
+    {
+        if (parentProcessPtr->pageDirPtr!=KERNEL_CR3)
+           copyToKernel(parentProcessPtr,process->path,path,PATH_MAX);
+    }
+    else
+        strcpy(process->path,path);
     printd(DEBUG_PROCESS,"process->path (0x%08X)=%s\n",process->path,process->path);
     process->elf=NULL;
     gmtime_r((time_t*)&kSystemCurrentTime,&process->startTime);
@@ -219,7 +284,6 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
 //        process->stdin=((process_t*)parentProcessPtr)->stdout=STDOUT_FILE;
 //        process->stdin=((process_t*)parentProcessPtr)->stderr=STDERR_FILE;
     }  
-    process->task=createTask(isKernelProcess);
     process->mmaps=kMalloc(sizeof(dllist_t));
     
     process->argv=argv;
@@ -242,7 +306,6 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     process->task->process=process;
     process->this=process;
     process->processSyscallESP=process->task->tss->ESP1;
-    process->pageDirPtr=process->task->tss->CR3;
     process->priority=PROCESS_DEFAULT_PRIORITY;
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
     pagingMapPage(process->task->tss->CR3,PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000,0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
