@@ -198,7 +198,7 @@ static int printI(char **out, const char *format, va_list args )
 
 int printp_valist(const char *format, va_list args)
 {
-    char inString[1024];
+    char inString[512];
     char* in=inString;
 
     printI(&in, format,args);
@@ -207,7 +207,10 @@ int printp_valist(const char *format, va_list args)
     
     for (int cnt=0;cnt<len;cnt++)
     {
-            outb(0x3f8,inString[cnt]);
+//        Uncomment this to get initial logging from VirtualBox
+//        if (cnt%3==0)
+//            wait(10);
+        outb(0x3f8,inString[cnt]);
     }
     
 }

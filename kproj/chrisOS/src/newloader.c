@@ -214,6 +214,11 @@ void loadSections(void* file,elfInfo_t* elfInfo, bool isLibrary)
             printd(DEBUG_ELF_LOADER,"seeking to 0x%08X ...",elfInfo->pgmHdrTable[cnt].p_offset);
             fl_fseek(file, elfInfo->pgmHdrTable[cnt].p_offset, SEEK_SET);
             printd(DEBUG_ELF_LOADER,"reading %u bytes to 0x%08X\n",elfInfo->pgmHdrTable[cnt].p_filesz,loadAddress);
+            if (loadAddress==0xc0100000)
+            {
+                int a=0;
+                a+=1-1+2-2+3;
+            }
             fl_fread(loadAddress, 1, elfInfo->pgmHdrTable[cnt].p_filesz, file); //CLR 03/12/2017: Changed from p_memsz to p_filesz (prev & next line too))
             printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", cnt, elfInfo->pgmHdrTable[cnt].p_filesz, loadAddress);
             if (elfInfo->pgmHdrTable[cnt].p_filesz<elfInfo->pgmHdrTable[cnt].p_memsz)

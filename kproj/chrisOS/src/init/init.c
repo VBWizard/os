@@ -248,6 +248,7 @@ gdt_init();
     kInitDone=false;
     kPagingInitDone=false;
     kTicksPerMS=1000/kTicksPerSecond;
+    init_serial();
     kDebugStartsNow=false;
     memset(kATADeviceInfo,0x0,sizeof(struct ataDeviceInfo_t)*20);
     memset(kGDTSlotAvailableInd,0xFF,GDT_TABLE_SIZE);

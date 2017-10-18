@@ -567,7 +567,9 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
 elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool alreadyLoaded)
 {
     GET_OLD_CR3;
-            
+
+    __asm__("push ds");                 //clr 09/24/2017: This code is blowing away the DS so save it for restoration later
+    
     if (CR3==0x0)
         CR3=CURRENT_CR3;
     elfInfo_t* elfInfo;
@@ -604,6 +606,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
     {
         printk("Error opening file '%s' (err=%u), cannot exec\n",elfInfo->fileName,fPtr);
         elfInfo->loadCompleted=false;
+        __asm__("pop ds");                  //clr 09/24/2017: Restore the DS since we blew it up
         return elfInfo;
     }   
 
@@ -612,6 +615,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
         if (!elfLoadSections(fPtr,elfInfo,CR3))
         {
             elfInfo->loadCompleted=false;
+            __asm__("pop ds");                  //clr 09/24/2017: Restore the DS since we blew it up
             return elfInfo;
         }
 
@@ -771,6 +775,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
              printd(DEBUG_ELF_LOADER,"Failed to process ELF dynamic section, error=0x%08X\n",err);
             fl_fclose(fPtr);
             elfInfo->loadCompleted=false;
+            __asm__("pop ds");                  //clr 09/24/2017: Restore the DS since we blew it up
             return elfInfo;
          }
     }
@@ -778,6 +783,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
     elf_relocate(elfInfo);
     fl_fclose(fPtr);
     elfInfo->loadCompleted=true;
+    __asm__("pop ds");                  //clr 09/24/2017: Restore the DS since we blew it up
     return elfInfo;
 }
 

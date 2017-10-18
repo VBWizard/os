@@ -315,7 +315,10 @@ void execp(char* cmdline)
     if (pid>0)
     {
         if (!background)
+        {
+            //print("DEBUG1: waitpid = %08X\n",&waitpid);
             waitpid(pid);
+        }
     }
     else
         print("Error executing %s\n",pgm);

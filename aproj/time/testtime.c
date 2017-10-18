@@ -35,25 +35,45 @@ int main(int argc, char** argv) {
         retVal=-1;
     }
     char* execpgm=malloc(512);
-    strcpy(execpgm,argv[1]);
-    startTime=time();
-    pid=exec(execpgm,0,NULL);
-    if (pid==0)
+    if (argv[1]==NULL)
     {
-        print("Error executing %s\n",argv[1]);
-        retVal=-2;
+        print("Parameter 2 must be a program name to run\n");
+        retVal=-4;
     }
     else
     {
-        waitpid(pid);
-        endTime=time();
-        elapsed=(endTime-startTime);
-        totalTime=malloc(sizeof(totalTime));    
-        print("Elapsed ticks = %u\n",elapsed);
-        int ms=elapsed%TICKS_PER_SECOND;
-        elapsed/= TICKS_PER_SECOND;
-        gmtime_r(&elapsed,totalTime);
-        print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
+        strcpy(execpgm,argv[1]);
+        strtrim(execpgm);
+        if (retVal==0)
+        {
+            if (strlen(execpgm)==0)
+            {
+                print("Parameter 2 must be a program name to run\n");
+                retVal=-2;
+            }
+        }
+    }
+    if (retVal==0)
+    {
+        startTime=time();
+        pid=exec(execpgm,0,NULL);
+        if (pid==0)
+        {
+            print("Error executing %s\n",argv[1]);
+            retVal=-3;
+        }
+        else
+        {
+            waitpid(pid);
+            endTime=time();
+            elapsed=(endTime-startTime);
+            totalTime=malloc(sizeof(totalTime));    
+            print("Elapsed ticks = %u\n",elapsed);
+            int ms=elapsed%TICKS_PER_SECOND;
+            elapsed/= TICKS_PER_SECOND;
+            gmtime_r(&elapsed,totalTime);
+            print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
+        }
     }
     free(execpgm);
 //    free (execpgm);

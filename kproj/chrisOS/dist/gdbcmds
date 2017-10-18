@@ -11,6 +11,7 @@ set disassembly-flavor intel
 alias sv = set variable 
 #dashboard assembly
 #dashboard history -output /dev/pts/6
-target remote localhost:1234
+#target remote localhost:1234
+target remote localhost:8832
 #c
 

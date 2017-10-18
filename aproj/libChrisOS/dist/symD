@@ -1,5 +1,5 @@
 pushd ../
 ./make_debug
 popd
-objdump -x -t Debug/cross-Linux/kshell > kshell.sym
-vi kshell.sym
+objdump -x -t Debug/cross-Linux/libc.so > libc.sym
+vi libc.sym

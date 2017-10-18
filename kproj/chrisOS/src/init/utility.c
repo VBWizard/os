@@ -189,7 +189,7 @@ char * strtoupper(char* pointerToString)
 void printDumpedRegs()
 {
     uint32_t esp = exceptionSavedESP;
-
+    volatile unsigned short *lCSIPPtr=(volatile unsigned short *)exceptionCS;
 LOAD_ZERO_BASED_DS    
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
     printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
@@ -197,7 +197,7 @@ LOAD_ZERO_BASED_DS
     printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
     printk("GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
     printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
-          printk("Bytes at CS:EIP: ");
+//          printk("Bytes at CS:EIP: ");
 //          for (int cnt=0;cnt<19;cnt++)
 //              printk("%02X ", lCSIPPtr[cnt]);
 //          printk("\n");

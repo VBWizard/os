@@ -1,7 +1,35 @@
 #include "strings.h"
 
+__attribute__((visibility("default"))) void strtrim(char *input)
+{
+   char *dst = input, *src = input;
+   char *end;
+
+   // Skip whitespace at front...
+   //
+   while (*src==' ')
+   {
+      ++src;
+   }
+
+   // Trim at end...
+   //
+   end = src + strlenI(src) - 1;
+   while (end > src && *end==' ')
+   {
+      *end-- = 0;
+   }
+
+   // Move if needed.
+   //
+   if (src != dst)
+   {
+      while ((*dst++ = *src++));
+   }
+}
+
 /*FROM: http://codereview.stackexchange.com/questions/20897/trim-function-in-c*/
-__attribute__((visibility("default"))) char * strtrim(char * *pointerToString)
+/*__attribute__((visibility("default"))) char * strtrim(char * *pointerToString)
 {
     uint8_t start=0, length=0;
 
@@ -40,3 +68,5 @@ __attribute__((visibility("default"))) char * strtrim2(char* pointerToString)
 
     return pointerToString;
 }
+ */
+

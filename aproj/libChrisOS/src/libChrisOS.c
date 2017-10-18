@@ -99,7 +99,7 @@ VISIBLE int exec(char* path, int argc, char** argv)
     int pid=0;
     //Using the syscall is breaking the stack
 //    SYSCALL4(SYSCALL_EXEC,path,argc,argv);
-    __asm__("int 0x80\n"
+    __asm__("push ds\nint 0x80\npop ds\n"
             :"=a" (pid)
             :"a" (0x59),"b" (path),"c" (argc),"d" (argv));
     return pid;

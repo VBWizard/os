@@ -480,6 +480,7 @@ void runAnotherTask(bool schedulerRequested)
     {
         printd(DEBUG_PROCESS,"*No new task to run, continuing with the current task\n");
         changeTaskQueue(taskToStop,TASK_RUNNING);   //switch it back to the running queue
+        printd(DEBUG_PROCESS,"CS: 0x%08x, EIP: 0x%08x, DS: 0x%08x\n",taskToStop->tss->CS, taskToStop->tss->EIP, taskToStop->tss->DS);
     }
 
     if (taskToRun!=NULL && taskToRun->taskNum!=taskToStop->taskNum)

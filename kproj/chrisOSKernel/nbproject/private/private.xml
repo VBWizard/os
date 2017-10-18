@@ -11,17 +11,12 @@
             <file>file:/home/yogi/src/os/chrisOSKernel/src/kernel.c</file>
         </group>
         <group/>
-        <group name="os">
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/process.h</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernelISR.s</file>
-        </group>
         <group name="kproj">
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernel.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/keyboard.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/fs.h</file>
         </group>
+        <group name="os"/>
     </open-files>
 </project-private>

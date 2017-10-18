@@ -17,10 +17,14 @@
 
 void IRQ_set_mask(unsigned char IRQline);
 void IRQ_clear_mask(unsigned char IRQline);
+static __inline void outb(unsigned short __port, unsigned char __val);
+static __inline unsigned char inb(unsigned short __port);
+
 
 static __inline void outb(unsigned short __port, unsigned char __val)
 {
-	__asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
+   while (inb((unsigned short)(__port + 5)) & 0x20 == 0);
+   __asm__ volatile ("outb %1, %0" : : "a" (__val), "dN" (__port));
 }
 
 static __inline void outw(unsigned short __port, unsigned short __val)
