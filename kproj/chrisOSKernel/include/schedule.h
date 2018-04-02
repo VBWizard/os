@@ -29,6 +29,8 @@ extern "C" {
 #include "kernel.h"
 #include "thesignals.h"
     
+#define RUNNABLE_TICKS_INTERVAL 20
+    
     extern uint32_t* kTaskSlotAvailableInd;
     extern tss_t* kTSSTable;
     extern task_t* kTaskTable;

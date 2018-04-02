@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>include/kshell.h</itemPath>
+      <itemPath>../../kproj/chrisOSKernel/include/thesignals.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -64,6 +65,11 @@
           <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../../kproj/chrisOSKernel/include/thesignals.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="include/kshell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="kshell.c" ex="false" tool="0" flavor2="0">
@@ -112,6 +118,11 @@
           <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../../kproj/chrisOSKernel/include/thesignals.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="include/kshell.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="kshell.c" ex="false" tool="0" flavor2="0">

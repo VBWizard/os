@@ -12,7 +12,6 @@
  */
 
 #include <unistd.h>
-
 #include "kshell.h"
 
 bool timeToExit=false;

@@ -89,7 +89,7 @@ void stop()
     do_syscall1(SYSCALL_STOP);
 }
 
-void modifySignal(int signal, void* sigHandler, int sigData)
+VISIBLE void modifySignal(int signal, void* sigHandler, int sigData)
 {
     do_syscall4(SYSCALL_SETSIGACTION,signal,(uint32_t)sigHandler,sigData);
 }

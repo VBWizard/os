@@ -304,8 +304,11 @@ task_t* findTaskToRun()
                     ((process_t*)((task_t*)*queue)->process)->priority,
                     ((task_t*)*queue)->prioritizedTicksInRunnable);
             if ( (task_t*)*queue!=kIdleTask)
-                ((task_t*)*queue)->prioritizedTicksInRunnable+=(20-((process_t*)((task_t*)*queue)->process)->priority)+1;
-            printd(DEBUG_PROCESS,"%u\n",((task_t*)*queue)->prioritizedTicksInRunnable);
+                ((task_t*)*queue)->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-((process_t*)((task_t*)*queue)->process)->priority)+1;
+            printd(DEBUG_PROCESS,"%u",((task_t*)*queue)->prioritizedTicksInRunnable);
+            if ( (task_t*)*queue==kIdleTask)
+                printd(DEBUG_PROCESS," (idle task)");
+            printd(DEBUG_PROCESS,"\n");
             if ( ((task_t*)*queue)->prioritizedTicksInRunnable > mostIdleTicks)
             {
                 taskToRun=(task_t*)*queue;
@@ -384,6 +387,11 @@ void changeTaskQueue(task_t* task, eTaskState newState)
         task->prioritizedTicksInRunnable=0;
     else if (newState==TASK_RUNNING)
         task->lastRunStartTicks=*kTicksSinceStart;
+}
+
+void taskYield()
+{
+    
 }
 
 void triggerScheduler()

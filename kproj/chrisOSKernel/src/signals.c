@@ -19,6 +19,7 @@ extern uint32_t* kTicksSinceStart;
 extern task_t* findTaskByCR3(uint32_t cr3);
 extern task_t* findTaskByTaskNum(uint32_t taskNum);
 
+//Set a signal but don't trigger the scheduler
 void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
 {
     uint32_t oldCR3;
@@ -39,8 +40,15 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
             p->signals.sighandler[SIG_SEGV]=sigAction;
             p->signals.sigdata[SIG_SEGV]=sigData;
             break; 
+        case SIG_SLEEP:
+            printd(DEBUG_SIGNALS,"Set signal 0x%08X, action=*0x%08X, sigData=0x%08X\n",signal,sigAction,sigData);
+            p->signals.sigind|=SIG_SLEEP;
+            p->signals.sighandler[SIG_SLEEP]=sigAction;
+            p->signals.sigdata[SIG_SLEEP]=sigData;
+            triggerScheduler();
+            break;
         default:
-            panic("Unhandled signal 0x%08X, sigAction 0x%08X\n",signal,sigAction);
+            panic("sys_setsigaction: Unhandled signal 0x%08X, sigAction 0x%08X\n",signal,sigAction);
             break;
     }
     printd(DEBUG_SIGNALS,"Setting CR3 back to 0x%08X\n",oldCR3);
@@ -98,7 +106,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
             return p;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         default:
-            panic("Unhandled signal 0x%08X, sigAction 0x%08X\n",signal,sigAction);
+            panic("sys_sigaction2: Unhandled signal 0x%08X, sigAction 0x%08X\n",signal,sigAction);
     }
     return NULL;
 }

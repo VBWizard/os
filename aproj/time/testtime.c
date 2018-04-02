@@ -73,10 +73,10 @@ int main(int argc, char** argv) {
             elapsed/= TICKS_PER_SECOND;
             gmtime_r(&elapsed,totalTime);
             print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
+            free(totalTime);
         }
     }
     free(execpgm);
-//    free (execpgm);
     return (retVal);
 }
 
