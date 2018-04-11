@@ -60,3 +60,5 @@ core
 gdb_history
 /aproj/cpptest/build/
 /aproj/cpptest/dist/
+*/cross-Linux/*
+
