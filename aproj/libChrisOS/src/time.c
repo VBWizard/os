@@ -14,30 +14,6 @@ long _dstbias=0;                  // Offset for Daylight Saving Time
 char *_tzname[2] = {"GMT", "GMT"};  // Standard/daylight savings time zone names
 int ticksToWait;
 
-const char *_days[7] = {
-  "Sunday", "Monday", "Tuesday", "Wednesday",
-  "Thursday", "Friday", "Saturday"
-};
-
-const char *_days_abbrev[7] = {
-  "Sun", "Mon", "Tue", "Wed", 
-  "Thu", "Fri", "Sat"
-};
-
-const char *_months[12] = {
-  "January", "February", "March",
-  "April", "May", "June",
-  "July", "August", "September",
-  "October", "November", "December"
-};
-
-const char *_months_abbrev[12] = {
-  "Jan", "Feb", "Mar",
-  "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep",
-  "Oct", "Nov", "Dec"
-};
-
 const int _ytab[2][12] = {
   {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
   {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}

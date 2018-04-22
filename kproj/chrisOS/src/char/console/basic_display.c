@@ -21,6 +21,22 @@ KERNEL_DATA_SECTION uint8_t savedPosY[10];
 KERNEL_DATA_SECTION int8_t savedPosPointer=0;
 KERNEL_DATA_SECTION uint8_t kTerminalHeight;
 
+char ansiValue1[5];
+char ansiValue2[5];
+int ansiValue1Index = 0;
+int ansiValue2Index = 0;
+
+typedef enum eansisteps
+{
+    STEP_NONE,
+    STEP_INITIALIZED,
+    STEP_VALUE1,
+    STEP_VALUE2,
+    STEP_COMMAND
+} eAnsiSteps;
+
+eAnsiSteps ansiStep = STEP_NONE;
+
 void update_cursor()
  {
     unsigned short position=(terminal_row*VGA_WIDTH) + terminal_column;
@@ -107,7 +123,116 @@ void terminal_copyline(unsigned dstLine, unsigned srcLine)
     memcpy((void*)dest,(void*)src,rowBytes);
 }
 
+void char2short(unsigned char* pchar, unsigned short* pshort)
+{
+  *pshort = (pchar[0] << 8) | pchar[1];
+}
+
+void resetANSI()
+{
+    ansiStep = STEP_NONE;
+    strcpy(ansiValue1,"\0\0\0\0");
+    strcpy(ansiValue2,"\0\0\0\0");
+    ansiValue1Index = 0;
+    ansiValue2Index = 0;
+}
+
+///Processes an ANSI escape sequence character
+///Returns true if the character is consumed, false if it is not
+///NOTE: This only works for "Cursor Position" (i.e. CSIn;mH)
+bool processANSI(char c)
+{
+    switch (ansiStep)
+    {
+        //STEP_INITIALIZED: \033 has been sent but not [ so look for it
+        case (STEP_INITIALIZED):
+            if (c != '[')
+            {
+                resetANSI();
+                return false;
+            }
+            ansiStep = STEP_VALUE1;
+            return true;
+            break;
+        //STEP_VALUE1: \033[ has been sent so look for the first value
+        case (STEP_VALUE1):
+            //If the charater is a ; then following characters will be parameter 2, otherwise reset
+            if (ISDIGIT(c))
+            {
+                ansiValue1[ansiValue1Index++]=c;
+                return true;
+            }
+            if (c == ';')
+            {
+                ansiStep = STEP_VALUE2;
+                return true;
+            }
+            else
+            {
+                ansiStep = STEP_COMMAND;
+                return processANSI(c);
+            }
+            break;
+        //STEP_VALUE2: first parameter and separating ; have been sent so now accept the 2nd parameter
+        //bail if it is not numeric
+        case STEP_VALUE2:
+            if (ISDIGIT(c))
+            {
+                ansiValue2[ansiValue2Index++]=c;
+                return true;
+            }
+            else
+            {
+                ansiStep = STEP_COMMAND;
+                return processANSI(c);
+            }
+            break;
+        case (STEP_COMMAND):
+            switch (c)
+            {
+                case ('A'):
+                        cursorMoveToY(terminal_row-atoi(ansiValue1));
+                    break;
+                case ('B'):
+                        cursorMoveToY(terminal_row+atoi(ansiValue1));
+                    break;
+                case ('C'):
+                    cursorMoveToX(terminal_column+atoi(ansiValue1));
+                    break;
+                case ('D'):
+                    cursorMoveToX(terminal_column-atoi(ansiValue1));
+                    break;
+                case ('H'):
+                    cursorMoveTo(atoi(ansiValue1), atoi(ansiValue2));
+                    break;
+                case ('K'):
+                    terminal_clear_line(terminal_row);
+                    cursorMoveTo(0,terminal_row);
+                    break;
+                default:
+                    resetANSI();
+                    return false;
+                    break;
+            }
+            resetANSI();
+            return true;
+            break;
+    }
+    
+    
+}
+
 void terminal_putchar(char c) {
+    if (c=='\033')
+    {
+        ansiStep = STEP_INITIALIZED;
+        return;
+    }
+    else if (ansiStep != STEP_NONE)
+    {
+        if (processANSI(c));
+        return;
+    }
     if (c=='\n')
     {
             terminal_column = 0;
@@ -140,15 +265,15 @@ void terminal_putchar(char c) {
     //We're going to ignore carriage return since most systems don't use it.  Unfortunately the FAT library we are using does
     else if (c=='\r')
         return;
+    else
+    {
+            terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+            if (++terminal_column == VGA_WIDTH) {
+                    terminal_column = 0;
+                    terminal_row++;
+            }
+    }
 
-        else
-        {
-                terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-                if (++terminal_column == VGA_WIDTH) {
-                        terminal_column = 0;
-                        terminal_row++;
-                }
-        }
     if (terminal_row == kTerminalHeight)
     {
         for (unsigned row=0;row<kTerminalHeight;row++)
@@ -169,19 +294,30 @@ void cursorUpdateBiosCursor()
 
 void cursorMoveTo(uint8_t x, uint8_t y)
 {
-    terminal_row = y;
-    terminal_column = x;
-    update_cursor();
+    if (x >= 0 && x < VGA_WIDTH && y >= 0 && y < VGA_HEIGHT)
+    {
+        terminal_row = y;
+        terminal_column = x;
+        update_cursor();
+    }
 }
 
 void cursorMoveToX(uint8_t x)
 {
-    terminal_column = x;
+    if (x >= 0 && x < VGA_WIDTH)
+    {
+        terminal_column = x;
+        update_cursor();
+    }
 }
 
 void cursorMoveToY(uint8_t y)
 {
-    terminal_row = y;
+    if (y >= 0 && y < VGA_HEIGHT)
+    {
+        terminal_row = y;
+        update_cursor();
+    }
 }
 
 uint8_t cursorGetPosX()

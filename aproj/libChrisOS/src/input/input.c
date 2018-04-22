@@ -56,7 +56,7 @@ VISIBLE int gets(char* buffer, int maxlen, int stream)
         else if (inchar!=0)
         {
             lbuf[0]=inchar;
-            PUTSTRING(&lbuf);
+            //PUTSTRING(&lbuf);
             buffer[len++]=inchar;
             //Note: Written this way so that gets an be used as a getc which waits for the key
             if ((len+1>=maxlen) || (inchar==0x0a)) //-1 because we need to leave the terminator (0x0) at the end of the string

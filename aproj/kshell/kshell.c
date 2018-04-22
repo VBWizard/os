@@ -17,6 +17,9 @@
 bool timeToExit=false;
 uint32_t exitCode=0;
 char delim[6] = " \t\n-,";
+char commandHistory[500][MAX_PARAM_WIDTH];
+int commandHistoryPtr=0;
+int commandHistoryMax=0;
 
 void execInternalCommand(char lCommand[256]);
 int findCommand(char* command);
@@ -41,7 +44,7 @@ void execInternalCommand(char lCommand[256])
     }
     else
     {
-        print("Invalid command '%s' ya dummy!\n",lCommand);
+        print("\tInvalid command '%s' ya dummy!\n",lCommand);
     }
 }
 
@@ -290,6 +293,9 @@ void execp(char* cmdline)
     int execParamCount=0;
     int pcount=1;
     
+    if (paramCount==0)
+        return;
+    
     tok=strtok(cmdline,delim);
     while (tok!=NULL)
     {
@@ -360,18 +366,42 @@ void pwd()
     free(buf);
 }
 
+/*void getDate()
+{
+    struct tm theDate;
+    
+    
+}
+*/
+
+void saveCommand(char* command)
+{
+    strcpy(commandHistory[commandHistoryMax++],command);
+}
+
+void prompt()
+{
+    print("%s> ",sExecutingProgram);
+}
+
+int reprintCommand(char* command)
+{
+    resetRow();
+    prompt();
+    print("%s",command);
+ 
+}
+
 int kShell(int argc, char** argv)
 {
     char lCommand[256];
     uint8_t lCurrKey=0;
     int lCurrKeyCount=0;
-    char commands[50][50];
-    int commandsPtr=0;
-    int commandBuffPtr=0;
     int commandWasFromThisBufferPtr=0;
     char ansiSeq[20];
 
     libc_init();
+    
     ansiSeq[0]=0x1b;
     sKShellProgramName=malloc(1024);
     strcpy(sKShellProgramName,"kShell");
@@ -381,10 +411,12 @@ int kShell(int argc, char** argv)
     while (!timeToExit)
     {
 getACommand:
+        commandHistoryPtr = commandHistoryMax;
+        commandWasFromThisBufferPtr = -1;
         lCurrKey=0;
         lCurrKeyCount=0;
         memset(lCommand,0,256);
-        print("%s> ",sExecutingProgram);
+        prompt();
 getAKey:
         lCurrKey=0;
         while(lCurrKey==0)
@@ -394,38 +426,39 @@ getAKey:
         //print("key='%08X'",lCurrKey);
         if((unsigned short)lCurrKey==0xc8) //up
         {
-            if (commandBuffPtr>=0)
-            {/*
-                int lTemp=cursorGetPosY();
-                strcpy(lCommand,commands[--commandBuffPtr]);
-                commandWasFromThisBufferPtr=commandBuffPtr;
-                ansiSeq[1]=1;ansiSeq[2]='A';
-                print(ansiSeq);
-                print("%s                     ",lCommand);
-                lCurrKeyCount=strlen(lCommand);
-                cursorMoveTo(4+lCurrKeyCount,lTemp);
-                goto getAKey;*/
+            if (commandHistoryPtr>=0)
+            {
+                //int lTemp=cursorGetPosY();
+                if (commandHistoryPtr-1>=0)
+                {
+                    strcpy(lCommand,commandHistory[--commandHistoryPtr]);
+                    commandWasFromThisBufferPtr=commandHistoryPtr;
+                    reprintCommand(lCommand);
+                    lCurrKeyCount=strlen(lCommand);
+                }
+                goto getAKey;
             }
             else
                 goto getAKey;
         }
         else if (lCurrKey==0xD0)  //down
         {
-            if (commandBuffPtr<=commandsPtr)
+            if (commandHistoryPtr>=0)
             {
-                /*
-                int lTemp=cursorGetPosY();
-                strcpy(lCommand,commands[++commandBuffPtr]);
-                commandWasFromThisBufferPtr=commandBuffPtr;
-                cursorMoveTo(4,lTemp);
-                print("%s                                                                                ",lCommand);
-                lCurrKeyCount=strlen(lCommand);
-                cursorMoveTo(4+lCurrKeyCount,lTemp);
-                goto getAKey;*/
+                //int lTemp=cursorGetPosY();
+                if (commandHistoryPtr+1<=commandHistoryMax)
+                {
+                    strcpy(lCommand,commandHistory[++commandHistoryPtr]);
+                    commandWasFromThisBufferPtr=commandHistoryPtr;
+                    if (commandHistoryPtr>=commandHistoryMax)
+                        commandWasFromThisBufferPtr=-1;
+                    reprintCommand(lCommand);
+                    lCurrKeyCount=strlen(lCommand);
+                }
+                goto getAKey;
             }
             else
                 goto getAKey;
-            
         }   
         else if (lCurrKey==0xcb) //left
         {
@@ -458,34 +491,25 @@ getAKey:
         }
         else if (lCurrKey==0xa) //Enter
         {
+            print("\n");
             goto doneGettingKeys;
         }
         else
         {
             lCommand[lCurrKeyCount++]=lCurrKey;
+            reprintCommand(lCommand);
+            //Reset pointer to command buffer so that this possibly modified command gets written as a new one
+            commandWasFromThisBufferPtr=-1;
         }
         goto getAKey;
 //        gets(lCommand,50);
 doneGettingKeys:
         if (lCommand[0]==0x0)
             goto getACommand;
+        if (commandWasFromThisBufferPtr == -1)
+            saveCommand(lCommand);
         int i = findCommand(lCommand);
-
         execInternalCommand(lCommand);
-        if(i>0)
-        {
-            i--;
-            //print("Executing command # %u (%s)\n", i, cmds[i].name);
-            if (commandWasFromThisBufferPtr)
-            {
-//                for (int cnt=commandWasFromThisBufferPtr;cnt<=commandsPtr;cnt++)
-//                    strcpy(commands[cnt],commands[cnt+1]);
-//                commandWasFromThisBufferPtr=0;
-//                commandsPtr--;
-            }
-            strcpy(commands[commandsPtr++],lCommand);
-            commandBuffPtr=commandsPtr;
-        }
     }
     free(sKShellProgramName);
     return exitCode;

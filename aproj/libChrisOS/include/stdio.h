@@ -83,7 +83,8 @@ extern "C" {
         struct file_operations fops;
     };
 
-
+    void moveTo(int row, int col);
+    void resetRow();
 
 
 

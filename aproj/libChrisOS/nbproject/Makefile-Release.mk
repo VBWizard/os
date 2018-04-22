@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/4459a81c/strchr.o \
 	${OBJECTDIR}/_ext/4459a81c/strcspn.o \
 	${OBJECTDIR}/_ext/4459a81c/strtok.o \
+	${OBJECTDIR}/src/ascii.o \
 	${OBJECTDIR}/src/input/input.o \
 	${OBJECTDIR}/src/libChrisOS.o \
 	${OBJECTDIR}/src/malloc.o \
@@ -45,6 +46,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/memset.o \
 	${OBJECTDIR}/src/mmap.o \
 	${OBJECTDIR}/src/stdio.o \
+	${OBJECTDIR}/src/strftime.o \
 	${OBJECTDIR}/src/strings/strcat.o \
 	${OBJECTDIR}/src/strings/strcmp.o \
 	${OBJECTDIR}/src/strings/strcpy.o \
@@ -99,6 +101,11 @@ ${OBJECTDIR}/_ext/4459a81c/strtok.o: ../../kproj/chrisOS/src/strings/strtok.c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../../chrisOSKernel/include -I../../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/4459a81c/strtok.o ../../kproj/chrisOS/src/strings/strtok.c
 
+${OBJECTDIR}/src/ascii.o: src/ascii.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../../chrisOSKernel/include -I../../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ascii.o src/ascii.c
+
 ${OBJECTDIR}/src/input/input.o: src/input/input.c 
 	${MKDIR} -p ${OBJECTDIR}/src/input
 	${RM} "$@.d"
@@ -133,6 +140,11 @@ ${OBJECTDIR}/src/stdio.o: src/stdio.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../../chrisOSKernel/include -I../../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/stdio.o src/stdio.c
+
+${OBJECTDIR}/src/strftime.o: src/strftime.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../../chrisOSKernel/include -I../../chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strftime.o src/strftime.c
 
 ${OBJECTDIR}/src/strings/strcat.o: src/strings/strcat.c 
 	${MKDIR} -p ${OBJECTDIR}/src/strings

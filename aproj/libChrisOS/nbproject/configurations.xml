@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>include/ascii.h</itemPath>
       <itemPath>include/input.h</itemPath>
       <itemPath>include/libChrisOS.h</itemPath>
       <itemPath>include/malloc.h</itemPath>
@@ -28,6 +29,7 @@
         <itemPath>src/strings/strcmp.c</itemPath>
         <itemPath>src/strings/strcpy.c</itemPath>
         <itemPath>../../kproj/chrisOS/src/strings/strcspn.c</itemPath>
+        <itemPath>src/strftime.c</itemPath>
         <itemPath>src/strings/strlen.c</itemPath>
         <itemPath>src/strings/strncmp.c</itemPath>
         <itemPath>src/strings/strncpy.c</itemPath>
@@ -37,6 +39,7 @@
         <itemPath>src/strings/strtol.c</itemPath>
         <itemPath>src/strings/strtrim.c</itemPath>
       </logicalFolder>
+      <itemPath>src/ascii.c</itemPath>
       <itemPath>src/input/input.c</itemPath>
       <itemPath>src/libChrisOS.c</itemPath>
       <itemPath>src/malloc.c</itemPath>
@@ -105,6 +108,8 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
@@ -122,6 +127,8 @@
       <item path="include/time.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/ascii.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -209,6 +216,8 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
@@ -227,6 +236,8 @@
       </item>
       <item path="include/types.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/ascii.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
@@ -240,6 +251,8 @@
       <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/stdio.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strftime.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strcat.c" ex="false" tool="0" flavor2="0">
       </item>

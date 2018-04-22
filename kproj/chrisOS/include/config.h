@@ -31,7 +31,7 @@ extern "C" {
 #define PAGE_SIZE 0x1000
 
 #define MAX_PARAM_COUNT 10
-#define MAX_PARAM_WIDTH 50
+#define MAX_PARAM_WIDTH 128
     
 /* ***NOTE: If DEBUG_NONE is defined then there will be no debugging*** */
 //#define DEBUG_NONE 0
