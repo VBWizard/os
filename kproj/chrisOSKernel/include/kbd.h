@@ -119,3 +119,4 @@ static const unsigned char keyboard_map_up[128] =
 uint8_t getKeyboardKey();
 char waitForKeyboardKey();
 int gets(char* buffer, int len);
+char getc();

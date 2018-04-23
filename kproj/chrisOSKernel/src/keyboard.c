@@ -5,20 +5,19 @@
 #include "memory.h"
 #include "time_os.h"
 #include "kbd.h"
-#include "fs.h"
 #include "strings.h"
+#include "charDev.h"
 
 extern volatile char kTranslatedKeypress;
 extern uint32_t kDebugLevel;
 extern volatile char* kKbdBuffCurrTop;
 extern volatile char* kKbdBuffCurrChar;
 
-char getc();
 int gets(char* buffer, int len);
 
-file_operations_t fops;
-inode_t console_node={.i_dev=1,.i_mode=0};
-file_t console_file;
+//file_operations_t fops;
+//inode_t console_node={.i_dev=1,.i_mode=0};
+//file_t console_file;
 
 size_t readConsole (struct file * fptr, char *buffer, size_t size, uint64_t* whatever) 
 {
@@ -38,10 +37,11 @@ void consoleWriteString(const char* buffer)
 
 void keyboardInit()
 {
-    console_file.f_inode=&console_node;
-    fops.read=readConsole;
-    fops.write=writeConsole;
-    console_file.fops=fops;
+    //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS
+    //console_file.f_inode=&console_node;
+    //fops.read=readConsole;
+    //fops.write=writeConsole;
+    //console_file.fops=fops;
 }
 
 

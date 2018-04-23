@@ -69,7 +69,8 @@ int main(int argc, char** argv) {
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
 
     keyboardInit();
-    console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);
+    //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS
+    //console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);
     
     kIdleTicks=0;
     kIdleProcess=createProcess("/sbin/idle",0,NULL,NULL,true);
