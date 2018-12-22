@@ -5,6 +5,7 @@
  */
 
 #include "ascii.h"
+#include "libChrisOS.h"
 
 void reverseI(char s[])
  {
@@ -33,3 +34,17 @@ void reverseI(char s[])
      s[i] = '\0';
      reverseI(s);
  }
+
+  // A simple atoi() function - from http://www.geeksforgeeks.org/write-your-own-atoi
+VISIBLE int atoi(char *str)
+{
+    int res = 0; // Initialize result
+  
+    // Iterate through all characters of input string and
+    // update result
+    for (int i = 0; str[i] != '\0'; ++i)
+        res = res*10 + str[i] - '0';
+  
+    // return result.
+    return res;
+}

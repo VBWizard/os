@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=cross-Linux
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -52,19 +52,19 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L../../libChrisOS/dist/Debug/cross-Linux -Wl,-rpath,../libChrisOS/dist/Debug/cross-Linux -L../libChrisOS/dist/Debug/cross-Linux -lc
+LDLIBSOPTIONS=-L../../libChrisOS/dist/Debug/cross-Linux -Wl,-rpath,'../libChrisOS/dist/Debug/GNU-Linux' -L../libChrisOS/dist/Debug/GNU-Linux -lc
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ../libChrisOS/dist/Debug/cross-Linux/libc.so
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ../libChrisOS/dist/Debug/GNU-Linux/libc.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	gcc -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lc -T linker.ld
 
-${OBJECTDIR}/testMainProgramEntry.o: testMainProgramEntry.c 
+${OBJECTDIR}/testMainProgramEntry.o: testMainProgramEntry.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I../libChrisOS/include -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/testMainProgramEntry.o testMainProgramEntry.c
@@ -76,6 +76,7 @@ ${OBJECTDIR}/testMainProgramEntry.o: testMainProgramEntry.c
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.so
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry
 
 # Subprojects

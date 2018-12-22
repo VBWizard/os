@@ -19,6 +19,7 @@ extern "C" {
 #endif
 #include <stdarg.h>
 #include <stdint.h>
+#include <ascii.h>
 #include "malloc.h"
 #include "strings.h"
 #include "input.h"

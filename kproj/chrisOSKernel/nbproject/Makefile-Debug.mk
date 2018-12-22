@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=cross-Linux
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -118,283 +118,283 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lgcc
 
-${OBJECTDIR}/_ext/9e029b58/asmFunctions.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/asm/asmFunctions.s 
+${OBJECTDIR}/_ext/9e029b58/asmFunctions.o: ../chrisOS/asm/asmFunctions.s nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e029b58
 	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/_ext/9e029b58/asmFunctions.o ../chrisOS/asm/asmFunctions.s
 
-${OBJECTDIR}/_ext/734293bf/ahci.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/block/ahci.c 
+${OBJECTDIR}/_ext/734293bf/ahci.o: ../chrisOS/src/block/ahci.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/734293bf
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/734293bf/ahci.o ../chrisOS/src/block/ahci.c
 
-${OBJECTDIR}/_ext/734293bf/pci.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/block/pci.c 
+${OBJECTDIR}/_ext/734293bf/pci.o: ../chrisOS/src/block/pci.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/734293bf
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/734293bf/pci.o ../chrisOS/src/block/pci.c
 
-${OBJECTDIR}/_ext/7450142c/basic_display.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/char/console/basic_display.c 
+${OBJECTDIR}/_ext/7450142c/basic_display.o: ../chrisOS/src/char/console/basic_display.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/7450142c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7450142c/basic_display.o ../chrisOS/src/char/console/basic_display.c
 
-${OBJECTDIR}/_ext/7450142c/strftime.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/char/console/strftime.c 
+${OBJECTDIR}/_ext/7450142c/strftime.o: ../chrisOS/src/char/console/strftime.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/7450142c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7450142c/strftime.o ../chrisOS/src/char/console/strftime.c
 
-${OBJECTDIR}/_ext/101a755a/bits.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/cpu/bits.c 
+${OBJECTDIR}/_ext/101a755a/bits.o: ../chrisOS/src/cpu/bits.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a755a/bits.o ../chrisOS/src/cpu/bits.c
 
-${OBJECTDIR}/_ext/101a755a/gdt.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/cpu/gdt.c 
+${OBJECTDIR}/_ext/101a755a/gdt.o: ../chrisOS/src/cpu/gdt.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a755a/gdt.o ../chrisOS/src/cpu/gdt.c
 
-${OBJECTDIR}/_ext/101a755a/msr.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/cpu/msr.c 
+${OBJECTDIR}/_ext/101a755a/msr.o: ../chrisOS/src/cpu/msr.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a755a/msr.o ../chrisOS/src/cpu/msr.c
 
-${OBJECTDIR}/_ext/101a7ecb/fat_access.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/fat_access.c 
+${OBJECTDIR}/_ext/101a7ecb/fat_access.o: ../chrisOS/src/fat/fat_access.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_access.o ../chrisOS/src/fat/fat_access.c
 
-${OBJECTDIR}/_ext/101a7ecb/fat_cache.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/fat_cache.c 
+${OBJECTDIR}/_ext/101a7ecb/fat_cache.o: ../chrisOS/src/fat/fat_cache.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_cache.o ../chrisOS/src/fat/fat_cache.c
 
-${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/fat_filelib.c 
+${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o: ../chrisOS/src/fat/fat_filelib.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o ../chrisOS/src/fat/fat_filelib.c
 
-${OBJECTDIR}/_ext/101a7ecb/fat_format.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/fat_format.c 
+${OBJECTDIR}/_ext/101a7ecb/fat_format.o: ../chrisOS/src/fat/fat_format.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_format.o ../chrisOS/src/fat/fat_format.c
 
-${OBJECTDIR}/_ext/101a7ecb/fat_misc.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/fat_misc.c 
+${OBJECTDIR}/_ext/101a7ecb/fat_misc.o: ../chrisOS/src/fat/fat_misc.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_misc.o ../chrisOS/src/fat/fat_misc.c
 
-${OBJECTDIR}/_ext/101a7ecb/fat_string.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/fat_string.c 
+${OBJECTDIR}/_ext/101a7ecb/fat_string.o: ../chrisOS/src/fat/fat_string.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_string.o ../chrisOS/src/fat/fat_string.c
 
-${OBJECTDIR}/_ext/101a7ecb/fat_table.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/fat_table.c 
+${OBJECTDIR}/_ext/101a7ecb/fat_table.o: ../chrisOS/src/fat/fat_table.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_table.o ../chrisOS/src/fat/fat_table.c
 
-${OBJECTDIR}/_ext/101a7ecb/fat_write.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/fat_write.c 
+${OBJECTDIR}/_ext/101a7ecb/fat_write.o: ../chrisOS/src/fat/fat_write.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_write.o ../chrisOS/src/fat/fat_write.c
 
-${OBJECTDIR}/_ext/101a7ecb/taskSwitch.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/fat/taskSwitch.s 
+${OBJECTDIR}/_ext/101a7ecb/taskSwitch.o: ../chrisOS/src/fat/taskSwitch.s nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
 	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/_ext/101a7ecb/taskSwitch.o ../chrisOS/src/fat/taskSwitch.s
 
-${OBJECTDIR}/_ext/f336e79e/ata_disk.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/init/ata_disk.c 
+${OBJECTDIR}/_ext/f336e79e/ata_disk.o: ../chrisOS/src/init/ata_disk.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/f336e79e
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/f336e79e/ata_disk.o ../chrisOS/src/init/ata_disk.c
 
-${OBJECTDIR}/_ext/f336e79e/kpaging.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/init/kpaging.c 
+${OBJECTDIR}/_ext/f336e79e/kpaging.o: ../chrisOS/src/init/kpaging.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/f336e79e
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/f336e79e/kpaging.o ../chrisOS/src/init/kpaging.c
 
-${OBJECTDIR}/_ext/f336e79e/utility.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/init/utility.c 
+${OBJECTDIR}/_ext/f336e79e/utility.o: ../chrisOS/src/init/utility.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/f336e79e
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/f336e79e/utility.o ../chrisOS/src/init/utility.c
 
-${OBJECTDIR}/_ext/9e02dec1/iodugging.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/iodugging.c 
+${OBJECTDIR}/_ext/9e02dec1/iodugging.o: ../chrisOS/src/iodugging.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/iodugging.o ../chrisOS/src/iodugging.c
 
-${OBJECTDIR}/_ext/9e02dec1/memcpy.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/memcpy.c 
+${OBJECTDIR}/_ext/9e02dec1/memcpy.o: ../chrisOS/src/memcpy.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/memcpy.o ../chrisOS/src/memcpy.c
 
-${OBJECTDIR}/_ext/9e02dec1/panic.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/panic.c 
+${OBJECTDIR}/_ext/9e02dec1/panic.o: ../chrisOS/src/panic.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/panic.o ../chrisOS/src/panic.c
 
-${OBJECTDIR}/_ext/9e02dec1/printf.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/printf.c 
+${OBJECTDIR}/_ext/9e02dec1/printf.o: ../chrisOS/src/printf.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/printf.o ../chrisOS/src/printf.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strcat.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strcat.c 
+${OBJECTDIR}/_ext/3e0a6d34/strcat.o: ../chrisOS/src/strings/strcat.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strcat.o ../chrisOS/src/strings/strcat.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strcmp.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strcmp.c 
+${OBJECTDIR}/_ext/3e0a6d34/strcmp.o: ../chrisOS/src/strings/strcmp.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strcmp.o ../chrisOS/src/strings/strcmp.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strcpy.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strcpy.c 
+${OBJECTDIR}/_ext/3e0a6d34/strcpy.o: ../chrisOS/src/strings/strcpy.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strcpy.o ../chrisOS/src/strings/strcpy.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strlen.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strlen.c 
+${OBJECTDIR}/_ext/3e0a6d34/strlen.o: ../chrisOS/src/strings/strlen.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strlen.o ../chrisOS/src/strings/strlen.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strncmp.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strncmp.c 
+${OBJECTDIR}/_ext/3e0a6d34/strncmp.o: ../chrisOS/src/strings/strncmp.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strncmp.o ../chrisOS/src/strings/strncmp.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strncpy.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strncpy.c 
+${OBJECTDIR}/_ext/3e0a6d34/strncpy.o: ../chrisOS/src/strings/strncpy.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strncpy.o ../chrisOS/src/strings/strncpy.c
 
-${OBJECTDIR}/_ext/3e0a6d34/stroul.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/stroul.c 
+${OBJECTDIR}/_ext/3e0a6d34/stroul.o: ../chrisOS/src/strings/stroul.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/stroul.o ../chrisOS/src/strings/stroul.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strparts.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strparts.c 
+${OBJECTDIR}/_ext/3e0a6d34/strparts.o: ../chrisOS/src/strings/strparts.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strparts.o ../chrisOS/src/strings/strparts.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strtol.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strtol.c 
+${OBJECTDIR}/_ext/3e0a6d34/strtol.o: ../chrisOS/src/strings/strtol.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strtol.o ../chrisOS/src/strings/strtol.c
 
-${OBJECTDIR}/_ext/3e0a6d34/strtrim.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/strings/strtrim.c 
+${OBJECTDIR}/_ext/3e0a6d34/strtrim.o: ../chrisOS/src/strings/strtrim.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strtrim.o ../chrisOS/src/strings/strtrim.c
 
-${OBJECTDIR}/_ext/9e02dec1/time.o: nbproject/Makefile-${CND_CONF}.mk ../chrisOS/src/time.c 
+${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/time.o ../chrisOS/src/time.c
 
-${OBJECTDIR}/src/device.o: nbproject/Makefile-${CND_CONF}.mk src/device.c 
+${OBJECTDIR}/src/device.o: src/device.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/device.o src/device.c
 
-${OBJECTDIR}/src/dllist.o: nbproject/Makefile-${CND_CONF}.mk src/dllist.c 
+${OBJECTDIR}/src/dllist.o: src/dllist.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/dllist.o src/dllist.c
 
-${OBJECTDIR}/src/drivers/drv_genKeyboard.o: nbproject/Makefile-${CND_CONF}.mk src/drivers/drv_genKeyboard.c 
+${OBJECTDIR}/src/drivers/drv_genKeyboard.o: src/drivers/drv_genKeyboard.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src/drivers
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drivers/drv_genKeyboard.o src/drivers/drv_genKeyboard.c
 
-${OBJECTDIR}/src/exceptions.o: nbproject/Makefile-${CND_CONF}.mk src/exceptions.c 
+${OBJECTDIR}/src/exceptions.o: src/exceptions.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/exceptions.o src/exceptions.c
 
-${OBJECTDIR}/src/kIRQHandlers.o: nbproject/Makefile-${CND_CONF}.mk src/kIRQHandlers.c 
+${OBJECTDIR}/src/kIRQHandlers.o: src/kIRQHandlers.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/kIRQHandlers.o src/kIRQHandlers.c
 
-${OBJECTDIR}/src/kInit.o: nbproject/Makefile-${CND_CONF}.mk src/kInit.c 
+${OBJECTDIR}/src/kInit.o: src/kInit.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/kInit.o src/kInit.c
 
-${OBJECTDIR}/src/kernel.o: nbproject/Makefile-${CND_CONF}.mk src/kernel.c 
+${OBJECTDIR}/src/kernel.o: src/kernel.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/kernel.o src/kernel.c
 
-${OBJECTDIR}/src/kernelISR.o: nbproject/Makefile-${CND_CONF}.mk src/kernelISR.s 
+${OBJECTDIR}/src/kernelISR.o: src/kernelISR.s nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/src/kernelISR.o src/kernelISR.s
 
-${OBJECTDIR}/src/keyboard.o: nbproject/Makefile-${CND_CONF}.mk src/keyboard.c 
+${OBJECTDIR}/src/keyboard.o: src/keyboard.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/keyboard.o src/keyboard.c
 
-${OBJECTDIR}/src/mm/alloc.o: nbproject/Makefile-${CND_CONF}.mk src/mm/alloc.c 
+${OBJECTDIR}/src/mm/alloc.o: src/mm/alloc.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src/mm
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/alloc.o src/mm/alloc.c
 
-${OBJECTDIR}/src/mm/kmalloc.o: nbproject/Makefile-${CND_CONF}.mk src/mm/kmalloc.c 
+${OBJECTDIR}/src/mm/kmalloc.o: src/mm/kmalloc.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src/mm
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/kmalloc.o src/mm/kmalloc.c
 
-${OBJECTDIR}/src/mm/mm.o: nbproject/Makefile-${CND_CONF}.mk src/mm/mm.c 
+${OBJECTDIR}/src/mm/mm.o: src/mm/mm.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src/mm
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/mm.o src/mm/mm.c
 
-${OBJECTDIR}/src/mm/mmap.o: nbproject/Makefile-${CND_CONF}.mk src/mm/mmap.c 
+${OBJECTDIR}/src/mm/mmap.o: src/mm/mmap.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src/mm
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mm/mmap.o src/mm/mmap.c
 
-${OBJECTDIR}/src/paging.o: nbproject/Makefile-${CND_CONF}.mk src/paging.c 
+${OBJECTDIR}/src/paging.o: src/paging.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/paging.o src/paging.c
 
-${OBJECTDIR}/src/process.o: nbproject/Makefile-${CND_CONF}.mk src/process.c 
+${OBJECTDIR}/src/process.o: src/process.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/process.o src/process.c
 
-${OBJECTDIR}/src/schedule.o: nbproject/Makefile-${CND_CONF}.mk src/schedule.c 
+${OBJECTDIR}/src/schedule.o: src/schedule.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/schedule.o src/schedule.c
 
-${OBJECTDIR}/src/signals.o: nbproject/Makefile-${CND_CONF}.mk src/signals.c 
+${OBJECTDIR}/src/signals.o: src/signals.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/signals.o src/signals.c
 
-${OBJECTDIR}/src/syscall.o: nbproject/Makefile-${CND_CONF}.mk src/syscall.c 
+${OBJECTDIR}/src/syscall.o: src/syscall.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/syscall.o src/syscall.c
 
-${OBJECTDIR}/src/sysloader.o: nbproject/Makefile-${CND_CONF}.mk src/sysloader.c 
+${OBJECTDIR}/src/sysloader.o: src/sysloader.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/sysloader.o src/sysloader.c
 
-${OBJECTDIR}/src/task.o: nbproject/Makefile-${CND_CONF}.mk src/task.c 
+${OBJECTDIR}/src/task.o: src/task.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/task.o src/task.c
 
-${OBJECTDIR}/src/x86.o: nbproject/Makefile-${CND_CONF}.mk src/x86.s 
+${OBJECTDIR}/src/x86.o: src/x86.s nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/src/x86.o src/x86.s
 
-${OBJECTDIR}/src/x86idt.o: nbproject/Makefile-${CND_CONF}.mk src/x86idt.c 
+${OBJECTDIR}/src/x86idt.o: src/x86idt.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/x86idt.o src/x86idt.c
@@ -405,7 +405,6 @@ ${OBJECTDIR}/src/x86idt.o: nbproject/Makefile-${CND_CONF}.mk src/x86idt.c
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel
 
 # Subprojects
 .clean-subprojects:

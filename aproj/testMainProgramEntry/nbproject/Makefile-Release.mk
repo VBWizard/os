@@ -52,19 +52,19 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-Linclude -L/home/yogi/src/os/chrisOS/include -Wl,-rpath,../libChrisOS/dist/Debug/cross-Linux -L../libChrisOS/dist/Debug/cross-Linux -lc
+LDLIBSOPTIONS=-Linclude -L/home/yogi/src/os/chrisOS/include -Wl,-rpath,'../libChrisOS/dist/Debug/GNU-Linux' -L../libChrisOS/dist/Debug/GNU-Linux -lc
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ../libChrisOS/dist/Debug/cross-Linux/libc.so
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ../libChrisOS/dist/Debug/GNU-Linux/libc.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lc -T linker.ld
 
-${OBJECTDIR}/testMainProgramEntry.o: testMainProgramEntry.c 
+${OBJECTDIR}/testMainProgramEntry.o: testMainProgramEntry.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -I../libChrisOS/include -I../../kproj/chrisOS/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/testMainProgramEntry.o testMainProgramEntry.c
@@ -76,6 +76,7 @@ ${OBJECTDIR}/testMainProgramEntry.o: testMainProgramEntry.c
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.so
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmainprogramentry
 
 # Subprojects

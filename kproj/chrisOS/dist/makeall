@@ -8,7 +8,7 @@ else
 	buildType="debug"
 fi
 
-pathMid=dist/${buildType^}/cross-Linux
+pathMid=dist/${buildType^}/GNU-Linux #cross-Linux
 
 declare -a kernProgArray=("chrisOS" "chrisOSKernel")
 declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")

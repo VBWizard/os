@@ -7,13 +7,13 @@ CND_BASEDIR=`pwd`
 CND_BUILDDIR=build
 CND_DISTDIR=dist
 # Debug configuration
-CND_PLATFORM_Debug=cross-Linux
-CND_ARTIFACT_DIR_Debug=dist/Debug/cross-Linux
+CND_PLATFORM_Debug=GNU-Linux
+CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux
 CND_ARTIFACT_NAME_Debug=libc.so
-CND_ARTIFACT_PATH_Debug=dist/Debug/cross-Linux/libc.so
-CND_PACKAGE_DIR_Debug=dist/Debug/cross-Linux/package
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/libc.so
+CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
 CND_PACKAGE_NAME_Debug=liblibChrisOS.so.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/cross-Linux/package/liblibChrisOS.so.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/liblibChrisOS.so.tar
 # Release configuration
 CND_PLATFORM_Release=cross-Linux
 CND_ARTIFACT_DIR_Release=dist/Release/cross-Linux

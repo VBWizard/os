@@ -20,7 +20,8 @@ extern "C" {
 
     void reverseI(char s[]);
     void itoaI(int n, char s[]);
-
+    int atoi(char *str);
+    
 #ifdef __cplusplus
 }
 #endif

@@ -31,6 +31,7 @@ void HandleSEGV();
 */
 int main2(int argc, char** argv) {
     int num=0;
+    int loopCount=0;
     
     libc_init();
 /*
@@ -58,7 +59,15 @@ int main2(int argc, char** argv) {
         print("Param %u=%s\n",cnt,argv[cnt]);
     }
     print("\n");
-    while (1==1)
+    
+    if (argc>1)
+        loopCount = atoi(argv[1]);
+    else
+        loopCount = 100;
+    
+    print ("Looping %u times\n",loopCount);
+    
+    while (num < loopCount*10)
     {
         sleep(1);
         num++;
