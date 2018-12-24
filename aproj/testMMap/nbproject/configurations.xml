@@ -61,7 +61,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
+          <commandLine>-ffreestanding -nostdlib -lgcc</commandLine>
         </linkerTool>
       </compileType>
       <item path="main.c" ex="false" tool="0" flavor2="0">

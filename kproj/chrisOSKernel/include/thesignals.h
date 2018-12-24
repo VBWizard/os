@@ -23,7 +23,7 @@ extern "C" {
         SIG_HALT = 1,
         SIG_SLEEP = 2,
         SIG_USLEEP = 4,
-        SIG_SEGV = 0x800,
+        SIG_SEGV = 11,
         SIG_STOP = 0x2000,
     } eSignals;
     

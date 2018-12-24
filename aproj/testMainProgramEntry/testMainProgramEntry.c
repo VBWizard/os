@@ -5,14 +5,18 @@
  * Created on May 16, 2016, 11:49 AM
  */
 
+#include <signal.h>
+
 #include "../libChrisOS/include/libChrisOS.h"
+#include "../../kproj/chrisOSKernel/include/thesignals.h"
+
 /*
  * testMainProgramEntry
  */
 
 void HandleSEGV();
 
-/*void crashFail(char** argv)
+void crashFail(char** argv)
 {
     uint64_t temp=0;
 
@@ -28,12 +32,14 @@ void HandleSEGV();
     goto jumpHere;
 
 }
-*/
+
 int main(int argc, char** argv) {
     int num=0;
     int loopCount=0;
     
-    //libc_init();
+    
+    //modifySignal(SIG_SEGV, &HandleSEGV, 0);
+
     
 /*
     char input[100];
@@ -75,7 +81,7 @@ int main(int argc, char** argv) {
         if (num%10==0)
             print("Still here!!! (%u)\n",num);
     }
-    //crashFail(argv);
+    crashFail(argv);
     print ("Bye bye now!!!\n");
     return 0x1234;
 }

@@ -31,18 +31,19 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     
     process_t *p=findTaskByCR3(oldCR3)->process;
 
+    //CLR 12/24/2018: Removed sigind's as we don't want to trigger signals, just set their actions
     printd(DEBUG_SIGNALS,"Handling signal 0x%08X\n",signal);
     switch (signal)
     {
         case SIG_SEGV:
             printd(DEBUG_SIGNALS,"Set signal 0x%08X, action=*0x%08X, sigData=0x%08X\n",signal,sigAction,sigData);
-            p->signals.sigind|=SIG_SEGV;
+            //p->signals.sigind|=SIG_SEGV;
             p->signals.sighandler[SIG_SEGV]=sigAction;
             p->signals.sigdata[SIG_SEGV]=sigData;
             break; 
         case SIG_SLEEP:
             printd(DEBUG_SIGNALS,"Set signal 0x%08X, action=*0x%08X, sigData=0x%08X\n",signal,sigAction,sigData);
-            p->signals.sigind|=SIG_SLEEP;
+            //p->signals.sigind|=SIG_SLEEP;
             p->signals.sighandler[SIG_SLEEP]=sigAction;
             p->signals.sigdata[SIG_SLEEP]=sigData;
             triggerScheduler();
@@ -54,6 +55,9 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     printd(DEBUG_SIGNALS,"Setting CR3 back to 0x%08X\n",oldCR3);
     __asm__("mov cr3,eax\nsti\n"::"a" (oldCR3));
 }
+
+    typedef void sigHandler(void);
+
 
 //Process a sigaction against a process, called by sys_sigaction or the kernel
 void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t callerCR3)
@@ -100,6 +104,21 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
             break;
         case SIG_SEGV:
             printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald=0x%08X processing signal\n",callerCR3,p->signals.sigind);
+/*            if (p->signals.sighandler[SIG_SEGV] != NULL)
+            {
+                sigHandler* sh = (void*)p->signals.sighandler[SIG_SEGV];
+                __asm__("mov cr3,eax\n"::"a" (callerCR3));
+                uint16_t cs = p->task->tss->CS;
+                __asm__ __volatile__("mov segment,%0\n" 
+                        "mov offseth, %1\n"
+                        ".byte   0x9a\n" 
+                        "offseth: .long   0       # offset\n" 
+                        ".word 0\n"
+                        "segment: .long   0        # segment" 
+                        : 
+                        : "A"(cs >> 3), "r"(&sh)); 
+                sh();
+            }*/
             p->signals.sigind|=SIG_SEGV;
             triggerScheduler();
             printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald=0x%08X, returning to caller\n",callerCR3,p->signals.sigind);
