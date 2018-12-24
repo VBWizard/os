@@ -29,11 +29,12 @@ void HandleSEGV();
 
 }
 */
-int main2(int argc, char** argv) {
+int main(int argc, char** argv) {
     int num=0;
     int loopCount=0;
     
-    libc_init();
+    //libc_init();
+    
 /*
     char input[100];
       print("Sleeping for 3 seconds");
@@ -63,7 +64,7 @@ int main2(int argc, char** argv) {
     if (argc>1)
         loopCount = atoi(argv[1]);
     else
-        loopCount = 100;
+        loopCount = 1;
     
     print ("Looping %u times\n",loopCount);
     
@@ -72,9 +73,10 @@ int main2(int argc, char** argv) {
         sleep(1);
         num++;
         if (num%10==0)
-            print("Still here!!!\n");
+            print("Still here!!! (%u)\n",num);
     }
     //crashFail(argv);
+    print ("Bye bye now!!!\n");
     return 0x1234;
 }
 

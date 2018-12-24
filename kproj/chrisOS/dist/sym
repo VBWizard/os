@@ -1,4 +1,4 @@
 pushd ..
 ./make_debug
 popd
-objdump -x -t Debug/cross-Linux-x86/chrisos > chrisos.sym
+objdump -x -t Debug/GNU-Linux-x86/chrisos > chrisos.sym

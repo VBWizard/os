@@ -2,5 +2,5 @@
 pushd ..
 ./make_debug
 popd
-objdump -d -S -l Debug/cross-Linux/testmainprogramentry -M intel-mnemonic > testmainprogramentry_all_debug.asm
+objdump -d -S -l Debug/GNU-Linux/testmainprogramentry -M intel-mnemonic > testmainprogramentry_all_debug.asm
 vi testmainprogramentry_all_debug.asm

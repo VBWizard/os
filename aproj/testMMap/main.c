@@ -11,8 +11,6 @@
  * Created on April 15, 2017, 8:17 AM
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "libChrisOS.h"
 
 /*
@@ -20,7 +18,6 @@
  */
 int main(int argc, char** argv) {
 
-    libc_init();
-    return (EXIT_SUCCESS);
+    return (0);
 }
 

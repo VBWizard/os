@@ -67,10 +67,9 @@ void kPagingExceptionHandler()
     lPDEAddress=kPagingGet4kPDEntryAddressCR3(exceptionCR3,exceptionCR2);
     lPDEValue=kPagingGet4kPDEntryValueCR3(exceptionCR3,exceptionCR2);
     lPTEValue=kPagingGet4kPTEntryValueCR3(exceptionCR3,exceptionCR2);
-    //Check for CoW pages in libraries
-    printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X) in %s\n",exceptionCR2,exceptionCR3);
     process_t* process=findTaskByCR3(exceptionCR3)->process;
     elfInfo_t* elf=process->elf;
+    printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X) in %s\n",exceptionCR2,exceptionCR3,elf->fileName);
 
 
     printd(DEBUG_EXCEPTIONS,"\tProcess=%s\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",process->path,lPTEValue);
@@ -113,16 +112,19 @@ void kPagingExceptionHandler()
     else
         printd(DEBUG_EXCEPTIONS,"\t\tNot mmap page\n",process->path,lPTEValue);
     
+    //Check for CoW pages in libraries
     printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bss/data in libraries\n",process->path);
     for (int cnt=0;cnt<process->elf->libraryElfCount;cnt++)
     {
         elfInfo_t* lib=elf->libraryElfPtr[cnt];
-        printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08X, bss=0x%08X/0x%08X, data=0x%08X/0x%08X\n",
+        printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08X, bss=0x%08X/0x%08X, data=0x%08X/0x%08X, tdata=0x%08X/0x%08X\n",
                 lib,
                 lib->libBSSAddress,
                 lib->libBSSSize,
                 lib->libDataAddress,
-                lib->libDataSize);
+                lib->libDataSize,
+                lib->libTDataAddress,
+                lib->libTDataSize);
         if (lib->libBSSAddress<=exceptionCR2 && lib->libBSSAddress+lib->libBSSSize>exceptionCR2)
         {
             printd(DEBUG_EXCEPTIONS,"\t\tThe page with address 0x%08X is a CoW .bss page from library %s\n",exceptionCR2,lib->fileName);
@@ -145,7 +147,7 @@ void kPagingExceptionHandler()
         pagingMapPage(KERNEL_CR3,exceptionCR2 & 0xFFFFF000,newPhys,0x7);
         pagingMapPage(KERNEL_CR3,newPhys,newPhys,0x7);
         memcpy((void*)newPhys,(void*)(mappedCR2),PAGE_SIZE);
-        printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08X with writable page 0x%08X (contents copied)\n",exceptionCR2&0xFFFFF000,newPhys);
+        printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08X (0x%08X) with writable page 0x%08X (contents copied)\n",exceptionCR2&0xFFFFF000,mappedCR2,newPhys);
         __asm__("xor ebx,ebx\nmov cr2,ebx\nmov cr3,eax\n"::"a" (exceptionCR3));
         return;
     }

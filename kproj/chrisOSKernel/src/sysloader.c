@@ -166,6 +166,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                             printd(DEBUG_ELF_LOADER,"\t\tDone mapping %s into program's vm.\n",searchElf->fileName);
                             printd(DEBUG_ELF_LOADER,"\t\tSetting up CopyOn pages\n");
                             elfSetupCopyOnPages(targetCR3,searchElf);
+                            elfInfo->libraryElfPtr[elfInfo->libraryElfCount++]=searchElf;
                             break;
                         }
                         printd(DEBUG_ELF_LOADER,"\t\tThis is not the module we want, skipping to the next\n");
@@ -353,12 +354,17 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
             addElfLoadInfo(elf, startVirtAddr & 0xFFFFF000, startPhysAddr & 0xFFFFF000, countToWrite/PAGE_SIZE);
         }
         //if page is not mapped, map it!
-        printd(DEBUG_ELF_LOADER,"putDataOnPages: Reading %u bytes to 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
         //write the data to the page
         if (writeFromFile)
+        {
             fl_fread((void*)startPhysAddr, 1, countToWrite, file);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: Reading %u bytes to 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
+        }
         else
+        {
             memset((void*)startPhysAddr,nonFileWriteValue,countToWrite);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: Zeroed %u bytes at 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
+        }
         //Decrement the total left to write by the count written
         totalLeftToWrite-=countToWrite;
         printd(DEBUG_ELF_LOADER,"putDataOnPages: Page written, 0x%08X bytes left to go\n",totalLeftToWrite);
@@ -529,7 +535,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
             
             if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz<elfInfo->pgmHdrTable[pgmSectionNum].p_memsz)
             {
-                printd(DEBUG_ELF_LOADER,"Section %u has uninitialized data (msize>fsize), zeroed 0x%08X bytes at 0x%08X\n", 
+                printd(DEBUG_ELF_LOADER,"Section %u has uninitialized data (msize>fsize), zeroing 0x%08X bytes at 0x%08X\n", 
                         pgmSectionNum, 
                         elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 
                         virtualLoadAddress+elfInfo->pgmHdrTable[pgmSectionNum].p_filesz);
@@ -727,18 +733,39 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
             else if (elfInfo->secHdrTable[cnt].sh_type==SHT_NOBITS || elfInfo->secHdrTable[cnt].sh_type==SHT_PROGBITS)
             {
                 bool sectionIsCOW=false;
+                uint32_t address=elfInfo->secHdrTable[cnt].sh_addr, 
+                        size=elfInfo->secHdrTable[cnt].sh_size; //CLR 12/23/2018
+                
                 if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".bss",255)==0)
                 {
                     printd(DEBUG_ELF_LOADER,"Found bss segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
                     if (elfInfo->isLibrary)
+                    {
                         sectionIsCOW=true;
+                        elfInfo->libBSSAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                        elfInfo->libBSSSize=elfInfo->secHdrTable[cnt].sh_size;
+                    }
 
                 }
                 else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".data",255)==0)
                 {
                     printd(DEBUG_ELF_LOADER,"Found data segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
                     if (elfInfo->isLibrary)
+                    {
                         sectionIsCOW=true;
+                        elfInfo->libDataAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                        elfInfo->libDataSize=elfInfo->secHdrTable[cnt].sh_size;
+                    }
+                }
+                else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".tdata",255)==0)
+                {
+                    printd(DEBUG_ELF_LOADER,"Found tdata segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                    if (elfInfo->isLibrary)
+                    {
+                        sectionIsCOW=true;
+                        elfInfo->libTDataAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                        elfInfo->libTDataSize=elfInfo->secHdrTable[cnt].sh_size;
+                    }
                 }
                 else
                     printd(DEBUG_ELF_LOADER,"Found (%s) (NOBITS) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
@@ -746,9 +773,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
                 if (sectionIsCOW)
                 {
                     printd(DEBUG_ELF_LOADER,"\tsegment belongs to a library, marking pages as CoW (moo)\n");
-                    elfInfo->libBSSAddress=elfInfo->secHdrTable[cnt].sh_addr;
-                    elfInfo->libBSSSize=elfInfo->secHdrTable[cnt].sh_size;
-                    elfMakePagesCOW(CR3,elfInfo->libBSSAddress,elfInfo->libBSSSize);
+                    elfMakePagesCOW(CR3,address,size);
                 }
             }
             else

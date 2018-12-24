@@ -11,5 +11,6 @@
         </group>
         <group name="aproj"/>
         <group name="os"/>
+        <group/>
     </open-files>
 </project-private>

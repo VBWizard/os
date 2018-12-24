@@ -5,8 +5,8 @@ rm ./myos.iso
 if [ $? -ne 0 ] then
 exit -1
 fi
-#strip --strip-debug --strip-unneeded Debug/cross-Linux-x86/chrisos
-cp Debug/cross-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
+#strip --strip-debug --strip-unneeded Debug/GNU-Linux-x86/chrisos
+cp Debug/GNU-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
 grub-mkrescue -o myos.iso ~/src/os/build_dir/isodir
 qemu-system-i386 							\
 	-m 1536								\

@@ -164,8 +164,23 @@ char* processGetCWD(char* buf, unsigned long size) //NOTE buf required to be not
     return retVal;
 }
 
-void processWrapup();
-bool taskRegInitialized=false;
+//This runs in user space.  We're just calling startup procedures
+void processStart(void)
+{
+    int lCounter;
+    process_t* process=(process_t*)PROCESS_STRUCT_VADDR;
+    printd(DEBUG_PROCESS,"processStart: Checking for start handlers\n");
+    for (lCounter=0;lCounter<PROCESS_MAX_EXIT_HANDLERS;lCounter++)
+        if (process->startHandler[lCounter]!=NULL)
+        {
+            //*X needs to be the pointer AT startHandler[lCounter] not startHandler[lCounter] itself***
+            uint32_t* handlers = (uint32_t*)process->startHandler[lCounter];
+            startHandler* x=handlers[lCounter];
+            printd(DEBUG_PROCESS,"processStart: Executing startHandler %u @ 0x%08X\n",lCounter,process->startHandler[lCounter]);
+            x();
+        }
+    return;
+}
 
 //This runs in user space.  We're just calling cleanup procedures and passing on the return value.
 void processExit()
@@ -251,6 +266,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;
     process->path=(char*)kMalloc(0x1000);
+    process->startHandlerPtr=0; //CLR 12/23/2018: Initialize the start handler pointer to the first entry
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
     //strcpy(process->path,path);
     if (parentProcessPtr!=NULL)
@@ -318,7 +334,21 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
         {
             return NULL;
         }
-        process->task->tss->EIP=process->elf->hdr.e_entry;
+        //CLR 12/23/2018: point to processStart ... which will initialize anything that needs to be initialized 
+        //and then jump into the loaded program
+        process->entryPoint = process->elf->hdr.e_entry;
+        //process->task->tss->EIP=process->elf->hdr.e_entry;
+        process->task->tss->EIP=(uint32_t)&processStart;
+        //Get processStart handlers
+        process->startHandlerPtr = 0;
+        for (int cnt=0;cnt<process->elf->libraryElfCount;cnt++)
+        {
+            elfInfo_t* lElf = (elfInfo_t*)process->elf->libraryElfPtr[cnt];
+            if (lElf->dynamicInfo.initFunctionAddress!=0)
+            {
+                process->startHandler[process->startHandlerPtr++]=lElf->dynamicInfo.initFunctionAddress;
+            }
+        }
     }
     else    //Configure the idle process
     {
@@ -330,12 +360,13 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     memcpy((void*)process->task->tss->ESP,&process->task->tss->EIP,8);
     memcpy((void*)process->task->tss->ESP+4,&process->task->tss->CS,8);
     memcpy((void*)process->task->tss->ESP+8,&process->task->tss->EFLAGS,8);
-    uint32_t tempESP=process->task->tss->ESP-0x100;
+    uint32_t tempESP=process->task->tss->ESP-0x104;
     memcpy((void*)process->task->tss->ESP+12,&tempESP,8);
     memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,8);
     
     //Per the above, the stack will start at -0x100 from where we write the CS/EIP/FLAGS/SS/ESP, so put our params around there
-    memcpy((void*)process->task->tss->ESP-0x104,process,4);
+    memcpy((void*)process->task->tss->ESP-0x108,process,4);
+    memcpy((void*)process->task->tss->ESP-0x104,&process->entryPoint,4);
     memcpy((void*)process->task->tss->ESP-0x100,&var,4);
     memcpy((void*)process->task->tss->ESP-0xfc,&argc,4);
     memcpy((void*)process->task->tss->ESP-0xf8,&argvVirt,4);

@@ -8,7 +8,7 @@ else
 	buildType="debug"
 fi
 
-pathMid=dist/${buildType^}/GNU-Linux #cross-Linux
+pathMid=dist/${buildType^}/GNU-Linux #GNU-Linux
 
 declare -a kernProgArray=("chrisOS" "chrisOSKernel")
 declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")
@@ -17,9 +17,7 @@ declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$
 
 sudo mount /dev/disk/by-id/ata-ST31000528AS_5VP8R4ME-part6 /mnt/loop/
 basePath=/home/yogi/src/os/kproj/
-
 tabs 5,36,50,70
-
 echo "Build environment: ${buildType^}"
 echo
 echo "Making kernel projects"

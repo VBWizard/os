@@ -400,7 +400,7 @@ int kShell(int argc, char** argv)
     int commandWasFromThisBufferPtr=0;
     char ansiSeq[20];
 
-    libc_init();
+    //libc_init();
     
     ansiSeq[0]=0x1b;
     sKShellProgramName=malloc(1024);

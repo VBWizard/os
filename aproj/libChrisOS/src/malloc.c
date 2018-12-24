@@ -11,6 +11,7 @@
 #define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
 void initmalloc()
 {
+    printdI(DEBUG_MALLOC,"heapBase = 0x%08X before\n", heapBase);
     heapBase=0;
     heapCurr=0;
     heapEnd=0;
@@ -70,7 +71,7 @@ __attribute__((visibility("default"))) void*  malloc(size_t size)
     HEAP_GET_NEXT(heapPtr,heapPtrNext);
     ((heaprec_t*)heapPtrNext)->prev=heapPtr;
     heapCurr+=size+(sizeof(heaprec_t));
-    printdI(DEBUG_MALLOC,"returning 0x%08X\n",retVal);
+    printdI(DEBUG_MALLOC,"malloc: returning 0x%08X\n",retVal);
     return retVal;
 }
 

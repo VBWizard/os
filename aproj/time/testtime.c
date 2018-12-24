@@ -23,7 +23,6 @@ int main(int argc, char** argv) {
     time_t startTime, endTime, elapsed;
     int retVal=0;
     
-    libc_init();
 #ifdef DEBUG
     print("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)

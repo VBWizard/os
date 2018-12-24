@@ -10,7 +10,7 @@
 #include "stdio.h"
 
 extern void sysEnter_Vector();
-int a=123;int b=456; int c=789;
+bool libcInitialized = false;
 
 int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3)
 {
@@ -40,16 +40,23 @@ int do_syscall1(int callnum)
     return retVal;
 }
 
-VISIBLE void libc_init(void)
+VISIBLE void __attribute__((constructor)) libc_init(void)
 {
-    printdI(DEBUG_LIBC,"***Initializing libc\n***");
-    initmalloc();
-    libcTZ=-4;
-    do_syscall1(SYSCALL_INVALID);
-    do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
+    printdI(DEBUG_LIBC,"***libc_init called\n***");
+    if (!libcInitialized)
+    {
+        initmalloc();
+        libcTZ=-4;
+        do_syscall1(SYSCALL_INVALID);
+        do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
+        libcInitialized = true;
+        printI("***libc_init completed\n");
+    }
+    else
+        printI("libc_init called previously, exiting\n");
 }
 
-void libc_cleanup(void)
+void __attribute__((destructor)) libc_cleanup(void)
 {
     malloc_cleanup();
 }

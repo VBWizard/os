@@ -1,5 +1,5 @@
 pushd ../
 ./make_debug
 popd
-objdump -x -t Debug/cross-Linux/libc.so > libc.sym
+objdump -x -t Debug/GNU-Linux/libc.so > libc.sym
 vi libc.sym

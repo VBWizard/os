@@ -8,7 +8,7 @@ else
 	buildType="debug"
 fi
 
-pathMid=dist/${buildType^}/GNU-Linux
+pathMid=dist/${buildType^}/GNU-Linux #GNU-Linux
 
 declare -a kernProgArray=("chrisOS" "chrisOSKernel")
 declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")
@@ -53,7 +53,7 @@ do
 	then
 		echo -en "\tMake $i ... \tsuccess!\n"
 	else
-		echo "\tMake $i ... \tfailed"
+		echo -en "\tMake $i ... \tfailed"
 		echo 
 		echo 
 		sudo umount /mnt/loop

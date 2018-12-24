@@ -2,7 +2,7 @@
 pushd ..
 ./make_release
 popd
-cp Release/cross-Linux-x86/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
+cp Release/GNU-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
 grub-mkrescue -o myos.iso ~/src/os/build_dir/isodir
 qemu-system-i386 					\
 	-m 1024						\
