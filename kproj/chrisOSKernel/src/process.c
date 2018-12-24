@@ -170,12 +170,11 @@ void processStart(void)
     int lCounter;
     process_t* process=(process_t*)PROCESS_STRUCT_VADDR;
     printd(DEBUG_PROCESS,"processStart: Checking for start handlers\n");
-    for (lCounter=0;lCounter<PROCESS_MAX_EXIT_HANDLERS;lCounter++)
+    for (lCounter=0;lCounter<process->startHandlerPtr;lCounter++)
         if (process->startHandler[lCounter]!=NULL)
         {
-            //*X needs to be the pointer AT startHandler[lCounter] not startHandler[lCounter] itself***
             uint32_t* handlers = (uint32_t*)process->startHandler[lCounter];
-            startHandler* x=handlers[lCounter];
+            startHandler* x=(void*)handlers[lCounter];
             printd(DEBUG_PROCESS,"processStart: Executing startHandler %u @ 0x%08X\n",lCounter,process->startHandler[lCounter]);
             x();
         }

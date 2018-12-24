@@ -166,7 +166,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                             printd(DEBUG_ELF_LOADER,"\t\tDone mapping %s into program's vm.\n",searchElf->fileName);
                             printd(DEBUG_ELF_LOADER,"\t\tSetting up CopyOn pages\n");
                             elfSetupCopyOnPages(targetCR3,searchElf);
-                            elfInfo->libraryElfPtr[elfInfo->libraryElfCount++]=searchElf;
+                            elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=searchElf;  //CLR 12/23/2018: Removed incrementing of libraryElfCount here as it is done below
                             break;
                         }
                         printd(DEBUG_ELF_LOADER,"\t\tThis is not the module we want, skipping to the next\n");
@@ -189,6 +189,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                 
                 ((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount])->isLibrary=true;
                 //libraryElfCount is incremented here
+                printd(DEBUG_ELF_LOADER,"loadElf: Incrementing libraryElfCount for %s\n",elfInfo->fileName);
                 if (((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount++])->loadCompleted==false)
                 {
                     printd(DEBUG_ELF_LOADER,"EXEC: processELFDynamicSection ... loading library failed.");
