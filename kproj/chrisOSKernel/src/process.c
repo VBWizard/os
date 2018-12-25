@@ -345,7 +345,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
             elfInfo_t* lElf = (elfInfo_t*)process->elf->libraryElfPtr[cnt];
             if (lElf->dynamicInfo.initFunctionAddress!=0)
             {
-                process->startHandler[process->startHandlerPtr++]=lElf->dynamicInfo.initFunctionAddress;
+                process->startHandler[process->startHandlerPtr++]=(void*)lElf->dynamicInfo.initFunctionAddress;
             }
         }
     }

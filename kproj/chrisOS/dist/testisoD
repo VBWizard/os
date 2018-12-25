@@ -26,6 +26,7 @@ qemu-system-i386 							\
 	-serial file:"qemu_port.log"					\
 	-d int,cpu_reset,pcall,guest_errors                        		\
 	-hda ~/qemu-test-disk2.img                                     \
+	-usb -device usb-host,hostbus=2,hostaddr=3 			\
 	$@ 
 #	--enable-kvm
 
