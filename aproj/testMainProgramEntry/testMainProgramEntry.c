@@ -74,12 +74,11 @@ int main(int argc, char** argv) {
     
     print ("Looping %u times\n",loopCount);
     
-    while (num < loopCount*10)
+    while (num < loopCount)
     {
         sleep(1);
         num++;
-        if (num%10==0)
-            print("Still here!!! (%u)\n",num);
+        print("Still here!!! (%u)\n",num);
     }
     crashFail(argv);
     print ("Bye bye now!!!\n");
