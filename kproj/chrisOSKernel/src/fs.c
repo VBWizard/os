@@ -64,15 +64,14 @@ void* fs_openFile(char* path, const char* mode)
     return handle;
 }
 
-void * fs_readFile(void* file, void * buffer, int size, int length)
+file_t* getFileFromList(file_system_t *fs, void* file)
 {
-    dllist_t* list = listHead(rootFs->files);
-    file_t* foundFile = NULL;
+    dllist_t* list = listHead(fs->files);
     
-    while (foundFile==NULL)
+    while (1)
     {
         if (((file_t*)list->payload)->handle==file)
-            foundFile = (file_t*)list->payload;
+            return (file_t*)list->payload;
         else
         {
             if (list->next==list)
@@ -80,10 +79,27 @@ void * fs_readFile(void* file, void * buffer, int size, int length)
             list=listNext(list);
         }
     }
+    return NULL;
+}
+
+int fs_readFile(void* file, void * buffer, int size, int length)
+{
+    
+    file_t* foundFile = getFileFromList(rootFs, file);
     
     if (foundFile==NULL)
         panic("fs_readFile: file handle not found in fs->files");
     
     return foundFile->fops->read(buffer, size, length, foundFile->handle);
     
+}
+
+int fs_seek(void* file, long offset, int whence)
+{
+    file_t* foundFile = getFileFromList(rootFs, file);
+    
+    if (foundFile==NULL)
+        panic("fs_readFile: file handle not found in fs->files");
+    
+    return foundFile->fops->seek(foundFile->handle, offset, whence);
 }

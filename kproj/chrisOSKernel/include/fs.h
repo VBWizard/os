@@ -121,7 +121,9 @@ extern "C" {
     
     file_system_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops);
     void* fs_openFile(char* path, const char* mode);
+    int fs_readFile(void* file, void * buffer, int size, int length);
     
+
 #ifdef __cplusplus
 }
 #endif
