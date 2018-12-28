@@ -359,7 +359,7 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
         if (writeFromFile)
         {
             //fl_fread((void*)startPhysAddr, 1, countToWrite, file);
-            fs_readFile(file, startPhysAddr,1, countToWrite);
+            fs_readFile(file, (void*)startPhysAddr,1, countToWrite);
             printd(DEBUG_ELF_LOADER,"putDataOnPages: Reading %u bytes to 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
         }
         else
@@ -407,7 +407,7 @@ bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFr
             printd(DEBUG_ELF_LOADER,"putDataOnPages2: Entire write area (startVirtAddr=0x%08X) already mapped.  %s 0x%08X bytes to 0x%08X\n",startVirtAddr, writeFromFile?"Writing":"Zeroing", size, startPhysAddr);
             if (writeFromFile)
                 //fl_fread((void*)startPhysAddr, size, 1, file);
-                fs_readFile(file, startPhysAddr, size, 1);
+                fs_readFile(file, (void*)startPhysAddr, size, 1);
             else
                 memset((void*)startPhysAddr,nonFileWriteValue,size);
             return true;
@@ -430,7 +430,7 @@ bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFr
         addElfLoadInfo(elf, startVirtAddr & 0xFFFFF000, startPhysAddr & 0xFFFFF000, size+(PAGE_SIZE-(size%PAGE_SIZE)));
         if (writeFromFile)
             //fl_fread((void*)startPhysAddr, size, 1, file);
-            fs_readFile(file, startPhysAddr, size, 1);
+            fs_readFile(file, (void*)startPhysAddr, size, 1);
         else
             memset((void*)startPhysAddr,nonFileWriteValue,size);
         return true;

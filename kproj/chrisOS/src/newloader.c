@@ -219,7 +219,7 @@ void loadSections(void* file,elfInfo_t* elfInfo, bool isLibrary)
                 int a=0;
                 a+=1-1+2-2+3;
             }
-            fl_fread(loadAddress, 1, elfInfo->pgmHdrTable[cnt].p_filesz, file); //CLR 03/12/2017: Changed from p_memsz to p_filesz (prev & next line too))
+            fl_fread(loadAddress, elfInfo->pgmHdrTable[cnt].p_filesz, 1, file); //CLR 03/12/2017: Changed from p_memsz to p_filesz (prev & next line too))
             printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", cnt, elfInfo->pgmHdrTable[cnt].p_filesz, loadAddress);
             if (elfInfo->pgmHdrTable[cnt].p_filesz<elfInfo->pgmHdrTable[cnt].p_memsz)
             {
