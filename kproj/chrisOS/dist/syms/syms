@@ -1,4 +1,5 @@
-	0008a000 =  8;
+	0008c000 =  8;
+	 =  00120000;
 	 =  00120000;
 	terminal_row =  00120000;
 	kernelData =  00120000;
@@ -9,12 +10,16 @@
 	savedPosY =  0012001c;
 	savedPosPointer =  00120026;
 	kTerminalHeight =  00120027;
+	 =  00120040;
 	_files =  00120040;
-	_filelib_init =  00124730;
-	_filelib_valid =  00124734;
-	_fs =  00124740;
-	_open_file_list =  001283e8;
-	_free_file_list =  001283f0;
+	 =  00124730;
+	 =  00124734;
+	 =  00124740;
+	_filelib_init =  00124a50;
+	_filelib_valid =  00124a54;
+	_fs =  00124a60;
+	 =  001283e8;
+	 =  001283f0;
 	smap_table =  00128400;
 	kE820Status =  00128404;
 	kE820MemoryBytes =  00128408;
@@ -129,3 +134,5 @@
 	_days_abbrev =  00128948;
 	_months =  00128980;
 	_months_abbrev =  001289c0;
+	_open_file_list =  0012eba8;
+	_free_file_list =  0012ebb0;

@@ -74,6 +74,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
 	${OBJECTDIR}/src/exceptions.o \
+	${OBJECTDIR}/src/fs.o \
 	${OBJECTDIR}/src/kIRQHandlers.o \
 	${OBJECTDIR}/src/kInit.o \
 	${OBJECTDIR}/src/kernel.o \
@@ -310,6 +311,11 @@ ${OBJECTDIR}/src/exceptions.o: src/exceptions.c nbproject/Makefile-${CND_CONF}.m
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/exceptions.o src/exceptions.c
+
+${OBJECTDIR}/src/fs.o: src/fs.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fs.o src/fs.c
 
 ${OBJECTDIR}/src/kIRQHandlers.o: src/kIRQHandlers.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src

@@ -24,6 +24,8 @@
 #include "io.h"
 #include "kbd.h"
 #include "thesignals.h"
+#include "../../chrisOS/src/fat/fat_filelib.h"
+
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -67,7 +69,14 @@ int main(int argc, char** argv) {
     initSched();
     printk("Done initializing scheduler\n");
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
-
+    
+    fileops_t fops;
+    fops.open = &fl_fopen;
+    fops.close = &fl_fclose;
+    fops.read = &fl_fread;
+    fops.seek = &fl_fseek;
+    rootFs = kRegisterFileSystem("/",&fops);
+    
     keyboardInit();
     //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS
     //console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);

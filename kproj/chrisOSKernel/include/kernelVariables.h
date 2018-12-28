@@ -13,6 +13,7 @@
 
 #ifndef KERNELVARIABLES_H
 #define KERNELVARIABLES_H
+#include "fs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +22,8 @@ extern "C" {
 uint32_t isrSavedEAX, isrSavedEBX, isrSavedECX, isrSavedEDX, isrSavedESI, isrSavedEDI, isrSavedEBP, isrSavedCR0, isrSavedCR3, isrSavedCR4,
                              isrSavedDS, isrSavedES, isrSavedFS, isrSavedGS, isrSavedSS, isrSavedESP,isrSavedFlags, isrSavedErrorCode, isrSavedEIP, isrSavedCS, isrSavedCR2, isrSavedTR;
 uint32_t*isrSavedStack = (uint32_t *)SAVED_STACK_FOR_EXCEPTIONS_ADDRESS;
+
+
 
 #ifdef __cplusplus
 }

@@ -74,6 +74,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
 	${OBJECTDIR}/src/exceptions.o \
+	${OBJECTDIR}/src/fs.o \
 	${OBJECTDIR}/src/kIRQHandlers.o \
 	${OBJECTDIR}/src/kInit.o \
 	${OBJECTDIR}/src/kernel.o \
@@ -310,6 +311,11 @@ ${OBJECTDIR}/src/exceptions.o: src/exceptions.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/exceptions.o src/exceptions.c
+
+${OBJECTDIR}/src/fs.o: src/fs.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fs.o src/fs.c
 
 ${OBJECTDIR}/src/kIRQHandlers.o: src/kIRQHandlers.c
 	${MKDIR} -p ${OBJECTDIR}/src

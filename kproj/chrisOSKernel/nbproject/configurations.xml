@@ -99,6 +99,7 @@
       <itemPath>src/dllist.c</itemPath>
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
       <itemPath>src/exceptions.c</itemPath>
+      <itemPath>src/fs.c</itemPath>
       <itemPath>../chrisOS/src/cpu/gdt.c</itemPath>
       <itemPath>../chrisOS/src/iodugging.c</itemPath>
       <itemPath>src/kIRQHandlers.c</itemPath>
@@ -385,6 +386,8 @@
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/fs.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kInit.c" ex="false" tool="0" flavor2="0">
@@ -667,6 +670,8 @@
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
       </item>
