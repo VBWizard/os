@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>testmainprogramentry.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>testMainProgramEntry.c</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <architecture>1</architecture>
+          <standard>3</standard>
+          <incDir>
+            <pElem>../libChrisOS/include</pElem>
+            <pElem>../../kproj/chrisOS/include</pElem>
+          </incDir>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+          <useLinkerLibraries>false</useLinkerLibraries>
+        </cTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>../../libChrisOS/dist/Debug/cross-Linux</pElem>
+          </linkerAddLib>
+          <commandlineTool>gcc</commandlineTool>
+          <linkerLibItems>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../libChrisOS"
+                            CT="2"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../libChrisOS"
+                            BC="${MAKE} -j 8 -f Makefile CONF=Debug"
+                            CC="${MAKE} -j 8 -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}">
+              </makeArtifact>
+            </linkerLibProjectItem>
+          </linkerLibItems>
+          <commandLine>-ffreestanding -nostdlib -lc -T linker.ld</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="testMainProgramEntry.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="testmainprogramentry.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>cross|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>../libChrisOS/include</pElem>
+            <pElem>../../kproj/chrisOS/include</pElem>
+          </incDir>
+          <commandLine>-ffreestanding -Wall -Wextra -masm=intel</commandLine>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>include</pElem>
+            <pElem>/home/yogi/src/os/chrisOS/include</pElem>
+          </linkerAddLib>
+          <linkerLibItems>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../libChrisOS"
+                            CT="2"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../libChrisOS"
+                            BC="${MAKE} -j 8 -f Makefile CONF=Debug"
+                            CC="${MAKE} -j 8 -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.${CND_DLIB_EXT}">
+              </makeArtifact>
+            </linkerLibProjectItem>
+          </linkerLibItems>
+          <commandLine>-ffreestanding -nostdlib -lc -T linker.ld</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="testMainProgramEntry.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="testmainprogramentry.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

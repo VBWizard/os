@@ -1,0 +1,5 @@
+#!/bin/bash
+pushd ..
+./make_release
+popd
+qemu-system-i386 -m 1024 -kernel Release/cross-Linux-x86/chrisos -monitor telnet:127.0.0.1:1234,server,wait -hda ~/qemu-test-disk.img -hdb qemu-test-disk2.img

@@ -1,0 +1,6 @@
+#!/bin/bash
+pushd ..
+./make_debug
+popd
+objdump -D -S -l Debug/cross-Linux/libc.so -M intel-mnemonic > libcD.asm
+vi libcD.asm

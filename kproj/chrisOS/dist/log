@@ -1,0 +1,32 @@
+[3;J[H[2JInitiating builds
+[3g    H                               H              H                    HBuild environment: Debug
+
+Making kernel projects
+  Make chrisOS
+	Make chrisOS ... 	success!
+  Make chrisOSKernel
+	Make chrisOSKernel ... 	success!
+
+Making application projects
+  Make libChrisOS
+	Make libChrisOS ... 	success!
+  Make testMainProgramEntry
+	Make testMainProgramEntry ... 	success!
+  Make kshell
+	Make kshell ... 	success!
+  Make time
+	Make time ... 	success!
+  Make testMMap
+	Make testMMap ... 	success!
+Done making projects
+Copying output to disk and ISO directory
+	chrisOS/dist/Debug/cross-Linux/chrisos ...done
+	chrisOSKernel/dist/Debug/cross-Linux/kernel ...done
+	libChrisOS/dist/Debug/cross-Linux/libc.so ... done
+	testMainProgramEntry/dist/Debug/cross-Linux/testmainprogramentry ... done
+	kshell/dist/Debug/cross-Linux/kshell ... done
+	time/dist/Debug/cross-Linux/time ... done
+	testMMap/dist/Debug/cross-Linux/testmmap ... done
+Copying done
+Builds complete
+[3gH        H        H        H        H        H        H        H        H        H        H        H        H        H        H    

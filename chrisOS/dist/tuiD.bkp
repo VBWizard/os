@@ -1,2 +1,0 @@
-#!/bin/bash
-gdb -tui --args qemu-system-i386 -args -m 1024 -kernel Debug/cross-Linux/chrisos  -hda ~/diskimage.img

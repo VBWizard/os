@@ -1,0 +1,31 @@
+#!/bin/bash
+rm ./myos.iso
+pushd ..
+./make_release
+popd
+strip --strip-debug --strip-unneeded Release/cross-Linux-x86/chrisos
+cp Release/cross-Linux-x86/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
+grub-mkrescue -o myos.iso ~/src/os/build_dir/isodir
+qemu-system-i386 					\
+	-m 1024						\
+	-smp 8    					\
+	-usb                                            \
+	-cdrom /home/yogi/src/os//chrisOS/dist/myos.iso \
+	-drive file=./myos.iso,if=none,id=sata-cd-0 \
+	-drive file=~/qemu-test-disk.img,if=none,id=sata-disk-0 \
+        -drive file=~/qemu-test-disk2.img,if=none,id=sata-disk-1 \
+        -drive file=~/qemu-test-disk3.img,if=none,id=sata-disk-2 \
+	-curses -monitor telnet:127.0.0.1:1234,server,wait	\
+	-device ich9-ahci,id=ahci0 \
+	-device ich9-ahci,id=ahci1 \
+	-device ide-drive,drive=sata-disk-1,bus=ahci0.0 \
+	-device ide-cd,drive=sata-cd-0,bus=ahci0.1	\
+       -device ide-drive,drive=sata-disk-2,bus=ahci1.0 \
+        -device ide-drive,drive=sata-disk-0,bus=ahci1.1      \
+	-boot order=d					
+	#-device pci-bridge,addr=5.0,chassis_nr=2 #	\
+	#--enable-kvm
+
+#drive=/home/yogi/qemu-usb-mass-storage.dsk
+#-hda ~/diskimage.img
+

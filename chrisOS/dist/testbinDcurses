@@ -1,7 +1,0 @@
-#!/bin/bash
-pushd ..
-./make_debug
-popd
-./asm
-qemu-system-i386 -m 1024 -kernel Debug/cross-Linux/chrisos -curses -monitor telnet:127.0.0.1:1234,server,wait
-

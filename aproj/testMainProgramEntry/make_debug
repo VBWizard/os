@@ -1,0 +1,4 @@
+#!/bin/bash
+#./local_make
+#make -j6 CONF=Debug clean
+make CONF=Debug build

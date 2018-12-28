@@ -1,3 +1,0 @@
-#!/bin/bash
-cp Release/cross-Linux-x86/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
-grub-mkrescue -o myos.iso ~/src/os/build_dir/isodir

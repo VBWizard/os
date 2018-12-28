@@ -1,3 +1,0 @@
-#!/bin/bash
-./gdbtestD  2>&1 &
-./tuiD

@@ -1,0 +1,6 @@
+#!/bin/bash
+pushd ..
+./make_debug
+popd
+objdump -D -S -l Debug/cross-Linux/time -M intel-mnemonic > timeD.asm
+vi timeD.asm

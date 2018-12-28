@@ -1,6 +1,0 @@
-#!/bin/bash
-pushd ..
-./make_debug
-popd
-objdump -S -l Debug/cross-Linux/chrisos -M intel-mnemonic --architecture=i386 > chrisos_all_debug.asm
-vi chrisos_all_debug.asm

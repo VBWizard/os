@@ -1,5 +1,0 @@
-#!/bin/bash
-pushd ..
-./make_debug
-popd
-qemu-system-i386 -S -s -m 1024 -kernel Debug/cross-Linux/chrisos -monitor telnet:127.0.0.1:1235,server,wait -hda ~/diskimage.img

@@ -1,5 +1,0 @@
-pushd ..
-./make_debug
-popd
-objdump -x -t Debug/cross-Linux-x86/libfatLib.so > fatlibD.sym
-vi fatlibD.sym

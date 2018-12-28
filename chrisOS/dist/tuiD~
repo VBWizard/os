@@ -1,3 +1,0 @@
-#!/bin/bash
-gdb Dashboard --command=gdbcmds 
-#--args qemu-system-i386 -args -m 1536 -kernel Debug/cross-Linux/chrisos  -hda ~/diskimage.img 

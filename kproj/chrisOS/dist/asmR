@@ -1,0 +1,6 @@
+#!/bin/bash
+pushd ..
+./make_release
+popd
+objdump -S -l Release_No_Optimization/cross-Linux/chrisos -M intel-mnemonic --architecture=i386 > chrisos_all_release.asm
+vi chrisos_all_release.asm

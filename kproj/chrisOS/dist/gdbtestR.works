@@ -1,0 +1,7 @@
+#!/bin/bash
+pushd ..
+./make_release
+popd
+#qemu-system-i386 -m 1024 -cdrom myos.iso  -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img -boot order=d -smp cpus=1,cores=4 -S -s
+#qemu-system-i386 -m 1024 -cdrom myos.iso  -hdb ~/qemu-test-disk.img  -hda ~/qemu-test-disk2.img -boot order=d #-d int,cpu_reset,pcall  -smp cpus=1,cores=4
+qemu-system-i386 -S -s -m 1024 -kernel Release/cross-Linux-x86/chrisos -hda ~/diskimage.img
