@@ -138,10 +138,10 @@ void* mallocI(uint32_t cr3, size_t size)
     
     process_t* p=findTaskByCR3(cr3)->process;
     printd(DEBUG_KMALLOC,"mallocI: Found process 0x%04X\n",p->task->taskNum);
-    uint32_t phys=(uint32_t)allocPages(size);
-    printd(DEBUG_KMALLOC,"mallocI: Allocated 0x%08X bytes @ 0x%08X\n",size,phys);
+    uint32_t phys=(uint32_t)allocPages(newSize);
+    printd(DEBUG_KMALLOC,"mallocI: Allocated 0x%08X bytes @ 0x%08X\n",newSize,phys);
     pagingMapPageCount(cr3,p->heapEnd,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
-    //Map phys to phys, kernel 
+    //Map into kernel, both phys to phys, and virtual to phys
     pagingMapPageCount(KERNEL_CR3,phys,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     pagingMapPageCount(KERNEL_CR3,p->heapEnd,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     retVal=p->heapEnd;

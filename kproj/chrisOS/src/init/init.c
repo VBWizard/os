@@ -68,10 +68,10 @@ struct gdt_ptr lGDT;
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
 #endif
-
+#define __i386__
 /* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
-#error "This tutorial needs to be compiled with a ix86-elf compiler"
+#error "This operating system needs to be compiled with a ix86-elf compiler"
 #endif
 
 
@@ -331,9 +331,9 @@ gdt_init();
     }
     else
         printk("APIC: not found\n");
-    printk("TSC: ticks per 10 = %u\n", tscGetTicksPerSecond());
+    printk("TSC: CPU frequency = %u\n", tscGetTicksPerSecond());
 #ifndef DEBUG_NONE
-    printd(0,"TSC: ticks per 10 = %u\n", tscGetTicksPerSecond());
+    printd(0,"TSC: CPU frequency = %u\n", tscGetTicksPerSecond());
 #endif
 #ifndef DISABLE_PAGING
     kCPU[0].registerBase=apicGetAPICBase();

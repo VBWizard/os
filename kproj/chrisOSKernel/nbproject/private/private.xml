@@ -19,10 +19,7 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/schedule.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/sysloader.c</file>
         </group>
     </open-files>
 </project-private>

@@ -75,7 +75,7 @@ extern "C" {
         size_t (*write) (struct file *, const char *, size_t, uint64_t *);
     }file_operations_t;
 
-        struct file
+    struct file
     {
         char* f_path;
         struct inode* f_inode;

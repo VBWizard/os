@@ -50,7 +50,7 @@ VISIBLE void __attribute__((constructor)) libc_init(void)
         do_syscall1(SYSCALL_INVALID);
         do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
         libcInitialized = true;
-        printI("***libc_init completed\n");
+        printdI(DEBUG_LIBC,"***libc_init completed\n");
     }
     else
         printI("libc_init called previously, exiting\n");

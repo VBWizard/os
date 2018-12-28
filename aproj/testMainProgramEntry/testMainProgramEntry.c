@@ -16,15 +16,14 @@
 
 void HandleSEGV();
 
-void crashFail(char** argv)
+void crashFail(char** argv, int count)
 {
-    uint64_t temp=0;
 
     jumpHere:
+    print("\t%s: Counting down ... %u\n",argv[0],count);
     sleep(1);
-    temp++;
-    print("\t%s: Still in the loop, %u iterations\n",argv[1],temp);
-    if (temp==5)
+    count--;
+    if (count==0)
     {
         print("Triggering SEGV\n");
         __asm__("mov eax,[0x50000000]\n");
@@ -74,14 +73,7 @@ int main(int argc, char** argv) {
     
     print ("Looping %u times\n",loopCount);
     
-    while (num < loopCount*10)
-    {
-        sleep(1);
-        num++;
-        if (num%10==0)
-            print("Still here!!! (%u)\n",num);
-    }
-    crashFail(argv);
+    crashFail(argv,loopCount);
     print ("Bye bye now!!!\n");
     return 0x1234;
 }
