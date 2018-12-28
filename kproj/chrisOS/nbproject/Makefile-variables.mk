@@ -15,13 +15,13 @@ CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
 CND_PACKAGE_NAME_Debug=chrisos.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/chrisos.tar
 # Release configuration
-CND_PLATFORM_Release=cross-Linux
-CND_ARTIFACT_DIR_Release=dist/Release/cross-Linux
+CND_PLATFORM_Release=GNU-Linux
+CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
 CND_ARTIFACT_NAME_Release=chrisos
-CND_ARTIFACT_PATH_Release=dist/Release/cross-Linux/chrisos
-CND_PACKAGE_DIR_Release=dist/Release/cross-Linux/package
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/chrisos
+CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
 CND_PACKAGE_NAME_Release=chrisos.tar
-CND_PACKAGE_PATH_Release=dist/Release/cross-Linux/package/chrisos.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/chrisos.tar
 # Release_No_Optimization configuration
 CND_PLATFORM_Release_No_Optimization=cross-Linux
 CND_ARTIFACT_DIR_Release_No_Optimization=dist/Release_No_Optimization/cross-Linux

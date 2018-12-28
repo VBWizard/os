@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
     if (retVal==0)
     {
         startTime=time();
-        pid=exec(execpgm,0,NULL);
+        pid=exec(execpgm,argc-1,argv+1);
         if (pid==0)
         {
             print("Error executing %s\n",argv[1]);
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
             waitpid(pid);
             endTime=time();
             elapsed=(endTime-startTime);
-            totalTime=malloc(sizeof(totalTime));    
+            totalTime=malloc(sizeof(struct tm));    
             print("Elapsed ticks = %u\n",elapsed);
             int ms=elapsed%TICKS_PER_SECOND;
             elapsed/= TICKS_PER_SECOND;

@@ -79,7 +79,7 @@ void elfMakePagesCOW(uint32_t cr3, uint32_t address, uint32_t size)
     }
 }
 
-void elfSetupCopyOnPages(uint32_t cr3, elfInfo_t* elf)
+void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
 {
 	printd(DEBUG_ELF_LOADER,"elfSetupCopyOnPages: Scanning section header table for .data and .bss\n");
 	for (int cnt=0;cnt<elf->secHdrRecordCount;cnt++)
@@ -164,8 +164,8 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                             foundElf=searchElf;
                             mapLibraryIntoProcess(targetCR3,searchElf);
                             printd(DEBUG_ELF_LOADER,"\t\tDone mapping %s into program's vm.\n",searchElf->fileName);
-                            printd(DEBUG_ELF_LOADER,"\t\tSetting up CopyOn pages\n");
-                            elfSetupCopyOnPages(targetCR3,searchElf);
+                            printd(DEBUG_ELF_LOADER,"\t\tSetting up CoW pages\n");
+                            elfSetupCoWPages(targetCR3,searchElf);
                             elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=searchElf;  //CLR 12/23/2018: Removed incrementing of libraryElfCount here as it is done below
                             break;
                         }

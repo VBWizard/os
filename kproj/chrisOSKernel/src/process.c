@@ -244,6 +244,7 @@ void processIdleLoop()
     while (1==1)
     {
         kIdleTicks++;
+        printd(DEBUG_PROCESS,"IDLE TASK: Idle ticks = %u\n",kIdleTicks);
         __asm__("sti;hlt;");
     }   
 }
@@ -291,6 +292,9 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
 //        process->stdin=((process_t*)parentProcessPtr)->stdin;
 //        process->stdin=((process_t*)parentProcessPtr)->stdout;
 //        process->stdin=((process_t*)parentProcessPtr)->stderr;
+       process->stdin=((process_t*)parentProcessPtr)->stdin=STDIN_FILE;
+       process->stdin=((process_t*)parentProcessPtr)->stdout=STDOUT_FILE;
+       process->stdin=((process_t*)parentProcessPtr)->stderr=STDERR_FILE;
     }
     else
     {

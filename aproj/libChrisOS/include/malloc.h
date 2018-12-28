@@ -38,6 +38,7 @@ extern "C" {
 #include <stddef.h>
 
     
+//This is the minimum request size for a call to the kernel to ALLOC memory. 
 #define ALLOC_REQUEST_SIZE 0x32000
 #define ALLOC_MARKER_VALUE 0xB00F00D0
     typedef struct sheap

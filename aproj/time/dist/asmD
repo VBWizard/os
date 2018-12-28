@@ -2,5 +2,5 @@
 pushd ..
 ./make_debug
 popd
-objdump -D -S -l Debug/cross-Linux/time -M intel-mnemonic > timeD.asm
+objdump -D -S -l Debug/GNU-Linux/time -M intel-mnemonic > timeD.asm
 vi timeD.asm

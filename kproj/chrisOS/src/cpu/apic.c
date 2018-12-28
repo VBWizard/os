@@ -132,6 +132,6 @@ uint32_t apicGetHZ() {
 int tscGetTicksPerSecond()
 {
     uint64_t ticksBefore=rdtsc();
-    wait(TICKS_PER_SECOND);
-    return rdtsc()-ticksBefore;
+    wait(500);
+    return (rdtsc()-ticksBefore)*2;
 }

@@ -18,6 +18,7 @@
 extern "C" {
 #endif
 
+//The minimum TPS I've gotten to work is 50.  Not possible to do > 1000 because of MS_PER_TICK
 #define TICKS_PER_SECOND 100
 //How many ticks expire between scheduler runs
 #define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 10
