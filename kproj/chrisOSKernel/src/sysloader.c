@@ -810,7 +810,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
          if (err)
          {
              printd(DEBUG_ELF_LOADER,"Failed to process ELF dynamic section, error=0x%08X\n",err);
-            fl_fclose(fPtr);
+            fs_close(fPtr);
             elfInfo->loadCompleted=false;
             __asm__("pop ds");                  //clr 09/24/2017: Restore the DS since we blew it up
             return elfInfo;
@@ -818,7 +818,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
     }
     elfDumpSymbols(elfInfo);
     elf_relocate(elfInfo);
-    fl_fclose(fPtr);
+    fs_close(fPtr);
     elfInfo->loadCompleted=true;
     __asm__("pop ds");                  //clr 09/24/2017: Restore the DS since we blew it up
     return elfInfo;

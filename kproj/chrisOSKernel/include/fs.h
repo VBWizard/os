@@ -123,7 +123,8 @@ extern "C" {
     void* fs_openFile(char* path, const char* mode);
     int fs_readFile(void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);
-
+    void fs_close(void* file);
+    
 #ifdef __cplusplus
 }
 #endif

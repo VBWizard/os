@@ -77,7 +77,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_EXEC:      //***exec: param1=program path
             __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
             parentProcess=(process_t*)(findTaskByCR3(processCR3))->process;
-            printd(DEBUG_PROCESS,"_sysCall: createProcess(0x%08X,0x%08X,0x%08X,0x%08X,false)\n",param1,param2,param3,parentProcess);
+            printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08X,0x%08X,0x%08X,false)\n",param1,param2,param3,parentProcess);
             process = createProcess((char*)param1, param2, param3, parentProcess, false);
             if (process!=NULL)
                 retVal=process->task->taskNum;

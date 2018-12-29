@@ -35,6 +35,24 @@ file_system_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
     return fs;
 }
 
+dllist_t* getFileListEntry(file_system_t *fs, void* file)
+{
+    dllist_t* list = listHead(fs->files);
+    
+    while (1)
+    {
+        if (((file_t*)list->payload)->handle==file)
+            return list;
+        else
+        {
+            if (list->next==list)
+                break;
+            list=listNext(list);
+        }
+    }
+    return NULL;
+}
+
 void* fs_openFile(char* path, const char* mode)
 {
     void* handle;
@@ -67,19 +85,7 @@ void* fs_openFile(char* path, const char* mode)
 file_t* getFileFromList(file_system_t *fs, void* file)
 {
     dllist_t* list = listHead(fs->files);
-    
-    while (1)
-    {
-        if (((file_t*)list->payload)->handle==file)
-            return (file_t*)list->payload;
-        else
-        {
-            if (list->next==list)
-                break;
-            list=listNext(list);
-        }
-    }
-    return NULL;
+    return getFileListEntry(fs, file)->payload;
 }
 
 int fs_readFile(void* file, void * buffer, int size, int length)
@@ -102,4 +108,22 @@ int fs_seek(void* file, long offset, int whence)
         panic("fs_readFile: file handle not found in fs->files");
     
     return foundFile->fops->seek(foundFile->handle, offset, whence);
+}
+
+void fs_close(void* file)
+{
+    dllist_t* foundFile = getFileListEntry(rootFs, file);
+    bool deInitTheList=false;
+    
+    if (foundFile==NULL)
+        panic("fs_readFile: file handle not found in fs->files");
+    
+    ((file_t*)(foundFile->payload))->fops->close(((file_t*)foundFile->payload)->handle);
+    if (foundFile->next==foundFile && foundFile->prev==foundFile)
+        deInitTheList=true;
+    listRemove(foundFile);
+    kFree(foundFile);
+    if (deInitTheList)
+        rootFs->files=NULL;
+    
 }
