@@ -42,7 +42,7 @@ task_t* getAvailableTask()
         slot=bitsScanF(ptr+cnt);
         if (slot>-1)
         {
-            slot=slot+(cnt*32);
+            slot=slot+(cnt*RESERVED_TASKS);
             printd(DEBUG_TASK,"getAvailableTask: Found free slot for task (0x%04X)\n",slot);
             task_t* task=(task_t*)kMalloc(sizeof(task_t));//&kTaskTable[slot];
             task->taskNum=slot;

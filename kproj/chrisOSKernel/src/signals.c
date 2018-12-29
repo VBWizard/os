@@ -121,7 +121,6 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
             }*/
             p->signals.sigind|=SIG_SEGV;
             triggerScheduler();
-            printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald=0x%08X, returning to caller\n",callerCR3,p->signals.sigind);
             return p;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         default:

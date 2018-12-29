@@ -210,6 +210,31 @@ LOAD_ZERO_BASED_DS
 LOAD_KERNEL_BASED_DS
 }
 
+//Called by exception 0xd & 0xe (possibly more)
+void logDumpedRegs()
+{
+    uint32_t esp = exceptionSavedESP;
+    volatile unsigned short *lCSIPPtr=(volatile unsigned short *)exceptionCS;
+LOAD_ZERO_BASED_DS    
+    printd(DEBUG_EXCEPTIONS,"EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
+    printd(DEBUG_EXCEPTIONS,"EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
+    printd(DEBUG_EXCEPTIONS,"CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
+    printd(DEBUG_EXCEPTIONS," DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
+    printd(DEBUG_EXCEPTIONS,"GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
+    printd(DEBUG_EXCEPTIONS,"CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
+//          printd(DEBUG_EXCEPTIONS,"Bytes at CS:EIP: ");
+//          for (int cnt=0;cnt<19;cnt++)
+//              printd(DEBUG_EXCEPTIONS,"%02X ", lCSIPPtr[cnt]);
+//          printd(DEBUG_EXCEPTIONS,"\n");
+          printd (DEBUG_EXCEPTIONS,"Stack @ 0x%08x:0x%08X:\n",exceptionSS, esp);
+          for (int cnt=0;cnt<40;cnt++)
+          {
+              printd(DEBUG_EXCEPTIONS,"\t0x%08X%: 0x%08X\n",esp, exceptionSavedStack[cnt]);
+              esp+=4;
+          }
+LOAD_KERNEL_BASED_DS
+}
+
 void printDebugRegs()
 {
     uint32_t esp = debugSavedESP;

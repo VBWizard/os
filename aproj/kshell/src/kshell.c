@@ -14,9 +14,6 @@
 #include <unistd.h>
 #include "kshell.h"
 
-bool timeToExit=false;
-uint32_t exitCode=0;
-char delim[6] = " \t\n-,";
 char commandHistory[500][MAX_PARAM_WIDTH];
 int commandHistoryPtr=0;
 int commandHistoryMax=0;
@@ -239,29 +236,6 @@ char **buildargv (const char *input)
   return (argv);
 }
 
-void helpMe(char *cmdline)
-{
-    char* tok;
-    
-    tok=strtok(cmdline,delim);
-/*    while (tok!=NULL)
-    {
-        print("\t%s",tok);
-        tok=strtok(0,delim);
-    }
-*/    
-    print("Help: %s\n",tok);
-    for (unsigned cnt=0;cnt<sizeof(cmds)/sizeof(command_table_t);cnt++)
-        if (tok!=NULL)
-        {
-            if (strncmp(tok,cmds[cnt].name,100)==0)
-                print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
-        }
-        else
-            print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
-        
-}
-
 char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH])
 {
     char** pptr=malloc(sizeof(char*)*pcount);
@@ -281,90 +255,28 @@ void freeArgV(int pcount, char **params)
     free(params);
 }
 
-void execp(char* cmdline)
+bool getEnvVariableValue(char* evName, char* value)
 {
-    bool background=false;
-    uint32_t pid=0;
-    char* tok;
-    char* pgm=NULL;
-
-    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-    int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
-    int execParamCount=0;
-    int pcount=1;
     
-    if (paramCount==0)
-        return;
-    
-    tok=strtok(cmdline,delim);
-    while (tok!=NULL)
+    for (int cnt=0;cnt<50;cnt++)
     {
-        if (strncmp(tok,"b",2)==0)
+        if (environmentLoc[cnt]!=0)
         {
-            background=true;
-            execParamCount++;
+            char* idx = strstr((char*)environmentLoc[cnt],evName);
+            if (idx>0)
+            {
+                idx = strstr(idx,"=");
+                //++ because we don't want to include the = sign
+                strcpy(value, ++idx);
+                //print("getEnvVariableValue: value for '%s'='%s'\n",evName, value);
+                return true;
+            }
         }
-        else if (pgm==NULL)
-        {
-            pgm=malloc(strlen(tok)+1);  //NOTE: +1 is for the terminating \0
-            strcpy(pgm,tok);
-        }
-        pcount++;
-        tok=strtok(0,delim);
-    }
-    
-    char** prms=paramsToArgv(paramCount-execParamCount,&params[execParamCount][0]);
-
-    print ("Executing %s\n",pgm);
-    pid=exec(pgm,paramCount-execParamCount,prms);
-    if (pid>0)
-    {
-        if (!background)
-        {
-            //print("DEBUG1: waitpid = %08X\n",&waitpid);
-            waitpid(pid);
-        }
-    }
-    else
-        print("Error executing %s\n",pgm);
-    //Its ok to free arguments now because they are copied by the kernel to pgm's memory
-    freeArgV(paramCount-1, (char**)prms);       
-    free(pgm);
+    } 
+    return false;
 }
 
-void kSleep(char *cmdline)
-{
-    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-    int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
 
-    if (params[0][0]==0)
-    {
-        print("Requires 1 parameter which is the number of seconds to sleep\n");
-        return;
-    }
-    //print("Sleeping for %u seconds\n",strtoul(params[0],0,10));
-    sleep(strtoul(params[0],0,10));
-}
-
-void kExit(char *cmdline)
-{
-    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-
-    if (parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT))
-    {
-        exitCode = strtoul(params[0],0,10);
-    }
-    else
-        exitCode = 0;
-    timeToExit=true;
-}
-
-void pwd()
-{
-    char* buf=malloc(512);
-    print("%s\n",getcwd(buf,512));
-    free(buf);
-}
 
 /*void getDate()
 {
@@ -392,7 +304,8 @@ int reprintCommand(char* command)
  
 }
 
-int kShell(int argc, char** argv)
+
+int kShell(int argc, char** argv, char** envp)
 {
     char lCommand[256];
     uint8_t lCurrKey=0;
@@ -400,8 +313,10 @@ int kShell(int argc, char** argv)
     int commandWasFromThisBufferPtr=0;
     char ansiSeq[20];
 
-    //libc_init();
-    
+    exitCode = 0;
+    timeToExit = false;
+    strcpy(delim," \t\n-,");
+    environmentLoc = envp;
     ansiSeq[0]=0x1b;
     sKShellProgramName=malloc(1024);
     strcpy(sKShellProgramName,"kShell");

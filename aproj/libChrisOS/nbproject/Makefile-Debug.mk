@@ -56,6 +56,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/strings/strparts.o \
 	${OBJECTDIR}/src/strings/strtol.o \
 	${OBJECTDIR}/src/strings/strtrim.o \
+	${OBJECTDIR}/src/strstr.o \
 	${OBJECTDIR}/src/time.o
 
 
@@ -187,6 +188,11 @@ ${OBJECTDIR}/src/strings/strtrim.o: src/strings/strtrim.c
 	${MKDIR} -p ${OBJECTDIR}/src/strings
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strtrim.o src/strings/strtrim.c
+
+${OBJECTDIR}/src/strstr.o: src/strstr.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strstr.o src/strstr.c
 
 ${OBJECTDIR}/src/time.o: src/time.c
 	${MKDIR} -p ${OBJECTDIR}/src

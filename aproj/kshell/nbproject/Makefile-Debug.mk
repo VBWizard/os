@@ -35,7 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/kshell.o
+	${OBJECTDIR}/src/commands.o \
+	${OBJECTDIR}/src/kshell.o
 
 
 # C Compiler Flags
@@ -64,10 +65,15 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kshell: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kshell ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc -T linker.ld
 
-${OBJECTDIR}/kshell.o: kshell.c
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/commands.o: src/commands.c
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../libChrisOS/include -Iinclude -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/kshell.o kshell.c
+	$(COMPILE.c) -g -I../libChrisOS/include -Iinclude -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/commands.o src/commands.c
+
+${OBJECTDIR}/src/kshell.o: src/kshell.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I../libChrisOS/include -Iinclude -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/kshell.o src/kshell.c
 
 # Subprojects
 .build-subprojects:

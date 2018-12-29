@@ -50,6 +50,7 @@ void initSystemDate();
 char * strtoupper(char* pointerToString);
 void printDumpedRegs();
 void printDebugRegs();
+void logDumpedRegs();
 void reboot(bool waitFirst);
 void dumpKernelAddresses();
 bool pauseDisplay(bool offerToQuit);

@@ -36,7 +36,7 @@ extern void getDateTimeString(char *s);
 struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
 dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call listInit and pass the first item (a dllist_t*) to it
 
-char env[2][50];
+char env[3][50];
 char* envs[100];
 
 void initKernelInternals()
@@ -83,13 +83,18 @@ __asm__("cli\n");
     kKernelProcess->stdin=STDIN_FILE;
     kKernelProcess->stdout=STDOUT_FILE;
     kKernelProcess->stderr=STDERR_FILE;
-
+    
+    kKernelProcess->path=allocPagesAndMap(0x255);
+    strcpy(kKernelProcess->path,"/kernel");
+    
     strcpy(env[0],"PATH=/");
     strcpy(env[1],"HOSTNAME=localhost.localdomain");
+    strcpy(env[2],"PWD=/");
     for (int cnt=0;cnt<100;cnt++)
         envs[cnt]=0;
     envs[0]=env[0];
     envs[1]=env[1];
+    envs[2]=env[2];
     kKernelProcess->envp = (uintptr_t)envs;
     
     pagingMapPage(kKernelTask->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);

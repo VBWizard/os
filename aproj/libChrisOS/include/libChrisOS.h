@@ -51,7 +51,8 @@ extern "C" {
     void *memset(void *d1, int val, size_t len);
     void * memcpy(void *dest, const void *src, size_t n);
     struct tm* gettime();
-
+    char* getcwd(char* buf, size_t size);
+    
     time_t libcTZ;
 
 #ifdef __cplusplus

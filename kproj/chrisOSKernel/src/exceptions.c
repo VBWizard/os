@@ -18,6 +18,7 @@
 #include "alloc.h"
 #include "paging.h"
 #include "mmap.h"
+#include "task.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
@@ -72,7 +73,7 @@ void kPagingExceptionHandler()
     printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X) in %s\n",exceptionCR2,exceptionCR3,elf->fileName);
 
 
-    printd(DEBUG_EXCEPTIONS,"\tProcess=%s\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",process->path,lPTEValue);
+    printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0X%08X)\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",process->path,process->task->taskNum, lPTEValue);
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
     pageVirtAddress=lPTEValue&0xFFFFF000;
     if ( (pageVirtAddress==(exceptionCR2&0xFFFFF000)) 
@@ -158,6 +159,7 @@ void kPagingExceptionHandler()
           printk("\nPaging handler called for virtual address 0x%02X\n",exceptionCR2);
           printk("PDE@0x%08X=0x%08X, PTE@0x%08X=0x%08X\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
           printDumpedRegs();
+          logDumpedRegs();
           //printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
     
@@ -168,14 +170,14 @@ void kPagingExceptionHandler()
 
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
 
-    if (p->task->taskNum!=1)
+    if (p->task->taskNum!=RESERVED_TASKS)
     {
         printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Returning\n");
         __asm__("\nsti\nnop\nnop\nnop\nmov cr3,eax\n":"=a"(exceptionCR3));
         return;
     }
 pagingExceptionStop: 
-    printk("Exception was not handled (taskNum=0x%04X), halting system\n",p->task->taskNum);
+    printk("Exception was in kernel task (taskNum=0x%04X), cannot continue, halting system\n",p->task->taskNum);
     __asm__("cli");
     __asm__("hlt");
     goto pagingExceptionStop;

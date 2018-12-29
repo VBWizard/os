@@ -28,10 +28,16 @@
    __attribute__((visibility("default"))) char *
    STRCAT (char *dest, const char *src)
    {
-     strcpy (dest + strlen (dest), src);
+     strcpyI (dest + strlenI (dest), src);
      return dest;
    }
 
+   char* strcatI (char *dest, const char *src)
+   {
+     strcpy (dest + strlen (dest), src);
+     return dest;
+   }
+   
    void concatenate(char p[], char q[]) {
    int c, d;
  

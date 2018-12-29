@@ -227,12 +227,17 @@ int sys_setpriority(process_t* process, int newpriority)
 
 void processCopyArgV(char** dest, char** src, uint32_t dVirt, int pcount)
 {
+    printd(DEBUG_PROCESS,"Executing %u argv copies from calling process's memory starting at src=0X%08X dest=0x%08X\n",pcount, src, dest);
     for (int cnt=0;cnt<pcount;cnt++)
     {
-            //Make the dest pointer [cnt] point to the same offset within the page as the source [cnt]
-            dest[cnt]=(char*)(((uintptr_t)dest & 0xFFFFF000) | ((uintptr_t)src[cnt] & 0x00000FFF));
-            memcpy(dest[cnt],src[cnt],50);
-            dest[cnt]=(char*)((dVirt & 0xFFFFF000) | ((uint32_t)dest[cnt] & 0x00000FFF));
+        //Make the dest pointer [cnt] point to the same offset within the page as the source [cnt]
+        dest[cnt]=(char*)(((uintptr_t)dest & 0xFFFFF000) | ((uintptr_t)src[cnt] & 0x00000FFF));
+        printd(DEBUG_PROCESS,"Iteration %u: Copying %u bytes from 0x%08X to 0x%08X\n",cnt,strlen(src[cnt]),src[cnt],dest[cnt]);
+        //CLR 12/29/2018: Replaced memcpy with strcpy as all arguments are represented as strings, and using memcpy with a static length of 50
+        //was causing paging fault because it was copying past the end of process->argv memory
+        //memcpy(dest[cnt],src[cnt],50);
+        strcpy(dest[cnt],src[cnt]);
+        dest[cnt]=(char*)((dVirt & 0xFFFFF000) | ((uint32_t)dest[cnt] & 0x00000FFF));
     }
 }
 
@@ -312,12 +317,14 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     uint32_t scratchMemory=0x6f010000;
     if (process->parent!=NULL)
     {
-        //Map the parent's heap into our paging table
+        printd(DEBUG_PROCESS,"Mapping parent's argv into our memory\n");
+        //Map the parent's argv into our paging table
         if (process->parent!=kKernelProcess)
             pagingMapProcessPageIntoKernel(((process_t*)process->parent)->pageDirPtr,argv,0x7);
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
         process->argv=(uintptr_t)allocPages(50*argc);
         pagingMapPageCount(KERNEL_CR3,process->argv,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
+        printd(DEBUG_PROCESS,"Retrieving argv parameter values from parent process\n");
         processCopyArgV((char**)process->argv,(char**)argv,argvVirt,argc);
         pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
     }
@@ -338,7 +345,9 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
         pagingMapPageCount(KERNEL_CR3,process->envp,process->envp,((50*50)/PAGE_SIZE)+1,0x7);
         pagingMapPageCount(KERNEL_CR3,envpVirt,process->envp,((50*50)/PAGE_SIZE)+1,0x7);
         //processCopyArgV((char**)process->envp,(char**)parentProcessPtr->envp,envpVirt,50);
+        printd(DEBUG_PROCESS,"Retrieving environment variables from parent process\n");
         copyToKernel(parentProcessPtr, (void*)envpVirt, (void*)envpVirt, (50*50));
+        printd(DEBUG_PROCESS,"Putting parent environment variables in our memory\n");
         memcpy((void*)process->envp, (void*)parentProcessPtr->envp, 50*4);
 
     }
@@ -379,6 +388,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     }
 
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
+    printd(DEBUG_PROCESS,"Setting up the stack\n");
     void* processExitAddress=&processExit;
     memcpy((void*)process->task->tss->ESP,&process->task->tss->EIP,8);
     memcpy((void*)process->task->tss->ESP+4,&process->task->tss->CS,8);
