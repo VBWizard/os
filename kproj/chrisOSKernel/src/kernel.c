@@ -88,13 +88,14 @@ int main(int argc, char** argv) {
     char program[40]="/kshell";
     printk("Loading and executing %s\n",program);
     /*NOTE: This is how to create argv!!!*/
-    char test[2][50];
-    strcpy(test[0],"1");
-    strcpy(test[1],"1");
-    char* testp[2];
-    testp[0]=test[0];
-    testp[1]=test[1];
-    process_t* process = createProcess(program, 2, &testp, NULL, false);
+    char params[2][50];
+    strcpy(params[0],"1");
+    strcpy(params[1],"1");
+    char* args[2];
+    args[0]=params[0];
+    args[1]=params[1];
+    
+    process_t* process = createProcess(program, 2, (uint32_t)&args, kKernelProcess, false);
     schedulerEnabled=true;
 /*#define pcount 3
     char* param1[pcount][10];

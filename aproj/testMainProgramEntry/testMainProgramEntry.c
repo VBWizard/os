@@ -32,10 +32,13 @@ void crashFail(char** argv, int count)
 
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv, char** envp) {
     int num=0;
     int loopCount=0;
     
+    int largc=argc;
+    char** largv=argv;
+    char** lenvp=envp;
     
     //modifySignal(SIG_SEGV, &HandleSEGV, 0);
 
@@ -65,6 +68,17 @@ int main(int argc, char** argv) {
         print("Param %u=%s\n",cnt,argv[cnt]);
     }
     print("\n");
+    
+    print ("Environment @ 0x%08X:\n",&envp);
+    for (int cnt=0;cnt<100;cnt++)
+    {
+        if (lenvp[cnt]!=0)
+        {
+            print("\t0x%08X: ",&lenvp[cnt]);
+            print("\t%u: %s\n",cnt,lenvp[cnt]);
+        }
+    }
+    print("end of environment ...\n\n");
     
     if (argc>1)
         loopCount = atoi(argv[1]);

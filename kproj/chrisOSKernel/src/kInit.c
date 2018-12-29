@@ -36,6 +36,9 @@ extern void getDateTimeString(char *s);
 struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
 dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call listInit and pass the first item (a dllist_t*) to it
 
+char env[2][50];
+char* envs[100];
+
 void initKernelInternals()
 {
     char currTime[50];
@@ -77,7 +80,18 @@ __asm__("cli\n");
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP,0x16,0x7);
     kKernelTask->tss->LINK=0x0;
     kKernelTask->tss->IOPB=0;
+    kKernelProcess->stdin=STDIN_FILE;
+    kKernelProcess->stdout=STDOUT_FILE;
+    kKernelProcess->stderr=STDERR_FILE;
 
+    strcpy(env[0],"PATH=/");
+    strcpy(env[1],"HOSTNAME=localhost.localdomain");
+    for (int cnt=0;cnt<100;cnt++)
+        envs[cnt]=0;
+    envs[0]=env[0];
+    envs[1]=env[1];
+    kKernelProcess->envp = (uintptr_t)envs;
+    
     pagingMapPage(kKernelTask->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
     pagingMapPage(KERNEL_CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
     printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08X) into task and kernel\n", kKernelTask->tss);

@@ -29,6 +29,7 @@ extern "C" {
 #define PROCESS_HEAP_START 0x70000000
 #define PROCESS_HEAP_END   0xBFFFFFFF
 #define PROCESS_MAX_EXIT_HANDLERS 20    
+#define PROCESS_MAX_ENVIRONMENT_VARIABLES 512
 #define PROCESS_STRUCT_VADDR 0xF000F000
 #define PROCESS_STRUCT_VADDR_THIS_OFFSET 0x4
     
@@ -65,10 +66,11 @@ extern "C" {
         char* cwd;                              //Current working directory for the process
         void* startHandler[PROCESS_MAX_EXIT_HANDLERS];
         int startHandlerPtr;
+        uintptr_t envp;
     } process_t;
 
 
-    process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool kernelProcess);
+    process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool isKernelProcess);
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);

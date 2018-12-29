@@ -20,6 +20,7 @@
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
 extern uint64_t kIdleTicks;
+process_t* kKernelProcess;
 
 #define PAGE_USER_READABLE 0x4
 #define PAGE_USER_WRITABLE 0x6           //0x4 for "User" | 0x2 for "Writable"
@@ -29,6 +30,7 @@ extern uint64_t kIdleTicks;
 
 uintptr_t userCR3=0;
 
+//NOTE: Assumes contiguous memory area
 void* copyToKernel(process_t* process, void* dest, const void* src, unsigned long size) //Copy memory from user space to kernel (assumes dest is kernel page)
 {
     uintptr_t srcCR3=process->pageDirPtr, destCR3=KERNEL_CR3;
@@ -227,10 +229,10 @@ void processCopyArgV(char** dest, char** src, uint32_t dVirt, int pcount)
 {
     for (int cnt=0;cnt<pcount;cnt++)
     {
-        //Make the dest pointer [cnt] point to the same offset within the page as the source [cnt]
-        dest[cnt]=(char*)(((uintptr_t)dest & 0xFFFFF000) | ((uintptr_t)src[cnt] & 0x00000FFF));
-        memcpy(dest[cnt],src[cnt],50);
-        dest[cnt]=(char*)((dVirt & 0xFFFFF000) | ((uint32_t)dest[cnt] & 0x00000FFF));
+            //Make the dest pointer [cnt] point to the same offset within the page as the source [cnt]
+            dest[cnt]=(char*)(((uintptr_t)dest & 0xFFFFF000) | ((uintptr_t)src[cnt] & 0x00000FFF));
+            memcpy(dest[cnt],src[cnt],50);
+            dest[cnt]=(char*)((dVirt & 0xFFFFF000) | ((uint32_t)dest[cnt] & 0x00000FFF));
     }
 }
 
@@ -269,7 +271,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     process->startHandlerPtr=0; //CLR 12/23/2018: Initialize the start handler pointer to the first entry
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
     //strcpy(process->path,path);
-    if (parentProcessPtr!=NULL)
+    if (parentProcessPtr!=NULL && parentProcessPtr->pageDirPtr!=0)
     {
         if (parentProcessPtr->pageDirPtr!=KERNEL_CR3)
            copyToKernel(parentProcessPtr,process->path,path,PATH_MAX);
@@ -292,9 +294,9 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
 //        process->stdin=((process_t*)parentProcessPtr)->stdin;
 //        process->stdin=((process_t*)parentProcessPtr)->stdout;
 //        process->stdin=((process_t*)parentProcessPtr)->stderr;
-       process->stdin=((process_t*)parentProcessPtr)->stdin=STDIN_FILE;
-       process->stdin=((process_t*)parentProcessPtr)->stdout=STDOUT_FILE;
-       process->stdin=((process_t*)parentProcessPtr)->stderr=STDERR_FILE;
+       process->stdin=((process_t*)parentProcessPtr)->stdin;
+       process->stdout=((process_t*)parentProcessPtr)->stdout;
+       process->stderr=((process_t*)parentProcessPtr)->stderr;
     }
     else
     {
@@ -307,20 +309,38 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     
     process->argv=argv;
     uint32_t argvVirt=0x6f000000;
+    uint32_t scratchMemory=0x6f010000;
     if (process->parent!=NULL)
     {
         //Map the parent's heap into our paging table
-        pagingMapProcessPageIntoKernel(((process_t*)process->parent)->pageDirPtr,argv,0x7);
+        if (process->parent!=kKernelProcess)
+            pagingMapProcessPageIntoKernel(((process_t*)process->parent)->pageDirPtr,argv,0x7);
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
         process->argv=(uintptr_t)allocPages(50*argc);
-        pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
         pagingMapPageCount(KERNEL_CR3,process->argv,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
         processCopyArgV((char**)process->argv,(char**)argv,argvVirt,argc);
+        pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
     }
     else
     {
         argv=0;
         argc=0;
+    }
+
+    uint32_t envpVirt=0x6f050000;
+
+    //TODO: Both envp(s) (process & parentProcess) both map to the same virtual addresses
+    if (parentProcessPtr != 0 && parentProcessPtr->envp != 0)
+    {
+        //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
+        process->envp=(uintptr_t)allocPages(50*50);
+        pagingMapPageCount(process->task->tss->CR3,envpVirt,process->envp,((50*50)/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(KERNEL_CR3,process->envp,process->envp,((50*50)/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(KERNEL_CR3,envpVirt,process->envp,((50*50)/PAGE_SIZE)+1,0x7);
+        //processCopyArgV((char**)process->envp,(char**)parentProcessPtr->envp,envpVirt,50);
+        copyToKernel(parentProcessPtr, (void*)envpVirt, (void*)envpVirt, (50*50));
+        memcpy((void*)process->envp, (void*)parentProcessPtr->envp, 50*4);
+
     }
     process->task->process=process;
     process->this=process;
@@ -359,20 +379,21 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     }
 
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
-    void* var=&processExit;
+    void* processExitAddress=&processExit;
     memcpy((void*)process->task->tss->ESP,&process->task->tss->EIP,8);
     memcpy((void*)process->task->tss->ESP+4,&process->task->tss->CS,8);
     memcpy((void*)process->task->tss->ESP+8,&process->task->tss->EFLAGS,8);
-    uint32_t tempESP=process->task->tss->ESP-0x104;
-    memcpy((void*)process->task->tss->ESP+12,&tempESP,8);
+    uint32_t realESP=process->task->tss->ESP-0x104;
+    memcpy((void*)process->task->tss->ESP+12,&realESP,8);
     memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,8);
     
     //Per the above, the stack will start at -0x100 from where we write the CS/EIP/FLAGS/SS/ESP, so put our params around there
-    memcpy((void*)process->task->tss->ESP-0x108,process,4);
-    memcpy((void*)process->task->tss->ESP-0x104,&process->entryPoint,4);
-    memcpy((void*)process->task->tss->ESP-0x100,&var,4);
-    memcpy((void*)process->task->tss->ESP-0xfc,&argc,4);
-    memcpy((void*)process->task->tss->ESP-0xf8,&argvVirt,4);
+    memcpy((void*)realESP-4,process,4);
+    memcpy((void*)realESP,&process->entryPoint,4);
+    memcpy((void*)realESP+4,&processExitAddress,4);
+    memcpy((void*)realESP+8,&argc,4);
+    memcpy((void*)realESP+12,&argvVirt,4);
+    memcpy((void*)realESP+16,&envpVirt,4);
     //Set the return point since the task will simply ret to exit
     printd(DEBUG_PROCESS,"Return point for process is 0x%08X\n",&processExit);
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
