@@ -18,6 +18,7 @@ uintptr_t *qUSleep;
 uintptr_t *qISleep;
 uintptr_t *qExited;
 
+extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t* kTicksSinceStart;
 uint32_t kTaskSwitchCount;
 uint32_t kSchedulerCallCount;
@@ -92,7 +93,7 @@ task_t* findTaskByCR3(uint32_t cr3)
         printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Could not find task with CR3=0x%08X\n",cr3);
         return NULL;
     }
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Found task @ 0x%08X\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Found task 0x%04X @ 0x%08X\n", taskList->taskNum, taskList);
     return taskList;
 }
 
@@ -289,7 +290,7 @@ task_t* findRunningTaskToReplace()
 //Using the fairness doctrine for now, so task with most ticks in runnable gets to run
 task_t* findTaskToRun()
 {
-    int32_t mostIdleTicks=-1;
+    uint32_t mostIdleTicks=0;
     task_t* taskToRun=NULL;
 
     uintptr_t* queue=qRunnable;
@@ -299,8 +300,8 @@ task_t* findTaskToRun()
         if (*queue!=0)
         {
             //This is where we increment all the runnable ticks, based on the process' priority
-            printd(DEBUG_PROCESS,"*\tfindTaskToRun: task 0x%04X, priority=%u, old ticks=%u, new ticks=",
-                    ((task_t*)*queue)->taskNum,
+            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s), priority=%u, old ticks=%u, new ticks=",
+                    ((task_t*)*queue)->taskNum, ((process_t*)((task_t*)*queue)->process)->path,
                     ((process_t*)((task_t*)*queue)->process)->priority,
                     ((task_t*)*queue)->prioritizedTicksInRunnable);
             if ( (task_t*)*queue!=kIdleTask)
@@ -309,7 +310,7 @@ task_t* findTaskToRun()
             if ( (task_t*)*queue==kIdleTask)
                 printd(DEBUG_PROCESS," (idle task)");
             printd(DEBUG_PROCESS,"\n");
-            if ( ((task_t*)*queue)->prioritizedTicksInRunnable > mostIdleTicks)
+            if ( ((task_t*)*queue)->prioritizedTicksInRunnable >= mostIdleTicks)
             {
                 taskToRun=(task_t*)*queue;
                 mostIdleTicks=((task_t*)*queue)->prioritizedTicksInRunnable;
@@ -408,23 +409,28 @@ void checkUSleepTasks(task_t* taskToStop)
     while (*q!=NO_NEXT)
     {
         task=(task_t*)*q;
-        process=task->process;
-        if (process->signals.sigdata[SIG_USLEEP]==taskToStop->taskNum)
+        if (task->taskNum!=0)
         {
-            printd(DEBUG_PROCESS,"checkUSleepTasks: Found process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
-            process->signals.sigdata[SIG_USLEEP]=0;
-            process->signals.sigind &=~SIG_USLEEP;
-            printd(DEBUG_PROCESS,"checkUSleepTasks: Process 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
-            changeTaskQueue(task,TASK_RUNNABLE);
+            process=task->process;
+            printd(DEBUG_PROCESS, "\tTask 0x%04X: Waiting for task 0x%04X\n",task->taskNum, process->signals.sigdata[SIGUSLEEP]);
+            if (process->signals.sigdata[SIGUSLEEP]==taskToStop->taskNum)
+            {
+                printd(DEBUG_PROCESS,"\tFound process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
+                process->signals.sigdata[SIGUSLEEP]=0;
+                process->signals.sigind &=~SIGUSLEEP;
+                printd(DEBUG_PROCESS,"\tProcess 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
+                changeTaskQueue(task,TASK_RUNNABLE);
+            }
         }
         q++;
     }
+    printd(DEBUG_PROCESS, "checkUSleepTasks: Done!\n");
 }
 
 void runAnotherTask(bool schedulerRequested)
 {
     uint32_t oldCR3;
-    eTaskState stopQueue=TASK_NONE, startQueue=TASK_NONE;
+    eTaskState taskToStopNewQueue=TASK_NONE, startQueue=TASK_NONE;
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
             :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
     printd(DEBUG_PROCESS,"\n****************************** SCHEDULER *******************************\n");
@@ -432,7 +438,7 @@ void runAnotherTask(bool schedulerRequested)
     //Get task to stop
     task_t* taskToStop=findRunningTaskToReplace();
     if (taskToStop==NULL)
-    panic("Can't find task to put in the running queue ... not possible!!!\n");
+    panic("Can't find the running task in the running queue  ... unpossible!!!\n");
 
 #ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS,"*Found task 0x%04X to take off CPU @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
@@ -442,7 +448,7 @@ void runAnotherTask(bool schedulerRequested)
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Task (0x%04X) ended, removing it from %s list.\n",taskToStop->taskNum,TASK_STATE_NAMES[taskToStop->taskState]);
 #endif
-        stopQueue=TASK_EXITED;
+        taskToStopNewQueue=TASK_EXITED;
         gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
         //Look through the USleep looking for task that is waiting on this one to end
         checkUSleepTasks(taskToStop);
@@ -454,21 +460,31 @@ void runAnotherTask(bool schedulerRequested)
 #endif
         switch (((process_t*)(taskToStop->process))->signals.sigind)
         {
-            case SIG_USLEEP:
-                stopQueue=TASK_USLEEP;
+            case SIGUSLEEP:
+                taskToStopNewQueue=TASK_USLEEP;
                 break;
-            case SIG_SEGV:
-                stopQueue=TASK_EXITED;
+            case SIGSEGV:
+                taskToStopNewQueue=TASK_EXITED;
                 checkUSleepTasks(taskToStop);
                 break;
-            case SIG_STOP:
-                stopQueue=TASK_STOPPED;
+            case SIGSTOP:
+                taskToStopNewQueue=TASK_STOPPED;
 #ifdef SCHEDULER_DEBUG
                 printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
 #endif
                 break;
-            case SIG_SLEEP:
-                stopQueue=TASK_ISLEEP;
+            case SIGSLEEP:
+                taskToStopNewQueue=TASK_ISLEEP;
+                break;
+            case SIGINT:
+                //If no handler is installed, default action is to kill the process
+                if (!((process_t*)(taskToStop->process))->signals.sighandler[SIGINT])
+                {
+                    printd(DEBUG_PROCESS,"*Task 0x%04X: SIGINT received, no default handler  Executing default action (kill process).\n",taskToStop->taskNum);
+                    taskToStopNewQueue=TASK_EXITED;
+                    checkUSleepTasks(taskToStop);
+                    
+                }   
                 break;
             default:
                 panic("scheduler: Unhandled signal");
@@ -477,13 +493,16 @@ void runAnotherTask(bool schedulerRequested)
     }
     else
     {
-        stopQueue=TASK_RUNNABLE;
+        taskToStopNewQueue=TASK_RUNNABLE;
     }
     //Get task to start
-    changeTaskQueue(taskToStop,stopQueue);
+    changeTaskQueue(taskToStop,taskToStopNewQueue);
     printd(DEBUG_PROCESS,"*Finding task to run\n");
     task_t* taskToRun=findTaskToRun();
 
+    if (taskToRun == 0)
+        panic("findTaskToRun returned no task, unpossible!!!\n");
+    
     if (taskToRun!=NULL && taskToRun->taskNum==taskToStop->taskNum)
     {
         printd(DEBUG_PROCESS,"*No new task to run, continuing with the current task\n");

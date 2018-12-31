@@ -20,20 +20,24 @@ extern "C" {
 #include <stdint.h>
 #include "task.h"
 #include "kernel.h"
+#include "thesignals.h"
+
+    extern task_t* findTaskByCR3(uint32_t cr3);
+    extern uint32_t NO_PREV;
+    extern uint32_t NO_NEXT;
     
     typedef struct ssignal
     {
         void* sighandler[32];
         uint32_t sigdata[32];
+        uint32_t sigmask;
         uintptr_t sigind;
         
     } signal_t;
 
     void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t callerCR3);
     void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData);
-    extern task_t* findTaskByCR3(uint32_t cr3);
-    extern uint32_t NO_PREV;
-    extern uint32_t NO_NEXT;
+    void sys_masksig(signals signal, bool mask);
 
 #ifdef __cplusplus
 }

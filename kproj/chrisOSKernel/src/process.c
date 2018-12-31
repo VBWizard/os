@@ -16,6 +16,7 @@
 #include "paging.h"
 #include "kutility.h"
 #include "errors.h"
+#include "thesignals.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
@@ -248,6 +249,8 @@ void processIdleLoop()
     __asm__("mov eax,cr3\n":"=a" (cr3));
     process_t* process=findTaskByCR3(cr3)->process;
     sys_setpriority(process,20);
+    //Block idle task SIGINT ... default action for SIGINT is to kill the process
+    sys_masksig(SIGINT,1);
     while (1==1)
     {
         kIdleTicks++;
@@ -336,7 +339,6 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
 
     uint32_t envpVirt=0x6f050000;
 
-    //TODO: Both envp(s) (process & parentProcess) both map to the same virtual addresses
     if (parentProcessPtr != 0 && parentProcessPtr->envp != 0)
     {
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space

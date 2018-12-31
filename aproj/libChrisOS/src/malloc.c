@@ -11,7 +11,7 @@
 #define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
 void initmalloc()
 {
-    printdI(DEBUG_MALLOC,"heapBase = 0x%08X before\n", heapBase);
+    printdI(DEBUG_MALLOC,"heapBase @ 0X%08X = 0x%08X before\n", &heapBase, heapBase);
     heapBase=0;
     heapCurr=0;
     heapEnd=0;

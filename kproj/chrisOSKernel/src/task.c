@@ -17,6 +17,7 @@ extern char* kernelDataLoadAddress, *kernelLoadAddress, *kernelLoadEnd;
 extern uint32_t getESP();
 extern task_t* kKernelTask;
 extern uint32_t* sysEnter_Vector;
+extern uint32_t* isrSavedStack;
 
 //TODO: Replace current list with dllist_t!
 
@@ -170,6 +171,11 @@ task_t* createTask(bool kernelTSS)
     pagingMapPageCount(task->tss->CR3,task->tss->ESP0,task->tss->ESP0,0x16,0x7);
     pagingMapPageCount(task->tss->CR3,task->tss->ESP0 | KERNEL_PAGED_BASE_ADDRESS,task->tss->ESP0,0x16,0x7);
     pagingMapPageCount(KERNEL_CR3,task->tss->ESP0,task->tss->ESP0,0x16,0x7);
+
+    //Map kernel's isrSavedStack into the user process (read write - 1 page)
+    pagingMapPageCount(task->tss->CR3,((uint32_t)isrSavedStack) | KERNEL_PAGED_BASE_ADDRESS,(uint32_t)isrSavedStack,0x1,0x7);
+    printd(DEBUG_TASK,"Mapped isrSavedStack into process: p=0x%08X/v=0x%08X\n",isrSavedStack, ((uint32_t)isrSavedStack) | KERNEL_PAGED_BASE_ADDRESS);
+
     task->tss->ESP0+=0x15000;
     printd(DEBUG_TASK,"createTask: ESP0 set to 0x%08X\n", task->tss->ESP0);
     

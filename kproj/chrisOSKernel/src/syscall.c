@@ -87,7 +87,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_WAITFORPID:      //***waitForPID - param1=pid to check
             printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08X) on pid=0x%04X.  Good night!\n",processCR3,param1);
-            sys_sigaction(SIG_USLEEP,0,param1);
+            sys_sigaction(SIGUSLEEP,0,param1);
             break;
         case SYSCALL_SETPRIORITY:      //***Set process priority - param1=new priority, returns old priority
             retVal=sys_setpriority(findTaskByCR3(processCR3)->process,param1);
@@ -111,7 +111,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_SLEEP:     //***sleep - sleep until kTicksSinceStart==param1
             printd(DEBUG_PROCESS,"_syscall: sleep(0x%08X) called (cr3=0x%08X)\n",param1,processCR3);
-            sys_sigaction(SIG_SLEEP,0,param1);
+            sys_sigaction(SIGSLEEP,0,param1);
             break;
         case SYSCALL_SETSIGACTION:     //***setsigaction
             printd(DEBUG_PROCESS,"_syscall: sys_setsigaction(0x%08X, 0x%08X, 0x%08X) called\n",param1,param2,param3);
@@ -119,7 +119,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_STOP:     //******stop - put process in STOPPED queue
             printd(DEBUG_PROCESS,"_syscall: Stop() called.\n");
-            sys_sigaction(SIG_STOP,0,0);
+            sys_sigaction(SIGSTOP,0,0);
             break;
         case SYSCALL_REBOOT:     //***reboot
             sysReboot();
@@ -140,6 +140,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_HLT:     //***hlt - execute hlt instruction
             __asm__("sti;hlt;");
+            break;
+        case SYSCALL_MASKSIG: //sys_masksig (masks/unmasks an individual signal for the running process)
+            sys_masksig(param1, param2);
             break;
         default:
             panic("_syscall: Invalid call number 0x%04X\n",callNum);

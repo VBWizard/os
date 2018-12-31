@@ -88,11 +88,12 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
-#jmp overSaveTheStack
+jmp overSaveTheStack
     mov eax,isrNumber
     cmp eax,0x20                
     jge overSaveTheStack        #CLR 03/26/2017: Changed (je to jge) to skip stack capture for 0x20 (IRQ0) & 0x21 (KBD) (not sure what else)
     mov esi, isrSavedEBP
+    #CLR 12/29/2018: I tried to subtract some from the ESP before copying but this is a bad idea, kept faulting everywhere because it would try to read from a non-existent page (i.e. BFFFFFEC ... because kernel starts at C0000000)
 #    add esi,12                  #drop the eip/cs/flags from the call to this proc
     mov edi, isrSavedStack
     mov ecx, 40       #NOTE: This can cause an exception if the target's esp is within 40 bytes of non-mapped memory
@@ -206,9 +207,8 @@ noIRQResponseRequired:
     mov bx, isrSavedGS
     mov gs, bx
     mov ebp,isrSavedEBP
-    #Adjust the stack if the exception had an error code (get rid of error code per prolog http://geezer.osdevbrasil.net/osd/intr/index.htm 9. If the exception pushed an error code, the handler must pop it now and discard it. )
+    #ESP is being loaded, so no PUSHes or POPs after this!
     mov esp, isrSavedESP
-    mov ebx,isrNumber
     #CLR 04/12/2017: Removed stack correction code (pop 1 dword to get rid of error) because vector functionality takes care of that
 overCorrection:
     mov al,schedulerTaskSwitched

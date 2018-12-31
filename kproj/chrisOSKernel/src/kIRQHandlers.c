@@ -18,8 +18,7 @@ void kIRQ0_handler()
 static char currTime[200];
 static struct tm theDateTime;
 #endif
-    *kTicksSinceStart=*kTicksSinceStart+1;
-    if (*kTicksSinceStart % kTicksPerSecond == 0)
+    if (++*kTicksSinceStart % kTicksPerSecond == 0)
         kSystemCurrentTime++;
     if (schedulerEnabled)
     {

@@ -84,7 +84,8 @@ int main(int argc, char** argv) {
     kIdleTicks=0;
     kIdleProcess=createProcess("/sbin/idle",0,NULL,NULL,true);
     kIdleTask=kIdleProcess->task;
-
+    //Need to let the idle task run once so that it initializes, so make sure it is the first task to run when the scheduler starts
+    kIdleTask->prioritizedTicksInRunnable = 0xDFFFFFFF;
     char program[40]="/kshell";
     printk("Loading and executing %s\n",program);
     /*NOTE: This is how to create argv!!!*/
@@ -113,7 +114,12 @@ int main(int argc, char** argv) {
 */
 
     waitTicks(3);
-    sys_sigaction(SIG_USLEEP,0,process->task->taskNum);
+    sys_sigaction(SIGUSLEEP,0,process->task->taskNum);
+    printk("\n\nLast task was killed, shutting down the kernel ...\n");
+    schedulerEnabled=false;
+    printk("Disabled scheduler ...\n");
+    waitTicks(3);
+    printk("All shut down, exiting kernel!\n");
     return (0xbad);
 }
 

@@ -28,6 +28,7 @@ extern uint32_t getFS();
 extern uint32_t getGS();
 extern uint32_t getSS();
 extern uint32_t getESP();
+extern uint32_t* isrSavedStack;
 extern bool schedulerTaskSwitched;
 extern cpuid_features_t kCPUFeatures;
 extern time_t kSystemCurrentTime;
@@ -96,6 +97,9 @@ __asm__("cli\n");
     envs[1]=env[1];
     envs[2]=env[2];
     kKernelProcess->envp = (uintptr_t)envs;
+    
+    isrSavedStack = (uint32_t*)allocPagesAndMapI(kKernelTask->tss->CR3,0x1000); //1k saved stack area
+    printd(DEBUG_TASK,"Set up isrSavedStack at 0x%08X (and in the kernel)\n",isrSavedStack);
     
     pagingMapPage(kKernelTask->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
     pagingMapPage(KERNEL_CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
