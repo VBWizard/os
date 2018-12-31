@@ -37,7 +37,7 @@ extern void getDateTimeString(char *s);
 struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
 dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call listInit and pass the first item (a dllist_t*) to it
 
-char env[3][50];
+char env[50][50];
 char* envs[100];
 
 void initKernelInternals()

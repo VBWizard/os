@@ -25,18 +25,20 @@ extern "C" {
 #include "input.h"
 #include "config.h"
 #include "time.h"
+#include "syscalls.h"
+    
 #include <bits/time.h>
 #ifndef NULL
 #define NULL ((void *) 0)
 #endif
 
 #define VISIBLE __attribute__((visibility("default")))
-#define SYSCALL1(a) {asm("call sysEnter_Vector\n"::"a" (a));}
-#define SYSCALL2(a,b) {asm("call sysEnter_Vector\n"::"a" (a), "b" (b));}
-#define SYSCALL3(a,b,c) {asm("call sysEnter_Vector\n"::"a" (a), "b" (b), "c" (c));}
-#define SYSCALL4(a,b,c,d) {asm("call sysEnter_Vector\n"::"a" (a), "b" (b), "c" (c), "d" (d));}
-#define GET_TICKS(t) {asm("mov eax,0x170\ncall sysEnter_Vector\n":"=a" (t));}
-#define SLEEP_SECONDS(s) {uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; asm("call sysEnter_Vector\n"::"a" (0x166), "b" (s), "c" (0), "d" (0));}
+#define SYSCALL1(a,b) {asm("call sysEnter_Vector\n":"=a" (b):"a" (a));}
+#define SYSCALL2(a,b,c) {asm("call sysEnter_Vector\n":"=a" (c):"a" (a), "b" (b));}
+#define SYSCALL3(a,b,c,d) {asm("call sysEnter_Vector\n":"=a" (d):"a" (a), "b" (b), "c" (c));}
+#define SYSCALL4(a,b,c,d,e) {asm("call sysEnter_Vector\n":"=a" (e):"a" (a), "b" (b), "c" (c), "d" (d));}
+#define GET_TICKS(t) SYSCALL1(SYSCALL_GETTICKS,t);
+#define SLEEP_SECONDS(s) {uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; SYSCALL2(SYSCALL_SLEEP,s,s2);}
 
     void libc_init(void);
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden

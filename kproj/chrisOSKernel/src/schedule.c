@@ -5,6 +5,7 @@
  */
 
 #include "schedule.h"
+#include "strings.h"
 
 #define SCHEDULER_DEBUG 1
 
@@ -400,7 +401,7 @@ void triggerScheduler()
      nextScheduleTicks=*kTicksSinceStart-1;
 }
 
-void checkUSleepTasks(task_t* taskToStop)
+void checkUSleepTasks(task_t* taskToStop, uint32_t retVal)
 {
     uintptr_t* q=qUSleep;
     task_t* task;
@@ -418,6 +419,31 @@ void checkUSleepTasks(task_t* taskToStop)
                 printd(DEBUG_PROCESS,"\tFound process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
                 process->signals.sigdata[SIGUSLEEP]=0;
                 process->signals.sigind &=~SIGUSLEEP;
+                //Write retVal from the child process in the parent process' environment
+                for (int cnt=0;cnt<50;cnt++)
+                {
+                    if (((char**)process->envp)[cnt]!=0)
+                    {
+                        if (strncmp(((char**)process->envp)[cnt],"RETVAL",6)==0)
+                        {
+                            strcpy(((char**)process->envp)[cnt],"RETVAL=");
+                            char str[20];
+                            itoa(retVal,str);
+                            strcat(((char**)process->envp)[cnt],str);
+                            break;
+                        }
+                    }
+                    else if (((char**)process->envp)[cnt]==0)
+                    {
+                        //(char**)env = 
+                        ((char**)process->envp)[cnt]=allocPagesAndMapI(task->tss->CR3,20);
+                        strcpy(((char**)process->envp)[cnt],"RETVAL=");
+                        char str[20];
+                        itoa(retVal,str);
+                        strcat(((char**)process->envp)[cnt],str);
+                        break;
+                    }
+                }
                 printd(DEBUG_PROCESS,"\tProcess 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
                 changeTaskQueue(task,TASK_RUNNABLE);
             }
@@ -451,7 +477,7 @@ void runAnotherTask(bool schedulerRequested)
         taskToStopNewQueue=TASK_EXITED;
         gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
         //Look through the USleep looking for task that is waiting on this one to end
-        checkUSleepTasks(taskToStop);
+        checkUSleepTasks(taskToStop, ((process_t*)taskToStop->process)->retVal);
     }
     else if (/*(taskToStop->taskNum!=1) && */((process_t*)(taskToStop->process))->signals.sigind)
     {
@@ -465,7 +491,7 @@ void runAnotherTask(bool schedulerRequested)
                 break;
             case SIGSEGV:
                 taskToStopNewQueue=TASK_EXITED;
-                checkUSleepTasks(taskToStop);
+                checkUSleepTasks(taskToStop, -1);
                 break;
             case SIGSTOP:
                 taskToStopNewQueue=TASK_STOPPED;
@@ -482,7 +508,7 @@ void runAnotherTask(bool schedulerRequested)
                 {
                     printd(DEBUG_PROCESS,"*Task 0x%04X: SIGINT received, no default handler  Executing default action (kill process).\n",taskToStop->taskNum);
                     taskToStopNewQueue=TASK_EXITED;
-                    checkUSleepTasks(taskToStop);
+                    checkUSleepTasks(taskToStop, -1);
                     
                 }   
                 break;

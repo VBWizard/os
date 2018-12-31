@@ -17,6 +17,7 @@
 #include "kutility.h"
 #include "errors.h"
 #include "thesignals.h"
+#include "syscalls.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
@@ -201,7 +202,7 @@ void processExit()
         }
     gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
 
-     __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (0x1), "b" (lRetVal));
+     __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (SYSCALL_ENDPROCESS), "b" (lRetVal));
     //Free memory allocated to the process
      
      //freeMemory(process);
@@ -275,7 +276,7 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     process->pageDirPtr=process->task->tss->CR3;
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;
-    process->path=(char*)kMalloc(0x1000);
+    process->path=(char*)kMalloc(0x1000); 
     process->startHandlerPtr=0; //CLR 12/23/2018: Initialize the start handler pointer to the first entry
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
     //strcpy(process->path,path);
@@ -428,7 +429,3 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     return process;
 }
 
-void processWrapup()
-{
-    __asm__("mov ebx,eax\nmov eax,0x1\nmov ecx,cs\ncall sysEnter_Vector\n");
- }

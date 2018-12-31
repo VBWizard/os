@@ -15,28 +15,28 @@ bool libcInitialized = false;
 int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3)
 {
     int retVal=0;
-    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1), "c" (param2), "d" (param3));
+    SYSCALL4(callnum, param1, param2, param3, retVal);
     return retVal;
 }
 
 int do_syscall3(int callnum, uint32_t param1, uint32_t param2)
 {
     int retVal=0;
-    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1), "c" (param2));
+    SYSCALL3(callnum, param1, param2, retVal);
     return retVal;
 }
 
 int do_syscall2(int callnum, uint32_t param1)
 {
     int retVal=0;
-    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1));
+    SYSCALL2(callnum, param1, retVal);
     return retVal;
 }
 
 int do_syscall1(int callnum)
 {
     int retVal=0;
-    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum));
+    SYSCALL1(callnum, retVal);
     return retVal;
 }
 
@@ -81,7 +81,8 @@ int printdI(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
     va_start( args, format );
-    asm("mov eax,0x301\ncall sysEnter_Vector\n"::"b" (DebugLevel), "c" (format), "d" (args));
+    
+    do_syscall4(SYSCALL_PRINTD, DebugLevel, (uint32_t)format, (uint32_t)args);
     return 0;
 }
 
@@ -122,7 +123,8 @@ VISIBLE struct tm* gettime()
 {
     uint32_t ticks=0;
     struct tm theTime;
-    do_syscall2(SYSCALL_GETTICKS,ticks);
+    
+    GET_TICKS(ticks);
     return gmtime_r((time_t*)&ticks,&theTime);
 }
 

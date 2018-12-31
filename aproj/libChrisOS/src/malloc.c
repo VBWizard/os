@@ -54,7 +54,7 @@ __attribute__((visibility("default"))) void*  malloc(size_t size)
     printdI(DEBUG_MALLOC,"libc_malloc: needed=0x%08X\n",needed);
     if (needed!=0)      //New heap required
     {
-        asm("mov eax,0x165\ncall sysEnter_Vector\n":"=a" (allocatedPtr):"b" (needed));
+        allocatedPtr = do_syscall2(SYSCALL_ALLOC, needed);
         //This is needed to keep in sync with what the kernel thinks
         printdI(DEBUG_MALLOC,"libc_malloc: heaEnd=0x%08X\n",heapEnd);
         heapEnd=allocatedPtr+needed;
@@ -100,5 +100,5 @@ gotoHere:
 
 void malloc_cleanup()
 {
-    asm("mov eax,0x164\ncall sysEnter_Vector\n"::"b" (heapBase));
+    do_syscall2(SYSCALL_FREE, heapBase);
 }

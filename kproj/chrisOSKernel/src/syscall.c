@@ -60,7 +60,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             if (param1==STDIN_FILE)
                 retVal=getc();
             else
-                panic("_sysCall: sys_read for descriptor 0x%08X not implemented\n",param1);
+                fs_read((void*)param1, (void*)param2, param3, 1);
             break;
         case SYSCALL_WRITE:       //***write to descriptor, param1 = descriptor #, param2 = string to write
             if (param1==STDOUT_FILE)

@@ -22,7 +22,7 @@ const int _ytab[2][12] = {
 VISIBLE time_t time(/*time_t* arg*/)
 {
     uint32_t retVal=0;
-    __asm__("call sysEnter_Vector\n":"=a" (retVal):"a" (SYSCALL_GETTICKS));
+    GET_TICKS(retVal);
     return (time_t)retVal;
 }
 

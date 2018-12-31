@@ -12,6 +12,7 @@
       <itemPath>include/rusage.h</itemPath>
       <itemPath>include/stdio.h</itemPath>
       <itemPath>include/strings.h</itemPath>
+      <itemPath>../../kproj/chrisOSKernel/include/syscalls.h</itemPath>
       <itemPath>../../kproj/chrisOSKernel/include/thesignals.h</itemPath>
       <itemPath>include/time.h</itemPath>
       <itemPath>include/types.h</itemPath>
@@ -103,6 +104,11 @@
       <item path="../../kproj/chrisOS/src/strings/strtok.c"
             ex="false"
             tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../kproj/chrisOSKernel/include/syscalls.h"
+            ex="false"
+            tool="3"
             flavor2="0">
       </item>
       <item path="../../kproj/chrisOSKernel/include/thesignals.h"
@@ -215,6 +221,11 @@
       <item path="../../kproj/chrisOS/src/strings/strtok.c"
             ex="false"
             tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../kproj/chrisOSKernel/include/syscalls.h"
+            ex="false"
+            tool="3"
             flavor2="0">
       </item>
       <item path="../../kproj/chrisOSKernel/include/thesignals.h"

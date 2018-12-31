@@ -29,6 +29,8 @@ bool strisnum(char* str);
 
 int main(int argc, char** argv) {
 
+    int retVal=0;
+    
     unsigned int sec;
     
     if (argc==1)
@@ -40,9 +42,9 @@ int main(int argc, char** argv) {
         return -2;
     }
     sec = atoi(argv[1]);
+    retVal = sec;
     SLEEP_SECONDS(sec);
-    return (0);
-    return -1;
+    return (retVal);
 }
 
   // A simple atoi() function - from http://www.geeksforgeeks.org/write-your-own-atoi
