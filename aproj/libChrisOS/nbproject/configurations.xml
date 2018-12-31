@@ -30,6 +30,7 @@
         <itemPath>src/strings/strcpy.c</itemPath>
         <itemPath>../../kproj/chrisOS/src/strings/strcspn.c</itemPath>
         <itemPath>src/strftime.c</itemPath>
+        <itemPath>src/strings/strisnum.c</itemPath>
         <itemPath>src/strings/strlen.c</itemPath>
         <itemPath>src/strings/strncmp.c</itemPath>
         <itemPath>src/strings/strncpy.c</itemPath>
@@ -151,6 +152,8 @@
       </item>
       <item path="src/strings/strcpy.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/strings/strisnum.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/strings/strlen.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strncmp.c" ex="false" tool="0" flavor2="0">
@@ -262,6 +265,8 @@
       <item path="src/strings/strcmp.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strcpy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strisnum.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strlen.c" ex="false" tool="0" flavor2="0">
       </item>

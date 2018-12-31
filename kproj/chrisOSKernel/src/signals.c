@@ -70,7 +70,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
     if (!processAddr)
         panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",callerCR3,signal,sigAction);
     p=((task_t*)processAddr)->process;
-    printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08X, task 0x%04X for cr3 of 0x%08X\n",p,p->task->taskNum,sigData);
+    printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08X, task 0x%04X for cr3 of 0x%08X\n",p,p->task->taskNum,callerCR3);
     switch (signal)
     {
         case SIGUSLEEP:    //Put task to sleep until a situation occurs.  For now its only when another task ends
@@ -172,13 +172,13 @@ void processSignals()
 {
     uintptr_t*run;
     uintptr_t*sleep;
+    bool awoken=false;
     //Process running
 
     uint32_t priorCR3;
 
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
             :"=b" (priorCR3):[cr3Val] "r" (KERNEL_CR3));
-    printd(DEBUG_SIGNALS,"\tSaving old CR3 value (0x%08X)\n",priorCR3);
     run=qRunning;
     sleep=qISleep;
 goto scanSleep; //Currently no running signals to process, remove me later
@@ -211,16 +211,26 @@ scanSleep:
             task_t* task=(task_t*)*sleep;
             if (((process_t*)(task->process))->signals.sigdata[SIGSLEEP]<*kTicksSinceStart)
             {
-                printd("\tWaking task %0x04X as wakeTicks (0x%08X) < kTicksSinceStart (0x%08X)",((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
+                printd(DEBUG_SIGNALS,"\tWaking task 0x%04X as wakeTicks (0x%08X) < kTicksSinceStart (0x%08X)\n",task->taskNum,((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
                 changeTaskQueue(task,TASK_RUNNABLE);
                 ((process_t*)(task->process))->signals.sigdata[SIGSLEEP]=0;
                 ((process_t*)(task->process))->signals.sigind&=~SIGSLEEP;
                 task->prioritizedTicksInRunnable=1000000;  //Make this the next chosen task
+                awoken=true;
             }
         }
         sleep++;
     }
     __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (priorCR3));
-    printd(DEBUG_SIGNALS,"\tRestored old CR3 (0x%08X)\n",priorCR3);
+    if (awoken) 
+    {
+        printd(DEBUG_SIGNALS,"Trigger the scheduler to process ... the awoken\n");
+        triggerScheduler();
+    }
     printd(DEBUG_SIGNALS,"Done processing signals\n");
+}
+
+void executeSigHandler()
+{
+    
 }

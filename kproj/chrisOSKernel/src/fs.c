@@ -53,7 +53,7 @@ dllist_t* getFileListEntry(file_system_t *fs, void* file)
     return NULL;
 }
 
-void* fs_openFile(char* path, const char* mode)
+void* fs_open(char* path, const char* mode)
 {
     void* handle;
     dllist_t* list;
@@ -88,7 +88,7 @@ file_t* getFileFromList(file_system_t *fs, void* file)
     return getFileListEntry(fs, file)->payload;
 }
 
-int fs_readFile(void* file, void * buffer, int size, int length)
+int fs_read(void* file, void * buffer, int size, int length)
 {
     
     file_t* foundFile = getFileFromList(rootFs, file);

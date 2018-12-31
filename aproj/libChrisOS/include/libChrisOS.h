@@ -52,6 +52,7 @@ extern "C" {
     void * memcpy(void *dest, const void *src, size_t n);
     struct tm* gettime();
     char* getcwd(char* buf, size_t size);
+    bool strisnum(char* str);
     
     time_t libcTZ;
 

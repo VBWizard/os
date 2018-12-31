@@ -49,6 +49,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/strings/strcat.o \
 	${OBJECTDIR}/src/strings/strcmp.o \
 	${OBJECTDIR}/src/strings/strcpy.o \
+	${OBJECTDIR}/src/strings/strisnum.o \
 	${OBJECTDIR}/src/strings/strlen.o \
 	${OBJECTDIR}/src/strings/strncmp.o \
 	${OBJECTDIR}/src/strings/strncpy.o \
@@ -153,6 +154,11 @@ ${OBJECTDIR}/src/strings/strcpy.o: src/strings/strcpy.c
 	${MKDIR} -p ${OBJECTDIR}/src/strings
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strcpy.o src/strings/strcpy.c
+
+${OBJECTDIR}/src/strings/strisnum.o: src/strings/strisnum.c
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strisnum.o src/strings/strisnum.c
 
 ${OBJECTDIR}/src/strings/strlen.o: src/strings/strlen.c
 	${MKDIR} -p ${OBJECTDIR}/src/strings
