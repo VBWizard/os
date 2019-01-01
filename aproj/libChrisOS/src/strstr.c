@@ -48,7 +48,7 @@ static char rcsid[] = "$Header: /user6/ouster/tcl/compat/RCS/strstr.c,v 1.2 93/0
 
 #include "strings.h"
 
-VISIBLE char* strstr(char* string, char* substring)
+char* strstrI(char* string, char* substring)
 {
     register char *a, *b;
 
@@ -77,4 +77,9 @@ VISIBLE char* strstr(char* string, char* substring)
 	b = substring;
     }
     return (char *) 0;
+}
+
+VISIBLE char* strstr(char* string, char* substring)
+{
+    return strstrI(string, substring);
 }

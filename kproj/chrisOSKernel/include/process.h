@@ -34,7 +34,7 @@ extern "C" {
 #define PROCESS_STRUCT_VADDR_THIS_OFFSET 0x4
     
     typedef void exitHandler(void);
-    typedef void startHandler(void);
+    typedef void startHandler();
 
     //NOTE: Any code can use PROCESS_STRUCT_VADDR for access to the process r/o
     //NOTE: Kernel code can use PROCESS_STRUCT_VADDR+4 for a pointer to the process which will be r/w
@@ -66,7 +66,10 @@ extern "C" {
         char* cwd;                              //Current working directory for the process
         void* startHandler[PROCESS_MAX_EXIT_HANDLERS];
         int startHandlerPtr;
-        uintptr_t envp;
+        char** mappedEnvp;
+        char** realEnvp;
+        char* mappedEnv;
+        char* realEnv;
     } process_t;
 
 

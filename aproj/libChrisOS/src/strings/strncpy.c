@@ -10,7 +10,7 @@
  */
 #include <stddef.h>
 
-__attribute__((visibility("default"))) char * strncpy(char *s1, const char *s2, size_t n)
+char *strncpyI(char *s1, const char *s2, size_t n)
 {
     char *s = s1;
     while (n > 0 && *s2 != '\0') {
@@ -22,4 +22,9 @@ __attribute__((visibility("default"))) char * strncpy(char *s1, const char *s2, 
 	--n;
     }
     return s1;
+}
+
+__attribute__((visibility("default"))) char * strncpy(char *s1, const char *s2, size_t n)
+{
+    return strncpyI(s1, s2, n);
 }

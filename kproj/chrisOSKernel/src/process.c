@@ -18,6 +18,7 @@
 #include "errors.h"
 #include "thesignals.h"
 #include "syscalls.h"
+#include "alloc.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
@@ -33,9 +34,9 @@ process_t* kKernelProcess;
 uintptr_t userCR3=0;
 
 //NOTE: Assumes contiguous memory area
-void* copyToKernel(process_t* process, void* dest, const void* src, unsigned long size) //Copy memory from user space to kernel (assumes dest is kernel page)
+void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size) //Copy memory from user space to kernel (assumes dest is kernel page)
 {
-    uintptr_t srcCR3=process->pageDirPtr, destCR3=KERNEL_CR3;
+    uintptr_t srcCR3=srcProcess->task->pageDir , destCR3=KERNEL_CR3;
     uintptr_t workingDestAddr=0, workingSrcAddr=0;
     unsigned long bytesLeft=size,loopBytesLeft=0;
     uintptr_t destPagedAddress, srcPagedAddress;
@@ -53,16 +54,16 @@ void* copyToKernel(process_t* process, void* dest, const void* src, unsigned lon
         
         //Verify the page table entry for the source is present and allows reading by the kernel
         if (!srcPagedAddress&PAGE_PRESENT)
-            process->errno=ERROR_SOURCE_ADDRESS_NOT_PRESENT;
+            srcProcess->errno=ERROR_SOURCE_ADDRESS_NOT_PRESENT;
         if (!srcPagedAddress&PAGE_USER_READABLE)
-            process->errno=ERROR_SOURCE_ADDRESS_NOT_READABLE;
+            srcProcess->errno=ERROR_SOURCE_ADDRESS_NOT_READABLE;
 
         //Verify the page table entry for the destination is present, allows reading by the user and allows writing by the kernel
         if (!destPagedAddress&PAGE_PRESENT)
-            process->errno=ERROR_DEST_ADDRESS_NOT_PRESENT;
+            srcProcess->errno=ERROR_DEST_ADDRESS_NOT_PRESENT;
         if (!destPagedAddress&PAGE_USER_WRITABLE)
-            process->errno=ERROR_DEST_ADDRESS_NOT_WRITABLE;
-        if (process->errno)
+            srcProcess->errno=ERROR_DEST_ADDRESS_NOT_WRITABLE;
+        if (srcProcess->errno)
             return NULL;
         
         destPagedAddress=(destPagedAddress&0xFFFFF000) | (workingDestAddr&0x00000FFF);
@@ -169,7 +170,7 @@ char* processGetCWD(char* buf, unsigned long size) //NOTE buf required to be not
 }
 
 //This runs in user space.  We're just calling startup procedures
-void processStart(void)
+void processStart()
 {
     int lCounter;
     process_t* process=(process_t*)PROCESS_STRUCT_VADDR;
@@ -318,7 +319,6 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     
     process->argv=argv;
     uint32_t argvVirt=0x6f000000;
-    uint32_t scratchMemory=0x6f010000;
     if (process->parent!=NULL)
     {
         printd(DEBUG_PROCESS,"Mapping parent's argv into our memory\n");
@@ -339,20 +339,37 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
     }
 
     uint32_t envpVirt=0x6f050000;
+    uint32_t envVirt = 0x6f060000;
 
-    if (parentProcessPtr != 0 && parentProcessPtr->envp != 0)
+    if (parentProcessPtr != 0 && parentProcessPtr->mappedEnvp != 0)
     {
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
-        process->envp=(uintptr_t)allocPages(50*50);
-        pagingMapPageCount(process->task->tss->CR3,envpVirt,process->envp,((50*50)/PAGE_SIZE)+1,0x7);
-        pagingMapPageCount(KERNEL_CR3,process->envp,process->envp,((50*50)/PAGE_SIZE)+1,0x7);
-        pagingMapPageCount(KERNEL_CR3,envpVirt,process->envp,((50*50)/PAGE_SIZE)+1,0x7);
+        process->mappedEnvp=(char**)allocPagesAndMap(50*4);
+        process->realEnvp = pagingGet4kPTEntryValueCR3(CURRENT_CR3, process->mappedEnvp) & 0xFFFFF000;
+        memset(process->mappedEnvp, 0, 50*4);
+        process->mappedEnv=(char*)allocPagesAndMap(50*512);
+        process->realEnv = pagingGet4kPTEntryValueCR3(CURRENT_CR3, process->mappedEnv) & 0xFFFFF000;
+        memset(process->mappedEnv, 0, 50*512);
+        //Map envp into process at envpVirt
+        pagingMapPageCount(process->task->tss->CR3,envpVirt,process->mappedEnvp,((50*4)/PAGE_SIZE)+1,0x7);
+        //Map env into process
+        pagingMapPageCount(process->task->tss->CR3,envVirt,process->mappedEnv,((50*512)/PAGE_SIZE)+1,0x7);
+        //Map envp into the kernel
+        pagingMapPageCount(KERNEL_CR3,process->mappedEnvp,process->mappedEnvp,((50*4)/PAGE_SIZE)+1,0x7);
+        //Map env into the kernel
+        pagingMapPageCount(KERNEL_CR3,process->mappedEnv,process->mappedEnv,((50*512)/PAGE_SIZE)+1,0x7);
         //processCopyArgV((char**)process->envp,(char**)parentProcessPtr->envp,envpVirt,50);
-        printd(DEBUG_PROCESS,"Retrieving environment variables from parent process\n");
-        copyToKernel(parentProcessPtr, (void*)envpVirt, (void*)envpVirt, (50*50));
-        printd(DEBUG_PROCESS,"Putting parent environment variables in our memory\n");
-        memcpy((void*)process->envp, (void*)parentProcessPtr->envp, 50*4);
-
+        printd(DEBUG_PROCESS,"Copying environment variables from parent process\n");
+        
+        for (int cnt=0;cnt<50;cnt++)
+        {
+            if (parentProcessPtr->mappedEnvp[cnt]!=0)
+            {
+                process->mappedEnvp[cnt] = process->mappedEnv+(cnt*512);
+                copyToKernel(parentProcessPtr,process->mappedEnvp[cnt],parentProcessPtr->mappedEnvp[cnt],512);
+                process->mappedEnvp[cnt] = envVirt+(cnt*512);
+            }
+        }
     }
     process->task->process=process;
     process->this=process;

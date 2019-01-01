@@ -78,8 +78,10 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
             p->signals.sigdata[SIGUSLEEP]=sigData;
             printd(DEBUG_SIGNALS,"Signalling USLEEP for cr3=0x%08X, sigData=0x%08X, sigind=0x%08X\n",callerCR3,sigData,p->signals.sigind);
             triggerScheduler();
-            __asm__("mov cr3,eax\nsti\n"::"a" (callerCR3));
             __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
+__asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
+            return (void*)getExitCode(sigData);
+__asm__("mov cr3,eax\n"::"a" (callerCR3));
             break;
         case SIGSLEEP:
             p->signals.sigind|=SIGSLEEP;
@@ -124,7 +126,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
 }
 
 //Process a sigaction, called by running program which wants the signal
-void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
+void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
 {
     uint32_t oldCR3;
     
@@ -133,9 +135,9 @@ void sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
 
     printd(DEBUG_PROCESS,"sys_sigaction(0x%08X,0x%08X,0x%08X,0x%08X)\n",signal,sigAction,sigData,oldCR3);
-    void* junk=sys_sigaction2(signal, sigAction, sigData, oldCR3);
+    void* retVal=sys_sigaction2(signal, sigAction, sigData, oldCR3);
     __asm__("mov cr3,eax\nsti\n"::"a" (oldCR3));
-
+    return retVal;
 }
 
 //Pass a signal to the currently running task

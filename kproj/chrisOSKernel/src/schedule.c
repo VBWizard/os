@@ -420,30 +420,31 @@ void checkUSleepTasks(task_t* taskToStop, uint32_t retVal)
                 process->signals.sigdata[SIGUSLEEP]=0;
                 process->signals.sigind &=~SIGUSLEEP;
                 //Write retVal from the child process in the parent process' environment
-                for (int cnt=0;cnt<50;cnt++)
+/*                for (int cnt=0;cnt<50;cnt++)
                 {
-                    if (((char**)process->envp)[cnt]!=0)
+                    if (((char**)process->realEnvp)[cnt]!=0)
                     {
-                        if (strncmp(((char**)process->envp)[cnt],"RETVAL",6)==0)
+                        if (strncmp(((char**)process->realEnvp)[cnt],"RETVAL",6)==0)
                         {
-                            strcpy(((char**)process->envp)[cnt],"RETVAL=");
+                            strcpy(((char**)process->realEnvp)[cnt],"RETVAL=");
                             char str[20];
                             itoa(retVal,str);
-                            strcat(((char**)process->envp)[cnt],str);
+                            strcat(((char**)process->realEnvp)[cnt],str);
                             break;
                         }
                     }
-                    else if (((char**)process->envp)[cnt]==0)
+                    else if (((char**)process->realEnvp)[cnt]==0)
                     {
                         //(char**)env = 
-                        ((char**)process->envp)[cnt]=allocPagesAndMapI(task->tss->CR3,20);
-                        strcpy(((char**)process->envp)[cnt],"RETVAL=");
+                        ((char**)process->realEnvp)[cnt]=allocPagesAndMapI(task->tss->CR3,20);
+                        strcpy(((char**)process->realEnvp)[cnt],"RETVAL=");
                         char str[20];
                         itoa(retVal,str);
-                        strcat(((char**)process->envp)[cnt],str);
+                        strcat(((char**)process->realEnvp)[cnt],str);
                         break;
                     }
                 }
+*/
                 printd(DEBUG_PROCESS,"\tProcess 0x%04X, sigind=0x%08X\n",task->taskNum,process->signals.sigind);
                 changeTaskQueue(task,TASK_RUNNABLE);
             }
@@ -574,3 +575,25 @@ void scheduler()
     kSchedulerCallCount++;
 }
 
+int32_t getExitCode(uint32_t taskNum)
+{
+    uintptr_t* q=qExited;
+    task_t* task;
+    process_t* process;
+    
+    printd(DEBUG_PROCESS,"getExitCode: Looking through EXITED queue for exit code for task 0x%04X\n", taskNum);
+
+    while (*q!=NO_NEXT)
+    {
+        task=(task_t*)*q;
+        if (task->taskNum!=0)
+        {
+            printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04X\n", task->taskNum);
+            if (task->taskNum == taskNum)
+                return ((process_t*)task->process)->retVal;
+        }
+        q++;
+    }
+    printd(DEBUG_PROCESS,"getExitCode: Didn't find the task we were looking for\n", task->taskNum);
+    return 0;
+}

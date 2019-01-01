@@ -5,27 +5,26 @@
  */
 
 /* 
- * File:   ascii.h
+ * File:   environment.h
  * Author: yogi
  *
- * Created on April 4, 2018, 6:49 PM
+ * Created on December 31, 2018, 8:19 PM
  */
 
-#ifndef ASCII_H
-#define ASCII_H
+#ifndef ENVIRONMENT_H
+#define ENVIRONMENT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    void reverseI(char s[]);
-    void itoaI(int n, char s[]);
-    int atoi(char *str);
-    void itoa(int n, char s[]);
-    
+    int getenv(char *varname, char *value);
+    void  setenv(char *varname, char *value);
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ASCII_H */
+#endif /* ENVIRONMENT_H */
 

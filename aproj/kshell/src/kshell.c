@@ -236,10 +236,8 @@ char **buildargv (const char *input)
   return (argv);
 }
 
-char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH])
+char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char** pptr)
 {
-    char** pptr=malloc(sizeof(char*)*pcount);
-    
     for (int cnt=0;cnt<pcount;cnt++)
     {
         pptr[cnt]=malloc(MAX_PARAM_WIDTH);
@@ -293,7 +291,12 @@ void saveCommand(char* command)
 
 void prompt()
 {
-    print("%s> ",sExecutingProgram);
+    char *path = malloc(512);
+    
+    getenv("CWD",path);
+    
+    print("%s %s> ",sExecutingProgram, path);
+    free(path);
 }
 
 int reprintCommand(char* command)

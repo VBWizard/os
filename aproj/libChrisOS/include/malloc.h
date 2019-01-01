@@ -55,6 +55,7 @@ uint32_t heapEnd;
 
 void initmalloc();
 void* malloc(size_t size);
+void*  mallocI(size_t size);
 void malloc_cleanup();
 void free(void* fpointer);
 #ifdef __cplusplus

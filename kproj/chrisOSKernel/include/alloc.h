@@ -12,6 +12,10 @@
 
 #include "chrisos.h"
 
+#define CURRENT_CR3 ({uint32_t cr3Val; \
+                      __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
+                      cr3Val;})
+
 typedef struct smeminfo
 {
     uintptr_t* prev;       //4

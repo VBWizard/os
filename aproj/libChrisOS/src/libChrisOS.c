@@ -40,12 +40,14 @@ int do_syscall1(int callnum)
     return retVal;
 }
 
-VISIBLE void __attribute__((constructor)) libc_init(void)
+VISIBLE void __attribute__((constructor)) libc_init()
 {
     printdI(DEBUG_LIBC,"***libc_init called\n***");
     if (!libcInitialized)
     {
         initmalloc();
+        //processEnvp = envp;
+        __asm__("mov %0,[ebp+52]\n":"=a" (processEnvp));
         libcTZ=-4;
         do_syscall1(SYSCALL_INVALID);
         do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
@@ -114,9 +116,9 @@ VISIBLE int exec(char* path, int argc, char** argv)
     return pid;
 }
 
-VISIBLE void waitpid(uint32_t pid)
+VISIBLE int waitpid(uint32_t pid)
 {
-    do_syscall2(SYSCALL_WAITFORPID,pid);
+    return do_syscall2(SYSCALL_WAITFORPID,pid);
 }
 
 VISIBLE struct tm* gettime()

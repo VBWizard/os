@@ -41,7 +41,7 @@ uint32_t newHeapRequiredToFulfillRequest(size_t size)
         return 0;
 }
 
-__attribute__((visibility("default"))) void*  malloc(size_t size)
+void*  mallocI(size_t size)
 {
     void* retVal;
 
@@ -78,6 +78,11 @@ __attribute__((visibility("default"))) void*  malloc(size_t size)
     heapCurr+=size+(sizeof(heaprec_t));
     printdI(DEBUG_MALLOC,"malloc: returning 0x%08X\n",retVal);
     return retVal;
+}
+
+__attribute__((visibility("default"))) void*  malloc(size_t size)
+{
+    return mallocI(size);
 }
 
 __attribute__((visibility("default"))) void free(void* fpointer)

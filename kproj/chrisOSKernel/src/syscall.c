@@ -87,7 +87,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_WAITFORPID:      //***waitForPID - param1=pid to check
             printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08X) on pid=0x%04X.  Good night!\n",processCR3,param1);
-            sys_sigaction(SIGUSLEEP,0,param1);
+            retVal = sys_sigaction(SIGUSLEEP,0,param1);
             break;
         case SYSCALL_SETPRIORITY:      //***Set process priority - param1=new priority, returns old priority
             retVal=sys_setpriority(findTaskByCR3(processCR3)->process,param1);

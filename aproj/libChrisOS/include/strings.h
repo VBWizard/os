@@ -41,8 +41,11 @@ size_t strlen(const char* str);
     char * strcpyc(char *s1, const char *s2, unsigned count);
     char* strleft(char* val, int cnt);
     size_t strlen(const char* str);
+    size_t strlenI(const char* str);
     int strncmp(const char *s1, const char *s2, size_t n);
+    int strncmpI(const char *s1, const char *s2, size_t n);
     char * strncpy(char *s1, const char *s2, size_t n);
+    char *strncpyI(char *s1, const char *s2, size_t n);
     long strtol(const char *nptr, char **endptr, register int base);
     unsigned long strtoul(const char *nptr, char **endptr, register int base);
     //char * strtrim(char * *pointerToString);
@@ -51,5 +54,6 @@ size_t strlen(const char* str);
     char *strchr(const char *s, int c);
     int strcspn(char* string, char* chars);
     char* strstr(char* string, char* substring);
+    char* strstrI(char* string, char* substring);
 #endif	/* STRINGS_H */
 

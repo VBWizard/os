@@ -34,7 +34,7 @@
 
    char* strcatI (char *dest, const char *src)
    {
-     strcpy (dest + strlen (dest), src);
+     strcpyI (dest + strlenI (dest), src);
      return dest;
    }
    

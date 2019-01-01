@@ -44,18 +44,19 @@ void cmdExecp(char* cmdline)
         else if (pgm==NULL)
         {
             char path[50];
-            bool retVal = getEnvVariableValue("PATH",path);
-            int a = strlen(tok);
-            pgm=malloc(strlen(tok)+1+strlen(path));  //NOTE: +1 is for the terminating \0
+            bool retVal = getenv("CWD",path);
+            pgm=malloc(strlen(tok)+1+(retVal?strlen(path):0));  //NOTE: +1 is for the terminating \0
             
-            strcpy(pgm,path);
+            if (retVal)
+                strcpy(pgm,path);
             strcat(pgm,tok);
         }
         pcount++;
         tok=strtok(0,delim);
     }
     
-    char** prms=paramsToArgv(paramCount-execParamCount,&params[execParamCount][0]);
+    char** prms=malloc(sizeof(char*)*pcount);
+    paramsToArgv(paramCount-execParamCount,&params[execParamCount][0], prms);
 
     print ("Executing %s\n",pgm);
     pid=exec(pgm,paramCount-execParamCount,prms);
@@ -64,7 +65,10 @@ void cmdExecp(char* cmdline)
         if (!background)
         {
             //print("DEBUG1: waitpid = %08X\n",&waitpid);
-            waitpid(pid);
+            lastExecExitCode = waitpid(pid);
+            char ret[10];
+            itoa(lastExecExitCode,ret);
+            setenv("LASTEXIT",ret);
         }
     }
     else

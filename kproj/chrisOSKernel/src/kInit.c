@@ -57,6 +57,7 @@ __asm__("cli\n");
     //Set up our kernel task
     kKernelTask->kernel=true;
     kKernelTask->pageDir=(uint32_t*)oldCR3;
+//    kKernelProcess->pageDirPtr=oldCR3;
     kKernelTask->tss->EIP=(uint32_t)0xBADBADBA;
     kKernelTask->tss->CS=0x20;
     kKernelTask->tss->DS=0x10;
@@ -90,13 +91,13 @@ __asm__("cli\n");
     
     strcpy(env[0],"PATH=/");
     strcpy(env[1],"HOSTNAME=localhost.localdomain");
-    strcpy(env[2],"PWD=/");
+    strcpy(env[2],"CWD=/");
     for (int cnt=0;cnt<100;cnt++)
         envs[cnt]=0;
     envs[0]=env[0];
     envs[1]=env[1];
     envs[2]=env[2];
-    kKernelProcess->envp = (uintptr_t)envs;
+    kKernelProcess->mappedEnvp = (uintptr_t)envs;
     
     isrSavedStack = (uint32_t*)allocPagesAndMapI(kKernelTask->tss->CR3,0x1000); //1k saved stack area
     printd(DEBUG_TASK,"Set up isrSavedStack at 0x%08X (and in the kernel)\n",isrSavedStack);

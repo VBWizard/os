@@ -19,13 +19,14 @@ extern "C" {
 #endif
 #include <stdarg.h>
 #include <stdint.h>
-#include <ascii.h>
+#include "ascii.h"
 #include "malloc.h"
 #include "strings.h"
+#include "environment.h"
 #include "input.h"
 #include "config.h"
 #include "time.h"
-#include "syscalls.h"
+#include "../../../kproj/chrisOSKernel/include/syscalls.h"
     
 #include <bits/time.h>
 #ifndef NULL
@@ -40,7 +41,7 @@ extern "C" {
 #define GET_TICKS(t) SYSCALL1(SYSCALL_GETTICKS,t);
 #define SLEEP_SECONDS(s) {uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; SYSCALL2(SYSCALL_SLEEP,s,s2);}
 
-    void libc_init(void);
+    void libc_init();
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
@@ -49,7 +50,7 @@ extern "C" {
     void modifySignal(int signal, void* sigHandler, int sigData);
     void libc_cleanup(void);
     int exec(char* path, int argc, char** argv);
-    void waitpid(uint32_t pid);
+    int waitpid(uint32_t pid);
     void *memset(void *d1, int val, size_t len);
     void * memcpy(void *dest, const void *src, size_t n);
     struct tm* gettime();
@@ -57,7 +58,8 @@ extern "C" {
     bool strisnum(char* str);
     
     time_t libcTZ;
-
+    char** processEnvp;
+    
 #ifdef __cplusplus
 }
 #endif

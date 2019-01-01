@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>include/ascii.h</itemPath>
+      <itemPath>include/environment.h</itemPath>
       <itemPath>include/input.h</itemPath>
       <itemPath>include/libChrisOS.h</itemPath>
       <itemPath>include/malloc.h</itemPath>
@@ -43,6 +44,7 @@
         <itemPath>src/strings/strtrim.c</itemPath>
       </logicalFolder>
       <itemPath>src/ascii.c</itemPath>
+      <itemPath>src/environment.c</itemPath>
       <itemPath>src/input/input.c</itemPath>
       <itemPath>src/libChrisOS.c</itemPath>
       <itemPath>src/malloc.c</itemPath>
@@ -118,6 +120,8 @@
       </item>
       <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/environment.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
@@ -137,6 +141,8 @@
       <item path="include/types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/ascii.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/environment.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -235,6 +241,8 @@
       </item>
       <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/environment.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
@@ -254,6 +262,8 @@
       <item path="include/types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/ascii.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/environment.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/input/input.c" ex="false" tool="0" flavor2="0">
       </item>
