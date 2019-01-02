@@ -82,8 +82,10 @@ void* fs_open(char* path, const char* mode)
     dllist_t* list;
     file_t *file;
     
+    printd(DEBUG_FILESYS, "fs_open: called with path=%s, mode=%s\n", path, mode);
     //call the fs's open method
     handle = rootFs->fops->open(path, mode);
+
     if (handle)
     {
         list = kMalloc(sizeof(dllist_t));
@@ -103,8 +105,10 @@ void* fs_open(char* path, const char* mode)
         }
         else
             listAdd(rootFs->files,list,file);
+        printd(DEBUG_FILESYS, "fs_open: returning handle 0x%08X\n",handle);
         return handle;
     }
+    printd(DEBUG_FILESYS, "fs_open: returning NULL\n",handle);
     return NULL;
 }
 

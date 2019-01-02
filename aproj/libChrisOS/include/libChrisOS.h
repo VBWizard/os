@@ -35,11 +35,11 @@ extern "C" {
 #endif
 
 #define VISIBLE __attribute__((visibility("default")))
-#define SYSCALL0(a,b) {asm("call sysEnter_Vector\n":"=a" (b):"a" (a));}
-#define SYSCALL1(a,b,c) {asm("call sysEnter_Vector\n":"=a" (c):"a" (a), "b" (b));}
-#define SYSCALL2(a,b,c,d) {asm("call sysEnter_Vector\n":"=a" (d):"a" (a), "b" (b), "c" (c));}
-#define SYSCALL3(a,b,c,d,e) {asm("call sysEnter_Vector\n":"=a" (e):"a" (a), "b" (b), "c" (c), "d" (d));}
-#define SYSCALL4(a,b,c,d,e,f) {asm("call sysEnter_Vector\n":"=a" (e):"a" (a), "b" (b), "c" (c), "d" (d), "S" (f));}
+#define SYSCALL0(a,b) {asm("call sysEnter_Vector\n":"=a" (b):"a" (a), "b" (0), "c" (0), "d" (0), "S" (0));}
+#define SYSCALL1(a,b,c) {asm("call sysEnter_Vector\n":"=a" (c):"a" (a), "b" (b), "c" (0), "d" (0), "S" (0));}
+#define SYSCALL2(a,b,c,d) {asm("call sysEnter_Vector\n":"=a" (d):"a" (a), "b" (b), "c" (c), "d" (0), "S" (0));}
+#define SYSCALL3(a,b,c,d,e) {asm("call sysEnter_Vector\n":"=a" (e):"a" (a), "b" (b), "c" (c), "d" (d), "S" (0));}
+#define SYSCALL4(a,b,c,d,e,f) {asm("call sysEnter_Vector\n":"=a" (f):"a" (a), "b" (b), "c" (c), "d" (d), "S" (e));}
 #define GET_TICKS(t) SYSCALL0(SYSCALL_GETTICKS,t);
 #define SLEEP_SECONDS(s) {uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; SYSCALL1(SYSCALL_SLEEP,s,s2);}
 

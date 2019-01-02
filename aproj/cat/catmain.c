@@ -20,24 +20,20 @@ int main(int argc, char** argv) {
 
     void* file;
     char* buffer;
-    char fileName[20]="/test1.sh";
     
     if (argc<2)
         return -1;
     
-    file = open(fileName,"r");
+    file = open(argv[1],"r");
     if (file)
     {
         buffer = malloc(4072);
-        
         int readSize = read(file, buffer, 4072, 1);
-        
-        print ("File: %s\nBytes read: %i\n",fileName, readSize);
-        print ("Contents: %s",buffer);
-        print ("<eof>\n");
-        free(buffer);
         close(file);
+        print ("%s",buffer);
+        free(buffer);
+        return 0;
     }
-    return 0;
+    return -2;
 }
 

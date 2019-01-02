@@ -103,7 +103,10 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08X,0x%08X,0x%08X,false)\n",param1,param2,param3,parentProcess);
             process = createProcess((char*)param1, param2, (char**)param3, parentProcess, false);
             if (process!=NULL)
+            {
                 retVal=process->task->taskNum;
+                printd(DEBUG_PROCESS, "_sysCall: createProcess returning 0x%04X\n",retVal);
+            }
             else
                 retVal=0;
             __asm__("mov cr3,eax"::"a" (processCR3));
