@@ -16,7 +16,6 @@
 #include "../../chrisOS/include/elfloader.h"
 #include "time_os.h"
 #include "rusage.h"
-#include "fs.h"
 #include "signals.h"
 
 #ifndef PROCESS_H
@@ -58,9 +57,9 @@ extern "C" {
         uint32_t totalRunTicks;
         uint32_t entryPoint;
         int argc;
-        uintptr_t argv;
+        char** argv;
         struct rusage usage;
-        file_t* stdin, *stdout, *stderr;        //standard input/output/error pointers
+        void* stdin, *stdout, *stderr;        //standard input/output/error pointers
         dllist_t* mmaps;
         int errno;
         char* cwd;                              //Current working directory for the process
@@ -73,12 +72,13 @@ extern "C" {
     } process_t;
 
 
-    process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool isKernelProcess);
+    process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess);
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);
     char* processGetCWD(char* buf, unsigned long size);
-    
+    void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size); //Copy memory from kernel to user space (assumes dest is user page)
+    void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size); //Copy memory from user space to kernel (assumes dest is kernel page)
 #define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus
 }

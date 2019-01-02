@@ -291,12 +291,7 @@ void saveCommand(char* command)
 
 void prompt()
 {
-    char *path = malloc(512);
-    
-    getenv("CWD",path);
-    
-    print("%s %s> ",sExecutingProgram, path);
-    free(path);
+    print("%s %s> ",sExecutingProgram, cwd);
 }
 
 int reprintCommand(char* command)
@@ -334,6 +329,7 @@ getACommand:
         lCurrKey=0;
         lCurrKeyCount=0;
         memset(lCommand,0,256);
+        getenv("CWD",cwd);
         prompt();
 getAKey:
         lCurrKey=0;

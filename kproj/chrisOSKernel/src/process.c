@@ -64,7 +64,10 @@ void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned 
         if (!destPagedAddress&PAGE_USER_WRITABLE)
             srcProcess->errno=ERROR_DEST_ADDRESS_NOT_WRITABLE;
         if (srcProcess->errno)
+        {
+            printd(DEBUG_PROCESS,"copyToKernel: Error! %d, cr3=0x%08X, src=0x%08X, srcPagedAddress=\n",srcProcess->errno,srcCR3, workingSrcAddr, srcPagedAddress);
             return NULL;
+        }
         
         destPagedAddress=(destPagedAddress&0xFFFFF000) | (workingDestAddr&0x00000FFF);
         srcPagedAddress=(srcPagedAddress&0xFFFFF000) | (workingSrcAddr&0x00000FFF);
@@ -91,7 +94,7 @@ void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned 
 
 void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size) //Copy memory from kernel to user space (assumes dest is user page)
 {
-    uintptr_t srcCR3=KERNEL_CR3, destCR3=process->pageDirPtr;
+    uintptr_t srcCR3=KERNEL_CR3, destCR3=(uintptr_t)process->task->pageDir;
     uintptr_t workingDestAddr=0, workingSrcAddr=0;
     unsigned long bytesLeft=size,loopBytesLeft=0;
     uintptr_t destPagedAddress, srcPagedAddress;
@@ -261,7 +264,7 @@ void processIdleLoop()
     }   
 }
 
-process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool isKernelProcess)
+process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess)
 {
 
     process_t* process;
@@ -326,10 +329,19 @@ process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentP
         if (process->parent!=kKernelProcess)
             pagingMapProcessPageIntoKernel(((process_t*)process->parent)->pageDirPtr,argv,0x7);
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
-        process->argv=(uintptr_t)allocPages(50*argc);
-        pagingMapPageCount(KERNEL_CR3,process->argv,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
+        process->argv=(uintptr_t)allocPages(50*argc+(4*argc));
+        pagingMapPageCount(KERNEL_CR3,process->argv,process->argv,((50*argc+(4*argc))/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(KERNEL_CR3,argvVirt,process->argv,((50*argc+(4*argc))/PAGE_SIZE)+1,0x7);
         printd(DEBUG_PROCESS,"Retrieving argv parameter values from parent process\n");
-        processCopyArgV((char**)process->argv,(char**)argv,argvVirt,argc);
+        //processCopyArgV((char**)process->argv,(char**)argv,argvVirt,argc);
+        uint32_t argcPtr=argc*4; //start at the end of the pointer
+        uint32_t argvVal=(char*)process->argv;
+        for (int cnt=0;cnt<argc;cnt++)
+        {
+            process->argv[cnt]=(char*)argcPtr+argvVirt;
+            copyToKernel(parentProcessPtr,process->argv[cnt],argv[cnt],50);
+            argcPtr+=50;
+        }
         pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
     }
     else

@@ -12,9 +12,7 @@
 #include "chrisos.h"
 #include "io.h"
 #include "utility.h"
-#include "fs.h"
 
-    file_system_t *rootFs;
     
 
 #endif	/* KERNEL_H */

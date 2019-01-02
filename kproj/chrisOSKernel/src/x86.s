@@ -8,7 +8,8 @@ sysEnter_Vector:                #WARNING: change libChrisOS linker file if you c
     push edx
     push ebp
     mov ebp,esp
-    call sysEnterReturn
+    call sysEnterReturn #NOTE: sysEnterReturn only exists to put a return address on the stack to be put in the
+                        #EDX register before the sysExit
     add esp,4
     pop ebp
     pop edx

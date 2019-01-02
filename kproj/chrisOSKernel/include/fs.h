@@ -17,8 +17,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "dllist.h"
 #include <stdint.h>
+#include "dllist.h"
+#include "process.h"
     
 #define STDIN_FILE 0
 #define STDOUT_FILE 1
@@ -29,8 +30,17 @@ extern "C" {
 #define SEEK_END 2
 
 #define DENTRY_ROOT 0xFFFFFFFF    
+
+    typedef enum
+    {
+        LIST_DIRECTORY,
+        LIST_FILE
+    } eListType;
     
     typedef struct file file_t;
+    typedef struct directory directory_t;
+    typedef struct direntry dirent_t;
+    typedef struct dir_operations dirops_t;
     typedef struct file_operations fileops_t;
     typedef struct inode inode_t;
     typedef struct dentry dentry_t;
@@ -38,6 +48,7 @@ extern "C" {
     typedef struct vfsmount vfs_mount_t;
     typedef struct inode_operations inode_operations_t;
     typedef struct file_system file_system_t;
+    typedef struct inode inode_t;
     
     struct super_block
     {
@@ -65,15 +76,6 @@ extern "C" {
         struct vfsmount         *i_vfsmount;
     };
 
-    typedef struct inode inode_t;
-    
-    struct dentry
-    {
-        char* d_name;
-        struct inode* d_inode;
-        dentry_t* d_parent;
-    };
-    
     struct inode_operations
     {
         int (*create) (inode_t *,dentry_t *);
@@ -83,6 +85,21 @@ extern "C" {
         int (*rename) (inode_t *, dentry_t *,inode_t *, dentry_t *, unsigned int);
     };
     
+    struct dentry
+    {
+        char* d_name;
+        struct inode* d_inode;
+        dentry_t* d_parent;
+    };
+    
+    struct file
+    {
+        char* f_path;
+        inode_t* f_inode;
+        fileops_t* fops;
+        void* handle;
+    };
+
     struct file_operations
     {
         
@@ -98,33 +115,52 @@ extern "C" {
         size_t (*write) (const void * data, int size, int count, void *f);
     };
 
+    struct dir_operations
+    {
+        void* (*open) (const char* path);
+        int (*read) (void *dir, dirent_t *entry);
+        int (*close) (void *dir);
+    };
     
-    
-    struct file
+    struct directory
     {
         char* f_path;
         inode_t* f_inode;
-        fileops_t* fops;
+        dirops_t* dops;
         void* handle;
     };
-
+    
+    struct direntry
+    {
+    char                      filename[256];
+    uint8_t                   is_dir;
+    uint32_t                  cluster;
+    uint32_t                  size;
+    uint16_t                  access_date;
+    uint16_t                  write_time;
+    uint16_t                  write_date;
+    uint16_t                  create_date;
+    uint16_t                  create_time;
+    };
 
     struct file_system
     {
         vfs_mount_t *mount; 
         inode_operations_t* iops;
         file_operations_t* fops;
+        dirops_t* dops;
         dllist_t inode_list;
         dllist_t* files;
+        dllist_t* dirs;
     };
     
     
     file_system_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops);
     void* fs_open(char* path, const char* mode);
-    int fs_read(void* file, void * buffer, int size, int length);
+    int fs_read(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);
     void fs_close(void* file);
-    
+    int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);
 #ifdef __cplusplus
 }
 #endif

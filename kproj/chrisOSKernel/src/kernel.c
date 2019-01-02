@@ -25,14 +25,15 @@
 #include "kbd.h"
 #include "thesignals.h"
 #include "../../chrisOS/src/fat/fat_filelib.h"
-
+#include "fs.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
 extern bool schedulerEnabled;
 bool schedulerTaskSwitched=0;
-extern file_t console_file;
+extern uint32_t* isrSavedStack; 
 
+file_system_t *rootFs;
 process_t* kKernelProcess;
 task_t* kKernelTask;
 process_t* kIdleProcess;
@@ -71,15 +72,22 @@ int main(int argc, char** argv) {
     int lRetVal=fl_attach_media((fn_diskio_read)ahciBlockingRead28, (fn_diskio_write)ahciBlockingWrite28);
     
     fileops_t fops;
+    dirops_t dops;
     fops.open = &fl_fopen;
     fops.close = &fl_fclose;
     fops.read = &fl_fread;
     fops.seek = &fl_fseek;
+    dops.open = &fl_opendir;
+    dops.close = &fl_closedir;
+    dops.read = &fl_readdir;
+    
     rootFs = kRegisterFileSystem("/",&fops);
     
     keyboardInit();
     //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS
     //console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);
+    
+    isrSavedStack = exceptionSavedStack;
     
     kIdleTicks=0;
     kIdleProcess=createProcess("/sbin/idle",0,NULL,NULL,true);
@@ -96,7 +104,7 @@ int main(int argc, char** argv) {
     args[0]=params[0];
     args[1]=params[1];
     
-    process_t* process = createProcess(program, 2, (uint32_t)&args, kKernelProcess, false);
+    process_t* process = createProcess(program, 2, args, kKernelProcess, false);
     schedulerEnabled=true;
 /*#define pcount 3
     char* param1[pcount][10];

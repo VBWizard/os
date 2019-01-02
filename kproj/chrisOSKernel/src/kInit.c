@@ -82,9 +82,9 @@ __asm__("cli\n");
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP,0x16,0x7);
     kKernelTask->tss->LINK=0x0;
     kKernelTask->tss->IOPB=0;
-    kKernelProcess->stdin=STDIN_FILE;
-    kKernelProcess->stdout=STDOUT_FILE;
-    kKernelProcess->stderr=STDERR_FILE;
+    kKernelProcess->stdin=0;
+    kKernelProcess->stdout=1;
+    kKernelProcess->stderr=2;
     
     kKernelProcess->path=allocPagesAndMap(0x255);
     strcpy(kKernelProcess->path,"/kernel");

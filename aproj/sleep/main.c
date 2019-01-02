@@ -71,6 +71,9 @@ bool strisnum(char* str)
 {
     int cnt=0;
     
+    if (str[0]==0)
+        return false;
+    
     while (str[cnt])
         if (!check_digit(*str+cnt++))
             return false;

@@ -88,7 +88,6 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
-jmp overSaveTheStack
     mov eax,isrNumber
     cmp eax,0x20                
     jge overSaveTheStack        #CLR 03/26/2017: Changed (je to jge) to skip stack capture for 0x20 (IRQ0) & 0x21 (KBD) (not sure what else)
@@ -96,9 +95,10 @@ jmp overSaveTheStack
     #CLR 12/29/2018: I tried to subtract some from the ESP before copying but this is a bad idea, kept faulting everywhere because it would try to read from a non-existent page (i.e. BFFFFFEC ... because kernel starts at C0000000)
 #    add esi,12                  #drop the eip/cs/flags from the call to this proc
     mov edi, isrSavedStack
-    mov ecx, 40       #NOTE: This can cause an exception if the target's esp is within 40 bytes of non-mapped memory
+    mov ecx, 80                  #CLR 01/01/2019: Changed from 40 to 80
+                                 #NOTE: This can cause an exception if the target's esp is within 80 bytes of non-mapped memory
     cld
-    rep movsd
+    rep movsb                    #CLR 01/01/2019: Changed from movsd to movsb
 overSaveTheStack:
     mov eax,isrNumber
     cmp eax,0x20

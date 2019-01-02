@@ -43,7 +43,8 @@ typedef struct
     char delim[6];
     uint32_t exitCode, lastExecExitCode;
     bool timeToExit;
-
+    char cwd[256];
+    
 static command_table_t cmds[] = { 
         {"env","Print environment",cmdPrintEnv,0},
         {"exec","Execute a program",cmdExecp,1},

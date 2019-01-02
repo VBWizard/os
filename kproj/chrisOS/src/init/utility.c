@@ -16,7 +16,7 @@
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
 extern uint32_t exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4, 
-            exceptionErrorCode,exceptionCS, exceptionEIP, exceptionSavedESP, exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionFlags, exceptionTR;
+            exceptionErrorCode,exceptionCS, exceptionEIP, exceptionSavedESP, exceptionSavedEBP, exceptionDS, exceptionES, exceptionFS, exceptionGS, exceptionSS, exceptionFlags, exceptionTR;
 extern uint32_t  *exceptionSavedStack;
 extern uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR3, debugCR4, 
             debugErrorCode,debugCS, debugEIP, debugSavedESP, debugDS, debugES, debugFS, debugGS, debugSS, debugFlags;
@@ -188,7 +188,7 @@ char * strtoupper(char* pointerToString)
 //Called by exception 0xd & 0xe (possibly more)
 void printDumpedRegs()
 {
-    uint32_t esp = exceptionSavedESP;
+    uint32_t esp = exceptionBP;
     volatile unsigned short *lCSIPPtr=(volatile unsigned short *)exceptionCS;
 LOAD_ZERO_BASED_DS    
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
@@ -201,7 +201,7 @@ LOAD_ZERO_BASED_DS
 //          for (int cnt=0;cnt<19;cnt++)
 //              printk("%02X ", lCSIPPtr[cnt]);
 //          printk("\n");
-          printk ("Stack @ 0x%08x:0x%08X:\n",exceptionSS, esp);
+          printk ("Stack (ss:ebp) @ 0x%08x:0x%08X:\n",exceptionSS, esp);
           for (int cnt=0;cnt<20;cnt++)
           {
               printk("\t0x%08X%: 0x%08X\n",esp, exceptionSavedStack[cnt]);

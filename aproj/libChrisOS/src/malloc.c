@@ -54,7 +54,7 @@ void*  mallocI(size_t size)
     printdI(DEBUG_MALLOC,"libc_malloc: needed=0x%08X\n",needed);
     if (needed!=0)      //New heap required
     {
-        allocatedPtr = do_syscall2(SYSCALL_ALLOC, needed);
+        allocatedPtr = do_syscall1(SYSCALL_ALLOC, needed);
         //This is needed to keep in sync with what the kernel thinks
         printdI(DEBUG_MALLOC,"libc_malloc: heaEnd=0x%08X\n",heapEnd);
         heapEnd=allocatedPtr+needed;
@@ -105,5 +105,5 @@ gotoHere:
 
 void malloc_cleanup()
 {
-    do_syscall2(SYSCALL_FREE, heapBase);
+    do_syscall1(SYSCALL_FREE, heapBase);
 }

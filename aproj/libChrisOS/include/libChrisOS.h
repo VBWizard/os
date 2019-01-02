@@ -26,6 +26,7 @@ extern "C" {
 #include "input.h"
 #include "config.h"
 #include "time.h"
+#include "file.h"
 #include "../../../kproj/chrisOSKernel/include/syscalls.h"
     
 #include <bits/time.h>
@@ -34,14 +35,20 @@ extern "C" {
 #endif
 
 #define VISIBLE __attribute__((visibility("default")))
-#define SYSCALL1(a,b) {asm("call sysEnter_Vector\n":"=a" (b):"a" (a));}
-#define SYSCALL2(a,b,c) {asm("call sysEnter_Vector\n":"=a" (c):"a" (a), "b" (b));}
-#define SYSCALL3(a,b,c,d) {asm("call sysEnter_Vector\n":"=a" (d):"a" (a), "b" (b), "c" (c));}
-#define SYSCALL4(a,b,c,d,e) {asm("call sysEnter_Vector\n":"=a" (e):"a" (a), "b" (b), "c" (c), "d" (d));}
-#define GET_TICKS(t) SYSCALL1(SYSCALL_GETTICKS,t);
-#define SLEEP_SECONDS(s) {uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; SYSCALL2(SYSCALL_SLEEP,s,s2);}
+#define SYSCALL0(a,b) {asm("call sysEnter_Vector\n":"=a" (b):"a" (a));}
+#define SYSCALL1(a,b,c) {asm("call sysEnter_Vector\n":"=a" (c):"a" (a), "b" (b));}
+#define SYSCALL2(a,b,c,d) {asm("call sysEnter_Vector\n":"=a" (d):"a" (a), "b" (b), "c" (c));}
+#define SYSCALL3(a,b,c,d,e) {asm("call sysEnter_Vector\n":"=a" (e):"a" (a), "b" (b), "c" (c), "d" (d));}
+#define SYSCALL4(a,b,c,d,e,f) {asm("call sysEnter_Vector\n":"=a" (e):"a" (a), "b" (b), "c" (c), "d" (d), "S" (f));}
+#define GET_TICKS(t) SYSCALL0(SYSCALL_GETTICKS,t);
+#define SLEEP_SECONDS(s) {uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; SYSCALL1(SYSCALL_SLEEP,s,s2);}
 
     void libc_init();
+    int do_syscall0(int callnum);
+    int do_syscall1(int callnum, uint32_t param1);
+    int do_syscall2(int callnum, uint32_t param1, uint32_t param2);
+    int do_syscall3(int callnum, uint32_t param1, uint32_t param2, uint32_t param3);
+    int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4);
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
