@@ -59,7 +59,7 @@ void cmdExecp(char* cmdline)
     paramsToArgv(paramCount-execParamCount,&params[execParamCount][0], prms);
 
     print ("Executing %s\n",pgm);
-    pid=exec(pgm,paramCount-execParamCount,prms);
+    pid=execa(pgm,paramCount-execParamCount,prms);
     if (pid>0)
     {
         if (!background)

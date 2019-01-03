@@ -1,6 +1,6 @@
 #include "strings.h"
 
-__attribute__((visibility("default"))) void strtrim(char *input)
+void strtrimI(char *input)
 {
    char *dst = input, *src = input;
    char *end;
@@ -26,6 +26,11 @@ __attribute__((visibility("default"))) void strtrim(char *input)
    {
       while ((*dst++ = *src++));
    }
+}
+
+__attribute__((visibility("default"))) void strtrim(char *input)
+{
+    return strtrimI(input);
 }
 
 /*FROM: http://codereview.stackexchange.com/questions/20897/trim-function-in-c*/

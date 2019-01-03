@@ -65,7 +65,7 @@ void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned 
             srcProcess->errno=ERROR_DEST_ADDRESS_NOT_WRITABLE;
         if (srcProcess->errno)
         {
-            printd(DEBUG_PROCESS,"copyToKernel: Error! %d, cr3=0x%08X, src=0x%08X, srcPagedAddress=\n",srcProcess->errno,srcCR3, workingSrcAddr, srcPagedAddress);
+            printd(DEBUG_PROCESS,"copyToKernel: Error! %d, cr3=0x%08X, src=0x%08X, srcPagedAddress=0x%08X\n",srcProcess->errno,srcCR3, workingSrcAddr, srcPagedAddress);
             return NULL;
         }
         
@@ -231,22 +231,6 @@ int sys_setpriority(process_t* process, int newpriority)
     return retVal;
 }
 
-void processCopyArgV(char** dest, char** src, uint32_t dVirt, int pcount)
-{
-    printd(DEBUG_PROCESS,"Executing %u argv copies from calling process's memory starting at src=0X%08X dest=0x%08X\n",pcount, src, dest);
-    for (int cnt=0;cnt<pcount;cnt++)
-    {
-        //Make the dest pointer [cnt] point to the same offset within the page as the source [cnt]
-        dest[cnt]=(char*)(((uintptr_t)dest & 0xFFFFF000) | ((uintptr_t)src[cnt] & 0x00000FFF));
-        printd(DEBUG_PROCESS,"Iteration %u: Copying %u bytes from 0x%08X to 0x%08X\n",cnt,strlen(src[cnt]),src[cnt],dest[cnt]);
-        //CLR 12/29/2018: Replaced memcpy with strcpy as all arguments are represented as strings, and using memcpy with a static length of 50
-        //was causing paging fault because it was copying past the end of process->argv memory
-        //memcpy(dest[cnt],src[cnt],50);
-        strcpy(dest[cnt],src[cnt]);
-        dest[cnt]=(char*)((dVirt & 0xFFFFF000) | ((uint32_t)dest[cnt] & 0x00000FFF));
-    }
-}
-
 void processIdleLoop()
 {
     uint32_t cr3=0;
@@ -331,18 +315,20 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
         process->argv=(uintptr_t)allocPages(50*argc+(4*argc));
         pagingMapPageCount(KERNEL_CR3,process->argv,process->argv,((50*argc+(4*argc))/PAGE_SIZE)+1,0x7);
-        pagingMapPageCount(KERNEL_CR3,argvVirt,process->argv,((50*argc+(4*argc))/PAGE_SIZE)+1,0x7);
         printd(DEBUG_PROCESS,"Retrieving argv parameter values from parent process\n");
         //processCopyArgV((char**)process->argv,(char**)argv,argvVirt,argc);
         uint32_t argcPtr=argc*4; //start at the end of the pointer
         uint32_t argvVal=(char*)process->argv;
         for (int cnt=0;cnt<argc;cnt++)
         {
-            process->argv[cnt]=(char*)argcPtr+argvVirt;
+            //argv[cnt] = address of argv + # of arguments * 8 (char**) + 
+            process->argv[cnt]=(char*)process->argv+argcPtr;
             copyToKernel(parentProcessPtr,process->argv[cnt],argv[cnt],50);
+            process->argv[cnt]=(char*)argcPtr+argvVirt;
             argcPtr+=50;
         }
         pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(KERNEL_CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
     }
     else
     {

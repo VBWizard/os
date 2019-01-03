@@ -56,7 +56,8 @@ extern "C" {
     void stop();
     void modifySignal(int signal, void* sigHandler, int sigData);
     void libc_cleanup(void);
-    int exec(char* path, int argc, char** argv);
+    int exec(char* path);
+    int execa(char* path, int argc, char** argv);
     int waitpid(uint32_t pid);
     void *memset(void *d1, int val, size_t len);
     void * memcpy(void *dest, const void *src, size_t n);

@@ -112,7 +112,54 @@ VISIBLE void modifySignal(int signal, void* sigHandler, int sigData)
     do_syscall3(SYSCALL_SETSIGACTION,signal,(uint32_t)sigHandler,sigData);
 }
 
-VISIBLE int exec(char* path, int argc, char** argv)
+VISIBLE int exec(char* path)
+{
+    int pid=0, argc=0;
+    char** argv;
+    char* spacePtr=path, *lastSpacePtr=path;
+    char* program;
+    program=mallocI(512);
+    do
+    {
+        spacePtr=strstrI(spacePtr," ");
+        if (argc==0)
+        {
+            if (spacePtr==0)
+                strncpyI(program, path, strlenI(path));
+            else
+                strncpyI(program, path, spacePtr-path);
+        }
+        argc++;
+            
+    } while (spacePtr++);
+    
+    argv=mallocI((argc*50)+(argc*4));
+    int argvPtr=4*argc;
+    spacePtr=path;
+    for (int cnt=0;cnt<argc; cnt++)
+    {
+        argv[cnt]=(char*)argv+argvPtr;
+        spacePtr=strstrI(spacePtr," ");
+        if (spacePtr)
+            strncpyI(argv[cnt],lastSpacePtr,spacePtr-lastSpacePtr);
+        else
+            strncpyI(argv[cnt],lastSpacePtr,strlenI(lastSpacePtr));
+        strtrimI(argv[cnt]);
+        lastSpacePtr=spacePtr++;
+        argvPtr+=50;
+    }
+    //Using the syscall is breaking the stack
+//    SYSCALL3(SYSCALL_EXEC,path,argc,argv);
+    printdI(DEBUG_LIBC,"libc: exec for %s\n",path);;
+    __asm__("push ds\nint 0x80\npop ds\n"
+            :"=a" (pid)
+            :"a" (0x59),"b" (program),"c" (argc),"d" (argv));
+    return pid;
+    freeI(argv);
+    freeI(program);
+}
+
+VISIBLE int execa(char* path, int argc, char** argv)
 {
     int pid=0;
     //Using the syscall is breaking the stack

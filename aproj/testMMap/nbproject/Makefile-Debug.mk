@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/mmapmain.o
 
 
 # C Compiler Flags
@@ -64,10 +64,10 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc
 
-${OBJECTDIR}/main.o: main.c
+${OBJECTDIR}/mmapmain.o: mmapmain.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../libChrisOS/include -I../../kproj/chrisOSKernel/include -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -g -I../libChrisOS/include -I../../kproj/chrisOSKernel/include -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mmapmain.o mmapmain.c
 
 # Subprojects
 .build-subprojects:

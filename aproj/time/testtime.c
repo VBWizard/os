@@ -43,19 +43,22 @@ int main(int argc, char** argv) {
     {
         strcpy(execpgm,argv[1]);
         strtrim(execpgm);
-        if (retVal==0)
+        if (strlen(execpgm)==0)
         {
-            if (strlen(execpgm)==0)
-            {
-                print("Parameter 2 must be a program name to run\n");
-                retVal=-2;
-            }
+            print("Parameter 2 must be a program name to run\n");
+            retVal=-2;
         }
     }
     if (retVal==0)
     {
         startTime=time();
-        pid=exec(execpgm,argc-1,argv+1);
+        //print("executing %s with first parameter at 0x%08X (%u parameters)\n", execpgm, argv[1], argc-1);
+        for (int cnt=2;cnt<argc;cnt++)
+        {
+            strcat(execpgm," ");
+            strcat(execpgm,argv[cnt]);
+        }
+        pid=exec(execpgm);
         if (pid==0)
         {
             print("Error executing %s\n",argv[1]);

@@ -41,6 +41,24 @@ uint32_t newHeapRequiredToFulfillRequest(size_t size)
         return 0;
 }
 
+void freeI(void* fpointer)
+{
+    heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
+    
+    if (fpointer==NULL)
+        return;             //CLR 04/20/2017: If pointer to be freed is NULL, don't do anything
+    HEAP_CURR(fpointer,mp);
+    
+    //printDebug(DEBUG_MALLOC,"libc_free: Freeing heap @ fp=0x%08X (mp=0x%08X)\n",fpointer,mp);
+    if (mp->marker!=ALLOC_MARKER_VALUE)
+    {
+        //print("malloc: marker not found error!!!\n");
+gotoHere:
+        goto gotoHere;
+    }
+    mp->inUse=false;
+}
+
 void*  mallocI(size_t size)
 {
     void* retVal;
@@ -87,20 +105,7 @@ __attribute__((visibility("default"))) void*  malloc(size_t size)
 
 __attribute__((visibility("default"))) void free(void* fpointer)
 {
-    heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
-    
-    if (fpointer==NULL)
-        return;             //CLR 04/20/2017: If pointer to be freed is NULL, don't do anything
-    HEAP_CURR(fpointer,mp);
-    
-    //printDebug(DEBUG_MALLOC,"libc_free: Freeing heap @ fp=0x%08X (mp=0x%08X)\n",fpointer,mp);
-    if (mp->marker!=ALLOC_MARKER_VALUE)
-    {
-        //print("malloc: marker not found error!!!\n");
-gotoHere:
-        goto gotoHere;
-    }
-    mp->inUse=false;
+    freeI(fpointer);
 }
 
 void malloc_cleanup()

@@ -5,7 +5,6 @@
  * Created on May 16, 2016, 11:49 AM
  */
 
-#include <signal.h>
 
 #include "../libChrisOS/include/libChrisOS.h"
 #include "../../kproj/chrisOSKernel/include/thesignals.h"
@@ -85,7 +84,7 @@ int main(int argc, char** argv, char** envp) {
     else
         loopCount = 1;
     
-    print ("Looping %u times\n",loopCount);
+    print ("Looping %u times\n",loopCount-1);
     
     crashFail(argv,loopCount);
     print ("Bye bye now!!!\n");
