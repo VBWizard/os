@@ -24,7 +24,7 @@ VISIBLE void  setenv(char *varname, char *value)
     for (int cnt=0;cnt<100;cnt++)
         if (processEnvp[cnt]!=0)
         {
-            lastPopulated = processEnvp[cnt];
+            lastPopulated = (uint32_t)processEnvp[cnt];
             if (strncmpI(processEnvp[cnt],varname, strlenI(varname))==0)
             {
                 strcpyI(processEnvp[cnt],varname);

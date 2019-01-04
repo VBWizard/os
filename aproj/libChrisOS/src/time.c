@@ -19,7 +19,7 @@ const int _ytab[2][12] = {
   {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 };
 
-VISIBLE time_t time(/*time_t* arg*/)
+VISIBLE time_t getticks(/*time_t* arg*/)
 {
     uint32_t retVal=0;
     GET_TICKS(retVal);
@@ -27,7 +27,8 @@ VISIBLE time_t time(/*time_t* arg*/)
 }
 
 
-VISIBLE struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
+struct tm *gmtime_rI(const time_t *timer, struct tm *tmbuf) 
+{
   time_t time = *timer;
   unsigned long dayclock, dayno;
   int year = EPOCH_YR;
@@ -55,6 +56,11 @@ VISIBLE struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
   return tmbuf;
 }
 
+VISIBLE struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) 
+{
+    return gmtime_rI(timer, tmbuf);
+}
+
 VISIBLE struct tm *localtime(const time_t *timer) {
   time_t t;
   struct tm tmbuf;
@@ -63,11 +69,16 @@ VISIBLE struct tm *localtime(const time_t *timer) {
   return gmtime_r(&t, &tmbuf);
 }
 
-VISIBLE struct tm *localtime_r(const time_t *timer, struct tm *tmbuf) {
+struct tm *localtime_rI(const time_t *timer, struct tm *tmbuf) 
+{
   time_t t;
 
   t = *timer - libcTZ;
-  return gmtime_r(&t, tmbuf);
+  return gmtime_rI(&t, tmbuf);
+}
+
+VISIBLE struct tm *localtime_r(const time_t *timer, struct tm *tmbuf) {
+    return localtime_rI(timer, tmbuf);
 }
 
 VISIBLE time_t mktime(struct tm *tmbuf) {
@@ -175,4 +186,15 @@ VISIBLE time_t mktime(struct tm *tmbuf) {
 
   if ((time_t) seconds != seconds) return (time_t) -1;
   return (time_t) seconds;
+}
+
+VISIBLE struct tm* gettime(struct tm *time, bool localTime)
+{
+    time_t ticks=0;
+    
+    SYSCALL0(SYSCALL_GETTIME, ticks);
+    if (localTime)
+        return localtime_rI(&ticks,time);
+    else
+        return gmtime_rI((time_t*)&ticks,time);
 }

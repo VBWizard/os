@@ -268,7 +268,7 @@ typedef struct cpu_s
 *  for which the 'presence' bit is cleared (0) will generate an
 *  "Unhandled Interrupt" exception */
 void idt_load(uint64_t value);
-void init_PIT();
+void init_PIT(uint32_t frequency);
 
 bool apicCheckFor();
 uint32_t apicGetAPICBase(void);

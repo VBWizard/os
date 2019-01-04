@@ -13,6 +13,7 @@
 #include "charDev.h"
 #include "i386/kPaging.h"
 
+extern int kTimeZone;
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
 extern uint32_t exceptionAX, exceptionBX, exceptionCX, exceptionDX, exceptionSI, exceptionDI, exceptionBP, exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4, 
@@ -157,11 +158,14 @@ void initSystemDate()
     tmbuf.tm_mday = bcdToDec(inb(0x71));
     outb(0x70, 0x08);
     tmbuf.tm_mon = bcdToDec(inb(0x71));
+    tmbuf.tm_mon-=1;
     outb(0x70, 0x09);
     tmbuf.tm_year = bcdToDec(inb(0x71));
     tmbuf.tm_isdst = -1;
     tmbuf.tm_year += 2000;
     tmbuf.tm_year = tmbuf.tm_year - 1900;
+    tmbuf.__tm_gmtoff = -5;
+    kTimeZone = -5;
     kSystemStartTime = mktime(&tmbuf);
     kSystemCurrentTime = kSystemStartTime;
 //printf("System Date = %d/%d/%d %d:%d:%d\n", tmbuf.tm_mon, tmbuf.tm_mday, tmbuf.tm_year, tmbuf.tm_hour, tmbuf.tm_min, tmbuf.tm_sec, tmbuf.tm_hour, tmbuf.tm_min, tmbuf.tm_sec);

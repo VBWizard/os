@@ -276,6 +276,7 @@ gdt_init();
     IRQ_clear_mask(0);
     IRQ_clear_mask(1);
     __asm__("sti\n");
+
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
     printk("Boot: ");

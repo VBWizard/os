@@ -17,9 +17,11 @@ void HandleSEGV();
 
 void crashFail(char** argv, int count)
 {
-
+    struct tm* time=malloc(sizeof(struct tm));
+    
     jumpHere:
-    print("\t%s: Counting down ... %u\n",argv[0],count);
+    gettime(time,true);
+    print("\t%s: Counting down ... %u (%02u:%02u:%02u)\n",argv[0],count, time->tm_hour, time->tm_min, time->tm_sec);
     sleep(1);
     count--;
     if (count==0)

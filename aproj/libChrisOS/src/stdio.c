@@ -15,6 +15,7 @@ file_operations_t fops;
 inode_t console_node={.i_dev=1,.i_mode=0};
 file_t console_file;
 
+/*
 size_t readConsole (struct file * fptr, char *buffer, size_t size, uint64_t* whatever) 
 {
     return gets(buffer,size,1);
@@ -61,7 +62,7 @@ VISIBLE void moveTo(int row, int col)
     
     return;
 }
-
+*/
 //Clears the current console row, setting the cursor to column 0
 VISIBLE void resetRow()
 {
@@ -81,6 +82,7 @@ VISIBLE void resetRow()
     return;
 }
 
+/*
 void ioInit()
 {
     console_file.f_inode=&console_node;
@@ -88,3 +90,4 @@ void ioInit()
     fops.write=writeConsole;
     console_file.fops=fops;
 }
+ */

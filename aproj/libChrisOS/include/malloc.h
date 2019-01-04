@@ -36,7 +36,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-
+#include "time.h"
     
 //This is the minimum request size for a call to the kernel to ALLOC memory. 
 #define ALLOC_REQUEST_SIZE 0x32000
@@ -52,12 +52,14 @@ extern "C" {
 uint32_t heapBase;    
 uint32_t heapCurr;
 uint32_t heapEnd;
+uint32_t libcTZ;
 
 void initmalloc();
 void* malloc(size_t size);
 void*  mallocI(size_t size);
 void malloc_cleanup();
 void free(void* fpointer);
+void freeI(void* fpointer);
 #ifdef __cplusplus
 }
 #endif

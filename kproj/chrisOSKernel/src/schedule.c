@@ -8,7 +8,7 @@
 #include "strings.h"
 
 #define SCHEDULER_DEBUG 1
-
+#define MAX_TASKS 1000
 
 task_t *kTaskList;
 uintptr_t *qZombie;
@@ -33,8 +33,6 @@ extern task_t* kKernelTask;
 extern task_t* kIdleTask;
 
 void changeTaskQueue(task_t* task, eTaskState newState);
-
-#define MAX_TASKS 100
 
 void initSched()
 {

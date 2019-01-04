@@ -60,12 +60,12 @@ extern "C" {
     int execa(char* path, int argc, char** argv);
     int waitpid(uint32_t pid);
     void *memset(void *d1, int val, size_t len);
+    void *memsetI(void *d1, int val, size_t len);
     void * memcpy(void *dest, const void *src, size_t n);
-    struct tm* gettime();
+    struct tm* gettime(struct tm *time, bool localTime);
     char* getcwd(char* buf, size_t size);
     bool strisnum(char* str);
-    
-    time_t libcTZ;
+
     char** processEnvp;
     
 #ifdef __cplusplus

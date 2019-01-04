@@ -50,6 +50,7 @@ size_t strlen(const char* str);
     unsigned long strtoul(const char *nptr, char **endptr, register int base);
     //char * strtrim(char * *pointerToString);
     void strtrim(char *input);
+    void strtrimI(char *input);
     char * strtok(char* s, /*const*/ char* delim);
     char *strchr(const char *s, int c);
     int strcspn(char* string, char* chars);

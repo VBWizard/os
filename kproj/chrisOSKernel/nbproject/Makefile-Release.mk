@@ -88,7 +88,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/schedule.o \
 	${OBJECTDIR}/src/signals.o \
-	${OBJECTDIR}/src/signalx86.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
@@ -381,10 +380,6 @@ ${OBJECTDIR}/src/signals.o: src/signals.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/signals.o src/signals.c
-
-${OBJECTDIR}/src/signalx86.o: src/signalx86.s
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/src/signalx86.o src/signalx86.s
 
 ${OBJECTDIR}/src/syscall.o: src/syscall.c
 	${MKDIR} -p ${OBJECTDIR}/src

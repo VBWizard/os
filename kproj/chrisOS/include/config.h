@@ -23,7 +23,7 @@ extern "C" {
 //How many ticks expire between scheduler runs
 #define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 10
 //How many ticks expire between signal checks
-#define TICKS_PER_SIGNAL_CHECK TICKS_PER_SECOND / 5
+#define TICKS_PER_SIGNAL_CHECK TICKS_PER_SECOND / 50
 //MS=Milliseconds or thousands of a second
 #define MS_PER_TICK 1000 / TICKS_PER_SECOND
 //IS=Microseconds or millionths of a second
@@ -65,7 +65,7 @@ extern "C" {
 #define DEBUG_MMAP 1<<26
 #define DEBUG_FILESYS 1<<27
 #define DEBUG_MAX 0XFFFFFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_SIGNALS | DEBUG_DETAILED | DEBUG_PRINT_TO_PORT | DEBUG_EXCEPTIONS | DEBUG_LIBC | DEBUG_MALLOC | DEBUG_TASK
+#define KDEBUGLEVEL DEBUG_ELF_LOADER | DEBUG_SIGNALS | DEBUG_DETAILED | DEBUG_PRINT_TO_PORT | DEBUG_EXCEPTIONS | DEBUG_LIBC | DEBUG_MALLOC | DEBUG_TASK
     //DEBUG_PROCESS | 
 #ifdef __cplusplus
 }

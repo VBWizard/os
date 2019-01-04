@@ -11,7 +11,6 @@
  * Created on March 23, 2017, 7:34 PM
  */
 
-#include <unistd.h>
 #include "kshell.h"
 
 char commandHistory[500][MAX_PARAM_WIDTH];

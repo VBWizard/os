@@ -15,6 +15,8 @@ void initmalloc()
     heapBase=0;
     heapCurr=0;
     heapEnd=0;
+    libcTZ=-5;
+
 }
 
 uint32_t newHeapRequiredToFulfillRequest(size_t size)

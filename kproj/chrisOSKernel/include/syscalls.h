@@ -38,6 +38,7 @@ extern "C" {
         SYSCALL_STOP			= 0x168,
         SYSCALL_REBOOT			= 0x169,
         SYSCALL_GETTICKS		= 0x170,
+        SYSCALL_GETTIME                 = 0x171,
         SYSCALL_PRINT			= 0x300,
         SYSCALL_PRINTD			= 0x301,
         SYSCALL_HLT			= 0x302,

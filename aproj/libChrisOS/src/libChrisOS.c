@@ -56,7 +56,6 @@ VISIBLE void __attribute__((constructor)) libc_init()
         initmalloc();
         //processEnvp = envp;
         __asm__("mov %0,[ebp+52]\n":"=a" (processEnvp));
-        libcTZ=-4;
         do_syscall0(SYSCALL_INVALID);
         do_syscall1(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
         libcInitialized = true;
@@ -174,15 +173,6 @@ VISIBLE int execa(char* path, int argc, char** argv)
 VISIBLE int waitpid(uint32_t pid)
 {
     return do_syscall1(SYSCALL_WAITFORPID,pid);
-}
-
-VISIBLE struct tm* gettime()
-{
-    uint32_t ticks=0;
-    struct tm theTime;
-    
-    GET_TICKS(ticks);
-    return gmtime_r((time_t*)&ticks,&theTime);
 }
 
 VISIBLE char* getcwd(char* buf, size_t size)

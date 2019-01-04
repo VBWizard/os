@@ -20,10 +20,13 @@ int main(int argc, char** argv) {
 
     int pid=0;
     struct tm *totalTime;
-    time_t startTime, endTime, elapsed;
+    time_t startTicks, endTicks, elapsed;
+    struct tm *startTime, *endTime;
     int retVal=0;
     
 #ifdef DEBUG
+    startTime = malloc(sizeof(struct tm));
+    endTime = malloc(sizeof(struct tm));
     print("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
         print("Param %u=%s\n",cnt,argv[cnt]);
@@ -51,13 +54,14 @@ int main(int argc, char** argv) {
     }
     if (retVal==0)
     {
-        startTime=time();
         //print("executing %s with first parameter at 0x%08X (%u parameters)\n", execpgm, argv[1], argc-1);
         for (int cnt=2;cnt<argc;cnt++)
         {
             strcat(execpgm," ");
             strcat(execpgm,argv[cnt]);
         }
+        startTicks=getticks();
+        gettime(startTime,true);
         pid=exec(execpgm);
         if (pid==0)
         {
@@ -67,17 +71,21 @@ int main(int argc, char** argv) {
         else
         {
             waitpid(pid);
-            endTime=time();
-            elapsed=(endTime-startTime);
+            endTicks=getticks();
+            gettime(endTime,true);
+            elapsed=(endTicks-startTicks);
             totalTime=malloc(sizeof(struct tm));    
+            print("Start time: %02u:%02u:%02u\n",startTime->tm_hour, startTime->tm_min, startTime->tm_sec);
             print("Elapsed ticks = %u\n",elapsed);
-            int ms=elapsed%TICKS_PER_SECOND;
+            int ms=elapsed%TICKS_PER_SECOND*(TICKS_PER_SECOND/10);
             elapsed/= TICKS_PER_SECOND;
             gmtime_r(&elapsed,totalTime);
             print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
-            free(totalTime);
+            free(endTime);
         }
     }
+    free(totalTime);
+    free(startTime);
     free(execpgm);
     return (retVal);
 }

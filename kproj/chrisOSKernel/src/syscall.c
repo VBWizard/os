@@ -25,6 +25,7 @@
 #define check_flag(flags, n) ((flags) & bit(n))
 
 extern int kTimeZone;
+extern time_t kSystemCurrentTime;
 char* processGetCWD(char* buf, unsigned long size);
 
 //NOTE: Upon entering _sysCall, the process' CR3 is still being used
@@ -169,6 +170,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_MASKSIG: //sys_masksig (masks/unmasks an individual signal for the running process)
             sys_masksig(param1, param2);
+            break;
+        case SYSCALL_GETTIME:
+            retVal = kSystemCurrentTime;
             break;
         default:
             panic("_syscall: Invalid call number 0x%04X\n",callNum);
