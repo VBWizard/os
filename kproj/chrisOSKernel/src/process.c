@@ -210,7 +210,7 @@ void processExit()
             x();
         }
     gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
-
+    
      __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (SYSCALL_ENDPROCESS), "b" (lRetVal));
     //Free memory allocated to the process
      

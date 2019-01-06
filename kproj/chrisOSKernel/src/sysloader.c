@@ -169,6 +169,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                             printd(DEBUG_ELF_LOADER,"\t\tSetting up CoW pages\n");
                             elfSetupCoWPages(targetCR3,searchElf);
                             elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=searchElf;  //CLR 12/23/2018: Removed incrementing of libraryElfCount here as it is done below
+                            searchElf->usageCount++;
                             break;
                         }
                         printd(DEBUG_ELF_LOADER,"\t\tThis is not the module we want, skipping to the next\n");
@@ -184,9 +185,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                 {
                     printd(DEBUG_ELF_LOADER,"loadElf: Calling loadElf again to load '%s'\n",&fileName);
                 }
-                if (foundElf!=NULL)
-                    elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=foundElf; //sysLoadElf(fileName, foundElf, targetCR3, true);
-                else
+                if (foundElf==NULL)
                     elfInfo->libraryElfPtr[elfInfo->libraryElfCount]=sysLoadElf(fileName, NULL, targetCR3, false);
                 
                 ((elfInfo_t*)elfInfo->libraryElfPtr[elfInfo->libraryElfCount])->isLibrary=true;

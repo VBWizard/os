@@ -55,6 +55,7 @@ typedef struct sElfInfo
     char* fileName;
     elfPageInfo_t* elfLoadedPages;
     bool mapMemoryOnly; //set to true if library is already loaded, and we only want to map it into the new process
+    int usageCount;
 } elfInfo_t;
 
 void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);

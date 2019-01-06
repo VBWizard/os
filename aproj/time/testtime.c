@@ -22,11 +22,13 @@ int main(int argc, char** argv) {
     struct tm *totalTime;
     time_t startTicks, endTicks, elapsed;
     struct tm *startTime, *endTime;
+    char* execpgm;
     int retVal=0;
     
 #ifdef DEBUG
     startTime = malloc(sizeof(struct tm));
     endTime = malloc(sizeof(struct tm));
+    execpgm = malloc(512);
     print("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
         print("Param %u=%s\n",cnt,argv[cnt]);
@@ -36,13 +38,8 @@ int main(int argc, char** argv) {
         print("Error: Not enough parameters supplied, must pass path to program to be run\n");
         retVal=-1;
     }
-    char* execpgm=malloc(512);
-    if (argv[1]==NULL)
-    {
-        print("Parameter 2 must be a program name to run\n");
-        retVal=-4;
-    }
-    else
+
+    if (retVal==0)
     {
         strcpy(execpgm,argv[1]);
         strtrim(execpgm);
@@ -86,6 +83,7 @@ int main(int argc, char** argv) {
         }
     }
     free(startTime);
+    free(endTime);
     free(execpgm);
     return (retVal);
 }
