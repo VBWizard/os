@@ -12,6 +12,7 @@
 #include "process.h"
 #include "thesignals.h"
 #include "fs.h"
+#include "schedule.h"
 
 //#include "fs.h" - CLR 04/23/2018: Commented out
 
@@ -60,6 +61,11 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              __asm__("sysCallIdleLoop: sti;hlt;jmp sysCallIdleLoop");
              panic("_syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
+            break;
+        case SYSCALL_FORK:
+            __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
+            retVal=process_fork(findTaskByCR3(processCR3)->process);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_OPEN: //param1=path, param2=mode
             __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));

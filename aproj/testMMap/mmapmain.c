@@ -18,18 +18,26 @@
  */
 int main(int argc, char** argv) {
 
-    char fileName[50] = "/kshell";
-    for (int cnt=0;cnt<4;cnt++)
+    int pid=0;
+    
+    pid=fork();
+    if (pid==0)
     {
-        print("Iteration %u ...\n",cnt);
-        int pid = execa(&fileName, NULL, NULL);
-        sleep(1);
-/*        if (pid)
+        //child executes here
+        for (int cnt=0;cnt<10;cnt++)
         {
-            waitpid(pid);
-            print("done!\n");
+            print("Child: Count = %u\n",cnt);
+            sleep(1);
         }
-*/    }
+        return 1;
+    }
+    //parent executes here
+
+    for (int cnt=0;cnt<10;cnt++)
+    {
+        print("Parent: Count = %u\n",cnt);
+        sleep(1);
+    }
     return (0);
 }
 

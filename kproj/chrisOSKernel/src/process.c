@@ -19,10 +19,15 @@
 #include "thesignals.h"
 #include "syscalls.h"
 #include "alloc.h"
+#include "schedule.h"
+#include "mmap.h"
+#include "task.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
 extern uint64_t kIdleTicks;
+extern uintptr_t *qRunnable;
+void CoWProcess(process_t* process);
 process_t* kKernelProcess;
 
 #define PAGE_USER_READABLE 0x4
@@ -260,7 +265,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     process=allocPagesAndMap(sizeof(process_t));
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process\n",process);
     memset(process,0,sizeof(process_t));
-    process->task=createTask(isKernelProcess);
+    process->task=createTask(process, isKernelProcess);
     process->pageDirPtr=process->task->tss->CR3;
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;
@@ -370,7 +375,6 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         }
     }
     process->task->process=process;
-    process->this=process;
     process->processSyscallESP=process->task->tss->ESP1;
     process->priority=PROCESS_DEFAULT_PRIORITY;
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
@@ -444,3 +448,87 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     return process;
 }
 
+//Upon fork the child task's EIP will be set to child_task_forked
+uint32_t child_task_forked()
+{
+    //Pop the EBP that is pushed when the child starts executing this method.
+    //That way the automatic pop epb at the end of this method will simulate the pop ebp 
+    //that would have happened at the end of process_fork if the child started where the parent forked it
+    __asm__("pop ebp\nmov esp,ebp\n");
+    return 0;
+}
+
+uint32_t process_fork(process_t* currProcess)
+{
+    process_t* newProcess = allocPagesAndMap(sizeof(process_t));
+    task_t* newTask;
+    uint32_t retVal;
+    
+    //Duplicate the calling process
+    memcpy(newProcess,currProcess,sizeof(process_t));
+    
+    //Create a new task.  Can't dup the task because it needs its own taskNum which is 
+    newTask=getAvailableTask();
+    newTask->process = newProcess;
+    newTask->esp0Base = currProcess->task->esp0Base;
+    newTask->esp0Size = currProcess->task->esp0Size;
+    newTask->exited = 0;
+    newTask->kernel = currProcess->task->kernel;
+    newTask->kernelPageDirPtr = currProcess->task->kernelPageDirPtr;
+    newTask->lastRunEndTicks = currProcess->task->lastRunEndTicks;
+    newTask->lastRunStartTicks = currProcess->task->lastRunStartTicks;
+    
+    newTask->pageDir = currProcess->task->pageDir;
+    newTask->prioritizedTicksInRunnable = currProcess->task->prioritizedTicksInRunnable; //so new task should run closely to old one
+    newTask->taskState = TASK_RUNNABLE;
+    newTask->ticksSinceLastInterrupted = currProcess->task->ticksSinceLastInterrupted;
+    memcpy(newTask->tss,currProcess->task->tss,sizeof(tss_t));
+    //Child task will return from child_task_forked with a 0 return value, whereas we will return with the child task PID
+    newTask->tss->EIP=(uint32_t)&child_task_forked;
+    addToQ(qRunnable,newTask);
+    
+    __asm__("pushad\n");
+    __asm__("mov %0, [esp+28]\n": "=d" (newTask->tss->EAX));
+    __asm__("mov %0, [esp+24]\n": "=d" (newTask->tss->ECX));
+    __asm__("mov %0, [esp+20]\n": "=d" (newTask->tss->EDX));
+    __asm__("mov %0, [esp+16]\n": "=d" (newTask->tss->EBX));
+    __asm__("mov %0, [esp+12]\n": "=d" (newTask->tss->ESP));
+    __asm__("mov %0, [esp+8]\n": "=d" (newTask->tss->EBP));
+    __asm__("mov %0, [esp+4]\n": "=d" (newTask->tss->ESI));
+    __asm__("mov %0, [esp]\n": "=d" (newTask->tss->EDI));
+    __asm__("mov %0, cs\n": "=d" (newTask->tss->CS));
+    __asm__("mov %0, ds\n": "=d" (newTask->tss->DS));
+    __asm__("mov %0, es\n": "=d" (newTask->tss->ES));
+    __asm__("mov %0, ss\n": "=d" (newTask->tss->SS));
+    __asm__("popad\n");
+    newTask->tss->ESP+=0x1c;
+    __asm__("mov [%0], ecx":: "r" (newTask->tss->ESP), "c" (&child_task_forked));
+    //sys_mmapI(process, )
+    newProcess->justForked=true;
+    __asm__("cli\n");
+    triggerScheduler();
+    CoWProcess(currProcess);
+    __asm__("sti\n");
+    return newTask->taskNum;
+    
+}
+
+void CoWProcess(process_t* process)
+{
+    //CoW the text segment
+    if (process->elf->textAddress>0)
+        sys_mmapI(process, (uintptr_t*)(process->elf->textAddress & 0xFFFFF000), process->elf->textSize, PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+    //CoW the data/tdata segments
+    if (process->elf->bssAddress>0)
+    sys_mmapI(process, (uintptr_t*)(process->elf->bssAddress & 0xFFFFF000), process->elf->bssSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+    //CoW the bss segment
+    if (process->elf->dataAddress>0)
+    sys_mmapI(process, (uintptr_t*)(process->elf->dataAddress & 0xFFFFF000), process->elf->dataSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+    if (process->elf->tdataAddress>0)
+    sys_mmapI(process, (uintptr_t*)(process->elf->tdataAddress & 0xFFFFF000), process->elf->tdataSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+    //CoW the heap segment
+    if (process->heapEnd - process->heapStart > 0)
+    sys_mmapI(process, (uintptr_t*)(process->heapStart & 0xFFFFF000), process->heapEnd - process->heapStart, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+    //CoW the stack segment
+    sys_mmapI(process, (uintptr_t*)(process->stackStart & 0xFFFFF000), process->stackSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+}

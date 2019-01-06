@@ -90,6 +90,8 @@ void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
                 if (strncmp(strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),".bss",255)==0)
                 {
                     printd(DEBUG_ELF_LOADER,"Found bss segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    elf->bssAddress=elf->secHdrTable[cnt].sh_addr;
+                    elf->bssSize=elf->secHdrTable[cnt].sh_size;
                     if (elf->isLibrary)
                         sectionIsCOW=true;
 
@@ -97,6 +99,8 @@ void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
                 else if (strncmp(strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),".data",255)==0)
                 {
                     printd(DEBUG_ELF_LOADER,"Found data segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    elf->dataAddress=elf->secHdrTable[cnt].sh_addr;
+                    elf->dataSize=elf->secHdrTable[cnt].sh_size;
                     if (elf->isLibrary)
                         sectionIsCOW=true;
                 }
@@ -106,9 +110,7 @@ void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
                 if (sectionIsCOW)
                 {
                     printd(DEBUG_ELF_LOADER,"\tsegment belongs to a library, marking pages as CoW (moo)\n");
-                    elf->libBSSAddress=elf->secHdrTable[cnt].sh_addr;
-                    elf->libBSSSize=elf->secHdrTable[cnt].sh_size;
-                    elfMakePagesCOW(cr3,elf->libBSSAddress,elf->libBSSSize);
+                    elfMakePagesCOW(cr3,elf->bssAddress,elf->bssSize);
                 }
             }
 	}
@@ -618,7 +620,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
     printd(DEBUG_ELF_LOADER,"fopen returned %u\n",fPtr);
     if (fPtr==0)
     {
-        printk("Error opening file '%s' (err=%u), cannot exec\n",elfInfo->fileName,fPtr);
+        //printk("Error opening file '%s' (err=%u), cannot exec\n",elfInfo->fileName,fPtr);
         elfInfo->loadCompleted=false;
         __asm__("pop ds");                  //clr 09/24/2017: Restore the DS since we blew it up
         return elfInfo;
@@ -751,33 +753,39 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool a
                 if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".bss",255)==0)
                 {
                     printd(DEBUG_ELF_LOADER,"Found bss segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                    elfInfo->bssAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                    elfInfo->bssSize=elfInfo->secHdrTable[cnt].sh_size;
                     if (elfInfo->isLibrary)
                     {
                         sectionIsCOW=true;
-                        elfInfo->libBSSAddress=elfInfo->secHdrTable[cnt].sh_addr;
-                        elfInfo->libBSSSize=elfInfo->secHdrTable[cnt].sh_size;
                     }
 
                 }
                 else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".data",255)==0)
                 {
                     printd(DEBUG_ELF_LOADER,"Found data segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                    elfInfo->dataAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                    elfInfo->dataSize=elfInfo->secHdrTable[cnt].sh_size;
                     if (elfInfo->isLibrary)
                     {
                         sectionIsCOW=true;
-                        elfInfo->libDataAddress=elfInfo->secHdrTable[cnt].sh_addr;
-                        elfInfo->libDataSize=elfInfo->secHdrTable[cnt].sh_size;
                     }
                 }
                 else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".tdata",255)==0)
                 {
                     printd(DEBUG_ELF_LOADER,"Found tdata segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                    elfInfo->tdataAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                    elfInfo->tdataSize=elfInfo->secHdrTable[cnt].sh_size;
                     if (elfInfo->isLibrary)
                     {
                         sectionIsCOW=true;
-                        elfInfo->libTDataAddress=elfInfo->secHdrTable[cnt].sh_addr;
-                        elfInfo->libTDataSize=elfInfo->secHdrTable[cnt].sh_size;
                     }
+                }
+                else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".text",255)==0)
+                {
+                    elfInfo->textAddress=elfInfo->secHdrTable[cnt].sh_addr;
+                    elfInfo->textSize=elfInfo->secHdrTable[cnt].sh_size;
+                    printd(DEBUG_ELF_LOADER,"Found text segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
                 }
                 else
                     printd(DEBUG_ELF_LOADER,"Found (%s) (NOBITS) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);

@@ -61,7 +61,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>-ffreestanding -nostdlib -lgcc</commandLine>
+          <commandLine>-ffreestanding -nostdlib -T linker.ld -masm=intel</commandLine>
         </linkerTool>
       </compileType>
       <item path="mmapmain.c" ex="false" tool="0" flavor2="0">

@@ -19,7 +19,12 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/asm/asmFunctions.s</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/exceptions.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/task.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernelISR.s</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/mm/mmap.c</file>
         </group>
     </open-files>
 </project-private>

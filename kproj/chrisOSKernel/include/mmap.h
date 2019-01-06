@@ -38,7 +38,8 @@ extern "C" {
     {
         MAP_PRIVATE = 1,
         MAP_SHARED = 2,
-        MAP_FIXED = 3
+        MAP_ANONYMOUS = 3,
+        MAP_FIXED = 4 //MAP_FIXED has to be the largest value
     } eMapFlags;
 
     typedef struct smmappedpage

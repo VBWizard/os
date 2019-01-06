@@ -41,7 +41,7 @@ typedef struct sElfInfo
     dllist_t loadedListItem;
     int libraryElfCount;
     void* libraryElfPtr[10];
-    uint32_t libBSSAddress, libBSSSize, libDataAddress, libDataSize, libTDataAddress, libTDataSize; //CLR 12/23/2018: Added TData variables
+    uint32_t bssAddress, bssSize, dataAddress, dataSize, tdataAddress, tdataSize, textAddress, textSize; //CLR 12/23/2018: Added TData variables
     Elf32_Ehdr hdr;
     Elf32_Shdr secHdrTable[50];
     Elf32_Phdr pgmHdrTable[50];

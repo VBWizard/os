@@ -6,6 +6,7 @@
 
 #include "signals.h"
 #include "process.h"
+
 //TODO: ******************** Tie signals into scheduler ********************************
 extern void sigSleepReturn();
 extern void triggerScheduler();
@@ -107,6 +108,7 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald=0x%08X processing signal\n",callerCR3,p->signals.sigind);
             p->signals.sigind|=SIGSEGV;
             triggerScheduler();
+            __asm__("sti\nhlt\n");      //Put the task to sleep until the next tick when another task will take its place    
             return p;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         case SIGINT:

@@ -34,8 +34,6 @@ bool schedulerTaskSwitched=0;
 extern uint32_t* isrSavedStack; 
 
 file_system_t *rootFs;
-process_t* kKernelProcess;
-task_t* kKernelTask;
 process_t* kIdleProcess;
 task_t* kIdleTask;
 uint64_t kIdleTicks=0;

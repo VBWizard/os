@@ -192,7 +192,7 @@ char * strtoupper(char* pointerToString)
 //Called by exception 0xd & 0xe (possibly more)
 void printDumpedRegs()
 {
-    uint32_t esp = exceptionBP;
+    uint32_t esp = exceptionSavedESP;
     volatile unsigned short *lCSIPPtr=(volatile unsigned short *)exceptionCS;
 LOAD_ZERO_BASED_DS    
     printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);

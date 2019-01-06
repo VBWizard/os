@@ -111,6 +111,11 @@ VISIBLE void modifySignal(int signal, void* sigHandler, int sigData)
     do_syscall3(SYSCALL_SETSIGACTION,signal,(uint32_t)sigHandler,sigData);
 }
 
+VISIBLE int fork()
+{
+    return do_syscall0(SYSCALL_FORK);
+}
+
 VISIBLE int exec(char* path)
 {
     int pid=0, argc=0;

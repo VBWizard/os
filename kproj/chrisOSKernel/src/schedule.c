@@ -18,6 +18,7 @@ uintptr_t *qStopped;
 uintptr_t *qUSleep;
 uintptr_t *qISleep;
 uintptr_t *qExited;
+bool forkReturn;
 
 extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t* kTicksSinceStart;
@@ -36,6 +37,8 @@ void changeTaskQueue(task_t* task, eTaskState newState);
 
 void initSched()
 {
+    NO_PREV = 0xFFFFFFFF;
+    NO_NEXT = 0xFFFFFFFF;
     kTaskList=kMalloc(1000*sizeof(task_t));
     memset(kTaskList,0,1000*sizeof(task_t));
     printd(DEBUG_PROCESS,"\tInitialized kTaskList @ 0x%08X, sizeof(task_t)=0x%02X\n",kTaskList,sizeof(task_t));
@@ -553,6 +556,13 @@ void runAnotherTask(bool schedulerRequested)
                 ((process_t*)taskToRun->process)->totalRunTicks);
         schedulerTaskSwitched=true;
         kTaskSwitchCount++;
+        forkReturn = false;
+        if (((process_t*)taskToRun->process)->justForked)
+        {
+            forkReturn = ((process_t*)taskToRun->process)->justForked;
+            ((process_t*)taskToRun->process)->justForked = 0;
+        }
+
     }
     else
     {

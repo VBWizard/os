@@ -43,7 +43,7 @@ typedef struct s_task
     uint32_t esp0Base, esp0Size;
 } task_t;
 
-task_t* createTask(bool kernelTSS);
+task_t* createTask(void* process, bool kernelTSS);
 task_t* getAvailableTask();
 
 #endif	/* TASK_H */

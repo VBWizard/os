@@ -48,6 +48,8 @@ void initKernelInternals()
     
 __asm__("cli\n");
     uint32_t oldCR3=0;
+    isrSavedStack = (uint32_t *)SAVED_STACK_FOR_EXCEPTIONS_ADDRESS;
+
     kKernelTask=getAvailableTask();
     kKernelProcess=(process_t*)allocPagesAndMap(sizeof(process_t));
     kKernelProcess->task=kKernelTask;

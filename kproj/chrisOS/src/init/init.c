@@ -5,7 +5,6 @@
 #include "multiboot.h"
 #include "utility.h"
 #include "memory.h"
-#include "init/initVars.h"
 #include "i386/gdt.h"
 #include "i386/cpu.h"
 #include "io.h"
@@ -60,6 +59,8 @@ bool ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char* cmdToFind,
 char kBootParams[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
 int kBootParamCount;
 struct gdt_ptr lGDT;
+//NOTE: This is a temporary idt pointer ... only used during init
+struct idt_ptr kInitialIDTReg;
 
 //CLR 04/27/2016: Even though we are working on our cross compiler env, somehow __linus is set
 //so unset it

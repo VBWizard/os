@@ -20,6 +20,7 @@ sysEnterReturn:
     sysenter
 .globl sysEnter_Vector
 
+
 .org 0x100
 .section .systemData
 .globl _sysEnter
@@ -36,7 +37,7 @@ _sysEnter:
     push eax
     sti
     call _sysCall
-    mov [esp+52],eax
+    mov saved_eax,eax
     sti
     pop ebx             #4
     pop ebx             #8
@@ -48,6 +49,7 @@ _sysEnter:
     pop ebp
     mov edx,[ebp]
     mov ecx,ebp
+    mov eax, saved_eax
     sysexit
 .globl _sysEnter
 retVal: .word 0x0, 0x0
@@ -137,3 +139,6 @@ idt_load:
     ret
 .globl idt_load
 
+saved_eax:
+        .word 0
+        .word 0

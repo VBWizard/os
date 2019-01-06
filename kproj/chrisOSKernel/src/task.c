@@ -4,10 +4,12 @@
 #include "i386/bits/bits.h"
 #include "../include/tss.h"
 #include "task.h"
+#include "process.h"
 #include "../../chrisOSKernel/include/alloc.h"
 #include "i386/kPaging.h"
 #include "paging.h"
 #include "alloc.h"
+#include "process.h"
 
 extern uint32_t* kTaskSlotAvailableInd;
 extern tss_t* kTSSTable;
@@ -18,6 +20,9 @@ extern uint32_t getESP();
 extern task_t* kKernelTask;
 extern uint32_t* sysEnter_Vector;
 extern uint32_t* isrSavedStack;
+
+
+task_t* getAvailableTask();
 
 //TODO: Replace current list with dllist_t!
 
@@ -122,12 +127,13 @@ void mmMapKernelIntoTask(task_t* task, bool kernelTSS)
     kDebugLevel=oldDebugLevel;
 }
 
-task_t* createTask(bool kernelTSS)
+task_t* createTask(void* process, bool kernelTSS)
 {
     printd(DEBUG_TASK,"createTask: calling getTaskSlot\n");
     task_t* task;
     task=getAvailableTask();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
     
+    task->process=process;
     task->tss->CR3=(uint32_t)pagingAllocatePagingTablePage();
     //Configure the task registers
     printd(DEBUG_TASK,"createTask: Set task CR3 to 1k page directory @ 0x%08X\n",task->tss->CR3);
@@ -194,7 +200,10 @@ task_t* createTask(bool kernelTSS)
             task->tss->CR3,
             kKernelTask->esp0Size/PAGE_SIZE);
     pagingMapPageCount(task->tss->CR3,kKernelTask->esp0Base| KERNEL_PAGED_BASE_ADDRESS,kKernelTask->esp0Base,kKernelTask->esp0Size/PAGE_SIZE,0x7);
+    
     task->tss->ESP=(uint32_t)allocPages(0x16000);
+    ((process_t*)task->process)->stackStart=task->tss->ESP;
+    ((process_t*)task->process)->stackSize=0x16000;
     printd(DEBUG_TASK,"createTask: ESP for task allocated at 0x%08X\n",task->tss->ESP);
     pagingMapPageCount(task->tss->CR3,task->tss->ESP,task->tss->ESP,0x16,0x7);
     pagingMapPageCount(task->tss->CR3,task->tss->ESP | KERNEL_PAGED_BASE_ADDRESS,task->tss->ESP,0x16,0x7);

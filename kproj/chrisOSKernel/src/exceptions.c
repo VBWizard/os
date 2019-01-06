@@ -113,28 +113,41 @@ void kPagingExceptionHandler()
     
     //Check for CoW pages in libraries
     printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bss/data in libraries\n",process->path);
-    for (int cnt=0;cnt<process->elf->libraryElfCount;cnt++)
+    if (pagingGet4kPTEntryValueCR3((uint32_t)process->task->pageDir,exceptionCR2) & COW_PAGE)
     {
-        elfInfo_t* lib=elf->libraryElfPtr[cnt];
-        printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08X, bss=0x%08X/0x%08X, data=0x%08X/0x%08X, tdata=0x%08X/0x%08X\n",
-                lib,
-                lib->libBSSAddress,
-                lib->libBSSSize,
-                lib->libDataAddress,
-                lib->libDataSize,
-                lib->libTDataAddress,
-                lib->libTDataSize);
-        if (lib->libBSSAddress<=exceptionCR2 && lib->libBSSAddress+lib->libBSSSize>exceptionCR2)
+        isCow=true;
+        printd(DEBUG_EXCEPTIONS,"\tAddress is CoW per PTE\n");
+    }
+    
+
+
+    if (!isCow)
+    {
+        for (int cnt=0;cnt<process->elf->libraryElfCount;cnt++)
         {
-            printd(DEBUG_EXCEPTIONS,"\t\tThe page with address 0x%08X is a CoW .bss page from library %s\n",exceptionCR2,lib->fileName);
-            isCow=true;
-            break;
-        }
-        else if (lib->libDataAddress<=exceptionCR2 && lib->libDataAddress+lib->libDataSize>exceptionCR2)
-        {
-            printd(DEBUG_EXCEPTIONS,"\t\tPage (0x%08X) is CoW .data page from library %s\n",exceptionCR2,lib->fileName);
-            isCow=true;
-            break;
+            elfInfo_t* lib=elf->libraryElfPtr[cnt];
+            printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08X, bss=0x%08X/0x%08X, data=0x%08X/0x%08X, tdata=0x%08X/0x%08X\n",
+                    lib,
+                    lib->bssAddress,
+                    lib->bssSize,
+                    lib->dataAddress,
+                    lib->dataSize,
+                    lib->tdataAddress,
+                    lib->tdataSize);
+            if (lib->bssAddress<=exceptionCR2 && lib->bssAddress+lib->bssSize>exceptionCR2)
+            {
+                //CLR 01/04/2019: lib->fileName suddenly is 0x50000000, so can't use it???
+                printd(DEBUG_EXCEPTIONS,"\t\tThe page with address 0x%08X is a CoW .bss page from library %s\n",exceptionCR2,""/*lib->fileName*/);
+                isCow=true;
+                break;
+            }
+            else if (lib->dataAddress<=exceptionCR2 && lib->dataAddress+lib->dataSize>exceptionCR2)
+            {
+                //CLR 01/04/2019: lib->fileName suddenly is 0x50000000, so can't use it???
+                printd(DEBUG_EXCEPTIONS,"\t\tPage (0x%08X) is CoW .data page from library %s\n",exceptionCR2,""/*lib->fileName*/);
+                isCow=true;
+                break;
+            }
         }
     }
 
@@ -172,7 +185,7 @@ void kPagingExceptionHandler()
     if (p->task->taskNum!=RESERVED_TASKS)
     {
         printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Returning\n");
-        __asm__("\nsti\nnop\nnop\nnop\nmov cr3,eax\n":"=a"(exceptionCR3));
+        __asm__("\nsti\nnop\nnop\nnop\nmov cr3,eax\n"::"a"(exceptionCR3));
         return;
     }
 pagingExceptionStop: 

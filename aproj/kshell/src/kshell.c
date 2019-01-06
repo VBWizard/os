@@ -40,7 +40,8 @@ void execInternalCommand(char lCommand[256])
     }
     else
     {
-        print("\tInvalid command '%s' ya dummy!\n",lCommand);
+        //print("\tInvalid command '%s' ya dummy!\n",lCommand);
+        cmdExecp(lCommand);
     }
 }
 

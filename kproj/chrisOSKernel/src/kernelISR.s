@@ -15,7 +15,7 @@
 .extern kKernelCR3
 .extern kKeyboardHandlerRoutine
 .extern call defaultISRHandler
-
+.extern forkReturn
 
 isrNumber: .word 0,0
 tempEAX: .word 0,0
@@ -231,10 +231,23 @@ restoreCR3:
     mov eax,isrSavedCR3
     mov ebx,cr3
     cmp eax,ebx
+    mov ebx, isrSavedEBX
     jz  overSetCR3
     mov CR3, eax
 
 overSetCR3:
+    mov eax,forkReturn
+    cmp eax,0
+    jz overForkReturn
+//mov eax,0x80000011
+//mov cr0,eax
+    mov eax, isrSavedEIP
+//    mov [esp],eax
+//mov eax,0x80010011
+//mov cr0,eax
+    mov eax,0
+    mov forkReturn,eax
+overForkReturn:
     mov eax, isrSavedEAX
     iretd
 

@@ -2,7 +2,8 @@
 #!/bin/bash
 rm ./myos.iso
 ./makeall
-if [ $? -ne 0 ] then
+if [ $? -ne 0 ] 
+then
 exit -1
 fi
 #strip --strip-debug --strip-unneeded Debug/GNU-Linux-x86/chrisos
@@ -27,8 +28,8 @@ qemu-system-i386 							\
 	-serial file:"qemu_port.log"					\
 	-S -s								\
 	-d int,cpu_reset,pcall,guest_errors                                     \
-	-machine accel=tcg						
-#	@$
+	#-machine accel=tcg					  	\	
+	@$
 #	--enable-kvm
 
 #drive=/home/yogi/qemu-usb-mass-storage.dsk
