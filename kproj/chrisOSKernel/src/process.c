@@ -29,6 +29,7 @@ extern uint64_t kIdleTicks;
 extern uintptr_t *qRunnable;
 void CoWProcess(process_t* process);
 process_t* kKernelProcess;
+extern void _schedule();
 
 #define PAGE_USER_READABLE 0x4
 #define PAGE_USER_WRITABLE 0x6           //0x4 for "User" | 0x2 for "Writable"
@@ -412,13 +413,12 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
     printd(DEBUG_PROCESS,"Setting up the stack\n");
     void* processExitAddress=&processExit;
-    memcpy((void*)process->task->tss->ESP,&process->task->tss->EIP,8);
-    memcpy((void*)process->task->tss->ESP+4,&process->task->tss->CS,8);
-    memcpy((void*)process->task->tss->ESP+8,&process->task->tss->EFLAGS,8);
-    uint32_t realESP=process->task->tss->ESP-0x104;
-    memcpy((void*)process->task->tss->ESP+12,&realESP,8);
-    memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,8);
-    
+
+    uint32_t realESP=0;
+    if (isKernelProcess)
+        realESP=process->task->tss->ESP-0x104;
+    else
+        realESP=process->task->tss->ESP;
     //Per the above, the stack will start at -0x100 from where we write the CS/EIP/FLAGS/SS/ESP, so put our params around there
     memcpy((void*)realESP-4,process,4);
     memcpy((void*)realESP,&process->entryPoint,4);
@@ -426,6 +426,16 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     memcpy((void*)realESP+8,&argc,4);
     memcpy((void*)realESP+12,&argvVirt,4);
     memcpy((void*)realESP+16,&envpVirt,4);
+    
+    //With the new scheduler return logic, we IRETD to kernel proceses, so the EIP/CS/FLAGS/ESP/SS have to be on the stack
+    if (isKernelProcess)  
+    {
+        memcpy((void*)process->task->tss->ESP,&process->task->tss->EIP,4);
+        memcpy((void*)process->task->tss->ESP+4,&process->task->tss->CS,4);
+        memcpy((void*)process->task->tss->ESP+8,&process->task->tss->EFLAGS,4);
+        memcpy((void*)process->task->tss->ESP+12,&realESP,4);
+        memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,4);
+    }
     //Set the return point since the task will simply ret to exit
     printd(DEBUG_PROCESS,"Return point for process is 0x%08X\n",&processExit);
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
@@ -442,6 +452,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         gdtFlags |= GDT_DPL0;
         tssFlags |= ACS_DPL_0;
     }
+    memset(process->task->tss->IOs,0,200);
+    process->task->tss->IOPB = sizeof(tss_t)-200;
     gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
     process->task=submitNewTask(process->task);
     printd(DEBUG_PROCESS,"Submitted process 0x%04X to be run\n",process->task->taskNum);
@@ -485,11 +497,11 @@ uint32_t process_fork(process_t* currProcess)
     memcpy(newTask->tss,currProcess->task->tss,sizeof(tss_t));
     //Child task will return from child_task_forked with a 0 return value, whereas we will return with the child task PID
     newTask->tss->EIP=(uint32_t)&child_task_forked;
-    addToQ(qRunnable,newTask);
-    
     __asm__("pushad\n");
     __asm__("mov %0, [esp+28]\n": "=d" (newTask->tss->EAX));
     __asm__("mov %0, [esp+24]\n": "=d" (newTask->tss->ECX));
+    __asm__("popad\n");
+    __asm__("pushad\n");
     __asm__("mov %0, [esp+20]\n": "=d" (newTask->tss->EDX));
     __asm__("mov %0, [esp+16]\n": "=d" (newTask->tss->EBX));
     __asm__("mov %0, [esp+12]\n": "=d" (newTask->tss->ESP));
@@ -500,14 +512,32 @@ uint32_t process_fork(process_t* currProcess)
     __asm__("mov %0, ds\n": "=d" (newTask->tss->DS));
     __asm__("mov %0, es\n": "=d" (newTask->tss->ES));
     __asm__("mov %0, ss\n": "=d" (newTask->tss->SS));
+    __asm__("mov %0, cr3\n": "=d" (newTask->tss->CR3));
     __asm__("popad\n");
-    newTask->tss->ESP+=0x1c;
-    __asm__("mov [%0], ecx":: "r" (newTask->tss->ESP), "c" (&child_task_forked));
+    newTask->tss->ESP=newTask->tss->EBP;
+    uint32_t temp = &child_task_forked;
+    //memcpy((void*)newTask->tss->ESP+4,&temp,4);
+    newTask->tss->EIP=temp;
+    //__asm__("mov %0, ecx":: "r" (newTask->tss->ESP), "c" (&child_task_forked));
     //sys_mmapI(process, )
     newProcess->justForked=true;
     __asm__("cli\n");
-    triggerScheduler();
     CoWProcess(currProcess);
+    
+    newTask->tss->ESP0=kMalloc(0x10*0x1000);
+    ((process_t*)newTask->process)->stack1Start=newTask->tss->ESP0;
+    ((process_t*)newTask->process)->stack1Size=0x10*0x1000;
+    printd(DEBUG_TASK,"process_fork: ESP0 allocated at 0x%08X\n", newTask->tss->ESP0);
+    printd(DEBUG_TASK,"process_fork: Allocated task ESP0 for syscall at 0x%08X (0x%08X bytes)\n",newTask->tss->ESP0,0x10*0x1000);
+    memcpy(((process_t*)newTask->process)->stack1Start, currProcess->stack1Start, currProcess->stack1Size);
+    pagingMapPageCount(newTask->tss->CR3,newTask->tss->ESP0 | KERNEL_PAGED_BASE_ADDRESS,newTask->tss->ESP0,0x10,0x7);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
+    pagingMapPageCount(newTask->tss->CR3,newTask->tss->ESP0,newTask->tss->ESP0,0x10,0x7);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
+    uint32_t offset = newTask->tss->EBP - currProcess->stack1Start;
+    newTask->tss->ESP0 = ((process_t*)newTask->process)->stack1Start + offset;
+    newTask->tss->EBP = ((process_t*)newTask->process)->stack1Start + offset;
+    addToQ(qRunnable,newTask);
+    
+    //_schedule();
     __asm__("sti\n");
     return newTask->taskNum;
     
@@ -518,10 +548,10 @@ void CoWProcess(process_t* process)
     //CoW the text segment
     if (process->elf->textAddress>0)
         sys_mmapI(process, (uintptr_t*)(process->elf->textAddress & 0xFFFFF000), process->elf->textSize, PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-    //CoW the data/tdata segments
+    //CoW the bss segment
     if (process->elf->bssAddress>0)
     sys_mmapI(process, (uintptr_t*)(process->elf->bssAddress & 0xFFFFF000), process->elf->bssSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-    //CoW the bss segment
+    //CoW the data/tata segments
     if (process->elf->dataAddress>0)
     sys_mmapI(process, (uintptr_t*)(process->elf->dataAddress & 0xFFFFF000), process->elf->dataSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     if (process->elf->tdataAddress>0)

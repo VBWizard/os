@@ -70,6 +70,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strtol.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strtrim.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
+	${OBJECTDIR}/src/_scheduler.o \
 	${OBJECTDIR}/src/device.o \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
@@ -291,6 +292,10 @@ ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/time.o ../chrisOS/src/time.c
+
+${OBJECTDIR}/src/_scheduler.o: src/_scheduler.s
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/src/_scheduler.o src/_scheduler.s
 
 ${OBJECTDIR}/src/device.o: src/device.c
 	${MKDIR} -p ${OBJECTDIR}/src

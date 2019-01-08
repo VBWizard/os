@@ -1,0 +1,798 @@
+18: chrisOS 0.1.20190107.213208 booting @02:32:06 on 00/08/19
+67: APIC: Timer running at 2523299 hz.
+167: TSC: CPU frequency = 4012588626
+168: CLOCK: tick frequency is 100hz
+815: E820 memory total: 1572339 kb
+815: Memory used by the kernel: 16777309
+815: Memory available to mm: 1555954 kb
+815: Total memory availabe to user applications: 1453554 kb
+815: Initializing memory manager
+
+815: Pool		Address			Length		
+815: Kernel	0x01100000		0x06400000
+815: User		0x07500000		0x57B7CB46
+815: Assigning heapMemoryInfo address of 0x07500000
+815: heapMemoryInfo = 0x07500000
+815: Allocating 0x00006D60 bytes to memory block tracking
+815: User memory base adjusted to 0x07507000
+815: User memory size adjusted to 0x57B75DE6
+830: findAvailableBlockBySize: Returning block address 0x07500000
+830: findEmptyBlock: Returning block # 0x0750001C
+831: allocateBlockFrom: findEmptyBlock returned 0x0750001C
+831: allocPagesAndMap: Mapped v=0x07507000 to p=0x07507000
+831: allocPagesAndMap: Mapped v=0xC7507000 to p=0x07507000
+831: allocPagesAndMap: Zeroing out page(s) at 0x07507000 for 0x00001000
+831: allocPagesAndMap: Returning address 0x07507000
+831: initKMalloc: kHeapPagePtr is at 0x07507000
+831: initHeapPagePtr Initializing pointer page @ 0x07507000, 0x000001FF pointers
+831: initHeapPagePtr Done
+831: Task table is at 0x00A8AC40
+832: getAvailableTask: Found free slot for task (0x0020)
+832: findFreeMallocPointer: Scanning for a free memory pointer
+832: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+832: aMTP: Size adjusted from 72 to 4096
+832: findEmptyBlock: Returning block # 0x07500038
+832: allocateBlockFrom: findEmptyBlock returned 0x07500038
+832: allocPagesAndMap: Mapped v=0x07508000 to p=0x07508000
+832: allocPagesAndMap: Mapped v=0xC7508000 to p=0x07508000
+832: allocPagesAndMap: Zeroing out page(s) at 0x07508000 for 0x00001000
+832: allocPagesAndMap: Returning address 0x07508000
+832: aMTP: Used allocPagesAndMap to allocate 0x00000048 bytes at 0x07508000
+832: getAvailableTask: Marking TSS 32 used
+832: findEmptyBlock: Returning block # 0x07500054
+832: allocateBlockFrom: findEmptyBlock returned 0x07500054
+832: getAvailableTask: Using task 32 @ 0x07508000, set TSS to 0x07509000
+832: Allocated kernel task at 0x07508000
+832: allocPagesAndMap: Size adjusted from 716 to 4096
+832: findEmptyBlock: Returning block # 0x07500070
+832: allocateBlockFrom: findEmptyBlock returned 0x07500070
+832: allocPagesAndMap: Mapped v=0x0750A000 to p=0x0750A000
+832: allocPagesAndMap: Mapped v=0xC750A000 to p=0x0750A000
+832: allocPagesAndMap: Zeroing out page(s) at 0x0750A000 for 0x00001000
+832: allocPagesAndMap: Returning address 0x0750A000
+832: Allocated kernel process at 0x0750A000
+832: findEmptyBlock: Returning block # 0x0750008C
+832: allocateBlockFrom: findEmptyBlock returned 0x0750008C
+832: Allocated pages at 0x0750B000 for kernel task ESP0
+832: Adjusted kernel task ESP0 to 0x07520000
+832: findEmptyBlock: Returning block # 0x075000A8
+832: allocateBlockFrom: findEmptyBlock returned 0x075000A8
+832: Allocated pages at 0x0752B000 for (ESP1) sysEnter
+832: findEmptyBlock: Returning block # 0x075000C4
+832: allocateBlockFrom: findEmptyBlock returned 0x075000C4
+832: Allocated pages at 0x07541000 for (ESP)
+832: allocPagesAndMap: Size adjusted from 597 to 4096
+832: findEmptyBlock: Returning block # 0x075000E0
+832: allocateBlockFrom: findEmptyBlock returned 0x075000E0
+832: allocPagesAndMap: Mapped v=0x07557000 to p=0x07557000
+832: allocPagesAndMap: Mapped v=0xC7557000 to p=0x07557000
+832: allocPagesAndMap: Zeroing out page(s) at 0x07557000 for 0x00001000
+832: allocPagesAndMap: Returning address 0x07557000
+832: Allocated memory at 0x07557000 for kernel path and set to /kernel
+832: Set up isrSavedStack at 0x007BB000 (and in the kernel)
+832: Mapped tss of the first task run (0x07509000) into task and kernel
+832: allocPages: Size adjusted from 304 to 4096
+832: findEmptyBlock: Returning block # 0x075000FC
+832: allocateBlockFrom: findEmptyBlock returned 0x075000FC
+832: Allocated TSS for paging exception task gate at 0x07558000832: findEmptyBlock: Returning block # 0x07500118
+832: allocateBlockFrom: findEmptyBlock returned 0x07500118
+832: allocPagesAndMap: Mapped v=0x07559000 to p=0x07559000
+832: allocPagesAndMap: Mapped v=0xC7559000 to p=0x07559000
+832: allocPagesAndMap: Zeroing out page(s) at 0x07559000 for 0x00016000
+832: allocPagesAndMap: Returning address 0x07559000
+832: Allocated pages at 0x07559000 for paging exception handler ESP0
+832: Offset paging exception handler ESP0 to 0x0756E000
+832: findEmptyBlock: Returning block # 0x07500134
+832: allocateBlockFrom: findEmptyBlock returned 0x07500134
+832: allocPagesAndMap: Mapped v=0x0756F000 to p=0x0756F000
+832: allocPagesAndMap: Mapped v=0xC756F000 to p=0x0756F000
+832: allocPagesAndMap: Zeroing out page(s) at 0x0756F000 for 0x00016000
+832: allocPagesAndMap: Returning address 0x0756F000
+832: Allocated pages at 0x0756F000 for paging exception handler ESP
+832: Offset paging exception handler ESP to 0x07581000
+832: Setup SYSENTER MSRs as CS:EIP=0x0088:0x00130100, ESP=0x07540000
+833: findFreeMallocPointer: Scanning for a free memory pointer
+833: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+833: findEmptyBlock: Returning block # 0x07500150
+833: allocateBlockFrom: findEmptyBlock returned 0x07500150
+833: allocPagesAndMap: Mapped v=0x07585000 to p=0x07585000
+833: allocPagesAndMap: Mapped v=0xC7585000 to p=0x07585000
+833: allocPagesAndMap: Zeroing out page(s) at 0x07585000 for 0x00016000
+833: allocPagesAndMap: Returning address 0x07585000
+833: aMTP: Used allocPagesAndMap to allocate 0x00016000 bytes at 0x07585000
+833: findFreeMallocPointer: Scanning for a free memory pointer
+833: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+833: aMTP: Size adjusted from 72000 to 73728
+834: findEmptyBlock: Returning block # 0x0750016C
+834: allocateBlockFrom: findEmptyBlock returned 0x0750016C
+834: allocPagesAndMap: Mapped v=0x0759B000 to p=0x0759B000
+835: allocPagesAndMap: Mapped v=0xC759B000 to p=0x0759B000
+835: allocPagesAndMap: Zeroing out page(s) at 0x0759B000 for 0x00012000
+835: allocPagesAndMap: Returning address 0x0759B000
+835: aMTP: Used allocPagesAndMap to allocate 0x00011940 bytes at 0x0759B000
+835: 	Initialized kTaskList @ 0x0759B000, sizeof(task_t)=0x48
+835: findFreeMallocPointer: Scanning for a free memory pointer
+835: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+835: aMTP: Size adjusted from 4000 to 4096
+835: findEmptyBlock: Returning block # 0x07500188
+835: allocateBlockFrom: findEmptyBlock returned 0x07500188
+835: allocPagesAndMap: Mapped v=0x075AD000 to p=0x075AD000
+835: allocPagesAndMap: Mapped v=0xC75AD000 to p=0x075AD000
+835: allocPagesAndMap: Zeroing out page(s) at 0x075AD000 for 0x00001000
+835: allocPagesAndMap: Returning address 0x075AD000
+835: aMTP: Used allocPagesAndMap to allocate 0x00000FA0 bytes at 0x075AD000
+836: findFreeMallocPointer: Scanning for a free memory pointer
+836: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+836: aMTP: Size adjusted from 4000 to 4096
+836: findEmptyBlock: Returning block # 0x075001A4
+836: allocateBlockFrom: findEmptyBlock returned 0x075001A4
+836: allocPagesAndMap: Mapped v=0x075AE000 to p=0x075AE000
+836: allocPagesAndMap: Mapped v=0xC75AE000 to p=0x075AE000
+836: allocPagesAndMap: Zeroing out page(s) at 0x075AE000 for 0x00001000
+836: allocPagesAndMap: Returning address 0x075AE000
+836: aMTP: Used allocPagesAndMap to allocate 0x00000FA0 bytes at 0x075AE000
+836: findFreeMallocPointer: Scanning for a free memory pointer
+836: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+836: aMTP: Size adjusted from 4000 to 4096
+836: findEmptyBlock: Returning block # 0x075001C0
+836: allocateBlockFrom: findEmptyBlock returned 0x075001C0
+836: allocPagesAndMap: Mapped v=0x075AF000 to p=0x075AF000
+836: allocPagesAndMap: Mapped v=0xC75AF000 to p=0x075AF000
+836: allocPagesAndMap: Zeroing out page(s) at 0x075AF000 for 0x00001000
+836: allocPagesAndMap: Returning address 0x075AF000
+836: aMTP: Used allocPagesAndMap to allocate 0x00000FA0 bytes at 0x075AF000
+836: findFreeMallocPointer: Scanning for a free memory pointer
+836: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+836: aMTP: Size adjusted from 4000 to 4096
+836: findEmptyBlock: Returning block # 0x075001DC
+836: allocateBlockFrom: findEmptyBlock returned 0x075001DC
+836: allocPagesAndMap: Mapped v=0x075B0000 to p=0x075B0000
+836: allocPagesAndMap: Mapped v=0xC75B0000 to p=0x075B0000
+836: allocPagesAndMap: Zeroing out page(s) at 0x075B0000 for 0x00001000
+836: allocPagesAndMap: Returning address 0x075B0000
+836: aMTP: Used allocPagesAndMap to allocate 0x00000FA0 bytes at 0x075B0000
+836: findFreeMallocPointer: Scanning for a free memory pointer
+836: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+836: aMTP: Size adjusted from 40000 to 40960
+836: findEmptyBlock: Returning block # 0x075001F8
+836: allocateBlockFrom: findEmptyBlock returned 0x075001F8
+836: allocPagesAndMap: Mapped v=0x075B1000 to p=0x075B1000
+837: allocPagesAndMap: Mapped v=0xC75B1000 to p=0x075B1000
+837: allocPagesAndMap: Zeroing out page(s) at 0x075B1000 for 0x0000A000
+837: allocPagesAndMap: Returning address 0x075B1000
+837: aMTP: Used allocPagesAndMap to allocate 0x00009C40 bytes at 0x075B1000
+837: findFreeMallocPointer: Scanning for a free memory pointer
+837: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+837: aMTP: Size adjusted from 4000 to 4096
+837: findEmptyBlock: Returning block # 0x07500214
+837: allocateBlockFrom: findEmptyBlock returned 0x07500214
+837: allocPagesAndMap: Mapped v=0x075BB000 to p=0x075BB000
+837: allocPagesAndMap: Mapped v=0xC75BB000 to p=0x075BB000
+837: allocPagesAndMap: Zeroing out page(s) at 0x075BB000 for 0x00001000
+837: allocPagesAndMap: Returning address 0x075BB000
+837: aMTP: Used allocPagesAndMap to allocate 0x00000FA0 bytes at 0x075BB000
+837: 	addTaskToTaskList: Found open slot @ 0x0759B000
+837: 	moved new task 0x0020 there
+837: *		addToQ: Adding task 0x0020 to queue Runnable
+837: *	changeTaskQueue: Changing task state for 0x0020 from Runnable to Running
+837: *		removeFromQ: Removing task 0x0020 (0x0759B000) from queue Runnable
+837: *		addToQ: Adding task 0x0020 to queue Running
+847: findFreeMallocPointer: Scanning for a free memory pointer
+847: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+847: aMTP: Size adjusted from 36 to 4096
+847: findEmptyBlock: Returning block # 0x07500230
+847: allocateBlockFrom: findEmptyBlock returned 0x07500230
+847: allocPagesAndMap: Mapped v=0x075BC000 to p=0x075BC000
+847: allocPagesAndMap: Mapped v=0xC75BC000 to p=0x075BC000
+847: allocPagesAndMap: Zeroing out page(s) at 0x075BC000 for 0x00001000
+847: allocPagesAndMap: Returning address 0x075BC000
+847: aMTP: Used allocPagesAndMap to allocate 0x00000024 bytes at 0x075BC000
+847: findFreeMallocPointer: Scanning for a free memory pointer
+847: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+847: aMTP: Size adjusted from 12 to 4096
+847: findEmptyBlock: Returning block # 0x0750024C
+847: allocateBlockFrom: findEmptyBlock returned 0x0750024C
+847: allocPagesAndMap: Mapped v=0x075BD000 to p=0x075BD000
+847: allocPagesAndMap: Mapped v=0xC75BD000 to p=0x075BD000
+847: allocPagesAndMap: Zeroing out page(s) at 0x075BD000 for 0x00001000
+847: allocPagesAndMap: Returning address 0x075BD000
+847: aMTP: Used allocPagesAndMap to allocate 0x0000000C bytes at 0x075BD000
+847: findFreeMallocPointer: Scanning for a free memory pointer
+847: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+847: aMTP: Size adjusted from 12 to 4096
+847: findEmptyBlock: Returning block # 0x07500268
+847: allocateBlockFrom: findEmptyBlock returned 0x07500268
+847: allocPagesAndMap: Mapped v=0x075BE000 to p=0x075BE000
+847: allocPagesAndMap: Mapped v=0xC75BE000 to p=0x075BE000
+847: allocPagesAndMap: Zeroing out page(s) at 0x075BE000 for 0x00001000
+847: allocPagesAndMap: Returning address 0x075BE000
+847: aMTP: Used allocPagesAndMap to allocate 0x0000000C bytes at 0x075BE000
+847: findFreeMallocPointer: Scanning for a free memory pointer
+847: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+847: aMTP: Size adjusted from 1 to 4096
+847: findEmptyBlock: Returning block # 0x07500284
+847: allocateBlockFrom: findEmptyBlock returned 0x07500284
+848: allocPagesAndMap: Mapped v=0x075BF000 to p=0x075BF000
+848: allocPagesAndMap: Mapped v=0xC75BF000 to p=0x075BF000
+848: allocPagesAndMap: Zeroing out page(s) at 0x075BF000 for 0x00001000
+848: allocPagesAndMap: Returning address 0x075BF000
+848: aMTP: Used allocPagesAndMap to allocate 0x00000001 bytes at 0x075BF000
+848: findFreeMallocPointer: Scanning for a free memory pointer
+848: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+848: aMTP: Size adjusted from 20 to 4096
+848: findEmptyBlock: Returning block # 0x075002A0
+848: allocateBlockFrom: findEmptyBlock returned 0x075002A0
+848: allocPagesAndMap: Mapped v=0x075C0000 to p=0x075C0000
+848: allocPagesAndMap: Mapped v=0xC75C0000 to p=0x075C0000
+848: allocPagesAndMap: Zeroing out page(s) at 0x075C0000 for 0x00001000
+848: allocPagesAndMap: Returning address 0x075C0000
+848: aMTP: Used allocPagesAndMap to allocate 0x00000014 bytes at 0x075C0000
+848: Creating kernel process for /sbin/idle
+848: createProcess: Mallocing process_t
+848: allocPagesAndMap: Size adjusted from 716 to 4096
+848: findEmptyBlock: Returning block # 0x075002BC
+848: allocateBlockFrom: findEmptyBlock returned 0x075002BC
+848: allocPagesAndMap: Mapped v=0x075C1000 to p=0x075C1000
+848: allocPagesAndMap: Mapped v=0xC75C1000 to p=0x075C1000
+848: allocPagesAndMap: Zeroing out page(s) at 0x075C1000 for 0x00001000
+848: allocPagesAndMap: Returning address 0x075C1000
+848: createProcess: Malloc'd 0x075C1000 for process
+848: createTask: calling getTaskSlot
+848: getAvailableTask: Found free slot for task (0x0021)
+848: findFreeMallocPointer: Scanning for a free memory pointer
+848: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+848: aMTP: Size adjusted from 72 to 4096
+848: findEmptyBlock: Returning block # 0x075002D8
+848: allocateBlockFrom: findEmptyBlock returned 0x075002D8
+848: allocPagesAndMap: Mapped v=0x075C2000 to p=0x075C2000
+848: allocPagesAndMap: Mapped v=0xC75C2000 to p=0x075C2000
+848: allocPagesAndMap: Zeroing out page(s) at 0x075C2000 for 0x00001000
+848: allocPagesAndMap: Returning address 0x075C2000
+849: aMTP: Used allocPagesAndMap to allocate 0x00000048 bytes at 0x075C2000
+849: getAvailableTask: Marking TSS 33 used
+849: findEmptyBlock: Returning block # 0x075002F4
+849: allocateBlockFrom: findEmptyBlock returned 0x075002F4
+849: getAvailableTask: Using task 33 @ 0x075C2000, set TSS to 0x075C3000
+849: createTask: Set task CR3 to 1k page directory @ 0x01100000
+851: Map K to U: p=0x01000000 (v=0x01000000) to p=0x0108FA5C (v=0x0108FA5C)
+851: Map K to U: p=0xC1000000 (v=0x01000000) to p=0xC108FA5C (v=0x0108FA5C)
+851: Map OS loader into user process: 0x00001000 to 0x01000000 r/o
+851: Mapping sysEnter_Vector page (0x00130000) to process, r/o
+851: Mapping our CR3 into program, v=0x001A8000, p=0x001A8000
+851: createTask: Mapping kernel into task
+851: findEmptyBlock: Returning block # 0x07500310
+851: allocateBlockFrom: findEmptyBlock returned 0x07500310
+851: createTask: ESP0 for task allocated at 0x075C4000
+851: createTask: Offset tasks's ESP0 to 0x075D9000
+851: Mapped isrSavedStack into process: p=0x007BB000/v=0xC07BB000
+851: createTask: Mapping kernel ESP0 v=0x0750B000/p=0x0750B000 into process, CR3=0x01100000, 0x18 pages
+851: createTask: Mapping kernel ESP0 v=0xC750B000/p=0x0750B000 into process, CR3=0x01100000, 0x18 pages
+851: findEmptyBlock: Returning block # 0x0750032C
+851: allocateBlockFrom: findEmptyBlock returned 0x0750032C
+851: createTask: ESP for task allocated at 0x075DA000
+851: createTask: ESP set to 0x075EF000
+851: findFreeMallocPointer: Scanning for a free memory pointer
+851: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+852: findEmptyBlock: Returning block # 0x07500348
+852: allocateBlockFrom: findEmptyBlock returned 0x07500348
+852: allocPagesAndMap: Mapped v=0x075F0000 to p=0x075F0000
+852: allocPagesAndMap: Mapped v=0xC75F0000 to p=0x075F0000
+852: allocPagesAndMap: Zeroing out page(s) at 0x075F0000 for 0x00010000
+852: allocPagesAndMap: Returning address 0x075F0000
+852: aMTP: Used allocPagesAndMap to allocate 0x00010000 bytes at 0x075F0000
+852: createTask: ESP1 allocated at 0x075F0000
+852: Allocated task ESP1 for syscall at 0x075F0000 (0x1000 bytes)
+852: createTask: ESP1 set to 0x075F9000
+852: findFreeMallocPointer: Scanning for a free memory pointer
+852: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+852: findEmptyBlock: Returning block # 0x07500364
+852: allocateBlockFrom: findEmptyBlock returned 0x07500364
+852: allocPagesAndMap: Mapped v=0x07600000 to p=0x07600000
+852: allocPagesAndMap: Mapped v=0xC7600000 to p=0x07600000
+852: allocPagesAndMap: Zeroing out page(s) at 0x07600000 for 0x00001000
+852: allocPagesAndMap: Returning address 0x07600000
+852: aMTP: Used allocPagesAndMap to allocate 0x00001000 bytes at 0x07600000
+852: createProcess: Malloc'd 0x07600000 for process->path
+852: process->path (0x07600000)=/sbin/idle
+852: findEmptyBlock: Returning block # 0x07500380
+852: allocateBlockFrom: findEmptyBlock returned 0x07500380
+852: allocPagesAndMap: Mapped v=0x07601000 to p=0x07601000
+852: allocPagesAndMap: Mapped v=0xC7601000 to p=0x07601000
+852: allocPagesAndMap: Zeroing out page(s) at 0x07601000 for 0x00001000
+852: allocPagesAndMap: Returning address 0x07601000
+852: findFreeMallocPointer: Scanning for a free memory pointer
+852: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+852: aMTP: Size adjusted from 12 to 4096
+852: findEmptyBlock: Returning block # 0x0750039C
+852: allocateBlockFrom: findEmptyBlock returned 0x0750039C
+852: allocPagesAndMap: Mapped v=0x07602000 to p=0x07602000
+852: allocPagesAndMap: Mapped v=0xC7602000 to p=0x07602000
+852: allocPagesAndMap: Zeroing out page(s) at 0x07602000 for 0x00001000
+853: allocPagesAndMap: Returning address 0x07602000
+853: aMTP: Used allocPagesAndMap to allocate 0x0000000C bytes at 0x07602000
+853: Mapping the process struct into the process, v=0xF000F000, p=0x075C1000
+853: Setting up the stack
+853: Return point for process is 0x01016EE7
+853: Created Process @ 0x075C1000
+853: 	addTaskToTaskList: Found open slot @ 0x0759B048
+853: 	moved new task 0x0021 there
+853: *		addToQ: Adding task 0x0021 to queue Runnable
+853: Submitted process 0x0021 to be run
+853: Creating user process for /kshell
+853: createProcess: Mallocing process_t
+853: allocPagesAndMap: Size adjusted from 716 to 4096
+853: findEmptyBlock: Returning block # 0x075003B8
+853: allocateBlockFrom: findEmptyBlock returned 0x075003B8
+853: allocPagesAndMap: Mapped v=0x07603000 to p=0x07603000
+853: allocPagesAndMap: Mapped v=0xC7603000 to p=0x07603000
+853: allocPagesAndMap: Zeroing out page(s) at 0x07603000 for 0x00001000
+853: allocPagesAndMap: Returning address 0x07603000
+853: createProcess: Malloc'd 0x07603000 for process
+853: createTask: calling getTaskSlot
+853: getAvailableTask: Found free slot for task (0x0022)
+853: findFreeMallocPointer: Scanning for a free memory pointer
+853: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+853: aMTP: Size adjusted from 72 to 4096
+853: findEmptyBlock: Returning block # 0x075003D4
+853: allocateBlockFrom: findEmptyBlock returned 0x075003D4
+853: allocPagesAndMap: Mapped v=0x07604000 to p=0x07604000
+853: allocPagesAndMap: Mapped v=0xC7604000 to p=0x07604000
+853: allocPagesAndMap: Zeroing out page(s) at 0x07604000 for 0x00001000
+853: allocPagesAndMap: Returning address 0x07604000
+853: aMTP: Used allocPagesAndMap to allocate 0x00000048 bytes at 0x07604000
+853: getAvailableTask: Marking TSS 34 used
+853: findEmptyBlock: Returning block # 0x075003F0
+854: allocateBlockFrom: findEmptyBlock returned 0x075003F0
+854: getAvailableTask: Using task 34 @ 0x07604000, set TSS to 0x07605000
+854: createTask: Set task CR3 to 1k page directory @ 0x01149000
+854: Map K to U: p=0x01000000 (v=0x01000000) to p=0x0108FA5C (v=0x0108FA5C)
+854: Map K to U: p=0xC1000000 (v=0x01000000) to p=0xC108FA5C (v=0x0108FA5C)
+854: Map OS loader into user process: 0x00001000 to 0x01000000 r/o
+856: Mapping sysEnter_Vector page (0x00130000) to process, r/o
+856: Mapping our CR3 into program, v=0x001A8000, p=0x001A8000
+856: createTask: Mapping kernel into task
+856: createTask: ESP0 for task allocated at 0x075C4000
+856: createTask: Offset tasks's ESP0 to 0x075D9000
+856: Mapped isrSavedStack into process: p=0x007BB000/v=0xC07BB000
+856: createTask: Mapping kernel ESP0 v=0x0750B000/p=0x0750B000 into process, CR3=0x01149000, 0x18 pages
+856: createTask: Mapping kernel ESP0 v=0xC750B000/p=0x0750B000 into process, CR3=0x01149000, 0x18 pages
+856: findEmptyBlock: Returning block # 0x0750040C
+856: allocateBlockFrom: findEmptyBlock returned 0x0750040C
+856: createTask: ESP for task allocated at 0x07606000
+856: createTask: ESP set to 0x0761B000
+856: findFreeMallocPointer: Scanning for a free memory pointer
+856: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+856: findEmptyBlock: Returning block # 0x07500428
+856: allocateBlockFrom: findEmptyBlock returned 0x07500428
+856: allocPagesAndMap: Mapped v=0x0761C000 to p=0x0761C000
+856: allocPagesAndMap: Mapped v=0xC761C000 to p=0x0761C000
+856: allocPagesAndMap: Zeroing out page(s) at 0x0761C000 for 0x00010000
+856: allocPagesAndMap: Returning address 0x0761C000
+856: aMTP: Used allocPagesAndMap to allocate 0x00010000 bytes at 0x0761C000
+856: createTask: ESP1 allocated at 0x0761C000
+856: Allocated task ESP1 for syscall at 0x0761C000 (0x1000 bytes)
+856: createTask: ESP1 set to 0x07625000
+856: findFreeMallocPointer: Scanning for a free memory pointer
+856: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+856: findEmptyBlock: Returning block # 0x07500444
+856: allocateBlockFrom: findEmptyBlock returned 0x07500444
+856: allocPagesAndMap: Mapped v=0x0762C000 to p=0x0762C000
+857: allocPagesAndMap: Mapped v=0xC762C000 to p=0x0762C000
+857: allocPagesAndMap: Zeroing out page(s) at 0x0762C000 for 0x00001000
+857: allocPagesAndMap: Returning address 0x0762C000
+857: aMTP: Used allocPagesAndMap to allocate 0x00001000 bytes at 0x0762C000
+857: createProcess: Malloc'd 0x0762C000 for process->path
+857: process->path (0x0762C000)=/kshell
+857: findEmptyBlock: Returning block # 0x07500460
+857: allocateBlockFrom: findEmptyBlock returned 0x07500460
+857: allocPagesAndMap: Mapped v=0x0762D000 to p=0x0762D000
+857: allocPagesAndMap: Mapped v=0xC762D000 to p=0x0762D000
+857: allocPagesAndMap: Zeroing out page(s) at 0x0762D000 for 0x00001000
+857: allocPagesAndMap: Returning address 0x0762D000
+857: findFreeMallocPointer: Scanning for a free memory pointer
+857: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+857: aMTP: Size adjusted from 12 to 4096
+857: findEmptyBlock: Returning block # 0x0750047C
+857: allocateBlockFrom: findEmptyBlock returned 0x0750047C
+857: allocPagesAndMap: Mapped v=0x0762E000 to p=0x0762E000
+857: allocPagesAndMap: Mapped v=0xC762E000 to p=0x0762E000
+857: allocPagesAndMap: Zeroing out page(s) at 0x0762E000 for 0x00001000
+857: allocPagesAndMap: Returning address 0x0762E000
+857: aMTP: Used allocPagesAndMap to allocate 0x0000000C bytes at 0x0762E000
+857: Mapping parent's argv into our memory
+857: allocPages: Size adjusted from 108 to 4096
+857: findEmptyBlock: Returning block # 0x07500498
+857: allocateBlockFrom: findEmptyBlock returned 0x07500498
+857: Retrieving argv parameter values from parent process
+857: allocPagesAndMap: Size adjusted from 200 to 4096
+857: findEmptyBlock: Returning block # 0x075004B4
+857: allocateBlockFrom: findEmptyBlock returned 0x075004B4
+857: allocPagesAndMap: Mapped v=0x07630000 to p=0x07630000
+857: allocPagesAndMap: Mapped v=0xC7630000 to p=0x07630000
+857: allocPagesAndMap: Zeroing out page(s) at 0x07630000 for 0x00001000
+857: allocPagesAndMap: Returning address 0x07630000
+857: allocPagesAndMap: Size adjusted from 25600 to 28672
+857: findEmptyBlock: Returning block # 0x075004D0
+858: allocateBlockFrom: findEmptyBlock returned 0x075004D0
+858: allocPagesAndMap: Mapped v=0x07631000 to p=0x07631000
+858: allocPagesAndMap: Mapped v=0xC7631000 to p=0x07631000
+858: allocPagesAndMap: Zeroing out page(s) at 0x07631000 for 0x00007000
+858: allocPagesAndMap: Returning address 0x07631000
+858: Copying environment variables from parent process
+858: Mapping the process struct into the process, v=0xF000F000, p=0x07603000
+858: findFreeMallocPointer: Scanning for a free memory pointer
+858: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+858: aMTP: Size adjusted from 7276 to 8192
+858: findEmptyBlock: Returning block # 0x075004EC
+858: allocateBlockFrom: findEmptyBlock returned 0x075004EC
+858: allocPagesAndMap: Mapped v=0x07638000 to p=0x07638000
+858: allocPagesAndMap: Mapped v=0xC7638000 to p=0x07638000
+858: allocPagesAndMap: Zeroing out page(s) at 0x07638000 for 0x00002000
+858: allocPagesAndMap: Returning address 0x07638000
+858: aMTP: Used allocPagesAndMap to allocate 0x00001C6C bytes at 0x07638000
+858: findEmptyBlock: Returning block # 0x07500508
+858: allocateBlockFrom: findEmptyBlock returned 0x07500508
+858: allocPagesAndMap: Mapped v=0x0763A000 to p=0x0763A000
+858: allocPagesAndMap: Mapped v=0xC763A000 to p=0x0763A000
+858: allocPagesAndMap: Zeroing out page(s) at 0x0763A000 for 0x00001000
+858: allocPagesAndMap: Returning address 0x0763A000
+858: findEmptyBlock: Returning block # 0x07500524
+858: allocateBlockFrom: findEmptyBlock returned 0x07500524
+858: allocPagesAndMap: Mapped v=0x0763B000 to p=0x0763B000
+858: allocPagesAndMap: Mapped v=0xC763B000 to p=0x0763B000
+858: allocPagesAndMap: Zeroing out page(s) at 0x0763B000 for 0x00001000
+858: allocPagesAndMap: Returning address 0x0763B000
+863: findFreeMallocPointer: Scanning for a free memory pointer
+863: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+863: aMTP: Size adjusted from 12 to 4096
+863: findEmptyBlock: Returning block # 0x07500540
+863: allocateBlockFrom: findEmptyBlock returned 0x07500540
+863: allocPagesAndMap: Mapped v=0x0763C000 to p=0x0763C000
+863: allocPagesAndMap: Mapped v=0xC763C000 to p=0x0763C000
+863: allocPagesAndMap: Zeroing out page(s) at 0x0763C000 for 0x00001000
+863: allocPagesAndMap: Returning address 0x0763C000
+863: aMTP: Used allocPagesAndMap to allocate 0x0000000C bytes at 0x0763C000
+863: findFreeMallocPointer: Scanning for a free memory pointer
+863: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+863: aMTP: Size adjusted from 16 to 4096
+863: findEmptyBlock: Returning block # 0x0750055C
+863: allocateBlockFrom: findEmptyBlock returned 0x0750055C
+863: allocPagesAndMap: Mapped v=0x0763D000 to p=0x0763D000
+863: allocPagesAndMap: Mapped v=0xC763D000 to p=0x0763D000
+863: allocPagesAndMap: Zeroing out page(s) at 0x0763D000 for 0x00001000
+863: allocPagesAndMap: Returning address 0x0763D000
+863: aMTP: Used allocPagesAndMap to allocate 0x00000010 bytes at 0x0763D000
+863: findFreeMallocPointer: Scanning for a free memory pointer
+863: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+863: aMTP: Size adjusted from 1024 to 4096
+863: findEmptyBlock: Returning block # 0x07500578
+863: allocateBlockFrom: findEmptyBlock returned 0x07500578
+863: allocPagesAndMap: Mapped v=0x0763E000 to p=0x0763E000
+863: allocPagesAndMap: Mapped v=0xC763E000 to p=0x0763E000
+863: allocPagesAndMap: Zeroing out page(s) at 0x0763E000 for 0x00001000
+863: allocPagesAndMap: Returning address 0x0763E000
+863: aMTP: Used allocPagesAndMap to allocate 0x00000400 bytes at 0x0763E000
+863: findFreeMallocPointer: Scanning for a free memory pointer
+864: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+864: aMTP: Size adjusted from 20 to 4096
+864: findEmptyBlock: Returning block # 0x07500594
+864: allocateBlockFrom: findEmptyBlock returned 0x07500594
+864: allocPagesAndMap: Mapped v=0x0763F000 to p=0x0763F000
+864: allocPagesAndMap: Mapped v=0xC763F000 to p=0x0763F000
+864: allocPagesAndMap: Zeroing out page(s) at 0x0763F000 for 0x00001000
+864: allocPagesAndMap: Returning address 0x0763F000
+864: aMTP: Used allocPagesAndMap to allocate 0x00000014 bytes at 0x0763F000
+864: findFreeMallocPointer: Scanning for a free memory pointer
+864: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+864: aMTP: Size adjusted from 12 to 4096
+864: findEmptyBlock: Returning block # 0x075005B0
+864: allocateBlockFrom: findEmptyBlock returned 0x075005B0
+864: allocPagesAndMap: Mapped v=0x07640000 to p=0x07640000
+864: allocPagesAndMap: Mapped v=0xC7640000 to p=0x07640000
+864: allocPagesAndMap: Zeroing out page(s) at 0x07640000 for 0x00001000
+864: allocPagesAndMap: Returning address 0x07640000
+864: aMTP: Used allocPagesAndMap to allocate 0x0000000C bytes at 0x07640000
+894: allocPages: Size adjusted from 19 to 4096
+894: findEmptyBlock: Returning block # 0x075005CC
+894: allocateBlockFrom: findEmptyBlock returned 0x075005CC
+899: findEmptyBlock: Returning block # 0x075005E8
+899: allocateBlockFrom: findEmptyBlock returned 0x075005E8
+904: findEmptyBlock: Returning block # 0x07500604
+904: allocateBlockFrom: findEmptyBlock returned 0x07500604
+919: findEmptyBlock: Returning block # 0x07500620
+919: allocateBlockFrom: findEmptyBlock returned 0x07500620
+919: findEmptyBlock: Returning block # 0x0750063C
+919: allocateBlockFrom: findEmptyBlock returned 0x0750063C
+919: findEmptyBlock: Returning block # 0x07500658
+919: allocateBlockFrom: findEmptyBlock returned 0x07500658
+919: findEmptyBlock: Returning block # 0x07500674
+919: allocateBlockFrom: findEmptyBlock returned 0x07500674
+919: findEmptyBlock: Returning block # 0x07500690
+919: allocateBlockFrom: findEmptyBlock returned 0x07500690
+919: findEmptyBlock: Returning block # 0x075006AC
+919: allocateBlockFrom: findEmptyBlock returned 0x075006AC
+919: findEmptyBlock: Returning block # 0x075006C8
+919: allocateBlockFrom: findEmptyBlock returned 0x075006C8
+919: findEmptyBlock: Returning block # 0x075006E4
+919: allocateBlockFrom: findEmptyBlock returned 0x075006E4
+919: findEmptyBlock: Returning block # 0x07500700
+919: allocateBlockFrom: findEmptyBlock returned 0x07500700
+919: findEmptyBlock: Returning block # 0x0750071C
+919: allocateBlockFrom: findEmptyBlock returned 0x0750071C
+919: findEmptyBlock: Returning block # 0x07500738
+919: allocateBlockFrom: findEmptyBlock returned 0x07500738
+919: findEmptyBlock: Returning block # 0x07500754
+919: allocateBlockFrom: findEmptyBlock returned 0x07500754
+919: findEmptyBlock: Returning block # 0x07500770
+919: allocateBlockFrom: findEmptyBlock returned 0x07500770
+919: findEmptyBlock: Returning block # 0x0750078C
+919: allocateBlockFrom: findEmptyBlock returned 0x0750078C
+919: findEmptyBlock: Returning block # 0x075007A8
+919: allocateBlockFrom: findEmptyBlock returned 0x075007A8
+919: allocPages: Size adjusted from 2016 to 4096
+919: findEmptyBlock: Returning block # 0x075007C4
+919: allocateBlockFrom: findEmptyBlock returned 0x075007C4
+939: findFreeMallocPointer: Scanning for a free memory pointer
+939: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+939: aMTP: Size adjusted from 4283 to 8192
+939: findEmptyBlock: Returning block # 0x075007E0
+939: allocateBlockFrom: findEmptyBlock returned 0x075007E0
+939: allocPagesAndMap: Mapped v=0x07654000 to p=0x07654000
+939: allocPagesAndMap: Mapped v=0xC7654000 to p=0x07654000
+939: allocPagesAndMap: Zeroing out page(s) at 0x07654000 for 0x00002000
+939: allocPagesAndMap: Returning address 0x07654000
+939: aMTP: Used allocPagesAndMap to allocate 0x000010BB bytes at 0x07654000
+949: findFreeMallocPointer: Scanning for a free memory pointer
+949: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+949: aMTP: Size adjusted from 4737 to 8192
+949: findEmptyBlock: Returning block # 0x075007FC
+949: allocateBlockFrom: findEmptyBlock returned 0x075007FC
+949: allocPagesAndMap: Mapped v=0x07656000 to p=0x07656000
+949: allocPagesAndMap: Mapped v=0xC7656000 to p=0x07656000
+949: allocPagesAndMap: Zeroing out page(s) at 0x07656000 for 0x00002000
+949: allocPagesAndMap: Returning address 0x07656000
+949: aMTP: Used allocPagesAndMap to allocate 0x00001281 bytes at 0x07656000
+959: findFreeMallocPointer: Scanning for a free memory pointer
+959: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+959: aMTP: Size adjusted from 4302 to 8192
+959: findEmptyBlock: Returning block # 0x07500818
+959: allocateBlockFrom: findEmptyBlock returned 0x07500818
+959: allocPagesAndMap: Mapped v=0x07658000 to p=0x07658000
+959: allocPagesAndMap: Mapped v=0xC7658000 to p=0x07658000
+959: allocPagesAndMap: Zeroing out page(s) at 0x07658000 for 0x00002000
+959: allocPagesAndMap: Returning address 0x07658000
+959: aMTP: Used allocPagesAndMap to allocate 0x000010CE bytes at 0x07658000
+964: findFreeMallocPointer: Scanning for a free memory pointer
+964: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+964: aMTP: Size adjusted from 4264 to 8192
+964: findEmptyBlock: Returning block # 0x07500834
+964: allocateBlockFrom: findEmptyBlock returned 0x07500834
+964: allocPagesAndMap: Mapped v=0x0765A000 to p=0x0765A000
+964: allocPagesAndMap: Mapped v=0xC765A000 to p=0x0765A000
+964: allocPagesAndMap: Zeroing out page(s) at 0x0765A000 for 0x00002000
+964: allocPagesAndMap: Returning address 0x0765A000
+964: aMTP: Used allocPagesAndMap to allocate 0x000010A8 bytes at 0x0765A000
+969: findFreeMallocPointer: Scanning for a free memory pointer
+969: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+969: aMTP: Size adjusted from 5472 to 8192
+969: findEmptyBlock: Returning block # 0x07500850
+969: allocateBlockFrom: findEmptyBlock returned 0x07500850
+969: allocPagesAndMap: Mapped v=0x0765C000 to p=0x0765C000
+969: allocPagesAndMap: Mapped v=0xC765C000 to p=0x0765C000
+969: allocPagesAndMap: Zeroing out page(s) at 0x0765C000 for 0x00002000
+969: allocPagesAndMap: Returning address 0x0765C000
+969: aMTP: Used allocPagesAndMap to allocate 0x00001560 bytes at 0x0765C000
+984: findFreeMallocPointer: Scanning for a free memory pointer
+984: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+984: aMTP: Size adjusted from 7276 to 8192
+984: findEmptyBlock: Returning block # 0x0750086C
+984: allocateBlockFrom: findEmptyBlock returned 0x0750086C
+984: allocPagesAndMap: Mapped v=0x0765E000 to p=0x0765E000
+984: allocPagesAndMap: Mapped v=0xC765E000 to p=0x0765E000
+984: allocPagesAndMap: Zeroing out page(s) at 0x0765E000 for 0x00002000
+984: allocPagesAndMap: Returning address 0x0765E000
+984: aMTP: Used allocPagesAndMap to allocate 0x00001C6C bytes at 0x0765E000
+984: findEmptyBlock: Returning block # 0x07500888
+984: allocateBlockFrom: findEmptyBlock returned 0x07500888
+984: allocPagesAndMap: Mapped v=0x07660000 to p=0x07660000
+984: allocPagesAndMap: Mapped v=0xC7660000 to p=0x07660000
+984: allocPagesAndMap: Zeroing out page(s) at 0x07660000 for 0x00001000
+984: allocPagesAndMap: Returning address 0x07660000
+984: findEmptyBlock: Returning block # 0x075008A4
+984: allocateBlockFrom: findEmptyBlock returned 0x075008A4
+984: allocPagesAndMap: Mapped v=0x07661000 to p=0x07661000
+984: allocPagesAndMap: Mapped v=0xC7661000 to p=0x07661000
+984: allocPagesAndMap: Zeroing out page(s) at 0x07661000 for 0x00001000
+984: allocPagesAndMap: Returning address 0x07661000
+984: findFreeMallocPointer: Scanning for a free memory pointer
+984: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+984: aMTP: Size adjusted from 12 to 4096
+984: findEmptyBlock: Returning block # 0x075008C0
+984: allocateBlockFrom: findEmptyBlock returned 0x075008C0
+984: allocPagesAndMap: Mapped v=0x07662000 to p=0x07662000
+984: allocPagesAndMap: Mapped v=0xC7662000 to p=0x07662000
+984: allocPagesAndMap: Zeroing out page(s) at 0x07662000 for 0x00001000
+984: allocPagesAndMap: Returning address 0x07662000
+984: aMTP: Used allocPagesAndMap to allocate 0x0000000C bytes at 0x07662000
+984: findFreeMallocPointer: Scanning for a free memory pointer
+984: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+984: aMTP: Size adjusted from 16 to 4096
+984: findEmptyBlock: Returning block # 0x075008DC
+985: allocateBlockFrom: findEmptyBlock returned 0x075008DC
+985: allocPagesAndMap: Mapped v=0x07663000 to p=0x07663000
+985: allocPagesAndMap: Mapped v=0xC7663000 to p=0x07663000
+985: allocPagesAndMap: Zeroing out page(s) at 0x07663000 for 0x00001000
+985: allocPagesAndMap: Returning address 0x07663000
+985: aMTP: Used allocPagesAndMap to allocate 0x00000010 bytes at 0x07663000
+985: findFreeMallocPointer: Scanning for a free memory pointer
+985: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+985: aMTP: Size adjusted from 1024 to 4096
+985: findEmptyBlock: Returning block # 0x075008F8
+985: allocateBlockFrom: findEmptyBlock returned 0x075008F8
+985: allocPagesAndMap: Mapped v=0x07664000 to p=0x07664000
+985: allocPagesAndMap: Mapped v=0xC7664000 to p=0x07664000
+985: allocPagesAndMap: Zeroing out page(s) at 0x07664000 for 0x00001000
+985: allocPagesAndMap: Returning address 0x07664000
+985: aMTP: Used allocPagesAndMap to allocate 0x00000400 bytes at 0x07664000
+985: findFreeMallocPointer: Scanning for a free memory pointer
+985: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+985: aMTP: Size adjusted from 20 to 4096
+985: findEmptyBlock: Returning block # 0x07500914
+985: allocateBlockFrom: findEmptyBlock returned 0x07500914
+985: allocPagesAndMap: Mapped v=0x07665000 to p=0x07665000
+985: allocPagesAndMap: Mapped v=0xC7665000 to p=0x07665000
+985: allocPagesAndMap: Zeroing out page(s) at 0x07665000 for 0x00001000
+985: allocPagesAndMap: Returning address 0x07665000
+985: aMTP: Used allocPagesAndMap to allocate 0x00000014 bytes at 0x07665000
+1010: findEmptyBlock: Returning block # 0x07500930
+1010: allocateBlockFrom: findEmptyBlock returned 0x07500930
+1015: findEmptyBlock: Returning block # 0x0750094C
+1015: allocateBlockFrom: findEmptyBlock returned 0x0750094C
+1020: findEmptyBlock: Returning block # 0x07500968
+1020: allocateBlockFrom: findEmptyBlock returned 0x07500968
+1025: findEmptyBlock: Returning block # 0x07500984
+1025: allocateBlockFrom: findEmptyBlock returned 0x07500984
+1030: allocPages: Size adjusted from 952 to 4096
+1030: findEmptyBlock: Returning block # 0x075009A0
+1030: allocateBlockFrom: findEmptyBlock returned 0x075009A0
+1055: findFreeMallocPointer: Scanning for a free memory pointer
+1055: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+1055: aMTP: Size adjusted from 4462 to 8192
+1055: findEmptyBlock: Returning block # 0x075009BC
+1055: allocateBlockFrom: findEmptyBlock returned 0x075009BC
+1055: allocPagesAndMap: Mapped v=0x0766B000 to p=0x0766B000
+1055: allocPagesAndMap: Mapped v=0xC766B000 to p=0x0766B000
+1055: allocPagesAndMap: Zeroing out page(s) at 0x0766B000 for 0x00002000
+1055: allocPagesAndMap: Returning address 0x0766B000
+1055: aMTP: Used allocPagesAndMap to allocate 0x0000116E bytes at 0x0766B000
+1065: findFreeMallocPointer: Scanning for a free memory pointer
+1065: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+1065: aMTP: Size adjusted from 5278 to 8192
+1065: findEmptyBlock: Returning block # 0x075009D8
+1065: allocateBlockFrom: findEmptyBlock returned 0x075009D8
+1065: allocPagesAndMap: Mapped v=0x0766D000 to p=0x0766D000
+1065: allocPagesAndMap: Mapped v=0xC766D000 to p=0x0766D000
+1065: allocPagesAndMap: Zeroing out page(s) at 0x0766D000 for 0x00002000
+1065: allocPagesAndMap: Returning address 0x0766D000
+1065: aMTP: Used allocPagesAndMap to allocate 0x0000149E bytes at 0x0766D000
+1080: findFreeMallocPointer: Scanning for a free memory pointer
+1080: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+1080: aMTP: Size adjusted from 4423 to 8192
+1080: findEmptyBlock: Returning block # 0x075009F4
+1080: allocateBlockFrom: findEmptyBlock returned 0x075009F4
+1080: allocPagesAndMap: Mapped v=0x0766F000 to p=0x0766F000
+1080: allocPagesAndMap: Mapped v=0xC766F000 to p=0x0766F000
+1080: allocPagesAndMap: Zeroing out page(s) at 0x0766F000 for 0x00002000
+1080: allocPagesAndMap: Returning address 0x0766F000
+1080: aMTP: Used allocPagesAndMap to allocate 0x00001147 bytes at 0x0766F000
+1085: findFreeMallocPointer: Scanning for a free memory pointer
+1085: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+1085: aMTP: Size adjusted from 4288 to 8192
+1085: findEmptyBlock: Returning block # 0x07500A10
+1085: allocateBlockFrom: findEmptyBlock returned 0x07500A10
+1085: allocPagesAndMap: Mapped v=0x07671000 to p=0x07671000
+1085: allocPagesAndMap: Mapped v=0xC7671000 to p=0x07671000
+1085: allocPagesAndMap: Zeroing out page(s) at 0x07671000 for 0x00002000
+1085: allocPagesAndMap: Returning address 0x07671000
+1085: aMTP: Used allocPagesAndMap to allocate 0x000010C0 bytes at 0x07671000
+1095: findFreeMallocPointer: Scanning for a free memory pointer
+1095: findFreeMallocPointer: Found memory pointer on page 0 (0x07507000)
+1095: aMTP: Size adjusted from 6608 to 8192
+1095: findEmptyBlock: Returning block # 0x07500A2C
+1095: allocateBlockFrom: findEmptyBlock returned 0x07500A2C
+1095: allocPagesAndMap: Mapped v=0x07673000 to p=0x07673000
+1095: allocPagesAndMap: Mapped v=0xC7673000 to p=0x07673000
+1095: allocPagesAndMap: Zeroing out page(s) at 0x07673000 for 0x00002000
+1095: allocPagesAndMap: Returning address 0x07673000
+1095: aMTP: Used allocPagesAndMap to allocate 0x000019D0 bytes at 0x07673000
+1110: findBlockByMemoryAddress: Found block 0x075005B0 for memory address 0x07640000
+1110: Freed block 0x075005b0 for memory address 0x07640000
+1110: findBlockByMemoryAddress: Found block 0x075005B0 for memory address 0x07640000
+1110: Freed block 0x075005b0 for memory address 0x07640000
+1110: Setting up the stack
+1110: Return point for process is 0x01016EE7
+1110: Created Process @ 0x07603000
+1110: 	addTaskToTaskList: Found open slot @ 0x0759B090
+1110: 	moved new task 0x0022 there
+1110: *		addToQ: Adding task 0x0022 to queue Runnable
+1110: Submitted process 0x0022 to be run
+1111: kIRQ0_Handler: triggering scheduler
+1111: 
+Processing signals
+1111: 	Scanning Interruptable Sleep queue
+1111: Done processing signals
+1111: 
+****************************** SCHEDULER *******************************
+1111: *Found task 0x0020 to take off CPU @0x0020:0xBADBADBA (exited=0).
+1111: *	changeTaskQueue: Changing task state for 0x0020 from Running to Runnable
+1111: *		removeFromQ: Removing task 0x0020 (0x0759B000) from queue Running
+1111: *		addToQ: Adding task 0x0020 to queue Runnable
+1111: *Finding task to run
+1111: *	Task 0x0021 (/sbin/idle), priority=0, old ticks=3758096383, new ticks=1111: 37580963831111:  (idle task)1111: 
+1111: *	Task 0x0022 (/kshell), priority=0, old ticks=0, new ticks=1111: 211111: 
+1111: *	Task 0x0020 (/kernel), priority=16, old ticks=0, new ticks=1111: 51111: 
+1111: *Found task 0x0021 move to CPU
+1111: *	Save: 1111: CR3=0x001A8000,1111: CS=0x0020,1111: EIP=0x01011616,1111: SS=0x0018,1111: DS=0x0010,1111: EAX=0x07603000,1111: DBX=0x00E00008,1111: ECX=0x00000010,1111: EDX=0x000003F8,1111: ESI=0xFEE00000,1111: EDI=0x00000000,1111: ESP=0x00FFD08C,1111: EBP=0x00FFD098,1111: FLAGS=0x00200206
+1111: *	changeTaskQueue: Changing task state for 0x0021 from Runnable to Running
+1111: *		removeFromQ: Removing task 0x0021 (0x0759B048) from queue Runnable
+1111: *		addToQ: Adding task 0x0021 to queue Running
+1111: *	Load: 1111: CR3=0x01100000,1111: CS=0x0008,1111: EIP=0x01017035,1111: SS=0x0018,1111: DS=0x0010,1111: EAX=0x00000000,1111: DBX=0x00000000,1111: ECX=0x00000000,1111: EDX=0x00000000,1111: ESI=0x00000000,1111: EDI=0x00000000,1111: ESP=0x075EF000,1111: EBP=0x00000000,1111: FLAGS=0x00200246
+1111: *Restarting CPU with new process (0x0021) @ 0x0008:0x01017035
+1111: *Total running ticks: 0x0020: 274, 0x0021: 0
+1111: *Scheduler calls=0, task switchs=1, ticks=0x00000457
+1111: **************************************************************************
+1112: 	findTaskByCR3: Finding task with CR3=0x01100000
+1112: 	findTaskByCR3: Found task 0x0021 @ 0x0759B048
+1112: 	findTaskByCR3: Finding task with CR3=0x01100000
+1112: 	findTaskByCR3: Found task 0x0021 @ 0x0759B048
+1112: sys_masksig: Old sigmask = 0x00000000
+1112: sys_masksig: New sigmask = 0x00000008
+1112: IDLE TASK: Idle ticks = 1
+1113: IDLE TASK: Idle ticks = 2
+1114: IDLE TASK: Idle ticks = 3
+1115: IDLE TASK: Idle ticks = 4
+1116: IDLE TASK: Idle ticks = 5
+1117: IDLE TASK: Idle ticks = 6
+1118: IDLE TASK: Idle ticks = 7
+1119: IDLE TASK: Idle ticks = 8
+1120: IDLE TASK: Idle ticks = 9
+1121: IDLE TASK: Idle ticks = 10
+1122: IDLE TASK: Idle ticks = 11
+1123: IDLE TASK: Idle ticks = 12
+1124: IDLE TASK: Idle ticks = 13
+1125: IDLE TASK: Idle ticks = 14
+1126: IDLE TASK: Idle ticks = 15
+1127: IDLE TASK: Idle ticks = 16
+1128: IDLE TASK: Idle ticks = 17
+1129: IDLE TASK: Idle ticks = 18
+1130: IDLE TASK: Idle ticks = 19
+1131: IDLE TASK: Idle ticks = 20
+1132: kIRQ0_Handler: triggering scheduler
+1132: 
+Processing signals
+1132: 	Scanning Interruptable Sleep queue
+1132: Done processing signals
+1132: 
+****************************** SCHEDULER *******************************
+1132: *Found task 0x0021 to take off CPU @0x0008:0x01017035 (exited=0).
+1132: *	changeTaskQueue: Changing task state for 0x0021 from Running to Runnable
+1132: *		removeFromQ: Removing task 0x0021 (0x0759B048) from queue Running
+1132: *		addToQ: Adding task 0x0021 to queue Runnable
+1132: *Finding task to run
+1132: *	Task 0x0021 (/sbin/idle), priority=20, old ticks=0, new ticks=1132: 01132:  (idle task)1132: 
+1132: *	Task 0x0022 (/kshell), priority=0, old ticks=21, new ticks=1132: 421132: 
+1132: *	Task 0x0020 (/kernel), priority=16, old ticks=5, new ticks=1132: 101132: 
+1132: *Found task 0x0022 move to CPU
+1132: *	Save: 1132: CR3=0x01100000,1132: CS=0x0008,1132: EIP=0x010170B8,1132: SS=0x0018,1132: DS=0x0010,1132: EAX=0x00000000,1132: DBX=0x00000000,1132: ECX=0x0000000A,1132: EDX=0x000003F8,1132: ESI=0x00000000,1132: EDI=0x00000000,1132: ESP=0x075EEFE4,1132: EBP=0x075EF008,1132: FLAGS=0x00200206
+1132: *	changeTaskQueue: Changing task state for 0x0022 from Runnable to Running
+1132: *		removeFromQ: Removing task 0x0022 (0x0759B090) from queue Runnable
+1132: *		addToQ: Adding task 0x0022 to queue Running
+1132: *	Load: 1132: CR3=0x01149000,1132: CS=0x003B,1132: EIP=0x01016E41,1132: SS=0x0043,1132: DS=0x0033,1132: EAX=0x00000000,1132: DBX=0x00000000,1132: ECX=0x00000000,1132: EDX=0x00000000,1132: ESI=0x00000000,1132: EDI=0x00000000,1132: ESP=0x0761B000,1132: EBP=0x00000000,1132: FLAGS=0x00200246
+1132: *Restarting CPU with new process (0x0022) @ 0x003B:0x01016E41
+1132: *Total running ticks: 0x0021: 21, 0x0022: 0
+1132: *Scheduler calls=1, task switchs=2, ticks=0x0000046C
+1132: **************************************************************************
+1132: processStart: Checking for start handlers
+1132: processStart: Executing startHandler 0 @ 0x300043A8
+***libc_init called
+***heapBase @ 0X300043BC = 0x00000000 before

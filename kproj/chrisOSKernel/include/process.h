@@ -48,7 +48,7 @@ extern "C" {
         char* path;
         uint32_t retVal;
         signal_t signals;
-        uint32_t heapStart, heapEnd, stackStart, stackSize;
+        uint32_t heapStart, heapEnd, stackStart, stackSize, stack1Start, stack1Size, stack0Start, stack0Size;
         short priority;           //-20=highest, 20=lowest
         void* exitHandler[PROCESS_MAX_EXIT_HANDLERS];
         void* parent;

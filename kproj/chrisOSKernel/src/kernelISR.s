@@ -16,6 +16,31 @@
 .extern kKeyboardHandlerRoutine
 .extern call defaultISRHandler
 .extern forkReturn
+.extern schedStack
+.extern _schedule
+.extern schedulerTriggered
+.extern kPagingExceptionHandlerNew
+
+.globl pagingExceptionHandler
+.type pagingExceptionHandler, @function
+pagingExceptionHandler:
+jumpHere:
+    mov eax,[esp]
+    push eax
+    mov eax,cr2
+    push eax
+    xor eax,eax
+    str eax
+    shr eax,3
+    push eax
+    call kPagingExceptionHandlerNew
+    iretd
+
+.globl pagingExceptionReturn
+.type pagingExceptionReturn, @function
+pagingExceptionReturn:
+iret
+jmp pagingExceptionHandler
 
 isrNumber: .word 0,0
 tempEAX: .word 0,0
@@ -92,6 +117,8 @@ saveTheStack:
     cmp eax,0x20                
     jge overSaveTheStack        #CLR 03/26/2017: Changed (je to jge) to skip stack capture for 0x20 (IRQ0) & 0x21 (KBD) (not sure what else)
     mov esi, isrSavedEBP
+    cmp esi, 0                  #CLR 01/08/2019: Hoping this will stop the paging exceptions!
+    je overSaveTheStack         
     #CLR 12/29/2018: I tried to subtract some from the ESP before copying but this is a bad idea, kept faulting everywhere because it would try to read from a non-existent page (i.e. BFFFFFEC ... because kernel starts at C0000000)
 #    add esi,12                  #drop the eip/cs/flags from the call to this proc
     mov edi, isrSavedStack
@@ -200,6 +227,9 @@ noIRQResponseRequired:
     #add esp,8                   #release the vector parameters from the stack
     mov bx, isrSavedDS
     mov ds, bx
+    mov ax,schedulerTriggered
+    cmp ax,0
+    jnz execScheduler
     mov bx, isrSavedES
     mov es, bx                  # load ds and es with valid selector
     mov bx, isrSavedFS
@@ -207,48 +237,30 @@ noIRQResponseRequired:
     mov bx, isrSavedGS
     mov gs, bx
     mov ebp,isrSavedEBP
-    #ESP is being loaded, so no PUSHes or POPs after this!
     mov esp, isrSavedESP
-    #CLR 04/12/2017: Removed stack correction code (pop 1 dword to get rid of error) because vector functionality takes care of that
 overCorrection:
-    mov al,schedulerTaskSwitched
-    cmp al,0
+    mov ecx, isrSavedECX
+    mov edx, isrSavedEDX
+    mov esi, isrSavedESI
+    mov edi, isrSavedEDI
     mov eax, isrSavedEAX
     mov ebx,isrSavedEBX
-    jnz newTaskLoaded
     iretd
 
-newTaskLoaded:
-    #Stack is already where it was when we started the ISR
-    #reset the task switched indicator
-    mov eax,0
-    mov schedulerTaskSwitched,eax
-#    mov eax,kTaskSwitchCount
-#    inc eax
-#    mov kTaskSwitchCount,eax
-    #Restore the CR3 if it differs from the current one
-restoreCR3:
-    mov eax,isrSavedCR3
-    mov ebx,cr3
-    cmp eax,ebx
-    mov ebx, isrSavedEBX
-    jz  overSetCR3
-    mov CR3, eax
-
-overSetCR3:
-    mov eax,forkReturn
-    cmp eax,0
-    jz overForkReturn
-//mov eax,0x80000011
-//mov cr0,eax
-    mov eax, isrSavedEIP
-//    mov [esp],eax
-//mov eax,0x80010011
-//mov cr0,eax
-    mov eax,0
-    mov forkReturn,eax
-overForkReturn:
-    mov eax, isrSavedEAX
+execScheduler:
+    #reset the scheduler triggered flag
+    #we need our own stack!
+    mov eax, 0
+    mov schedulerTriggered, eax
+    mov eax, schedStack
+    add eax, 0x100
+    mov esp, eax
+    mov eax,kKernelCR3
+    mov cr3,eax
+    lea eax, _schedule
+    pushf
+    push 0x8
+    push eax
     iretd
 
 .globl vector0

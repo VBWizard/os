@@ -152,12 +152,11 @@ VISIBLE int exec(char* path)
         lastSpacePtr=spacePtr++;
         argvPtr+=50;
     }
-    //Using the syscall is breaking the stack
-//    SYSCALL3(SYSCALL_EXEC,path,argc,argv);
-    printdI(DEBUG_LIBC,"libc: exec for %s\n",path);;
-    __asm__("push ds\nint 0x80\npop ds\n"
+    printdI(DEBUG_LIBC,"libc: executing for %s\n",path);;
+    pid = do_syscall3(SYSCALL_EXEC, (uintptr_t)program, argc, (uintptr_t)argv);
+/*    __asm__("push ds\nint 0x80\npop ds\n"
             :"=a" (pid)
-            :"a" (0x59),"b" (program),"c" (argc),"d" (argv));
+            :"a" (0x59),"b" (program),"c" (argc),"d" (argv));*/
     return pid;
     freeI(argv);
     freeI(program);
@@ -169,9 +168,10 @@ VISIBLE int execa(char* path, int argc, char** argv)
     //Using the syscall is breaking the stack
 //    SYSCALL3(SYSCALL_EXEC,path,argc,argv);
     printdI(DEBUG_LIBC,"libc: exec for %s\n",path);;
-    __asm__("push ds\nint 0x80\npop ds\n"
+    pid = do_syscall3(SYSCALL_EXEC, (uintptr_t)path, argc, (uintptr_t)argv);
+/*    __asm__("push ds\nint 0x80\npop ds\n"
             :"=a" (pid)
-            :"a" (0x59),"b" (path),"c" (argc),"d" (argv));
+            :"a" (0x59),"b" (path),"c" (argc),"d" (argv));*/
     return pid;
 }
 

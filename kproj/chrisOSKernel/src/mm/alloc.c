@@ -120,7 +120,6 @@ void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
     
     phys=allocPages(newSize);
     printd("allocPagesAndMap: allocPage'd 0x%08X bytes at 0x%08X\n",newSize,phys);
-    
     //Using random mappings isn't working, it stomps on other things
     //uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(cr3,newSize/PAGE_SIZE);
     

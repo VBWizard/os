@@ -19,12 +19,14 @@ uintptr_t *qUSleep;
 uintptr_t *qISleep;
 uintptr_t *qExited;
 bool forkReturn;
+uint32_t nextTaskTSS;
 
 extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t* kTicksSinceStart;
 uint32_t kTaskSwitchCount;
 uint32_t kSchedulerCallCount;
 uint32_t NO_TASK=0xFFFFFFFF;
+uintptr_t* schedStack; //Loaded by scheduler when it is called 
 
 uint32_t nextScheduleTicks;
 
@@ -37,6 +39,8 @@ void changeTaskQueue(task_t* task, eTaskState newState);
 
 void initSched()
 {
+    schedStack = kMalloc(0x16000);
+    pagingMapPageCount(KERNEL_CR3, schedStack, schedStack, 0x16000/PAGE_SIZE, 0x7);
     NO_PREV = 0xFFFFFFFF;
     NO_NEXT = 0xFFFFFFFF;
     kTaskList=kMalloc(1000*sizeof(task_t));
@@ -187,7 +191,10 @@ void loadISRSavedRegs(task_t* task)
     isrSavedEDX=task->tss->EDX;
     isrSavedESI=task->tss->ESI;
     isrSavedEDI=task->tss->EDI;
-    isrSavedESP=task->tss->ESP;
+    if ( ((process_t*)task->process)->justForked)
+        isrSavedESP=task->tss->ESP1;
+    else
+        isrSavedESP=task->tss->ESP;
     isrSavedEBP=task->tss->EBP;
     isrSavedFlags=task->tss->EFLAGS;
     isrSavedES=task->tss->ES;
@@ -557,6 +564,9 @@ void runAnotherTask(bool schedulerRequested)
         schedulerTaskSwitched=true;
         kTaskSwitchCount++;
         forkReturn = false;
+        nextTaskTSS = taskToRun->taskNum;
+        nextTaskTSS <<= 3;
+        
         if (((process_t*)taskToRun->process)->justForked)
         {
             forkReturn = ((process_t*)taskToRun->process)->justForked;
