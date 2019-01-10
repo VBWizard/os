@@ -25,19 +25,22 @@
 .globl pagingExceptionHandler
 .type pagingExceptionHandler, @function
 pagingExceptionHandler:
+    cli
+    mov ebp, esp
+    #Increment the paging exception count
     mov eax,kPagingExceptionCount
     inc eax
     mov kPagingExceptionCount, eax
+    #Push the error code
     mov eax,[esp]
     push eax
+    #Push the cr2
     mov eax,cr2
     push eax
-    xor eax,eax
-    str eax
-    shr eax,3
-    push eax
     call kPagingExceptionHandlerNew
-    iretd
+    mov esp, ebp
+    sti
+    iret
 
 .globl pagingExceptionReturn
 .type pagingExceptionReturn, @function
@@ -183,7 +186,8 @@ pagingHandler:
     mov exceptionAX,ebx
     mov ebx,isrSavedEBX
     mov exceptionBX,ebx
-    call kPagingExceptionHandler
+    //call kPagingExceptionHandler
+    call defaultISRHandler          #Should not get here because 0xe handler is a registered task
     jmp noIRQResponseRequired
 notPagingHandler:
     cmp eax,0x80

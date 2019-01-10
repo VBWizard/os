@@ -15,6 +15,7 @@ extern uint32_t* kTicksSinceStart;
 extern bool schedulerTaskSwitched;
 extern task_t* kKernelTask;
 extern task_t* kIdleTask;
+extern sGDT* bootGdt;
 
 task_t *kTaskList;
 uintptr_t *qZombie;
@@ -410,6 +411,7 @@ void taskYield()
 
 void triggerScheduler()
 {
+    printd(DEBUG_PROCESS,"triggerScheduler: triggering scheduler\n");
      nextScheduleTicks=*kTicksSinceStart-1;
 }
 
@@ -473,12 +475,13 @@ void runAnotherTask(bool schedulerRequested)
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
             :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
     printd(DEBUG_PROCESS,"\n****************************** SCHEDULER *******************************\n");
-    //printd(DEBUG_PROCESS,"*Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
     //Get task to stop
     task_t* taskToStop=findRunningTaskToReplace();
     if (taskToStop==NULL)
-    panic("Can't find the running task in the running queue  ... unpossible!!!\n");
+        panic("Can't find the running task in the running queue  ... unpossible!!!\n");
 
+        process_t* pToStop = taskToStop->process;
+    
 #ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS,"*Found task 0x%04X to take off CPU @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
 #endif
@@ -492,48 +495,49 @@ void runAnotherTask(bool schedulerRequested)
         //Look through the USleep looking for task that is waiting on this one to end
         checkUSleepTasks(taskToStop, ((process_t*)taskToStop->process)->retVal);
     }
-    else if (/*(taskToStop->taskNum!=1) && */((process_t*)(taskToStop->process))->signals.sigind)
+    else if (pToStop->signals.sigind)
     {
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*sys_sigaction: sigind=0x%08X\n",((process_t*)(taskToStop->process))->signals.sigind);
 #endif
-        switch (((process_t*)(taskToStop->process))->signals.sigind)
+        if ((pToStop->signals.sigind & SIGUSLEEP) == SIGUSLEEP)
+            taskToStopNewQueue=TASK_USLEEP;
+        else if ((pToStop->signals.sigind & SIGSEGV) == SIGSEGV)
         {
-            case SIGUSLEEP:
-                taskToStopNewQueue=TASK_USLEEP;
-                break;
-            case SIGSEGV:
-                taskToStopNewQueue=TASK_EXITED;
-                checkUSleepTasks(taskToStop, -1);
-                break;
-            case SIGSTOP:
-                taskToStopNewQueue=TASK_STOPPED;
+            taskToStopNewQueue=TASK_EXITED;
+            checkUSleepTasks(taskToStop, -1);
+        }
+        else if ((pToStop->signals.sigind & SIGSTOP) == SIGSTOP)
+        {
+            taskToStopNewQueue=TASK_STOPPED;
 #ifdef SCHEDULER_DEBUG
-                printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
+            printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
 #endif
-                break;
-            case SIGSLEEP:
-                taskToStopNewQueue=TASK_ISLEEP;
-                break;
-            case SIGINT:
+        }
+        else if ((pToStop->signals.sigind & SIGSLEEP) == SIGSLEEP)
+            taskToStopNewQueue=TASK_ISLEEP;
+        else if ((pToStop->signals.sigind & SIGINT) == SIGINT)
+        {
                 //If no handler is installed, default action is to kill the process
-                if (!((process_t*)(taskToStop->process))->signals.sighandler[SIGINT])
+                if (!pToStop->signals.sighandler[SIGINT])
                 {
                     printd(DEBUG_PROCESS,"*Task 0x%04X: SIGINT received, no default handler  Executing default action (kill process).\n",taskToStop->taskNum);
                     taskToStopNewQueue=TASK_EXITED;
                     checkUSleepTasks(taskToStop, -1);
                     
                 }   
-                break;
-            default:
-                panic("scheduler: Unhandled signal");
-                break;
+        }
+        else
+        {
+            panic("scheduler: Unhandled signal");
         }
     }
     else
     {
         taskToStopNewQueue=TASK_RUNNABLE;
+        printd(DEBUG_PROCESS, "No signals (sigind=%08X)\n",pToStop->signals.sigind);
     }
+
     //Get task to start
     changeTaskQueue(taskToStop,taskToStopNewQueue);
     printd(DEBUG_PROCESS,"*Finding task to run\n");
@@ -570,6 +574,14 @@ void runAnotherTask(bool schedulerRequested)
         forkReturn = false;
         nextTaskTSS = taskToRun->taskNum;
         nextTaskTSS <<= 3;
+        if (!taskToRun->kernel)
+            nextTaskTSS |= 3;
+        printd(DEBUG_PROCESS,"*SET nextTaskTSS to 0x%04X\n",nextTaskTSS);
+        bootGdt[taskToStop->taskNum].access &= ~(2);
+        
+        //Mark the task being taken off the CPU as "not busy."  This is necessary because the LTR instruction sets the busy flag
+        //Since we are using a task gate for exception 0xe, we have to use LTR to keep the currently running task in the TR for back linking
+        __asm__("ltr ax\nclts\n":: "a" (nextTaskTSS));
         
         if (((process_t*)taskToRun->process)->justForked)
         {

@@ -122,7 +122,7 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     if (foundFile==NULL)
         panic("fs_read: file handle not found in fs->files");
     
-    if (process == NULL)
+    if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
         return foundFile->fops->read(buffer, size, length, foundFile->handle);
     
     lBuffer = allocPagesAndMap(size*length);

@@ -11,7 +11,6 @@
 #include "charDev.h"
 #include "kbd.h"
 #include "signals.h"
-#include "thesignals.h"
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61

@@ -83,15 +83,18 @@ __asm__("cli\n");
     kKernelTask->tss->ESP0=kKernelTask->esp0Base;
     printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for kernel task ESP0\n",kKernelTask->tss->ESP0);
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP0 | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP0,0x16,0x7);
+    pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP0,kKernelTask->tss->ESP0,0x16,0x7);
     kKernelTask->tss->ESP0+=0x15000;
     printd(DEBUG_PROCESS,"Adjusted kernel task ESP0 to 0x%08X\n",kKernelTask->tss->ESP0);
     kKernelTask->tss->ESP1=allocPages(0x16000);           //Syscall stack
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP1 | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP1,0x16,0x7);
+    pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP1,kKernelTask->tss->ESP1,0x16,0x7);
     printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for (ESP1) sysEnter\n",kKernelTask->tss->ESP1);
     kKernelTask->tss->ESP1+=0x15000;
     kKernelTask->tss->EFLAGS=0x200207;
     kKernelTask->tss->ESP=allocPages(0x16000);
     pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP | KERNEL_PAGED_BASE_ADDRESS,kKernelTask->tss->ESP,0x16,0x7);
+    pagingMapPageCount(KERNEL_CR3,kKernelTask->tss->ESP,kKernelTask->tss->ESP,0x16,0x7);
     printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for (ESP)\n",kKernelTask->tss->ESP);
     kKernelTask->tss->ESP+=0x15000;
     kKernelTask->tss->LINK=0x0;
@@ -125,9 +128,6 @@ __asm__("cli\n");
     printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08X) into task and kernel\n", kKernelTask->tss);
     
     gdtEntryOS(kKernelTask->taskNum,(uint32_t)kKernelTask->tss,sizeof(tss_t), ACS_TSS | ACS_DPL_0,GDT_GRANULAR | GDT_32BIT,true);
-    __asm__("mov eax,%[taskTSS]\n"                                    //Load task register with user process TSS entry
-            "ltr ax\n"
-            ::[taskTSS] "r" (kKernelTask->taskNum<<3));
 
     
     //idt_set_gate (&idtTable[0x80], 0x8, (int)&_sysCall, ACS_INT | ACS_DPL_3);

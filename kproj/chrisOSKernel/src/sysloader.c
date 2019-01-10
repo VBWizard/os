@@ -151,6 +151,12 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                 strcat(fileName,elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount]);
                 printd(DEBUG_ELF_LOADER,"Found NEEDED, library name='%s', checking to see if it is already loaded.\n",
                         fileName);
+                if (strcmp(fileName,"/")==0)
+                { 
+                    int a = 0;
+                    int b = a;
+                    a = b;
+                }
                 elfInfo_t* foundElf=NULL;
                 dllist_t* theList=kLoadedElfInfo;
                 do

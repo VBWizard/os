@@ -451,8 +451,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     }
     else
     {
-        gdtFlags |= GDT_DPL0;
-        tssFlags |= ACS_DPL_0;
+        gdtFlags |= GDT_DPL3;
+        tssFlags |= ACS_DPL_3;
     }
     memset(process->task->tss->IOs,0,200);
     process->task->tss->IOPB = sizeof(tss_t)-200;

@@ -58,6 +58,13 @@ overRestoreCR3:
     cmp eax,1
     je overKernelReturn
     #For kernel processes, we have to switch back to the process' SS:ESP and then iret
+
+    mov eax, nextTaskTSS
+    cmp eax,0
+    je overloadTaskRegister2
+    mov eax,0
+    mov nextTaskTSS, eax
+overloadTaskRegister2:
     mov eax, isrSavedESP
     mov esp, eax
     mov eax, isrSavedSS
@@ -92,9 +99,8 @@ newTaskLoaded:
     mov eax, nextTaskTSS
     cmp eax,0
     je overloadTaskRegister
-    ltr ax
-    clts      #Clear TS (task switch) flag in CR0
     mov eax,0
+    mov nextTaskTSS, eax
     mov schedulerTaskSwitched,eax
 #    mov eax,kTaskSwitchCount
 #    inc eax

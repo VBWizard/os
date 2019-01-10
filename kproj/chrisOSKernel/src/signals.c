@@ -59,18 +59,24 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     typedef void sigHandler(void);
 
 
+#define CURRENT_TASK ({uint32_t task; \
+                  __asm__("str eax\nshr eax,3\n":"=a" (task));\
+                  task;})
+    
 //Process a sigaction against a process, called by sys_sigaction or the kernel
 void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t callerCR3)
 {
-    process_t *p;
+    uint32_t currentTask = 0;
+    
+    __asm__("str eax\nshr eax,3\n":"=a" (currentTask));
+    printd(DEBUG_PROCESS, "current task = 0x%04X\n",currentTask);
+    if (!currentTask)
+        panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",callerCR3,signal,sigAction);
+    process_t *p = findTaskByTaskNum(currentTask)->process;
+    callerCR3=p->pageDirPtr;
     
     printd(DEBUG_SIGNALS, "sys_sigAction2(0x%08X, 0x%08X, 0x%08X, 0x%08X)\n"
             ,signal, sigAction, sigData,callerCR3);
-
-    void* processAddr=findTaskByCR3(callerCR3);
-    if (!processAddr)
-        panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",callerCR3,signal,sigAction);
-    p=((task_t*)processAddr)->process;
     printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08X, task 0x%04X for cr3 of 0x%08X\n",p,p->task->taskNum,callerCR3);
     switch (signal)
     {
@@ -105,8 +111,10 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             printd(DEBUG_SIGNALS,"Process resumed from SIG_STOP");
             break;
         case SIGSEGV:
-            printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald=0x%08X processing signal\n",callerCR3,p->signals.sigind);
+            printd(DEBUG_EXCEPTIONS,"Signaling SEGV for cr3=0x%08X, signald before=0x%08X processing signal\n",callerCR3,p->signals.sigind);
+            __asm__("cli\n");
             p->signals.sigind|=SIGSEGV;
+            printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald after=0x%08X processing signal\n",callerCR3,p->signals.sigind);
             triggerScheduler();
             __asm__("sti\nhlt\n");      //Put the task to sleep until the next tick when another task will take its place    
             return p;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET

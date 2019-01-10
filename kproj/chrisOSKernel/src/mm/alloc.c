@@ -57,7 +57,7 @@ sMemInfo* findAvailableBlockBySize(uint32_t pSize)
     {
         if (mInfo->size>=pSize && (mInfo->inUse==false))
         {
-            printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
+            printd(DEBUG_PROCESS,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
             return mInfo;
         }
         mInfo--;

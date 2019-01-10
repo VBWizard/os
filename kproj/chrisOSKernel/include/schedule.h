@@ -27,7 +27,6 @@ extern "C" {
 #include "paging.h"
 #include "process.h"
 #include "kernel.h"
-#include "thesignals.h"
     
 #define RUNNABLE_TICKS_INTERVAL 20
     

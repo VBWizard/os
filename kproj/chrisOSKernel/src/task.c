@@ -129,9 +129,11 @@ void mmMapKernelIntoTask(task_t* task, bool kernelTSS)
     pagingMapPageCount(task->tss->CR3, schedStack, schedStack, 0x16000/PAGE_SIZE, 0x7);
     kDebugLevel=oldDebugLevel;
     
-    //Not sure if I should do these next two but I have to in order to get the exception 0xe task gate working
+    //Not sure if I should do these next 3 but I have to in order to get the exception 0xe task gate working
     pagingMapPageCount(task->tss->CR3,((uint32_t)pagingExceptionTSS),(uint32_t)pagingExceptionTSS,0x1,0x7);
     pagingMapPageCount(task->tss->CR3,((uint32_t)task->tss),(uint32_t)task->tss,0x1,0x7);
+    pagingMapPageCount(task->tss->CR3,pagingExceptionTSS->ESP ,pagingExceptionTSS->ESP,0x16,0x7);
+
 }
 
 task_t* createTask(void* process, bool kernelTSS)
