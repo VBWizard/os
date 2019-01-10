@@ -58,7 +58,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/9e02dec1/iodugging.o \
 	${OBJECTDIR}/_ext/9e02dec1/memcpy.o \
 	${OBJECTDIR}/_ext/9e02dec1/panic.o \
-	${OBJECTDIR}/_ext/9e02dec1/printf.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcat.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcmp.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcpy.o \
@@ -86,6 +85,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/mm/mm.o \
 	${OBJECTDIR}/src/mm/mmap.o \
 	${OBJECTDIR}/src/paging.o \
+	${OBJECTDIR}/src/printfNew.o \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/schedule.o \
 	${OBJECTDIR}/src/signals.o \
@@ -233,11 +233,6 @@ ${OBJECTDIR}/_ext/9e02dec1/panic.o: ../chrisOS/src/panic.c nbproject/Makefile-${
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/panic.o ../chrisOS/src/panic.c
 
-${OBJECTDIR}/_ext/9e02dec1/printf.o: ../chrisOS/src/printf.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
-	${RM} "$@.d"
-	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/printf.o ../chrisOS/src/printf.c
-
 ${OBJECTDIR}/_ext/3e0a6d34/strcat.o: ../chrisOS/src/strings/strcat.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
@@ -370,6 +365,11 @@ ${OBJECTDIR}/src/paging.o: src/paging.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/paging.o src/paging.c
+
+${OBJECTDIR}/src/printfNew.o: src/printfNew.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/printfNew.o src/printfNew.c
 
 ${OBJECTDIR}/src/process.o: src/process.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src

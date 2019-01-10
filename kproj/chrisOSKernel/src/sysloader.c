@@ -81,7 +81,7 @@ void elfMakePagesCOW(uint32_t cr3, uint32_t address, uint32_t size)
 
 void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
 {
-	printd(DEBUG_ELF_LOADER,"elfSetupCopyOnPages: Scanning section header table for .data and .bss\n");
+	printd(DEBUG_COW,"elfSetupCopyOnPages: Scanning section header table for .data and .bss\n");
 	for (int cnt=0;cnt<elf->secHdrRecordCount;cnt++)
 	{
             if (elf->secHdrTable[cnt].sh_type==SHT_NOBITS || elf->secHdrTable[cnt].sh_type==SHT_PROGBITS)
@@ -89,7 +89,7 @@ void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
                 bool sectionIsCOW=false;
                 if (strncmp(strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),".bss",255)==0)
                 {
-                    printd(DEBUG_ELF_LOADER,"Found bss segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    printd(DEBUG_COW,"\tFound bss segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
                     elf->bssAddress=elf->secHdrTable[cnt].sh_addr;
                     elf->bssSize=elf->secHdrTable[cnt].sh_size;
                     if (elf->isLibrary)
@@ -98,18 +98,18 @@ void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
                 }
                 else if (strncmp(strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),".data",255)==0)
                 {
-                    printd(DEBUG_ELF_LOADER,"Found data segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    printd(DEBUG_COW,"\tFound data segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
                     elf->dataAddress=elf->secHdrTable[cnt].sh_addr;
                     elf->dataSize=elf->secHdrTable[cnt].sh_size;
                     if (elf->isLibrary)
                         sectionIsCOW=true;
                 }
                 else
-                    printd(DEBUG_ELF_LOADER,"Found (%s) (NOBITS) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),elf->secHdrTable[cnt].sh_type,elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    printd(DEBUG_COW,"\tFound (%s) (NOBITS) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),elf->secHdrTable[cnt].sh_type,elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
 
                 if (sectionIsCOW)
                 {
-                    printd(DEBUG_ELF_LOADER,"\tsegment belongs to a library, marking pages as CoW (moo)\n");
+                    printd(DEBUG_COW,"\tsegment belongs to a library, marking pages as CoW (moo)\n");
                     elfMakePagesCOW(cr3,elf->bssAddress,elf->bssSize);
                 }
             }

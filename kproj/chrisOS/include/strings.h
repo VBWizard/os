@@ -20,6 +20,7 @@
 #define ISUPPER(c)  ((c) >= 'A' && (c) <= 'Z')
 
 size_t strlen(const char* str);
+size_t strnlen(const char* str, int maxLen);
 char * strcpy(char *s1, const char *s2);
 /* This routine should be optimized. */
 

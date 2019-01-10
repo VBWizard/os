@@ -10,6 +10,12 @@
 #define SCHEDULER_DEBUG 1
 #define MAX_TASKS 1000
 
+extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
+extern uint32_t* kTicksSinceStart;
+extern bool schedulerTaskSwitched;
+extern task_t* kKernelTask;
+extern task_t* kIdleTask;
+
 task_t *kTaskList;
 uintptr_t *qZombie;
 uintptr_t *qRunning;
@@ -21,24 +27,22 @@ uintptr_t *qExited;
 bool forkReturn;
 uint32_t nextTaskTSS;
 
-extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
-extern uint32_t* kTicksSinceStart;
 uint32_t kTaskSwitchCount;
 uint32_t kSchedulerCallCount;
 uint32_t NO_TASK=0xFFFFFFFF;
 uintptr_t* schedStack; //Loaded by scheduler when it is called 
 
 uint32_t nextScheduleTicks;
+uint32_t kPagingExceptionCount;
+extern uint32_t kCPUCyclesPerSecond;
 
 const char* TASK_STATE_NAMES[] = {"Zombie","Running","Runnable","Stopped","Uninterruptable Sleep","Interruptable Sleep","Exited","None"};
-extern bool schedulerTaskSwitched;
-extern task_t* kKernelTask;
-extern task_t* kIdleTask;
 
 void changeTaskQueue(task_t* task, eTaskState newState);
 
 void initSched()
 {
+    kPagingExceptionCount = 0;
     schedStack = kMalloc(0x16000);
     pagingMapPageCount(KERNEL_CR3, schedStack, schedStack, 0x16000/PAGE_SIZE, 0x7);
     NO_PREV = 0xFFFFFFFF;
@@ -578,19 +582,28 @@ void runAnotherTask(bool schedulerRequested)
     {
         __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (oldCR3));
     }
-#ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"*Scheduler calls=%u, task switchs=%u, ticks=0x%08X\n",kSchedulerCallCount, kTaskSwitchCount,*kTicksSinceStart);
-    printd(DEBUG_PROCESS,"**************************************************************************\n");
-#endif
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
     return;
 }
 
 void scheduler()
 {
+    uint64_t ticksBefore=rdtsc();
+    
     //NOTE: When this method is entered, it is time to reschedule.  The check for whether it is time is in kIRQ0_handler()
     runAnotherTask(true);
     kSchedulerCallCount++;
+    
+    uint64_t ticksAfter=rdtsc();
+    
+#ifdef SCHEDULER_DEBUG
+    printd(DEBUG_PROCESS,"*Scheduler: calls=%u, task switchs=%u, ticks=0x%08X\n",kSchedulerCallCount, kTaskSwitchCount,*kTicksSinceStart);
+    uint32_t diff = ticksAfter-ticksBefore;
+__asm__("clts\n");  //TODO: Hackish but have to clear the task switched flag BEFORE using the FPU
+    uint32_t timeInScheduler = (diff/kCPUCyclesPerSecond)*100;
+    printd(DEBUG_PROCESS,"%u MS expired (%u CPU cycles)\n",timeInScheduler, diff);
+    printd(DEBUG_PROCESS,"**************************************************************************\n");
+#endif
 }
 
 int32_t getExitCode(uint32_t taskNum)

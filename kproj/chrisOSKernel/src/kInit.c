@@ -15,6 +15,7 @@
 
 extern void _sysCall();
 extern void _sysEnter();
+extern void vector7();
 extern void vector13();
 extern void vector14();
 extern void vector32();
@@ -30,12 +31,14 @@ extern uint32_t getFS();
 extern uint32_t getGS();
 extern uint32_t getSS();
 extern uint32_t getESP();
+extern uint64_t kCPUCyclesPerSecond;
 extern uint32_t* isrSavedStack;
 extern bool schedulerTaskSwitched;
 extern cpuid_features_t kCPUFeatures;
 extern time_t kSystemCurrentTime;
 extern void getDateTimeString(char *s);
 extern uint32_t exceptionSavedStack;
+extern uint64_t kCPUCyclesPerSecond;
 
 struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
 dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call listInit and pass the first item (a dllist_t*) to it
@@ -48,7 +51,7 @@ void initKernelInternals()
 {
     char currTime[50];
     getDateTimeString((char*)currTime);
-    printk("Kernel init time is: %s\n",currTime);
+    //printk("Kernel init time is: %s\n",currTime);
     
 __asm__("cli\n");
     uint32_t oldCR3=0;
@@ -131,7 +134,6 @@ __asm__("cli\n");
     idt_set_gate (&idtTable[0x80], 0x8, (int)&vector128, ACS_INT | ACS_DPL_3);
     //See setupPagingHandler
     //idt_set_gate (&idtTable[0xe], 0x8, (int)&vector14, ACS_INT);   //paging exception
-    setupPagingHandler();
     //idt_set_gate (&idtTable[0xd], 0x8, (int)&vector13, ACS_INT); //Move this out of the way of the exception handlers
 
     //Configure SysEnter/SysExit
@@ -145,7 +147,39 @@ __asm__("cli\n");
 
     printk("Installing new IRQ0 handler\n");
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
+    idt_set_gate (&idtTable[0x7], 0x08, (int)&vector7, ACS_INT);
+    setupPagingHandler();
 
+    __asm__("jmp 0x88:kernJump1\nkernJump1:\n");
+
+kernJump1:    
 __asm__("sti\n");
 
+}
+
+int tscGetTicksPerSecond()
+{
+    uint64_t ticksBefore=rdtsc();
+    wait(500);
+    return (rdtsc()-ticksBefore)*2;
+}
+
+void hardwareInit()
+{
+    kCPUCyclesPerSecond = tscGetTicksPerSecond();
+
+    //Check for SEE and enable it if available, also disabling co emu and monitoring
+    __asm__("mov eax, 0x1\n"
+            "cpuid\n"
+            "test edx, 1<<25\n"
+            "jz .noSSE\n"
+            "mov eax, cr0\n"
+            "and ax, 0xFFFB\n"  //clear coprocessor emulation CR0.EM
+            "or ax, 0x2\n"      //set coprocessor monitoring  CR0.MP
+            "mov cr0, eax\n"
+            "mov eax, cr4\n"
+            "or ax, 3 << 9\n"   //set CR4.OSFXSR and CR4.OSXMMEXCPT at the same time
+            "mov cr4, eax\n"
+            ".noSSE:\n");
+    
 }

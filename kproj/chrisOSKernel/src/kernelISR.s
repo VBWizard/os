@@ -20,11 +20,14 @@
 .extern _schedule
 .extern schedulerTriggered
 .extern kPagingExceptionHandlerNew
+.extern kPagingExceptionCount
 
 .globl pagingExceptionHandler
 .type pagingExceptionHandler, @function
 pagingExceptionHandler:
-jumpHere:
+    mov eax,kPagingExceptionCount
+    inc eax
+    mov kPagingExceptionCount, eax
     mov eax,[esp]
     push eax
     mov eax,cr2
@@ -42,8 +45,6 @@ pagingExceptionReturn:
 iret
 jmp pagingExceptionHandler
 
-isrNumber: .word 0,0
-tempEAX: .word 0,0
 .globl alltraps
 .type alltraps, @function
 alltraps:
@@ -1836,3 +1837,7 @@ _isr_has_errorCode:  .byte      0,0,0,0,0,0,0,0, 1,0,1,1,1,1,1,0
                      .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
                      .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
                      .byte      0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+
+.globl isrNumber
+isrNumber: .word 0,0
+

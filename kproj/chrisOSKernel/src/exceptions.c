@@ -23,7 +23,6 @@
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
-extern uint16_t exceptionNumber;
 extern uint32_t exceptionCS;
 extern uint32_t exceptionEIP;
 extern uint32_t exceptionFlags;
@@ -47,6 +46,7 @@ extern void pagingExceptionHandler();
 extern task_t* kKernelTask;
 extern struct idt_entry* idtTable;
 extern void pagingExceptionReturn(uint32_t TR);
+extern uint16_t isrNumber;
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
@@ -171,7 +171,6 @@ void kPagingExceptionHandler()
     }
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
-        if (exceptionNumber==0x0e)
           printk("\nPaging handler called for virtual address 0x%02X\n",exceptionCR2);
           printk("PDE@0x%08X=0x%08X, PTE@0x%08X=0x%08X\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
           printDumpedRegs();
@@ -204,10 +203,22 @@ pagingExceptionStop:
 void defaultISRHandler()
 {
     //terminal_clear();
+
+    if (isrNumber==7)
+    {
 #ifndef DEBUG_NONE
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
-        printk("Exception handler called for exception # 0x%02x\n\n", exceptionNumber);
+        //printd(DEBUG_EXCEPTIONS,"defaultISRHandler: Exception 0x7 triggered.  We are ignoring the CR0 task switched flag (TS) for now.  Will reset the flag and resume.\n",kPagingExceptionsSinceStart+1);
+    }
+        __asm__("clts\n");
+        return;
+    }
+#endif
+#ifndef DEBUG_NONE
+    if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
+    {
+        printk("Exception handler called for exception # 0x%02x\n\n", isrNumber);
         printDumpedRegs();
         printd(DEBUG_EXCEPTIONS,"handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
@@ -232,7 +243,7 @@ void doubleFaultHandler()
 {
     uint32_t esp = (uint32_t)exceptionSavedESP;
         terminal_clear();
-        printk("Double Fault for exception %02X, CS:EIP = %04X:%08x, error = %08X\n", exceptionNumber, exceptionCS, exceptionEIP, exceptionCR2);
+        printk("Double Fault for exception %02X, CS:EIP = %04X:%08x, error = %08X\n", isrNumber, exceptionCS, exceptionEIP, exceptionCR2);
         printk ("Stack:\n");
         for (int cnt=0;cnt<10;cnt++)
         {
@@ -287,23 +298,12 @@ void setupPagingHandler()
 
     gdtEntryOS(0x17,pagingExceptionTSS,sizeof(tss_t), ACS_TSS,GDT_GRANULAR | GDT_32BIT,true);
 
-    //install the TSS
-    //DPL3 because that's the minimum calling priv
-    //Selector is B8 - DPL is 0
+    //install the paging exception handler task TSS
     idt_set_gate (&idtTable[0xe], 0xB8, 0, ACS_TASK | ACS_DPL_0); //paging exception
-    
 }
 
 void kPagingExceptionHandlerNew(uint32_t taskNum, uint32_t exceptionCR2, int ErrorCode)
 {
-    tss_t* ourTSS = pagingExceptionTSS;
-    uint32_t victimTaskNum = ourTSS->LINK;
-    victimTaskNum >>= 3;
-    task_t* victimTask = findTaskByTaskNum(victimTaskNum);
-    process_t* process = victimTask->process;
-    uint32_t exceptionCR3 = process->pageDirPtr;
-    
-
     uint32_t lPDEValue=0;
     uint32_t lPTEValue=0;
     uint32_t lPDEAddress=0, lPTEAddress=0;
@@ -312,7 +312,15 @@ void kPagingExceptionHandlerNew(uint32_t taskNum, uint32_t exceptionCR2, int Err
     uint32_t pagePhysAddr=lPTEValue&0xFFFFF000;
     uint32_t pageFlags=lPTEValue&0x00000FFF;
     uint32_t pageVirtAddress;
+    tss_t* ourTSS = pagingExceptionTSS;
+    uint32_t victimTaskNum = ourTSS->LINK;
+    victimTaskNum >>= 3;
+    task_t* victimTask = findTaskByTaskNum(victimTaskNum);
+    process_t* process = victimTask->process;
+    uint32_t exceptionCR3 = process->pageDirPtr;
+    uint32_t pagingExceptionESP = victimTask->tss->ESP;
     
+
     __asm__("mov cr3,eax\n"::"a"(KERNEL_CR3));
     
     lPTEAddress=kPagingGet4kPTEntryAddressCR3(exceptionCR3,exceptionCR2);
@@ -320,8 +328,9 @@ void kPagingExceptionHandlerNew(uint32_t taskNum, uint32_t exceptionCR2, int Err
     lPDEValue=kPagingGet4kPDEntryValueCR3(exceptionCR3,exceptionCR2);
     lPTEValue=kPagingGet4kPTEntryValueCR3(exceptionCR3,exceptionCR2);
     elfInfo_t* elf=process->elf;
-    printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X)\n",exceptionCR2,exceptionCR3);
-    printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0X%08X)\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",process->path,process->task->taskNum, lPTEValue);
+    //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X)\n",exceptionCR2,exceptionCR3);
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%08X (CR3=0x%08X)\n",exceptionCR2,exceptionCR3);
+    printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08X)\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",process->path,process->task->taskNum, lPTEValue);
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
     pageVirtAddress=lPTEValue&0xFFFFF000;
     if ( (pageVirtAddress==(exceptionCR2&0xFFFFF000)) 
@@ -415,10 +424,10 @@ void kPagingExceptionHandlerNew(uint32_t taskNum, uint32_t exceptionCR2, int Err
     }
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
-        if (exceptionNumber==0x0e)
           printk("\nPaging handler called for virtual address 0x%02X\n",exceptionCR2);
           printk("PDE@0x%08X=0x%08X, PTE@0x%08X=0x%08X\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
-          printDumpedRegs();
+          printPagingExceptionRegs(pagingExceptionESP);
+          //printDumpedRegs();
           if (!isCow) //CLR 12/29/2018: Stop logging exception info for CoWs
             logDumpedRegs();
           //printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);

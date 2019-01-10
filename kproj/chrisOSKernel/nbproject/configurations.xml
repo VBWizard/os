@@ -118,6 +118,7 @@
       <itemPath>../chrisOS/src/panic.c</itemPath>
       <itemPath>../chrisOS/src/block/pci.c</itemPath>
       <itemPath>../chrisOS/src/printf.c</itemPath>
+      <itemPath>src/printfNew.c</itemPath>
       <itemPath>src/process.c</itemPath>
       <itemPath>src/schedule.c</itemPath>
       <itemPath>src/schedule_old.c</itemPath>
@@ -297,8 +298,6 @@
       </item>
       <item path="../chrisOS/src/panic.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/printf.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/strings/strcat.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strcmp.c" ex="false" tool="0" flavor2="0">
@@ -410,6 +409,8 @@
       <item path="src/mm/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/printfNew.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/process.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -697,6 +698,8 @@
       <item path="src/mm/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/printfNew.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/process.c" ex="false" tool="0" flavor2="0">
       </item>

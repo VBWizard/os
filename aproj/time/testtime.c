@@ -29,9 +29,9 @@ int main(int argc, char** argv) {
     startTime = malloc(sizeof(struct tm));
     endTime = malloc(sizeof(struct tm));
     execpgm = malloc(512);
-    print("Param count=%u\n",argc);
-    for (int cnt=0;cnt<argc;cnt++)
-        print("Param %u=%s\n",cnt,argv[cnt]);
+//    print("Param count=%u\n",argc);
+//    for (int cnt=0;cnt<argc;cnt++)
+//        print("Param %u=%s\n",cnt,argv[cnt]);
 #endif
     if (argc<2)
     {
@@ -71,15 +71,16 @@ int main(int argc, char** argv) {
             endTicks=getticks();
             gettime(endTime,true);
             elapsed=(endTicks-startTicks);
-            totalTime=malloc(sizeof(struct tm));    
+            retVal=elapsed;
+/*            totalTime=malloc(sizeof(struct tm));    
             print("Start time: %02u:%02u:%02u\n",startTime->tm_hour, startTime->tm_min, startTime->tm_sec);
             print("Elapsed ticks = %u\n",elapsed);
             int ms=elapsed%TICKS_PER_SECOND*(TICKS_PER_SECOND/10);
             elapsed/= TICKS_PER_SECOND;
             gmtime_r(&elapsed,totalTime);
-            print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
-            free(endTime);
-            free(totalTime);
+            //print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
+*/
+//            free(totalTime);
         }
     }
     free(startTime);

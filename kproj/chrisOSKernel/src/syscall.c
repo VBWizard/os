@@ -92,7 +92,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             if (param1==STDOUT_FILE)
             {
                 //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
-                printu((const char*)param2, NULL);
+                printf((char*)param2,"");
+                //printu((const char*)param2, NULL);
             }
             else
                 panic("_sysCall: sys_write for descriptor 0x%08X not implemented\n",param1);
@@ -164,12 +165,18 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_PRINT:     //sys_print (prints to screen)
             va_copy(ap,(va_list*)(param2));
             //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
-            printu((const char*)param1, ap);
+            //printf((char*)param1, ap);
+            char printf_buf[1024];
+            memset(printf_buf,0,1024);
+            retVal = vsprintf(printf_buf, param1, ap);
+            putString(printf_buf);
+
+            //printu((const char*)param1, ap);
             break;
         case SYSCALL_PRINTD: //printd: Debug print - param1 debuglevel, param2 format, param3 args
             //printd(DEBUG_PROCESS,"_syscall: printd(0x%08X,0x%08X,0x%08X)\n",param1,&param2,param3);
             va_copy(ap,(va_list*)(param3));
-            printd_valist(param1, (const char*)param2, ap);
+            printd(param1, (const char*)param2, ap);
             break;
         case SYSCALL_HLT:     //***hlt - execute hlt instruction
             __asm__("sti;hlt;");

@@ -190,6 +190,30 @@ char * strtoupper(char* pointerToString)
 #define LOAD_KERNEL_BASED_DS __asm__("mov eax,0x10\nmov ds,eax":::"eax");
 
 //Called by exception 0xd & 0xe (possibly more)
+void printPagingExceptionRegs(uint32_t esp)
+{
+    volatile unsigned short *lCSIPPtr=(volatile unsigned short *)exceptionCS;
+LOAD_ZERO_BASED_DS    
+    printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
+    printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
+    printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
+    printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
+    printk("GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
+    printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
+//          printk("Bytes at CS:EIP: ");
+//          for (int cnt=0;cnt<19;cnt++)
+//              printk("%02X ", lCSIPPtr[cnt]);
+//          printk("\n");
+          printk ("Stack (ss:ebp) @ 0x%08x:0x%08X:\n",exceptionSS, esp);
+          for (int cnt=0;cnt<20;cnt++)
+          {
+              printk("\t0x%08X: 0x%08X\n",esp, exceptionSavedStack[cnt]);
+              esp+=4;
+          }
+LOAD_KERNEL_BASED_DS
+}
+
+//Called by exception 0xd & 0xe (possibly more)
 void printDumpedRegs()
 {
     uint32_t esp = exceptionSavedESP;
@@ -208,7 +232,7 @@ LOAD_ZERO_BASED_DS
           printk ("Stack (ss:ebp) @ 0x%08x:0x%08X:\n",exceptionSS, esp);
           for (int cnt=0;cnt<20;cnt++)
           {
-              printk("\t0x%08X%: 0x%08X\n",esp, exceptionSavedStack[cnt]);
+              printk("\t0x%08X: 0x%08X\n",esp, exceptionSavedStack[cnt]);
               esp+=4;
           }
 LOAD_KERNEL_BASED_DS

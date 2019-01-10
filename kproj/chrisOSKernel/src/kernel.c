@@ -33,15 +33,16 @@ extern bool schedulerEnabled;
 bool schedulerTaskSwitched=0;
 extern uint32_t* isrSavedStack; 
 extern uint32_t kNextSignalCheckTicks;
+extern void keyboardInit();
 
 file_system_t *rootFs;
 process_t* kIdleProcess;
 task_t* kIdleTask;
 uint64_t kIdleTicks=0;
+uint64_t kCPUCyclesPerSecond;
 uint32_t saveESP;
 uint32_t kKernelCR3=KERNEL_CR3;
 void* kKeyboardHandlerRoutine=NULL;
-extern void keyboardInit();
 
 int main(int argc, char** argv) {
     printk("\nkernel loaded ... \n");
@@ -58,6 +59,8 @@ int main(int argc, char** argv) {
     printk("Kernel loaded...\n");
     schedulerEnabled=false;
     schedulerTaskSwitched=false;
+    printk("Initializing hardware ...\n");
+    hardwareInit();
     printk("Initializing memory management ...\n");
     mmInit();
     printk("Done initializing memory management.\n\nInitializing malloc ...\n");

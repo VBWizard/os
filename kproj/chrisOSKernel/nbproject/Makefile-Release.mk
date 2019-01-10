@@ -86,6 +86,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/mm/mm.o \
 	${OBJECTDIR}/src/mm/mmap.o \
 	${OBJECTDIR}/src/paging.o \
+	${OBJECTDIR}/src/printfNew.o \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/schedule.o \
 	${OBJECTDIR}/src/signals.o \
@@ -370,6 +371,11 @@ ${OBJECTDIR}/src/paging.o: src/paging.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/paging.o src/paging.c
+
+${OBJECTDIR}/src/printfNew.o: src/printfNew.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/printfNew.o src/printfNew.c
 
 ${OBJECTDIR}/src/process.o: src/process.c
 	${MKDIR} -p ${OBJECTDIR}/src

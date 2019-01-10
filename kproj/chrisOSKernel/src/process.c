@@ -100,7 +100,7 @@ void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned 
 
 void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size) //Copy memory from kernel to user space (assumes dest is user page)
 {
-    uintptr_t srcCR3=KERNEL_CR3, destCR3=(uintptr_t)process->task->pageDir;
+    uintptr_t srcCR3=KERNEL_CR3, destCR3=(uintptr_t)process->pageDirPtr;
     uintptr_t workingDestAddr=0, workingSrcAddr=0;
     unsigned long bytesLeft=size,loopBytesLeft=0;
     uintptr_t destPagedAddress, srcPagedAddress;
@@ -160,9 +160,11 @@ char* processGetCWD(char* buf, unsigned long size) //NOTE buf required to be not
     //Get the process from 
     process_t* process;
     //GET_PROCESS_POINTER(process);
-    process=(process_t*)PROCESS_STRUCT_VADDR;
-    process=(process_t*)process->this;
+    uint32_t taskNum;
     LOAD_KERNEL_CR3;
+    __asm__("str eax\n":"=a" (taskNum));
+    taskNum>>=3;
+    process=findTaskByTaskNum(taskNum);
     cwdSize=strlen(process->cwd)+1;
     if (buf==NULL)
         process->errno=ERROR_INVALID_DEST;

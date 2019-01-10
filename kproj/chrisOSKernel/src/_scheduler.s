@@ -93,6 +93,7 @@ newTaskLoaded:
     cmp eax,0
     je overloadTaskRegister
     ltr ax
+    clts      #Clear TS (task switch) flag in CR0
     mov eax,0
     mov schedulerTaskSwitched,eax
 #    mov eax,kTaskSwitchCount
