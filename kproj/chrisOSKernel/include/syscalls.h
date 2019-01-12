@@ -22,8 +22,11 @@ extern "C" {
     {
         SYSCALL_INVALID                 = 0x0,
         SYSCALL_ENDPROCESS 		= 0x1,
-        SYSCALL_READ 			= 0x3,
-        SYSCALL_WRITE 			= 0x4,
+        SYSCALL_OPEN                    = 0x2,
+        SYSCALL_CLOSE                   = 0x3,
+        SYSCALL_READ 			= 0x4,  
+        SYSCALL_WRITE 			= 0x5,
+        SYSCALL_FORK                    = 0x6,
         SYSCALL_GETCWD                  = 0x4f,
         SYSCALL_EXEC			= 0x59,
         SYSCALL_WAITFORPID		= 0x61,
@@ -36,9 +39,12 @@ extern "C" {
         SYSCALL_STOP			= 0x168,
         SYSCALL_REBOOT			= 0x169,
         SYSCALL_GETTICKS		= 0x170,
+        SYSCALL_GETTIME                 = 0x171,
         SYSCALL_PRINT			= 0x300,
         SYSCALL_PRINTD			= 0x301,
-        SYSCALL_HLT			= 0x302
+        SYSCALL_HLT			= 0x302,
+        SYSCALL_MASKSIG                 = 0x303,
+        SYSCALL_GETDENTS                = 0x304
     } E_SYSCALLS;
 
 

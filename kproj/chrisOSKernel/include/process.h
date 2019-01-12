@@ -16,7 +16,6 @@
 #include "../../chrisOS/include/elfloader.h"
 #include "time_os.h"
 #include "rusage.h"
-#include "fs.h"
 #include "signals.h"
 
 #ifndef PROCESS_H
@@ -29,11 +28,12 @@ extern "C" {
 #define PROCESS_HEAP_START 0x70000000
 #define PROCESS_HEAP_END   0xBFFFFFFF
 #define PROCESS_MAX_EXIT_HANDLERS 20    
+#define PROCESS_MAX_ENVIRONMENT_VARIABLES 512
 #define PROCESS_STRUCT_VADDR 0xF000F000
 #define PROCESS_STRUCT_VADDR_THIS_OFFSET 0x4
     
     typedef void exitHandler(void);
-    typedef void startHandler(void);
+    typedef void startHandler();
 
     //NOTE: Any code can use PROCESS_STRUCT_VADDR for access to the process r/o
     //NOTE: Kernel code can use PROCESS_STRUCT_VADDR+4 for a pointer to the process which will be r/w
@@ -48,7 +48,7 @@ extern "C" {
         char* path;
         uint32_t retVal;
         signal_t signals;
-        uint32_t heapStart, heapEnd;
+        uint32_t heapStart, heapEnd, stackStart, stackSize, stack1Start, stack1Size, stack0Start, stack0Size;
         short priority;           //-20=highest, 20=lowest
         void* exitHandler[PROCESS_MAX_EXIT_HANDLERS];
         void* parent;
@@ -57,23 +57,29 @@ extern "C" {
         uint32_t totalRunTicks;
         uint32_t entryPoint;
         int argc;
-        uintptr_t argv;
+        char** argv;
         struct rusage usage;
-        file_t* stdin, *stdout, *stderr;        //standard input/output/error pointers
+        void* stdin, *stdout, *stderr;        //standard input/output/error pointers
         dllist_t* mmaps;
         int errno;
         char* cwd;                              //Current working directory for the process
         void* startHandler[PROCESS_MAX_EXIT_HANDLERS];
         int startHandlerPtr;
+        char** mappedEnvp;
+        char** realEnvp;
+        char* mappedEnv;
+        char* realEnv;
+        bool justForked;
     } process_t;
 
 
-    process_t* createProcess(char* path, int argc, uint32_t argv, process_t* parentProcessPtr, bool kernelProcess);
+    process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess);
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);
     char* processGetCWD(char* buf, unsigned long size);
-    
+    void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size); //Copy memory from kernel to user space (assumes dest is user page)
+    void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size); //Copy memory from user space to kernel (assumes dest is kernel page)
 #define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus
 }

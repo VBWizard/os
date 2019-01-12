@@ -39,6 +39,7 @@ typedef struct sTss
     uint32_t    LDTR;               //0x60
     uint16_t    trap;
     uint16_t    IOPB;               //0x64
+    uint8_t     IOs[200];
 } __attribute__((packed)) tss_t;
 
 #endif	/* TSS_H */

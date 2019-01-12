@@ -28,9 +28,9 @@ qemu-system-i386 							\
 	-serial file:"qemu_port.log"					\
 	-S -s								\
 	-d int,cpu_reset,pcall,guest_errors                                     \
-	-machine accel=tcg						
-#	@$
+	$1 $2
 #	--enable-kvm
+	#-machine accel=tcg					  	\	
 
 #drive=/home/yogi/qemu-usb-mass-storage.dsk
 #-hda ~/diskimage.img

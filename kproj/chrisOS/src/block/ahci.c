@@ -69,7 +69,7 @@ int AhciIssueCmd(volatile HBA_PORT *port,int cmdslot)
 
     //wait cmd
     for (i = 0; i < 100; i++) {
-        wait(50);
+        wait(1); //CLR 01/09/2018: changed from 50 to 1 ... this sped the system up immensely!
         if (!port->tfd.BSY)
             break;
     }

@@ -21,6 +21,7 @@ extern "C" {
     void reverseI(char s[]);
     void itoaI(int n, char s[]);
     int atoi(char *str);
+    void itoa(int n, char s[]);
     
 #ifdef __cplusplus
 }

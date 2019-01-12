@@ -28,7 +28,7 @@ extern "C" {
 extern void kIRQ0_handler();
     
 void initKernelInternals();
-
+void hardwareInit();
 
 
 #ifdef __cplusplus

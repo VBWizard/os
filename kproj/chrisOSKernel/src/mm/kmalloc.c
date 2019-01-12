@@ -35,6 +35,7 @@ void initHeapPagePtr(heapPtrPage* pagePtr);
 void initKMalloc()
 {
     kHeapPagePtr = allocPagesAndMap(sizeof(heapPtrPage));
+    printd(DEBUG_KMALLOC, "initKMalloc: kHeapPagePtr is at 0x%08X\n", kHeapPagePtr);
     kHeapPagePtr->prev=NO_PREV_HEAP_PTR;
     initHeapPagePtr(kHeapPagePtr);
 }

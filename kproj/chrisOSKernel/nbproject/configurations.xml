@@ -89,6 +89,7 @@
         <itemPath>../chrisOS/src/strings/strtol.c</itemPath>
         <itemPath>../chrisOS/src/strings/strtrim.c</itemPath>
       </logicalFolder>
+      <itemPath>src/_scheduler.s</itemPath>
       <itemPath>../chrisOS/src/block/ahci.c</itemPath>
       <itemPath>src/mm/alloc.c</itemPath>
       <itemPath>../chrisOS/asm/asmFunctions.s</itemPath>
@@ -99,6 +100,7 @@
       <itemPath>src/dllist.c</itemPath>
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
       <itemPath>src/exceptions.c</itemPath>
+      <itemPath>src/fs.c</itemPath>
       <itemPath>../chrisOS/src/cpu/gdt.c</itemPath>
       <itemPath>../chrisOS/src/iodugging.c</itemPath>
       <itemPath>src/kIRQHandlers.c</itemPath>
@@ -116,6 +118,7 @@
       <itemPath>../chrisOS/src/panic.c</itemPath>
       <itemPath>../chrisOS/src/block/pci.c</itemPath>
       <itemPath>../chrisOS/src/printf.c</itemPath>
+      <itemPath>src/printfNew.c</itemPath>
       <itemPath>src/process.c</itemPath>
       <itemPath>src/schedule.c</itemPath>
       <itemPath>src/schedule_old.c</itemPath>
@@ -295,8 +298,6 @@
       </item>
       <item path="../chrisOS/src/panic.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/printf.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/strings/strcat.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strcmp.c" ex="false" tool="0" flavor2="0">
@@ -377,6 +378,8 @@
       </item>
       <item path="kbd.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/_scheduler.s" ex="false" tool="4" flavor2="0">
+      </item>
       <item path="src/device.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/dllist.c" ex="false" tool="0" flavor2="0">
@@ -384,6 +387,8 @@
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -404,6 +409,8 @@
       <item path="src/mm/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/printfNew.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/process.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -660,6 +667,8 @@
       </item>
       <item path="kbd.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/_scheduler.s" ex="false" tool="4" flavor2="0">
+      </item>
       <item path="src/device.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/dllist.c" ex="false" tool="0" flavor2="0">
@@ -667,6 +676,8 @@
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -687,6 +698,8 @@
       <item path="src/mm/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/paging.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/printfNew.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/process.c" ex="false" tool="0" flavor2="0">
       </item>

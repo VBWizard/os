@@ -58,7 +58,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/9e02dec1/iodugging.o \
 	${OBJECTDIR}/_ext/9e02dec1/memcpy.o \
 	${OBJECTDIR}/_ext/9e02dec1/panic.o \
-	${OBJECTDIR}/_ext/9e02dec1/printf.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcat.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcmp.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcpy.o \
@@ -70,10 +69,12 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strtol.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strtrim.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
+	${OBJECTDIR}/src/_scheduler.o \
 	${OBJECTDIR}/src/device.o \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
 	${OBJECTDIR}/src/exceptions.o \
+	${OBJECTDIR}/src/fs.o \
 	${OBJECTDIR}/src/kIRQHandlers.o \
 	${OBJECTDIR}/src/kInit.o \
 	${OBJECTDIR}/src/kernel.o \
@@ -84,6 +85,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/mm/mm.o \
 	${OBJECTDIR}/src/mm/mmap.o \
 	${OBJECTDIR}/src/paging.o \
+	${OBJECTDIR}/src/printfNew.o \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/schedule.o \
 	${OBJECTDIR}/src/signals.o \
@@ -231,11 +233,6 @@ ${OBJECTDIR}/_ext/9e02dec1/panic.o: ../chrisOS/src/panic.c nbproject/Makefile-${
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/panic.o ../chrisOS/src/panic.c
 
-${OBJECTDIR}/_ext/9e02dec1/printf.o: ../chrisOS/src/printf.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
-	${RM} "$@.d"
-	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/printf.o ../chrisOS/src/printf.c
-
 ${OBJECTDIR}/_ext/3e0a6d34/strcat.o: ../chrisOS/src/strings/strcat.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
@@ -291,6 +288,10 @@ ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c nbproject/Makefile-${CN
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/time.o ../chrisOS/src/time.c
 
+${OBJECTDIR}/src/_scheduler.o: src/_scheduler.s nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/src/_scheduler.o src/_scheduler.s
+
 ${OBJECTDIR}/src/device.o: src/device.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -310,6 +311,11 @@ ${OBJECTDIR}/src/exceptions.o: src/exceptions.c nbproject/Makefile-${CND_CONF}.m
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/exceptions.o src/exceptions.c
+
+${OBJECTDIR}/src/fs.o: src/fs.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fs.o src/fs.c
 
 ${OBJECTDIR}/src/kIRQHandlers.o: src/kIRQHandlers.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -359,6 +365,11 @@ ${OBJECTDIR}/src/paging.o: src/paging.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/paging.o src/paging.c
+
+${OBJECTDIR}/src/printfNew.o: src/printfNew.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/printfNew.o src/printfNew.c
 
 ${OBJECTDIR}/src/process.o: src/process.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src

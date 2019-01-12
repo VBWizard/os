@@ -9,10 +9,6 @@ extern int heapMemoryBlockAvailIndMax;
 extern uint32_t* heapMemoryBlockAvailInd;
 extern sMemInfo* heapMemoryInfo;
 
-#define CURRENT_CR3 ({uint32_t cr3Val; \
-                      __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
-                      cr3Val;})
-
 //Returns pointer to first empty block found
 sMemInfo* findEmptyBlock()
 {
@@ -61,7 +57,7 @@ sMemInfo* findAvailableBlockBySize(uint32_t pSize)
     {
         if (mInfo->size>=pSize && (mInfo->inUse==false))
         {
-            printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
+            printd(DEBUG_PROCESS,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
             return mInfo;
         }
         mInfo--;
@@ -124,7 +120,6 @@ void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
     
     phys=allocPages(newSize);
     printd("allocPagesAndMap: allocPage'd 0x%08X bytes at 0x%08X\n",newSize,phys);
-    
     //Using random mappings isn't working, it stomps on other things
     //uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(cr3,newSize/PAGE_SIZE);
     
@@ -132,6 +127,7 @@ void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
     pagingMapPageCount(cr3,phys,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",phys,phys);
     pagingMapPageCount(KERNEL_CR3,(uint32_t)(phys) | 0xC0000000,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",(uint32_t)(phys) | 0xC0000000,phys);
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Zeroing out page(s) at 0x%08X for 0x%08X\n",phys,newSize);
     //Zero out the memory
     memset(phys,0,newSize);

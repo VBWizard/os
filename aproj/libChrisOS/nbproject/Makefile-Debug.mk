@@ -39,6 +39,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/4459a81c/strcspn.o \
 	${OBJECTDIR}/_ext/4459a81c/strtok.o \
 	${OBJECTDIR}/src/ascii.o \
+	${OBJECTDIR}/src/environment.o \
+	${OBJECTDIR}/src/file.o \
 	${OBJECTDIR}/src/input/input.o \
 	${OBJECTDIR}/src/libChrisOS.o \
 	${OBJECTDIR}/src/malloc.o \
@@ -49,6 +51,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/strings/strcat.o \
 	${OBJECTDIR}/src/strings/strcmp.o \
 	${OBJECTDIR}/src/strings/strcpy.o \
+	${OBJECTDIR}/src/strings/strisnum.o \
 	${OBJECTDIR}/src/strings/strlen.o \
 	${OBJECTDIR}/src/strings/strncmp.o \
 	${OBJECTDIR}/src/strings/strncpy.o \
@@ -56,6 +59,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/strings/strparts.o \
 	${OBJECTDIR}/src/strings/strtol.o \
 	${OBJECTDIR}/src/strings/strtrim.o \
+	${OBJECTDIR}/src/strstr.o \
 	${OBJECTDIR}/src/time.o
 
 
@@ -102,6 +106,16 @@ ${OBJECTDIR}/src/ascii.o: src/ascii.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ascii.o src/ascii.c
+
+${OBJECTDIR}/src/environment.o: src/environment.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/environment.o src/environment.c
+
+${OBJECTDIR}/src/file.o: src/file.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/file.o src/file.c
 
 ${OBJECTDIR}/src/input/input.o: src/input/input.c
 	${MKDIR} -p ${OBJECTDIR}/src/input
@@ -153,6 +167,11 @@ ${OBJECTDIR}/src/strings/strcpy.o: src/strings/strcpy.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strcpy.o src/strings/strcpy.c
 
+${OBJECTDIR}/src/strings/strisnum.o: src/strings/strisnum.c
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strisnum.o src/strings/strisnum.c
+
 ${OBJECTDIR}/src/strings/strlen.o: src/strings/strlen.c
 	${MKDIR} -p ${OBJECTDIR}/src/strings
 	${RM} "$@.d"
@@ -187,6 +206,11 @@ ${OBJECTDIR}/src/strings/strtrim.o: src/strings/strtrim.c
 	${MKDIR} -p ${OBJECTDIR}/src/strings
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strtrim.o src/strings/strtrim.c
+
+${OBJECTDIR}/src/strstr.o: src/strstr.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strstr.o src/strstr.c
 
 ${OBJECTDIR}/src/time.o: src/time.c
 	${MKDIR} -p ${OBJECTDIR}/src

@@ -11,10 +11,12 @@
 #define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
 void initmalloc()
 {
-    printdI(DEBUG_MALLOC,"heapBase = 0x%08X before\n", heapBase);
+    printdI(DEBUG_MALLOC,"heapBase @ 0X%08X = 0x%08X before\n", &heapBase, heapBase);
     heapBase=0;
     heapCurr=0;
     heapEnd=0;
+    libcTZ=-5;
+
 }
 
 uint32_t newHeapRequiredToFulfillRequest(size_t size)
@@ -41,7 +43,25 @@ uint32_t newHeapRequiredToFulfillRequest(size_t size)
         return 0;
 }
 
-__attribute__((visibility("default"))) void*  malloc(size_t size)
+void freeI(void* fpointer)
+{
+    heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
+    
+    if (fpointer==NULL)
+        return;             //CLR 04/20/2017: If pointer to be freed is NULL, don't do anything
+    HEAP_CURR(fpointer,mp);
+    
+    //printDebug(DEBUG_MALLOC,"libc_free: Freeing heap @ fp=0x%08X (mp=0x%08X)\n",fpointer,mp);
+    if (mp->marker!=ALLOC_MARKER_VALUE)
+    {
+        //print("malloc: marker not found error!!!\n");
+gotoHere:
+        goto gotoHere;
+    }
+    mp->inUse=false;
+}
+
+void*  mallocI(size_t size)
 {
     void* retVal;
 
@@ -54,7 +74,7 @@ __attribute__((visibility("default"))) void*  malloc(size_t size)
     printdI(DEBUG_MALLOC,"libc_malloc: needed=0x%08X\n",needed);
     if (needed!=0)      //New heap required
     {
-        asm("mov eax,0x165\ncall sysEnter_Vector\n":"=a" (allocatedPtr):"b" (needed));
+        allocatedPtr = do_syscall1(SYSCALL_ALLOC, needed);
         //This is needed to keep in sync with what the kernel thinks
         printdI(DEBUG_MALLOC,"libc_malloc: heaEnd=0x%08X\n",heapEnd);
         heapEnd=allocatedPtr+needed;
@@ -80,25 +100,17 @@ __attribute__((visibility("default"))) void*  malloc(size_t size)
     return retVal;
 }
 
+__attribute__((visibility("default"))) void*  malloc(size_t size)
+{
+    return mallocI(size);
+}
+
 __attribute__((visibility("default"))) void free(void* fpointer)
 {
-    heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
-    
-    if (fpointer==NULL)
-        return;             //CLR 04/20/2017: If pointer to be freed is NULL, don't do anything
-    HEAP_CURR(fpointer,mp);
-    
-    //printDebug(DEBUG_MALLOC,"libc_free: Freeing heap @ fp=0x%08X (mp=0x%08X)\n",fpointer,mp);
-    if (mp->marker!=ALLOC_MARKER_VALUE)
-    {
-        //print("malloc: marker not found error!!!\n");
-gotoHere:
-        goto gotoHere;
-    }
-    mp->inUse=false;
+    freeI(fpointer);
 }
 
 void malloc_cleanup()
 {
-    asm("mov eax,0x164\ncall sysEnter_Vector\n"::"b" (heapBase));
+    do_syscall1(SYSCALL_FREE, heapBase);
 }

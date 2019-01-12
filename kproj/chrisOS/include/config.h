@@ -20,10 +20,12 @@ extern "C" {
 
 //The minimum TPS I've gotten to work is 50.  Not possible to do > 1000 because of MS_PER_TICK
 #define TICKS_PER_SECOND 100
-//How many ticks expire between scheduler runs
-#define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 10
+//How many ticks expire between scheduler runs (5=20 ticks per run, 10=10  ticks per run)
+#define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 5
 //How many ticks expire between signal checks
-#define TICKS_PER_SIGNAL_CHECK TICKS_PER_SECOND / 5
+#define TICKS_PER_SIGNAL_CHECK 5 
+    //TICKS_PER_SECOND / 5 
+    //old=/50
 //MS=Milliseconds or thousands of a second
 #define MS_PER_TICK 1000 / TICKS_PER_SECOND
 //IS=Microseconds or millionths of a second
@@ -63,8 +65,11 @@ extern "C" {
 #define DEBUG_MALLOC 1<<24
 #define DEBUG_LIBC 1<<25
 #define DEBUG_MMAP 1<<26
-#define DEBUG_MAX 0XFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_DETAILED | DEBUG_PRINT_TO_PORT | DEBUG_EXCEPTIONS | DEBUG_LIBC | DEBUG_MALLOC | DEBUG_KMALLOC | DEBUG_PROCESS | DEBUG_TASK | DEBUG_ELF_LOADER
+#define DEBUG_FILESYS 1<<27
+#define DEBUG_COW 1<<28
+#define DEBUG_MAX 0XFFFFFFFF            //0XFFFF TO TURN ON
+#define KDEBUGLEVEL DEBUG_COW | DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT | DEBUG_PROCESS | DEBUG_DETAILED | DEBUG_LIBC | DEBUG_MALLOC | DEBUG_EXCEPTIONS 
+    //| DEBUG_ELF_LOADER
 #ifdef __cplusplus
 }
 #endif

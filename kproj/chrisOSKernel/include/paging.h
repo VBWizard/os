@@ -9,6 +9,7 @@
 #define	PAGING_H
 #include <stdbool.h>
 
+#define COW_PAGE 0x200
 #define RELOAD_CR3 __asm__("mov eax,cr3\nmov cr3,eax\n":::"eax");
 //Reserved page represented by bit 9 of the PTE being set
 //Reserved page won't have any other bits set in the PTE

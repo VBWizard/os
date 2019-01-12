@@ -23,23 +23,36 @@ typedef struct
     int paramCount;
 } command_table_t;
 
-void helpMe(char *cmdline);
-void kExit(char *cmdline);
-void execp(char* cmdline);
-void kSleep(char *cmdline);
-void pwd();
+    void cmdHelp(char *cmdline);
+    void cmdExit(char *cmdline);
+    void cmdExecp(char* cmdline);
+    void cmdSleep(char *cmdline);
+    void cmdPrintEnv();
+    void cmdPwd();
 
-char sExecutingProgram[512];
-char* sKShellProgramName;
-command_table_t cmds[] = { 
-        {"help","Get help (this information)",helpMe,1},
-        {"exec","Execute a program",execp,1},
-        {"exit","Exit kshell",kExit,1},
-        {"pwd","Print working directory",pwd,0},
-        {"sleep","Sleep for x seconds",kSleep,1}
+    void (*command_function)(void);
+    void (*command_function_p)(char*);
+    bool getEnvVariableValue(char* evName, char* value);
+    char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char** pptr);
+    void freeArgV(int pcount, char **params);
+    int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size);
+    
+    char sExecutingProgram[512];
+    char* sKShellProgramName;
+    char** environmentLoc;
+    char delim[6];
+    uint32_t exitCode, lastExecExitCode;
+    bool timeToExit;
+    char cwd[256];
+    
+static command_table_t cmds[] = { 
+        {"env","Print environment",cmdPrintEnv,0},
+        {"exec","Execute a program",cmdExecp,1},
+        {"exit","Exit kshell",cmdExit,1},
+        {"help","Get help (this information)",cmdHelp,1},
+        {"pwd","Print working directory",cmdPwd,0},
+        {"sleep","Sleep for x seconds",cmdSleep,1}
     };
-void (*command_function)(void);
-void (*command_function_p)(char*);
 
 #endif	/* BISHELL_H */
 

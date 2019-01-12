@@ -277,6 +277,7 @@ void pagingExceptionHandler()
 
 void defaultISRHandler()
 {
+    __asm__("mov cr3, eax"::"a" (KERNEL_CR3));
     //terminal_clear();
 #ifndef DEBUG_NONE
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)

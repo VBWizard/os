@@ -42,7 +42,7 @@ static const unsigned char keyboard_map[128] =
   '9', '0', '-', '=', '\b',	/* Backspace */
   '\t',			/* Tab */
   'q', 'w', 'e', 'r',	/* 19 */
-  't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',	/* Enter key */
+  't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',	/* Enter key 28*/
     0,			/* 29   - Control */
   'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',	/* 39 */
  '\'', '`',   0,		/* Left shift */

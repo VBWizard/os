@@ -62,3 +62,5 @@ gdb_history
 /aproj/cpptest/dist/
 */cross-Linux/*
 
+/aproj/sleep/build/
+/aproj/sleep/dist/

@@ -5,7 +5,6 @@
  * Created on May 16, 2016, 11:49 AM
  */
 
-#include <signal.h>
 
 #include "../libChrisOS/include/libChrisOS.h"
 #include "../../kproj/chrisOSKernel/include/thesignals.h"
@@ -18,9 +17,11 @@ void HandleSEGV();
 
 void crashFail(char** argv, int count)
 {
-
+    struct tm* time=malloc(sizeof(struct tm));
+    
     jumpHere:
-    print("\t%s: Counting down ... %u\n",argv[0],count);
+    gettime(time,true);
+    print("\t%s: Counting down ... %u (%02u:%02u:%02u)\n",argv[0],count, time->tm_hour, time->tm_min, time->tm_sec);
     sleep(1);
     count--;
     if (count==0)
@@ -32,10 +33,13 @@ void crashFail(char** argv, int count)
 
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv, char** envp) {
     int num=0;
     int loopCount=0;
     
+    int largc=argc;
+    char** largv=argv;
+    char** lenvp=envp;
     
     //modifySignal(SIG_SEGV, &HandleSEGV, 0);
 
@@ -66,12 +70,23 @@ int main(int argc, char** argv) {
     }
     print("\n");
     
+    print ("Environment @ 0x%08X:\n",&envp);
+    for (int cnt=0;cnt<100;cnt++)
+    {
+        if (lenvp[cnt]!=0)
+        {
+            print("\t0x%08X: ",&lenvp[cnt]);
+            print("\t%u: %s\n",cnt,lenvp[cnt]);
+        }
+    }
+    print("end of environment ...\n\n");
+    
     if (argc>1)
         loopCount = atoi(argv[1]);
     else
         loopCount = 1;
     
-    print ("Looping %u times\n",loopCount);
+    print ("Looping %u times\n",loopCount-1);
     
     crashFail(argv,loopCount);
     print ("Bye bye now!!!\n");

@@ -50,7 +50,7 @@ extern int kTicksPerMS;
 #define SHOW_STATUS \
 printk("status=%02X", inb(ATA_PORT_STATUS));
 
-#define ATA_STANDARD_WAIT_MS 10
+#define ATA_STANDARD_WAIT_MS 5
 #define	ATAHD_H
 /*PORT definitions*/
 #define ATA_PORT_DATA 0x0

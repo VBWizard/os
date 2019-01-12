@@ -33,10 +33,9 @@ void mmapRemoveFromGlobalList(memmap_t* map)
     listRemove(&map->listItem);
 }
 
-void* sys_mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memory map pages either to a file or anonymously
+void* sys_mmapI (process_t* p, void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memory map pages either to a file or anonymously
 {
     memmap_t* map;
-    process_t* p=(process_t*)PROCESS_STRUCT_VADDR+4;
     uintptr_t virtStartAddress=0;
     uintptr_t currMapping=0;
     
@@ -62,13 +61,22 @@ void* sys_mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset) //
 
     virtStartAddress=(uintptr_t)addr;
     currMapping=pagingGet4kPTEntryAddressCR3(p->pageDirPtr,(uintptr_t)addr);
-    if (currMapping!=0 || (uintptr_t)addr<0x1100000)
+    if (currMapping!=0 || (uintptr_t)addr<0x1100000)//Why the 2nd condition? (0x1100000)?
     {
         //If fixed flag was passed, we can't meet the address requirement so set errno and exit
         if (flags&MAP_FIXED)
         {
             printd(DEBUG_MMAP,"mmap:Fixed mapping requested.  Cannot use requested \n\taddress of 0x%08X, already in use.  Mapping=0x%08X\n",addr,currMapping);
             ERROR_EXIT(ERROR_MMAP_ADDRESS_IN_USE);
+        }
+        else if (flags&MAP_ANONYMOUS)
+        {
+            //FIXED + ANONYMOUS = Cow existing pages!
+            for (uint32_t addToCow=(uint32_t)addr;addToCow<(uint32_t)addr+len;addToCow+=PAGE_SIZE)
+            {
+                pagingMakePageCoW((uintptr_t*)pagingGet4kPTEntryAddressCR3((uint32_t)p->pageDirPtr,addToCow),true);
+            }
+            return addr;
         }
         else
         {
@@ -123,5 +131,12 @@ mmap_exit:
     if (p->errno)
         return (void*)MAP_FAILED;
     return 0;
+}
 
+void* sys_mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memory map pages either to a file or anonymously
+{
+    
+    process_t* p=(process_t*)PROCESS_STRUCT_VADDR+4;
+    return sys_mmapI(p, addr, len, prot, flags, fd, offset);
+    
 }
