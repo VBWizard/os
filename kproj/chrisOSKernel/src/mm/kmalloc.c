@@ -113,7 +113,7 @@ void* kMalloc(size_t size)
     uint32_t cs=getCS()>>3;
     bool isKernel=(bootGdt[cs].access & 0x60)==0x0;
     
-    heapPtr* ptr;
+    heapPtr* ptr=NULL;
     //First find a page to place the memory pointer on
     ptr=findFreeMallocPointer();
     //Next get a memory address to point to and map the memory into the process

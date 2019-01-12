@@ -49,19 +49,20 @@ sMemInfo* findAvailableBlockBySize(uint32_t pSize)
 {
     sMemInfo* mInfo=heapMemoryInfo;
     
-    //First try finding a block starting at the last block instead of the first
-    //Get to the last block
-    while (mInfo->next)
-        mInfo++;
-    while (mInfo>=heapMemoryInfo)
+    do
     {
-        if (mInfo->size>=pSize && (mInfo->inUse==false))
+        //Found an mInfo bigger than the required size, so return it
+        //a later call to allocateFromBlock will break off a piece of memory big enough to fulfill the request
+        //and make a new sMemInfo for the remaining memory
+        if (mInfo->size >= pSize)
         {
             printd(DEBUG_PROCESS,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
             return mInfo;
         }
-        mInfo--;
-    }
+        mInfo++;
+    } 
+    while (mInfo->next);
+    panic("findAvailableBlockBySize: Iterated all of the memory blocks and couldn't find one with enough space to use!\n");
 }
 
 //Create a new block with the requested amount of memory, and adjust the old block's size and pointer appropriately
@@ -119,7 +120,7 @@ void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
     }
     
     phys=allocPages(newSize);
-    printd("allocPagesAndMap: allocPage'd 0x%08X bytes at 0x%08X\n",newSize,phys);
+    printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: allocPage'd 0x%08X bytes at 0x%08X\n",newSize,phys);
     //Using random mappings isn't working, it stomps on other things
     //uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(cr3,newSize/PAGE_SIZE);
     

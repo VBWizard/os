@@ -45,6 +45,7 @@ typedef struct s_task
 
 task_t* createTask(void* process, bool kernelTSS);
 task_t* getAvailableTask();
+void freeTask(uint32_t taskNum);
 
 #endif	/* TASK_H */
 

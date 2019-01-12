@@ -24,6 +24,8 @@ extern uintptr_t schedStack;
 extern tss_t* pagingExceptionTSS;
 
 task_t* getAvailableTask();
+//max tasks = max GDT entries (256) - 32 reserved tasks
+#define MAXTASKS 224 
 
 //TODO: Replace current list with dllist_t!
 
@@ -38,6 +40,17 @@ void taskInit()
     kTaskSlotAvailableInd[0]=0x0;
     //There is padding at the end of the task table.  Make sure the padding is 0's so that we don's BSF past the end
     kTaskSlotAvailableInd[TSS_TABLE_RECORD_COUNT]=0x0;
+}
+
+void freeTask(uint32_t taskNum)
+{
+    uint32_t* ptr=kTaskSlotAvailableInd+1+((taskNum-32)/32);     //don't touch the first 32 tasks
+
+    //For now we aren't going to do anything
+    //TODO: Once we need more than MAXTASKS, we'll have to start resetting tasks once no longer used
+    //already did this once, but when opening a 2nd kshell, exiting it and starting another, the 2nd one reused
+    //task 0x0023, but some wierdness started happening in the CoW malloc page replacement
+    //bitsSet(ptr,(taskNum%32));
 }
 
 ///Find an open TSS slot and mark it in use

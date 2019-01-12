@@ -158,11 +158,7 @@ void setupPagingHandler()
     idt_set_gate (&idtTable[0xe], 0xB8, 0, ACS_TASK | ACS_DPL_0); //paging exception
 }
 
-//Returns a value indicating whether the result of the call was fatal
-//0=Not Fatal, Non-zero=Fatal
-//If non-zero the return value is the selector of the task for the handler to jump back to
-//The EIP it jumps back to will be that of the scheduler
-uint32_t kPagingExceptionHandlerNew(uint32_t exceptionCR2, int ErrorCode)
+void kPagingExceptionHandlerNew(uint32_t exceptionCR2, int ErrorCode)
 {
     uint32_t lPDEValue=0;
     uint32_t lPTEValue=0;
@@ -284,7 +280,7 @@ uint32_t kPagingExceptionHandlerNew(uint32_t exceptionCR2, int ErrorCode)
     }
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
-          printk("\nPaging handler processing non-CoW exception for virtual address 0x%02X\n",exceptionCR2);
+          printk("\nPaging handler: Exception for virtual address 0x%02X\n",exceptionCR2);
           printk("PDE@0x%08X=0x%08X, PTE@0x%08X=0x%08X\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
           printPagingExceptionRegs(pagingExceptionESP);
           //printDumpedRegs();
@@ -300,9 +296,10 @@ uint32_t kPagingExceptionHandlerNew(uint32_t exceptionCR2, int ErrorCode)
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
     sys_sigaction2(SIGSEGV,0,0xe,exceptionCR3);
 
-    //now we'll trigger the schedule and go to sleep so that it can kill the SEGV process.  
+    //Set the return address from the exception to a loop where the process can ... wait for death
     victimTask->tss->EIP = (uint32_t)&waitForDeath;
+    victimProcess->retVal = -1;
     //Return 1 which means SEGV
-    return exceptionCS;
+    return;
     
 }

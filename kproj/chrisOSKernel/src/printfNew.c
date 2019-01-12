@@ -414,3 +414,13 @@ int printd(uint32_t DebugLevel, const char *format, ...)
     }
     va_end(args);
  }
+
+//This version is called from the PRINTD syscall, so not from the kernel but from libc
+int printdExternal(uint32_t DebugLevel, const char *format, va_list args) 
+{
+    if ((DebugLevel & kDebugLevel) == DebugLevel)
+    {
+        printTicks("%u:",*kTicksSinceStart);
+        printdL2(format, args);
+    }
+ }

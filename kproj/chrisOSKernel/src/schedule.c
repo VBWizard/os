@@ -632,7 +632,10 @@ int32_t getExitCode(uint32_t taskNum)
         {
             printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04X\n", task->taskNum);
             if (task->taskNum == taskNum)
+            {
+                freeTask(taskNum);
                 return ((process_t*)task->process)->retVal;
+            }
         }
         q++;
     }

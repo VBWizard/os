@@ -174,8 +174,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_PRINTD: //printd: Debug print - param1 debuglevel, param2 format, param3 args
             //printd(DEBUG_PROCESS,"_syscall: printd(0x%08X,0x%08X,0x%08X)\n",param1,&param2,param3);
-            va_copy(ap,(va_list*)(param3));
-            printd(param1, (const char*)param2, ap);
+            printdExternal(param1, (const char*)param2, param3);
             break;
         case SYSCALL_HLT:     //***hlt - execute hlt instruction
             __asm__("sti;hlt;");

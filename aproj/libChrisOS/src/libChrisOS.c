@@ -93,6 +93,7 @@ int printdI(uint32_t DebugLevel, const char *format, ...)
     
     do_syscall3(SYSCALL_PRINTD, DebugLevel, (uint32_t)format, (uint32_t)args);
     return 0;
+    va_end(args);
 }
 
 VISIBLE unsigned int sleep (unsigned int __seconds)

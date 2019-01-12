@@ -240,6 +240,7 @@ int sys_setpriority(process_t* process, int newpriority)
 }
 
 //Called by exception handlers for fatal exceptions.  Just wait for death
+//NOTE: Runs in the context of the process that is to be killed
 void waitForDeath()
 {
     __asm__("sti\n");

@@ -58,7 +58,7 @@ void cmdExecp(char* cmdline)
     char** prms=malloc(sizeof(char*)*pcount);
     paramsToArgv(paramCount-execParamCount,&params[execParamCount][0], prms);
 
-    print ("Executing %s\n",pgm);
+//    print ("Executing %s\n",pgm);
     pid=execa(pgm,paramCount-execParamCount,prms);
     if (pid>0)
     {

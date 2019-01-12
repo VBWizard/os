@@ -39,10 +39,13 @@ pagingExceptionHandler:
     mov eax,cr2
     push eax
     call kPagingExceptionHandlerNew
+    #For fatals the paging handler will have set the victimTask's return address already for the IRET
+    #For non-fatals, the IRET will jump back into the task that triggered the exception
+    #either way we don't need to do anything before IRETing except reset the stack and enable interrupts
     mov esp, ebp
     sti
     iret
-    jmp pagingExceptionHandler #Next paging exception the handler will start here if last one was not a SEGV
+    jmp pagingExceptionHandler #Next paging exception the handler will start here so jump back to the beginning of the handler
 
 .globl alltraps
 .type alltraps, @function
