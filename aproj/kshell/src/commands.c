@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+
 #include "kshell.h"
 
 void cmdPrintEnv()
@@ -18,7 +19,58 @@ void cmdPrintEnv()
    
 }
 
-void cmdExecp(char* cmdline)
+void cmdSetEnv(char* cmdline)
+{
+    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
+    char *varName, *varValue;
+    
+    if (parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT))
+    {
+        int nameLen=0, valueLen=0;
+        int found=(uintptr_t)strstr(params[0],"=");
+        if (found==0)
+        {
+            print("Usage: set variable=value\n");
+            return;
+        }
+        nameLen=found-(uintptr_t)params[0];
+        valueLen=strlen(params[0])-nameLen-1;
+        varName = malloc(nameLen+1);
+        varValue = malloc(valueLen);
+        strncpy(varName,params[0],nameLen);
+        varName[nameLen]=0;
+        strncpy(varValue,params[0]+nameLen+1,valueLen);
+        strtrim(varName);
+        strtrim(varValue);
+        setenv(varName, varValue);
+        free(varName);
+        free(varValue);
+    }
+    else
+        cmdPrintEnv();
+}
+
+int kexec(char* path, int argc, char** argv, bool background)
+{
+    int pid=execa(path,argc,argv);
+
+    if (pid>0)
+    {
+        if (!background)
+        {
+            //print("DEBUG1: waitpid = %08X\n",&waitpid);
+            lastExecExitCode = waitpid(pid);
+            char ret[10];
+            itoa(lastExecExitCode,ret);
+            setenv("LASTEXIT",ret);
+        }
+    }
+    else
+        print("Error executing %s\n",path);
+
+}
+
+void execTime(char* cmdline, bool timeIt)
 {
     bool background=false;
     uint32_t pid=0;
@@ -29,10 +81,12 @@ void cmdExecp(char* cmdline)
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     int execParamCount=0;
     int pcount=1;
+    struct tm *startTime, *endTime;
+    uint32_t startTicks, endTicks;
     
     if (paramCount==0)
         return;
-    
+
     tok=strtok(cmdline,delim);
     while (tok!=NULL)
     {
@@ -59,23 +113,29 @@ void cmdExecp(char* cmdline)
     paramsToArgv(paramCount-execParamCount,&params[execParamCount][0], prms);
 
 //    print ("Executing %s\n",pgm);
-    pid=execa(pgm,paramCount-execParamCount,prms);
-    if (pid>0)
+    if (timeIt)
+        startTicks=getticks();
+
+    pid=kexec(pgm,paramCount-execParamCount,prms,background);
+    if (timeIt)
     {
-        if (!background)
-        {
-            //print("DEBUG1: waitpid = %08X\n",&waitpid);
-            lastExecExitCode = waitpid(pid);
-            char ret[10];
-            itoa(lastExecExitCode,ret);
-            setenv("LASTEXIT",ret);
-        }
+        endTicks=getticks();
+        print("%u ticks\n",endTicks-startTicks);
     }
-    else
-        print("Error executing %s\n",pgm);
     //Its ok to free arguments now because they are copied by the kernel to pgm's memory
     freeArgV(paramCount-1, (char**)prms);       
     free(pgm);
+    
+}
+
+void cmdTime(char* cmdline)
+{
+    execTime(cmdline,true);
+}
+
+void cmdExecp(char* cmdline)
+{
+    execTime(cmdline,false);
 }
 
 void cmdExit(char *cmdline)

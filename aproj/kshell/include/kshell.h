@@ -27,9 +27,10 @@ typedef struct
     void cmdExit(char *cmdline);
     void cmdExecp(char* cmdline);
     void cmdSleep(char *cmdline);
+    void cmdTime(char *cmdline);
     void cmdPrintEnv();
     void cmdPwd();
-
+    void cmdSetEnv(char *cmdline);
     void (*command_function)(void);
     void (*command_function_p)(char*);
     bool getEnvVariableValue(char* evName, char* value);
@@ -51,7 +52,9 @@ static command_table_t cmds[] = {
         {"exit","Exit kshell",cmdExit,1},
         {"help","Get help (this information)",cmdHelp,1},
         {"pwd","Print working directory",cmdPwd,0},
-        {"sleep","Sleep for x seconds",cmdSleep,1}
+        {"set","Set an environment variable",cmdSetEnv,1},
+        {"sleep","Sleep for x seconds",cmdSleep,1},
+        {"time","Time a program while it runs.\n\t\tUsage: time program [parameters]",cmdTime,1}
     };
 
 #endif	/* BISHELL_H */

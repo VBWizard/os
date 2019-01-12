@@ -87,7 +87,7 @@ int AhciIssueCmd(volatile HBA_PORT *port,int cmdslot)
             printd(DEBUG_AHCI, "AHCI: Read disk error\n");
             return -1;
         }
-        wait(20);
+        wait(10); //CLR 01/12/2019: Changed from (I think) 50 to 10 ... and WOW.  Can't change to less than 10 because 1 ms is 10 ticks and we can't get smaller than that
         delay -= 1;
     }
 
@@ -395,7 +395,7 @@ void start_cmd(volatile HBA_PORT *port) {
 
 void waitForPortIdle(volatile HBA_PORT *port) {
     while (port->cmd.ST | port->cmd.CR | port->cmd.FRE | port->cmd.FR) {
-        waitTicks(20);
+        waitTicks(10);
     }
 }
 
@@ -410,7 +410,7 @@ void stop_cmd(volatile volatile HBA_PORT *port) {
             break;
         if (!(port->cmd.CR))
             break;
-        waitTicks(20);
+        waitTicks(10);
     }
 
     // Clear FRE (bit4)
