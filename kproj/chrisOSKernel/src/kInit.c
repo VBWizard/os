@@ -127,6 +127,8 @@ __asm__("cli\n");
     pagingMapPage(KERNEL_CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
     printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08X) into task and kernel\n", kKernelTask->tss);
     
+    pagingMapPage(KERNEL_CR3,PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000,0x7); //CLR 1/10/2019: Changed perms from 0x7 to 0x5
+    printd(DEBUG_PROCESS,"pagingMapPage(0x%08X,0x%08X,0x%08X,0x%02X",KERNEL_CR3, PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000, 0x7);
     gdtEntryOS(kKernelTask->taskNum,(uint32_t)kKernelTask->tss,sizeof(tss_t), ACS_TSS | ACS_DPL_0,GDT_GRANULAR | GDT_32BIT,true);
 
     

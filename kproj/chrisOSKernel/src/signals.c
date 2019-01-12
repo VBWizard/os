@@ -67,13 +67,21 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
 void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t callerCR3)
 {
     uint32_t currentTask = 0;
+    process_t *p;
     
     __asm__("str eax\nshr eax,3\n":"=a" (currentTask));
     printd(DEBUG_PROCESS, "current task = 0x%04X\n",currentTask);
     if (!currentTask)
         panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",callerCR3,signal,sigAction);
-    process_t *p = findTaskByTaskNum(currentTask)->process;
-    callerCR3=p->pageDirPtr;
+    if (currentTask!=0x17)
+    {
+        p = findTaskByTaskNum(currentTask)->process;
+        callerCR3=p->pageDirPtr;
+    }
+    else
+    {
+        p = findTaskByCR3(callerCR3)->process;
+    }
     
     printd(DEBUG_SIGNALS, "sys_sigAction2(0x%08X, 0x%08X, 0x%08X, 0x%08X)\n"
             ,signal, sigAction, sigData,callerCR3);
@@ -112,12 +120,11 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             break;
         case SIGSEGV:
             printd(DEBUG_EXCEPTIONS,"Signaling SEGV for cr3=0x%08X, signald before=0x%08X processing signal\n",callerCR3,p->signals.sigind);
-            __asm__("cli\n");
+            //No CLI necessary as the exception 0xe handler has already done that
             p->signals.sigind|=SIGSEGV;
             printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald after=0x%08X processing signal\n",callerCR3,p->signals.sigind);
-            triggerScheduler();
-            __asm__("sti\nhlt\n");      //Put the task to sleep until the next tick when another task will take its place    
-            return p;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
+            //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
+            return;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         case SIGINT:
             //If signal is not blocked then set it

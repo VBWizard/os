@@ -577,10 +577,9 @@ void runAnotherTask(bool schedulerRequested)
         if (!taskToRun->kernel)
             nextTaskTSS |= 3;
         printd(DEBUG_PROCESS,"*SET nextTaskTSS to 0x%04X\n",nextTaskTSS);
-        bootGdt[taskToStop->taskNum].access &= ~(2);
-        
         //Mark the task being taken off the CPU as "not busy."  This is necessary because the LTR instruction sets the busy flag
         //Since we are using a task gate for exception 0xe, we have to use LTR to keep the currently running task in the TR for back linking
+        bootGdt[taskToStop->taskNum].access &= ~(2);
         __asm__("ltr ax\nclts\n":: "a" (nextTaskTSS));
         
         if (((process_t*)taskToRun->process)->justForked)

@@ -7,6 +7,7 @@
 .extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, isrSavedTR
 .extern kIRQ0_handler
 .extern _sysCall
+.extern _schedule
 .extern schedulerTaskSwitched
 .extern kTaskSwitchCount
 .extern kDebugLevel
@@ -41,12 +42,7 @@ pagingExceptionHandler:
     mov esp, ebp
     sti
     iret
-
-.globl pagingExceptionReturn
-.type pagingExceptionReturn, @function
-pagingExceptionReturn:
-iret
-jmp pagingExceptionHandler
+    jmp pagingExceptionHandler #Next paging exception the handler will start here if last one was not a SEGV
 
 .globl alltraps
 .type alltraps, @function

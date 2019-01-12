@@ -239,6 +239,14 @@ int sys_setpriority(process_t* process, int newpriority)
     return retVal;
 }
 
+//Called by exception handlers for fatal exceptions.  Just wait for death
+void waitForDeath()
+{
+    __asm__("sti\n");
+    waitForDeathHere:
+    goto waitForDeathHere;
+}
+
 void processIdleLoop()
 {
     uint32_t cr3=0;
