@@ -64,3 +64,5 @@ gdb_history
 
 /aproj/sleep/build/
 /aproj/sleep/dist/
+/aproj/cat/build/
+/aproj/cat/dist/
