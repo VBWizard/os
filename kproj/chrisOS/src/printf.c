@@ -245,6 +245,14 @@ int printd_valist(uint32_t DebugLevel, const char *format, va_list args)
             return printk_valist(format, args);
 }
 
+void printTicks(const char *format, ...)
+{
+        va_list args;
+        va_start( args, format );
+
+        printp_valist(format/*I*/,args);
+}
+
 int printd(uint32_t DebugLevel, const char *format, ...)
 {
     char formatI[1024];
@@ -252,15 +260,20 @@ int printd(uint32_t DebugLevel, const char *format, ...)
     if ((kDebugLevel & DebugLevel) == DebugLevel)    
     {
         va_list args;
-
         va_start( args, format );
         
         //sprintf(formatI,"0x%08X: %s",*kTicksSinceStart,format);
 
         if (kDebugLevel & DEBUG_PRINT_TO_PORT)
+        {
+            
+            printTicks("%u: ",*kTicksSinceStart);
             printp_valist(format/*I*/,args);
+        }
         else
+        {
             return printk_valist(format/*I*/, args);
+        }
     }
     return 0;
 }

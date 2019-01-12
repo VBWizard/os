@@ -14,7 +14,7 @@ dllist_t* listInit(dllist_t* firstItem, void* payload)
     return firstItem;
 }
 
-void listAdd(dllist_t* list, dllist_t* item, void* payload)
+void* listAdd(dllist_t* list, dllist_t* item, void* payload)
 {
     
     while (list->next!=list)
@@ -27,6 +27,7 @@ void listAdd(dllist_t* list, dllist_t* item, void* payload)
     item->next=item;
     list->next=item;
     item->payload=payload;
+    return list;
 }
 void listRemove(dllist_t* item)
 {

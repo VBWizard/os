@@ -5,22 +5,26 @@
  * Created on May 16, 2016, 11:49 AM
  */
 
+
 #include "../libChrisOS/include/libChrisOS.h"
+#include "../../kproj/chrisOSKernel/include/thesignals.h"
+
 /*
  * testMainProgramEntry
  */
 
 void HandleSEGV();
 
-/*void crashFail(char** argv)
+void crashFail(char** argv, int count)
 {
-    uint64_t temp=0;
-
+    struct tm* time=malloc(sizeof(struct tm));
+    
     jumpHere:
+    gettime(time,true);
+    print("\t%s: Counting down ... %u (%02u:%02u:%02u)\n",argv[0],count, time->tm_hour, time->tm_min, time->tm_sec);
     sleep(1);
-    temp++;
-    print("\t%s: Still in the loop, %u iterations\n",argv[1],temp);
-    if (temp==5)
+    count--;
+    if (count==0)
     {
         print("Triggering SEGV\n");
         __asm__("mov eax,[0x50000000]\n");
@@ -28,12 +32,18 @@ void HandleSEGV();
     goto jumpHere;
 
 }
-*/
-int main2(int argc, char** argv) {
+
+int main(int argc, char** argv, char** envp) {
     int num=0;
     int loopCount=0;
     
-    libc_init();
+    int largc=argc;
+    char** largv=argv;
+    char** lenvp=envp;
+    
+    //modifySignal(SIG_SEGV, &HandleSEGV, 0);
+
+    
 /*
     char input[100];
       print("Sleeping for 3 seconds");
@@ -60,21 +70,26 @@ int main2(int argc, char** argv) {
     }
     print("\n");
     
+    print ("Environment @ 0x%08X:\n",&envp);
+    for (int cnt=0;cnt<100;cnt++)
+    {
+        if (lenvp[cnt]!=0)
+        {
+            print("\t0x%08X: ",&lenvp[cnt]);
+            print("\t%u: %s\n",cnt,lenvp[cnt]);
+        }
+    }
+    print("end of environment ...\n\n");
+    
     if (argc>1)
         loopCount = atoi(argv[1]);
     else
-        loopCount = 100;
+        loopCount = 1;
     
-    print ("Looping %u times\n",loopCount);
+    print ("Looping %u times\n",loopCount-1);
     
-    while (num < loopCount*10)
-    {
-        sleep(1);
-        num++;
-        if (num%10==0)
-            print("Still here!!!\n");
-    }
-    //crashFail(argv);
+    crashFail(argv,loopCount);
+    print ("Bye bye now!!!\n");
     return 0x1234;
 }
 

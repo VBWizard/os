@@ -41,7 +41,7 @@ typedef struct sElfInfo
     dllist_t loadedListItem;
     int libraryElfCount;
     void* libraryElfPtr[10];
-    uint32_t libBSSAddress, libBSSSize, libDataAddress, libDataSize;
+    uint32_t bssAddress, bssSize, dataAddress, dataSize, tdataAddress, tdataSize, textAddress, textSize; //CLR 12/23/2018: Added TData variables
     Elf32_Ehdr hdr;
     Elf32_Shdr secHdrTable[50];
     Elf32_Phdr pgmHdrTable[50];
@@ -55,6 +55,7 @@ typedef struct sElfInfo
     char* fileName;
     elfPageInfo_t* elfLoadedPages;
     bool mapMemoryOnly; //set to true if library is already loaded, and we only want to map it into the new process
+    int usageCount;
 } elfInfo_t;
 
 void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);

@@ -33,6 +33,7 @@ VISIBLE char getc()
     return c;
 }
 
+//Get a string of {maxlen} characters, returning when the # of characters is reached or enter is pressed
 VISIBLE int gets(char* buffer, int maxlen, int stream)
 {
     char inchar;

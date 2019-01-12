@@ -52,19 +52,19 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-Wl,-rpath,../libChrisOS/dist/Debug/cross-Linux -L../libChrisOS/dist/Debug/cross-Linux -lc
+LDLIBSOPTIONS=-Wl,-rpath,'../libChrisOS/dist/Debug/GNU-Linux' -L../libChrisOS/dist/Debug/GNU-Linux -lc
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap: ../libChrisOS/dist/Debug/cross-Linux/libc.so
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap: ../libChrisOS/dist/Debug/GNU-Linux/libc.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc -T linker.ld
 
-${OBJECTDIR}/main.o: main.c 
+${OBJECTDIR}/main.o: main.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -I../libChrisOS/include -I../../kproj/chrisOSKernel/include -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
@@ -76,6 +76,7 @@ ${OBJECTDIR}/main.o: main.c
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.so
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap
 
 # Subprojects

@@ -1,6 +1,6 @@
 pushd ..
 ./make_release
 popd
-objdump -x -t Release/cross-Linux-x86/chrisos > chrisosR.sym
-#strip --strip-debug --strip-unneeded Release/cross-Linux-x86/chrisos
+objdump -x -t Release/GNU-Linux-x86/chrisos > chrisosR.sym
+#strip --strip-debug --strip-unneeded Release/GNU-Linux-x86/chrisos
 vi chrisosR.sym

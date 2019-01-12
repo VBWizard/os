@@ -11,6 +11,8 @@ bool schedulerEnabled=false;
 extern uint32_t nextScheduleTicks;
 extern void processSignals();
 uint32_t kNextSignalCheckTicks=0;
+bool schedulerTriggered=false;
+bool signalCheckTriggered=false;
 
 void kIRQ0_handler()
 {
@@ -18,20 +20,21 @@ void kIRQ0_handler()
 static char currTime[200];
 static struct tm theDateTime;
 #endif
-    *kTicksSinceStart=*kTicksSinceStart+1;
-    if (*kTicksSinceStart % kTicksPerSecond == 0)
+    if (++*kTicksSinceStart % kTicksPerSecond == 0)
         kSystemCurrentTime++;
     if (schedulerEnabled)
     {
         if(*kTicksSinceStart>nextScheduleTicks)
         {
-            scheduler();
+            printd(DEBUG_PROCESS,"kIRQ0_Handler: triggering scheduler\n");
+            schedulerTriggered=true;
         }
         if (*kTicksSinceStart>kNextSignalCheckTicks)
         {
             printd(DEBUG_SIGNALS,"\nProcessing signals\n");
+            //signalCheckTriggered=true;
             processSignals();
-            kNextSignalCheckTicks+=TICKS_PER_SIGNAL_CHECK;
+            kNextSignalCheckTicks=*kTicksSinceStart+TICKS_PER_SIGNAL_CHECK;
         }
     }
 #ifndef DEBUG_EXPANDED_TICK

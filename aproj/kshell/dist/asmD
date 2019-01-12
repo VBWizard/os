@@ -2,5 +2,5 @@
 pushd ..
 ./make_debug
 popd
-objdump -D -S -l Debug/cross-Linux/kshell -M intel-mnemonic > kshellD.asm
+objdump -D -S -l Debug/GNU-Linux/kshell -M intel-mnemonic > kshellD.asm
 vi kshellD.asm

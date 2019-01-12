@@ -20,12 +20,13 @@ extern "C" {
 
     typedef enum esignals
     {
-        SIG_HALT = 1,
-        SIG_SLEEP = 2,
-        SIG_USLEEP = 4,
-        SIG_SEGV = 0x800,
-        SIG_STOP = 0x2000,
-    } eSignals;
+        SIGHALT = 1,
+        SIGSLEEP = 1 << 1,
+        SIGUSLEEP = 1 << 2,
+        SIGINT = 1 << 3,
+        SIGSEGV = 1 << 4,
+        SIGSTOP = 1 << 5,
+    } signals;
     
 
 

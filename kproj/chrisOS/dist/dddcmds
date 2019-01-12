@@ -1,6 +1,6 @@
-symbol-file Debug/cross-Linux/chrisos
-add-symbol-file /home/yogi/src/os/chrisOSKernel/dist/Debug/cross-Linux/kernel 0x01000000
-add-symbol-file /home/yogi/src/os/testMainProgramEntry/dist/Debug/cross-Linux/testmainprogramentry 0x10000000
+symbol-file Debug/GNU-Linux/chrisos
+add-symbol-file /home/yogi/src/os/chrisOSKernel/dist/Debug/GNU-Linux/kernel 0x01000000
+add-symbol-file /home/yogi/src/os/testMainProgramEntry/dist/Debug/GNU-Linux/testmainprogramentry 0x10000000
 alias sv = set variable 
 target remote localhost:1234
 #c

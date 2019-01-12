@@ -19,7 +19,7 @@ uint32_t KERNEL_DATA_SECTION
 uint32_t kernelSize;
 uint32_t kernelStart = (uint32_t)&kernelLoadAddress;
 uint32_t kernelMemoryUsed;
-uint32_t kernelPoolMemorySize=1400000;   //20 MB kernel memory
+uint32_t kernelPoolMemorySize=100*1024*1024;   //20 MB kernel memory
 
 sMemInfo* heapMemoryInfo;
 

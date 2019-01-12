@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=cross-Linux
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
@@ -70,10 +70,12 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strtol.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strtrim.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
+	${OBJECTDIR}/src/_scheduler.o \
 	${OBJECTDIR}/src/device.o \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
 	${OBJECTDIR}/src/exceptions.o \
+	${OBJECTDIR}/src/fs.o \
 	${OBJECTDIR}/src/kIRQHandlers.o \
 	${OBJECTDIR}/src/kInit.o \
 	${OBJECTDIR}/src/kernel.o \
@@ -84,6 +86,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/mm/mm.o \
 	${OBJECTDIR}/src/mm/mmap.o \
 	${OBJECTDIR}/src/paging.o \
+	${OBJECTDIR}/src/printfNew.o \
 	${OBJECTDIR}/src/process.o \
 	${OBJECTDIR}/src/schedule.o \
 	${OBJECTDIR}/src/signals.o \
@@ -291,6 +294,10 @@ ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/time.o ../chrisOS/src/time.c
 
+${OBJECTDIR}/src/_scheduler.o: src/_scheduler.s
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/src/_scheduler.o src/_scheduler.s
+
 ${OBJECTDIR}/src/device.o: src/device.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -310,6 +317,11 @@ ${OBJECTDIR}/src/exceptions.o: src/exceptions.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/exceptions.o src/exceptions.c
+
+${OBJECTDIR}/src/fs.o: src/fs.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fs.o src/fs.c
 
 ${OBJECTDIR}/src/kIRQHandlers.o: src/kIRQHandlers.c
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -359,6 +371,11 @@ ${OBJECTDIR}/src/paging.o: src/paging.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/paging.o src/paging.c
+
+${OBJECTDIR}/src/printfNew.o: src/printfNew.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/printfNew.o src/printfNew.c
 
 ${OBJECTDIR}/src/process.o: src/process.c
 	${MKDIR} -p ${OBJECTDIR}/src

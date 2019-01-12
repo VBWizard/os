@@ -34,7 +34,7 @@ typedef struct s_task
     uint32_t next, prev;
     bool kernel;
     eTaskState taskState;
-    int32_t ticksSinceLastInterrupted, prioritizedTicksInRunnable;
+    uint32_t ticksSinceLastInterrupted, prioritizedTicksInRunnable;
     bool exited;
     uint32_t buffer;
     void* process;
@@ -43,7 +43,7 @@ typedef struct s_task
     uint32_t esp0Base, esp0Size;
 } task_t;
 
-task_t* createTask(bool kernelTSS);
+task_t* createTask(void* process, bool kernelTSS);
 task_t* getAvailableTask();
 
 #endif	/* TASK_H */

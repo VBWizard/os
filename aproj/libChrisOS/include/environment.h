@@ -5,25 +5,26 @@
  */
 
 /* 
- * File:   elfLibraryTable.h
+ * File:   environment.h
  * Author: yogi
  *
- * Created on March 16, 2017, 2:55 PM
+ * Created on December 31, 2018, 8:19 PM
  */
 
-#ifndef ELFLIBRARYTABLE_H
-#define ELFLIBRARYTABLE_H
+#ifndef ENVIRONMENT_H
+#define ENVIRONMENT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
+    int getenv(char *varname, char *value);
+    void  setenv(char *varname, char *value);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ELFLIBRARYTABLE_H */
+#endif /* ENVIRONMENT_H */
 

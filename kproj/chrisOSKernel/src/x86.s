@@ -8,7 +8,8 @@ sysEnter_Vector:                #WARNING: change libChrisOS linker file if you c
     push edx
     push ebp
     mov ebp,esp
-    call sysEnterReturn
+    call sysEnterReturn #NOTE: sysEnterReturn only exists to put a return address on the stack to be put in the
+                        #EDX register before the sysExit
     add esp,4
     pop ebp
     pop edx
@@ -18,6 +19,7 @@ sysEnterReturn:
     mov ebp,esp         #ebp will be the ESP (ECX) point to the return address, on sysExit
     sysenter
 .globl sysEnter_Vector
+
 
 .org 0x100
 .section .systemData
@@ -35,7 +37,7 @@ _sysEnter:
     push eax
     sti
     call _sysCall
-    mov [esp+52],eax
+    mov saved_eax,eax
     sti
     pop ebx             #4
     pop ebx             #8
@@ -47,6 +49,7 @@ _sysEnter:
     pop ebp
     mov edx,[ebp]
     mov ecx,ebp
+    mov eax, saved_eax
     sysexit
 .globl _sysEnter
 retVal: .word 0x0, 0x0
@@ -136,3 +139,6 @@ idt_load:
     ret
 .globl idt_load
 
+saved_eax:
+        .word 0
+        .word 0

@@ -5,7 +5,6 @@
 #include "multiboot.h"
 #include "utility.h"
 #include "memory.h"
-#include "init/initVars.h"
 #include "i386/gdt.h"
 #include "i386/cpu.h"
 #include "io.h"
@@ -60,6 +59,8 @@ bool ParamExists(char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char* cmdToFind,
 char kBootParams[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
 int kBootParamCount;
 struct gdt_ptr lGDT;
+//NOTE: This is a temporary idt pointer ... only used during init
+struct idt_ptr kInitialIDTReg;
 
 //CLR 04/27/2016: Even though we are working on our cross compiler env, somehow __linus is set
 //so unset it
@@ -68,10 +69,10 @@ struct gdt_ptr lGDT;
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
 #endif
-
+#define __i386__
 /* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
-#error "This tutorial needs to be compiled with a ix86-elf compiler"
+#error "This operating system needs to be compiled with a ix86-elf compiler"
 #endif
 
 
@@ -105,7 +106,7 @@ void HIGH_CODE_SECTION gdt_init()
     gdtEntryApplication(0x10, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - ring 0 starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
 
-    gdtEntryApplication(0x11, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE, //88 ring 0 starting at 0x0 - code used by sysEnter
+    gdtEntryApplication(0x11, 0xC0000000, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE, //88 ring 0 starting at 0x0 - code used by sysEnter
           GDT_GRANULAR | GDT_32BIT,true);
     gdtEntryApplication(0x12, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //90 - ring 0 starting at 0x0 data used by sysEnter
               GDT_GRANULAR | GDT_32BIT,true);
@@ -276,6 +277,7 @@ gdt_init();
     IRQ_clear_mask(0);
     IRQ_clear_mask(1);
     __asm__("sti\n");
+
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
     printk("Boot: ");
@@ -331,9 +333,9 @@ gdt_init();
     }
     else
         printk("APIC: not found\n");
-    printk("TSC: ticks per 10 = %u\n", tscGetTicksPerSecond());
+    printk("TSC: CPU frequency = %u\n", tscGetTicksPerSecond());
 #ifndef DEBUG_NONE
-    printd(0,"TSC: ticks per 10 = %u\n", tscGetTicksPerSecond());
+    printd(0,"TSC: CPU frequency = %u\n", tscGetTicksPerSecond());
 #endif
 #ifndef DISABLE_PAGING
     kCPU[0].registerBase=apicGetAPICBase();

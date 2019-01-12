@@ -2,4 +2,4 @@
 pushd ..
 ./make_debug
 popd
-qemu-system-i386 -S -s -m 1024 -kernel Debug/cross-Linux/chrisos -hda ~/diskimage.img
+qemu-system-i386 -S -s -m 1024 -kernel Debug/GNU-Linux/chrisos -hda ~/diskimage.img

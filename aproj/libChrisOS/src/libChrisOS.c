@@ -10,46 +10,62 @@
 #include "stdio.h"
 
 extern void sysEnter_Vector();
-int a=123;int b=456; int c=789;
+bool libcInitialized = false;
 
-int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3)
+
+int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4)
 {
     int retVal=0;
-    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1), "c" (param2), "d" (param3));
+    SYSCALL4(callnum, param1, param2, param3, param4, retVal);
     return retVal;
 }
 
-int do_syscall3(int callnum, uint32_t param1, uint32_t param2)
+int do_syscall3(int callnum, uint32_t param1, uint32_t param2, uint32_t param3)
 {
     int retVal=0;
-    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1), "c" (param2));
+    SYSCALL3(callnum, param1, param2, param3, retVal);
     return retVal;
 }
 
-int do_syscall2(int callnum, uint32_t param1)
+int do_syscall2(int callnum, uint32_t param1, uint32_t param2)
 {
     int retVal=0;
-    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum), "b" (param1));
+    SYSCALL2(callnum, param1, param2, retVal);
     return retVal;
 }
 
-int do_syscall1(int callnum)
+int do_syscall1(int callnum, uint32_t param1)
 {
     int retVal=0;
-    asm("call sysEnter_Vector\n":"=a" (retVal):"a" (callnum));
+    SYSCALL1(callnum, param1, retVal);
     return retVal;
 }
 
-VISIBLE void libc_init(void)
+int do_syscall0(int callnum)
 {
-    printdI(DEBUG_LIBC,"***Initializing libc\n***");
-    initmalloc();
-    libcTZ=-4;
-    do_syscall1(SYSCALL_INVALID);
-    do_syscall2(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
+    int retVal=0;
+    SYSCALL0(callnum, retVal);
+    return retVal;
 }
 
-void libc_cleanup(void)
+VISIBLE void __attribute__((constructor)) libc_init()
+{
+    printdI(DEBUG_LIBC,"***libc_init called\n***");
+    if (!libcInitialized)
+    {
+        initmalloc();
+        //processEnvp = envp;
+        __asm__("mov %0,[ebp+52]\n":"=a" (processEnvp));
+        do_syscall0(SYSCALL_INVALID);
+        do_syscall1(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
+        libcInitialized = true;
+        printdI(DEBUG_LIBC,"***libc_init completed\n");
+    }
+    else
+        printI("libc_init called previously, exiting\n");
+}
+
+void __attribute__((destructor)) libc_cleanup(void)
 {
     malloc_cleanup();
 }
@@ -58,7 +74,7 @@ VISIBLE int print(const char *format, ...)
 {
     va_list args;
     va_start( args, format );
-    do_syscall3(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
+    do_syscall2(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
     return 0;
 }
 
@@ -66,7 +82,7 @@ int printI(const char *format, ...)
 {
     va_list args;
     va_start( args, format );
-    do_syscall3(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
+    do_syscall2(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
     return 0;
 }
 
@@ -74,7 +90,8 @@ int printdI(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
     va_start( args, format );
-    asm("mov eax,0x301\ncall sysEnter_Vector\n"::"b" (DebugLevel), "c" (format), "d" (args));
+    
+    do_syscall3(SYSCALL_PRINTD, DebugLevel, (uint32_t)format, (uint32_t)args);
     return 0;
 }
 
@@ -86,39 +103,84 @@ VISIBLE unsigned int sleep (unsigned int __seconds)
 
 void stop()
 {
-    do_syscall1(SYSCALL_STOP);
+    do_syscall0(SYSCALL_STOP);
 }
 
 VISIBLE void modifySignal(int signal, void* sigHandler, int sigData)
 {
-    do_syscall4(SYSCALL_SETSIGACTION,signal,(uint32_t)sigHandler,sigData);
+    do_syscall3(SYSCALL_SETSIGACTION,signal,(uint32_t)sigHandler,sigData);
 }
 
-VISIBLE int exec(char* path, int argc, char** argv)
+VISIBLE int fork()
+{
+    return do_syscall0(SYSCALL_FORK);
+}
+
+VISIBLE int exec(char* path)
+{
+    int pid=0, argc=0;
+    char** argv;
+    char* spacePtr=path, *lastSpacePtr=path;
+    char* program;
+    program=mallocI(512);
+    do
+    {
+        spacePtr=strstrI(spacePtr," ");
+        if (argc==0)
+        {
+            if (spacePtr==0)
+                strncpyI(program, path, strlenI(path));
+            else
+                strncpyI(program, path, spacePtr-path);
+        }
+        argc++;
+            
+    } while (spacePtr++);
+    
+    argv=mallocI((argc*50)+(argc*4));
+    int argvPtr=4*argc;
+    spacePtr=path;
+    for (int cnt=0;cnt<argc; cnt++)
+    {
+        argv[cnt]=(char*)argv+argvPtr;
+        spacePtr=strstrI(spacePtr," ");
+        if (spacePtr)
+            strncpyI(argv[cnt],lastSpacePtr,spacePtr-lastSpacePtr);
+        else
+            strncpyI(argv[cnt],lastSpacePtr,strlenI(lastSpacePtr));
+        strtrimI(argv[cnt]);
+        lastSpacePtr=spacePtr++;
+        argvPtr+=50;
+    }
+    printdI(DEBUG_LIBC,"libc: executing for %s\n",path);;
+    pid = do_syscall3(SYSCALL_EXEC, (uintptr_t)program, argc, (uintptr_t)argv);
+/*    __asm__("push ds\nint 0x80\npop ds\n"
+            :"=a" (pid)
+            :"a" (0x59),"b" (program),"c" (argc),"d" (argv));*/
+    return pid;
+    freeI(argv);
+    freeI(program);
+}
+
+VISIBLE int execa(char* path, int argc, char** argv)
 {
     int pid=0;
     //Using the syscall is breaking the stack
-//    SYSCALL4(SYSCALL_EXEC,path,argc,argv);
-    __asm__("push ds\nint 0x80\npop ds\n"
+//    SYSCALL3(SYSCALL_EXEC,path,argc,argv);
+    printdI(DEBUG_LIBC,"libc: exec for %s\n",path);;
+    pid = do_syscall3(SYSCALL_EXEC, (uintptr_t)path, argc, (uintptr_t)argv);
+/*    __asm__("push ds\nint 0x80\npop ds\n"
             :"=a" (pid)
-            :"a" (0x59),"b" (path),"c" (argc),"d" (argv));
+            :"a" (0x59),"b" (path),"c" (argc),"d" (argv));*/
     return pid;
 }
 
-VISIBLE void waitpid(uint32_t pid)
+VISIBLE int waitpid(uint32_t pid)
 {
-    do_syscall2(SYSCALL_WAITFORPID,pid);
-}
-
-VISIBLE struct tm* gettime()
-{
-    uint32_t ticks=0;
-    struct tm theTime;
-    do_syscall2(SYSCALL_GETTICKS,ticks);
-    return gmtime_r((time_t*)&ticks,&theTime);
+    return do_syscall1(SYSCALL_WAITFORPID,pid);
 }
 
 VISIBLE char* getcwd(char* buf, size_t size)
 {
-    return (char*)do_syscall3(SYSCALL_GETCWD,(uint32_t)buf,size);
+    return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
 }

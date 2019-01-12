@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=cross-Linux
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/mmapmain.o
 
 
 # C Compiler Flags
@@ -52,22 +52,22 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-Wl,-rpath,../libChrisOS/dist/Debug/cross-Linux -L../libChrisOS/dist/Debug/cross-Linux -lc
+LDLIBSOPTIONS=-Wl,-rpath,'../libChrisOS/dist/Debug/GNU-Linux' -L../libChrisOS/dist/Debug/GNU-Linux -lc
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap: ../libChrisOS/dist/Debug/cross-Linux/libc.so
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap: ../libChrisOS/dist/Debug/GNU-Linux/libc.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc -T linker.ld
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -T linker.ld -masm=intel
 
-${OBJECTDIR}/main.o: main.c 
+${OBJECTDIR}/mmapmain.o: mmapmain.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../libChrisOS/include -I../../kproj/chrisOSKernel/include -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -g -I../libChrisOS/include -I../../kproj/chrisOSKernel/include -I../../kproj/chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mmapmain.o mmapmain.c
 
 # Subprojects
 .build-subprojects:
@@ -76,6 +76,7 @@ ${OBJECTDIR}/main.o: main.c
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libc.so
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/testmmap
 
 # Subprojects

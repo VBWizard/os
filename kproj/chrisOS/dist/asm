@@ -2,4 +2,4 @@
 pushd ..
 ./make_debug
 popd
-objdump -S -l Debug/cross-Linux-x86/chrisos -M intel-mnemonic > chrisos_all.asm
+objdump -S -l Debug/GNU-Linux-x86/chrisos -M intel-mnemonic > chrisos_all.asm

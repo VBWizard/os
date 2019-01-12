@@ -196,13 +196,37 @@ uint32_t pagingGet4kPTEntryValue(uint32_t address)
 
 void pagingSetPageReadOnlyFlag(uintptr_t* ptEntry, bool readOnly)
 {
-    printd(DEBUG_PAGING,"pagingMakePageReadOnly: 0x%08X - before/after: 0x%08X/", ptEntry, *ptEntry);
+    printd(DEBUG_PAGING,"pagingSetPageReadOnlyFlag: 0x%08X - before/after: 0x%08X/", ptEntry, *ptEntry);
     if (readOnly)
        *ptEntry&=0xFFFFFFFD;
     else
        *ptEntry|=2; 
     RELOAD_CR3
     printd(DEBUG_PAGING,"0x%08X\n", *ptEntry);
+}
+
+static inline void invlpg(void* m)
+{
+    /* Clobber memory to avoid optimizer re-ordering access before invlpg, which may cause nasty bugs. */
+    __asm__ volatile ( "invlpg [%0]" : : "b"(m) : "memory" );
+}
+
+void pagingMakePageCoW(uintptr_t* ptEntry, bool makeCoW)
+{
+    printd(DEBUG_COW,"pagingSetCowFlag: CoW 0x%08X? %c: before/after: 0x%08X/",*ptEntry, (makeCoW?'Y':'N'), *ptEntry);
+    if (makeCoW)
+    {
+       *ptEntry|=COW_PAGE; //Set CoW (bit 9) flag
+       *ptEntry&=0xFFFFFFFD; //Unset Read/Write (bit 1) flag
+    }
+    else
+    {
+       *ptEntry&=(~COW_PAGE); //Unset CoW (bit 9) flag
+       *ptEntry|=0x2;       //Set Read/Write (bit 1) flag
+    }   
+    invlpg(ptEntry);
+    RELOAD_CR3
+    printd(DEBUG_COW,"0x%08X\n", *ptEntry);    
 }
 
 void pagingSetAddressReadOnlyFlag(uintptr_t CR3, uintptr_t address, bool readOnly)

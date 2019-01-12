@@ -2,10 +2,10 @@
 pushd ..
 ./make_release
 popd
-strip --strip-debug --strip-unneeded Release/cross-Linux-x86/chrisos
+strip --strip-debug --strip-unneeded Release/GNU-Linux/chrisos
 qemu-system-i386 					\
 	-m 1024						\
-	-kernel Release/cross-Linux-x86/chrisos 	\
+	-kernel Release/GNU-Linux/chrisos 	\
 	-smp 8    					\
 	-usb                                            \
         -device usb-ehci,id=ehci                        \

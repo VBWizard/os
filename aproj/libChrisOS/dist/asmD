@@ -2,5 +2,5 @@
 pushd ..
 ./make_debug
 popd
-objdump -D -S -l Debug/cross-Linux/libc.so -M intel-mnemonic > libcD.asm
+objdump -D -S -l Debug/GNU-Linux/libc.so -M intel-mnemonic > libcD.asm
 vi libcD.asm

@@ -5,8 +5,8 @@ if [ $? -ne 0 ]
 then
 exit -1
 fi
-#strip --strip-debug --strip-unneeded Debug/cross-Linux-x86/chrisos
-cp Debug/cross-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
+#strip --strip-debug --strip-unneeded Debug/GNU-Linux/chrisos
+cp Debug/GNU-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
 grub-mkrescue -o myos.iso ~/src/os/build_dir/isodir > /dev/null
 qemu-system-i386 							\
 	-m 1536								\
@@ -26,6 +26,7 @@ qemu-system-i386 							\
 	-serial file:"qemu_port.log"					\
 	-d int,cpu_reset,pcall,guest_errors                        		\
 	-hda ~/qemu-test-disk2.img                                     \
+	-usb -device usb-host,hostbus=2,hostaddr=3 			\
 	$@ 
 #	--enable-kvm
 
