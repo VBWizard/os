@@ -48,7 +48,17 @@ extern "C" {
     void pipeclose();
     size_t piperead(void *buffer, int size, int length, void *f);
     size_t pipewrite(const void *buffer, int size, int count, void *f);
-
+    pipe_t *pipedup(void* path, const char *mode);
+    int fs_pipe(int pipefd[2]);
+    
+    typedef struct
+    {
+        char* path;
+        pipe_t* pipe;
+    } pipes_t;
+    
+    pipes_t openPipes[1000];
+    
 #ifdef __cplusplus
 }
 #endif

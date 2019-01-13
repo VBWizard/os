@@ -12,6 +12,7 @@
 #include "process.h"
 #include "fs.h"
 #include "schedule.h"
+#include "filesystem/pipe.h"
 
 //#include "fs.h" - CLR 04/23/2018: Commented out
 
@@ -96,6 +97,11 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             }
             else
                 panic("_sysCall: sys_write for descriptor 0x%08X not implemented\n",param1);
+            break;
+        case SYSCALL_PIPE:
+            __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
+            retVal = fs_pipe((int*)param1);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_GETDENTS:
             process=(process_t*)(findTaskByCR3(processCR3))->process;

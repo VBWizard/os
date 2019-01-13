@@ -30,6 +30,7 @@ extern "C" {
 #define ERROR_INVALID_DEST                  -109
 #define ERROR_SIZE_TOO_SMALL                -110
 #define ERROR_FS_FILE_INVALID_OPERATION     -111
+#define ERROR_FS_PIPE_DOESNT_EXIST          -112
 #ifdef __cplusplus
 }
 #endif

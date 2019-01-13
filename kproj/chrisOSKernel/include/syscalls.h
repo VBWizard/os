@@ -27,6 +27,7 @@ extern "C" {
         SYSCALL_READ 			= 0x4,  
         SYSCALL_WRITE 			= 0x5,
         SYSCALL_FORK                    = 0x6,
+        SYSCALL_PIPE                    = 0x7,
         SYSCALL_GETCWD                  = 0x4f,
         SYSCALL_EXEC			= 0x59,
         SYSCALL_WAITFORPID		= 0x61,

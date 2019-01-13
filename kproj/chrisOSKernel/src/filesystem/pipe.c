@@ -10,6 +10,7 @@
 #include "utility.h"
 #include "errors.h"
 #include "printf.h"
+#include "strings.h"
 
 extern filesystem_t* pipeFs;
 
@@ -25,8 +26,8 @@ filesystem_t *initpipefs()
     fops->close=&pipeclose;
     fops->seek=NULL;
     fs = kRegisterFileSystem("/pipe/",fops);
-    memset(fs, 0, sizeof(filesystem_t));
     fs->files = kMalloc(sizeof(dllist_t));
+    memset(openPipes,0,sizeof(pipes_t)*1000);
     return fs;
 }
 
@@ -50,11 +51,18 @@ void *pipeopen(void* filePtr, const char *mode)
     
     if (file->buffer==NULL)
     {
-        file->buffer = kMalloc(PIPE_FILE_SIZE);
+        file->buffer = fileContents;
         file->bufferPtr = file->buffer;
     }
     pipe->mode = (*mode=='r'?PIPEREAD:PIPEWRITE);
     pipe->file = file;
+    
+    pipes_t *op;
+    for (op=openPipes;op->pipe!=NULL;op++);
+
+    op->path = file->f_path;
+    op->pipe = pipe;
+    
     return 0;
 }
 
@@ -111,4 +119,35 @@ size_t pipewrite(const void *data, int size, int count, void *f)
 
     memcpy(file->bufferPtr, data, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
     file->bufferPtr+=copySize;    
+}
+
+pipe_t *pipedup(void* path, const char *mode)
+{
+    pipes_t *op;
+    pipe_t *pipe;
+    
+    for (op=openPipes;op->pipe!=NULL;op++)
+    {
+        if (strcmp(op->path, path)==0)
+        {
+            pipe = kMalloc(sizeof(pipe_t));
+            memcpy(pipe, op->pipe, sizeof(pipe_t));
+            pipe->mode = (*mode=='r'?PIPEREAD:PIPEWRITE);
+            return(pipe);
+        }
+    }
+    return NULL;
+}
+
+int fs_pipe(int pipefd[2])
+{
+    file_t *filer, *filew;
+    
+    filer = fs_open("/pipe/","r");
+    filew = fs_open(filer->f_path,"w");
+    
+    pipefd[0] = (int)filer;
+    pipefd[1] = (int)filew;
+    
+    return 0;
 }

@@ -21,6 +21,11 @@ int main(int argc, char** argv) {
     void* file;
     char* buffer;
     
+    int pipes[2];
+    pipe(pipes);
+    close(pipes[0]);
+    close(pipes[1]);
+    
     if (argc<2)
         return -1;
     

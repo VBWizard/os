@@ -10,6 +10,7 @@
 #include "printf.h"
 #include "kernel.h"
 #include "alloc.h"
+#include "errors.h"
 
 extern filesystem_t* rootFs;
 extern filesystem_t* pipeFs;
@@ -22,7 +23,8 @@ filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
     vfs_mount_t *vfs;
     
     fs = kMalloc(sizeof(filesystem_t));
-    
+    memset(fs, 0, sizeof(filesystem_t));
+
     fs->mount = kMalloc(sizeof(vfs_mount_t));
     
     fs->mount->mnt_root = kMalloc(sizeof(dentry_t));
@@ -81,6 +83,7 @@ void* getFileFromList(filesystem_t *fs, eListType listType, void* file)
     return getListEntry(fs, listType, file)->payload;
 }
 
+
 void* fs_open(char* path, const char* mode)
 {
     void* handle;
@@ -89,21 +92,31 @@ void* fs_open(char* path, const char* mode)
     bool isPipeFile = false;
     
     printd(DEBUG_FILESYS, "fs_open: called with path=%s, mode=%s\n", path, mode);
+    file = kMalloc(sizeof(file_t));
+    memset(file,0,sizeof(file_t));
+    
     //call the fs's open method
     if (strncmp(path,"/pipe/",6)==0)
     {
-        handle = (uintptr_t)pipeFileHandle--;
+        //handle = (uintptr_t*)pipeFileHandle--;
+        handle = file;
         isPipeFile = true;
     }
     else
         handle = rootFs->fops->open(path, mode);
 
-    file = kMalloc(sizeof(file_t));
     if (handle)
     {
         if (isPipeFile)
         {
-            if (mode=='r')
+            file->handle = handle;
+            if (strlen(path)>7)
+            {
+                file->pipe = (void*)pipedup(path, mode);
+                if (!file->pipe)
+                    return ERROR_FS_PIPE_DOESNT_EXIST;
+            }
+            else if (*mode=='r')
                 file->pipe = pipeFs->fops->open(file,"r");
             else
                 file->pipe = pipeFs->fops->open(file,"w");
@@ -176,7 +189,10 @@ void close(eListType listType, void* entry)
     else
         foundEntry = listHead(rootFs->files);
 
-    if (foundEntry==NULL)
+    while (((file_t*)foundEntry->payload)->handle!=entry && foundEntry->next!=foundEntry)
+        foundEntry=foundEntry->next;
+    
+    if (((file_t*)foundEntry->payload)->handle!=entry && foundEntry==foundEntry)
         panic("fs_close: handle not found in fs->files/fs->dirs");
     
     if (listType == LIST_DIRECTORY)
@@ -184,16 +200,14 @@ void close(eListType listType, void* entry)
     else
         ((file_t*)(foundEntry->payload))->fops->close(((file_t*)foundEntry->payload)->handle);
     
-    if (foundEntry->next==foundEntry && foundEntry->prev==foundEntry)
-        deInitTheList=true;
-    listRemove(foundEntry);
+    rootFs->files = listRemove(rootFs->files,foundEntry); //NOTE: listRemove will effectively de-init the list if it becomes empty
     kFree(foundEntry);
 
-    if (deInitTheList)
+/*    if (deInitTheList)
         if (listType == LIST_DIRECTORY)
             rootFs->dirs=NULL;
         else
-            rootFs->files=NULL;
+            rootFs->files=NULL;*/
 }
 
 void fs_close(void* file)

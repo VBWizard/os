@@ -19,8 +19,10 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/src/time.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/src/block/ahci.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOS/src/panic.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/fs.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/sysloader.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/pipe.c</file>
         </group>
     </open-files>
 </project-private>

@@ -28,10 +28,12 @@ void mmapAddToGlobalList(memmap_t* map)
         listAdd(kMemoryMapsList,&map->listItem,map);
 }
 
-void mmapRemoveFromGlobalList(memmap_t* map)
+//Need to change listRemove to reference the list head
+/*void mmapRemoveFromGlobalList(memmap_t* map)
 {
     listRemove(&map->listItem);
 }
+*/
 
 void* sys_mmapI (process_t* p, void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memory map pages either to a file or anonymously
 {
