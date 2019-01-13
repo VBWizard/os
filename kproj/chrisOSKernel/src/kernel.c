@@ -25,6 +25,7 @@
 #include "kbd.h"
 #include "../../chrisOS/src/fat/fat_filelib.h"
 #include "fs.h"
+#include "filesystem/pipe.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -34,7 +35,7 @@ extern uint32_t* isrSavedStack;
 extern uint32_t kNextSignalCheckTicks;
 extern void keyboardInit();
 
-file_system_t *rootFs;
+filesystem_t *rootFs, *pipeFs;
 process_t* kIdleProcess;
 task_t* kIdleTask;
 uint64_t kIdleTicks=0;
@@ -85,6 +86,7 @@ int main(int argc, char** argv) {
     dops.read = &fl_readdir;
     
     rootFs = kRegisterFileSystem("/",&fops);
+    pipeFs = initpipefs();
     
     keyboardInit();
     //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS

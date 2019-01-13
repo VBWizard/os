@@ -57,6 +57,7 @@
       <itemPath>include/mmap.h</itemPath>
       <itemPath>include/paging.h</itemPath>
       <itemPath>../../chrisOS/include/pci/pci.h</itemPath>
+      <itemPath>include/filesystem/pipe.h</itemPath>
       <itemPath>include/process.h</itemPath>
       <itemPath>include/rusage.h</itemPath>
       <itemPath>include/schedule.h</itemPath>
@@ -117,6 +118,7 @@
       <itemPath>src/paging.c</itemPath>
       <itemPath>../chrisOS/src/panic.c</itemPath>
       <itemPath>../chrisOS/src/block/pci.c</itemPath>
+      <itemPath>src/filesystem/pipe.c</itemPath>
       <itemPath>../chrisOS/src/printf.c</itemPath>
       <itemPath>src/printfNew.c</itemPath>
       <itemPath>src/process.c</itemPath>
@@ -340,6 +342,8 @@
       </item>
       <item path="include/errors.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
@@ -387,6 +391,8 @@
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/fs.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -629,6 +635,8 @@
       </item>
       <item path="include/errors.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
@@ -676,6 +684,8 @@
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/fs.c" ex="false" tool="0" flavor2="0">
       </item>

@@ -37,6 +37,12 @@ extern "C" {
         LIST_FILE
     } eListType;
     
+    typedef enum
+    {
+        FILETYPE_FILE,
+        FILETYPE_PIPE
+    } eFileType;
+    
     typedef struct file file_t;
     typedef struct directory directory_t;
     typedef struct direntry dirent_t;
@@ -47,7 +53,7 @@ extern "C" {
     typedef struct file_operations file_operations_t;
     typedef struct vfsmount vfs_mount_t;
     typedef struct inode_operations inode_operations_t;
-    typedef struct file_system file_system_t;
+    typedef struct file_system filesystem_t;
     typedef struct inode inode_t;
     
     struct super_block
@@ -94,17 +100,19 @@ extern "C" {
     
     struct file
     {
+        eFileType filetype;
         char* f_path;
         inode_t* f_inode;
         fileops_t* fops;
         void* handle;
+        void *pipe, *buffer, *bufferPtr;
     };
 
     struct file_operations
     {
         
         //file_t* (*open) (char *filename, const char *mode);
-        void* (*open) (char *filename, const char *mode); //using this temporarily for fat fs
+        void* (*open) (void *file, const char *mode); //using this temporarily for fat fs
         //int (*close) (file_t *);
         void (*close) (void *); //using this temporarily for fat fs
         //int (*seek) (file_t *, long offset, int whence);
@@ -155,7 +163,7 @@ extern "C" {
     };
     
     
-    file_system_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops);
+    filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops);
     void* fs_open(char* path, const char* mode);
     int fs_read(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);

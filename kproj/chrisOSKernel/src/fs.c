@@ -11,14 +11,17 @@
 #include "kernel.h"
 #include "alloc.h"
 
-extern file_system_t* rootFs;
+extern filesystem_t* rootFs;
+extern filesystem_t* pipeFs;
 
-file_system_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
+uint32_t pipeFileHandle = 0xFFFFFFFF;
+
+filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
 {
-    file_system_t *fs;
+    filesystem_t *fs;
     vfs_mount_t *vfs;
     
-    fs = kMalloc(sizeof(file_system_t));
+    fs = kMalloc(sizeof(filesystem_t));
     
     fs->mount = kMalloc(sizeof(vfs_mount_t));
     
@@ -29,6 +32,8 @@ file_system_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
     //See if the filesystem being mounted is the root of the filesystem
     if (strncmp(mountPoint,"/",1024)==0)
         fs->mount->mnt_root->d_parent = (dentry_t*)DENTRY_ROOT;
+    else if (strncmp(mountPoint,"/pipe/",1024)==0)
+    {}
     else
         panic("Mounting filesystem as non-root ... this is not yet supported");
     
@@ -38,7 +43,7 @@ file_system_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
     return fs;
 }
 
-dllist_t* getListEntry(file_system_t *fs, eListType listType, void* entryToFind)
+dllist_t* getListEntry(filesystem_t *fs, eListType listType, void* entryToFind)
 {
     dllist_t* list;
     
@@ -64,7 +69,7 @@ dllist_t* getListEntry(file_system_t *fs, eListType listType, void* entryToFind)
     return NULL;
 }
 
-void* getFileFromList(file_system_t *fs, eListType listType, void* file)
+void* getFileFromList(filesystem_t *fs, eListType listType, void* file)
 {
     dllist_t* list;
     
@@ -81,22 +86,40 @@ void* fs_open(char* path, const char* mode)
     void* handle;
     dllist_t* list;
     file_t *file;
+    bool isPipeFile = false;
     
     printd(DEBUG_FILESYS, "fs_open: called with path=%s, mode=%s\n", path, mode);
     //call the fs's open method
-    handle = rootFs->fops->open(path, mode);
+    if (strncmp(path,"/pipe/",6)==0)
+    {
+        handle = (uintptr_t)pipeFileHandle--;
+        isPipeFile = true;
+    }
+    else
+        handle = rootFs->fops->open(path, mode);
 
+    file = kMalloc(sizeof(file_t));
     if (handle)
     {
-        list = kMalloc(sizeof(dllist_t));
-        file = kMalloc(sizeof(file_t));
-        file->f_path = kMalloc(1024);
-        file->fops = kMalloc(sizeof(file_operations_t));
+        if (isPipeFile)
+        {
+            if (mode=='r')
+                file->pipe = pipeFs->fops->open(file,"r");
+            else
+                file->pipe = pipeFs->fops->open(file,"w");
+        }
+        else
+        {
+            file->handle = handle;
+            file->filetype=FILETYPE_FILE;
+            file->f_path = kMalloc(1024);
+            file->fops = kMalloc(sizeof(file_operations_t));
+            strncpy(file->f_path, path, 1024);
+            memcpy(file->fops, rootFs->fops, sizeof(file_operations_t));
+        }
         //identify the fs that the path is on
 
-        strncpy(file->f_path, path, 1024);
-        memcpy(file->fops, rootFs->fops, sizeof(file_operations_t));
-        file->handle = handle;
+        list = kMalloc(sizeof(dllist_t));
 
         if (rootFs->files == NULL)
         {
@@ -105,10 +128,10 @@ void* fs_open(char* path, const char* mode)
         }
         else
             listAdd(rootFs->files,list,file);
-        printd(DEBUG_FILESYS, "fs_open: returning handle 0x%08X\n",handle);
+        printd(DEBUG_FILESYS, "\tfs_open: returning handle 0x%08X\n",handle);
         return handle;
     }
-    printd(DEBUG_FILESYS, "fs_open: returning NULL\n",handle);
+    printd(DEBUG_FILESYS, "\tfs_open: returning NULL\n",handle);
     return NULL;
 }
 

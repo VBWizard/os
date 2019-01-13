@@ -56,7 +56,7 @@ sMemInfo* findAvailableBlockBySize(uint32_t pSize)
         //and make a new sMemInfo for the remaining memory
         if (mInfo->size >= pSize)
         {
-            printd(DEBUG_PROCESS,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
+            printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
             return mInfo;
         }
         mInfo++;
