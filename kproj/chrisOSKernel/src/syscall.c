@@ -96,7 +96,12 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 //printu((const char*)param2, NULL);
             }
             else
-                panic("_sysCall: sys_write for descriptor 0x%08X not implemented\n",param1);
+            {
+                __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));
+                process=(process_t*)(findTaskByCR3(processCR3))->process;
+                retVal=fs_write(process, (void*)param1, (void*)param2, param3, 1);
+                __asm__("mov cr3,eax\n"::"a" (processCR3));
+            }
             break;
         case SYSCALL_PIPE:
             __asm__("mov cr3,eax;"::"a" (KERNEL_CR3));

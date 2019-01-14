@@ -105,7 +105,8 @@ extern "C" {
         inode_t* f_inode;
         fileops_t* fops;
         void* handle;
-        void *pipe, *buffer, *bufferPtr;
+        void *pipe, *buffer, **bufferPtr;
+        uint32_t verification;
     };
 
     struct file_operations
@@ -166,6 +167,7 @@ extern "C" {
     filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops);
     void* fs_open(char* path, const char* mode);
     int fs_read(process_t* process, void* file, void * buffer, int size, int length);
+    int fs_write(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);
     void fs_close(void* file);
     int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);

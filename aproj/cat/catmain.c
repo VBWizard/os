@@ -36,6 +36,9 @@ int main(int argc, char** argv) {
         int readSize = read(file, buffer, 4072, 1);
         close(file);
         print ("%s",buffer);
+        //write(pipes[1], buffer, readSize, 1);
+        char* chars[4072];
+        int charsRead = read(pipes[0], chars, readSize, 1);
         free(buffer);
         return 0;
     }

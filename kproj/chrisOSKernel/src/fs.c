@@ -11,6 +11,7 @@
 #include "kernel.h"
 #include "alloc.h"
 #include "errors.h"
+#include "filesystem/pipe.h"
 
 extern filesystem_t* rootFs;
 extern filesystem_t* pipeFs;
@@ -112,9 +113,10 @@ void* fs_open(char* path, const char* mode)
             file->handle = handle;
             if (strlen(path)>7)
             {
-                file->pipe = (void*)pipedup(path, mode);
+                file->pipe = (void*)pipedup(path, mode, file);
                 if (!file->pipe)
                     return ERROR_FS_PIPE_DOESNT_EXIST;
+                ((pipe_t *)file->pipe)->file = file;
             }
             else if (*mode=='r')
                 file->pipe = pipeFs->fops->open(file,"r");
@@ -132,7 +134,7 @@ void* fs_open(char* path, const char* mode)
         }
         //identify the fs that the path is on
 
-        list = kMalloc(sizeof(dllist_t));
+/*        list = kMalloc(sizeof(dllist_t));
 
         if (rootFs->files == NULL)
         {
@@ -141,8 +143,10 @@ void* fs_open(char* path, const char* mode)
         }
         else
             listAdd(rootFs->files,list,file);
+*/
+        file->verification=0xBABAABAB;
         printd(DEBUG_FILESYS, "\tfs_open: returning handle 0x%08X\n",handle);
-        return handle;
+        return file;
     }
     printd(DEBUG_FILESYS, "\tfs_open: returning NULL\n",handle);
     return NULL;
@@ -150,39 +154,55 @@ void* fs_open(char* path, const char* mode)
 
 int fs_read(process_t* process, void* file, void * buffer, int size, int length)
 {
-    
-    file_t* foundFile = getFileFromList(rootFs, LIST_FILE, file);
+    file_t* theFile = file;
     int retVal = 0;
     char* lBuffer;
     
-    if (foundFile==NULL)
-        panic("fs_read: file handle not found in fs->files");
+    if (theFile->verification!=0xBABAABAB)
+        panic("fs_read: Referenced a file that is not a file");
     
     if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
-        return foundFile->fops->read(buffer, size, length, foundFile->handle);
+        return theFile->fops->read(buffer, size, length, theFile->handle);
     
     lBuffer = allocPagesAndMap(size*length);
-    retVal = foundFile->fops->read(lBuffer, size, length, foundFile->handle);
+    retVal = theFile->fops->read(lBuffer, size, length, theFile->handle);
     copyFromKernel(process, buffer, lBuffer, size*length);
     kFree(lBuffer);
+    return retVal;
+}
 
+int fs_write(process_t* process, void* file, void * buffer, int size, int length)
+{
+    file_t* theFile = file;
+    int retVal = 0;
+    char* lBuffer;
+    
+    if (theFile->verification!=0xBABAABAB)
+        panic("fs_read: Referenced a file that is not a file");
+
+    if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
+        return theFile->fops->write(buffer, size, length, theFile->handle);
+    
+    lBuffer = allocPagesAndMap(size*length);
+    copyToKernel(process, lBuffer, buffer, size*length);
+    retVal = theFile->fops->write(buffer, size, length, theFile->handle);
+    kFree(lBuffer);
     return retVal;
 }
 
 int fs_seek(void* file, long offset, int whence)
 {
-    file_t* foundFile = getFileFromList(rootFs, LIST_FILE, file);
+    file_t* theFile = file;
     
-    if (foundFile==NULL)
-        panic("fs_seek: file handle not found in fs->files");
+    if (theFile->verification!=0xBABAABAB)
+        panic("fs_seek: Referenced a file that is not a file",file);
     
-    return foundFile->fops->seek(foundFile->handle, offset, whence);
+    return theFile->fops->seek(theFile->handle, offset, whence);
 }
 
 void close(eListType listType, void* entry)
 {
-    bool deInitTheList=false;
-    dllist_t* foundEntry;
+/*    dllist_t* foundEntry;
 
     if (listType == LIST_DIRECTORY)
         foundEntry = listHead(rootFs->dirs);
@@ -194,14 +214,18 @@ void close(eListType listType, void* entry)
     
     if (((file_t*)foundEntry->payload)->handle!=entry && foundEntry==foundEntry)
         panic("fs_close: handle not found in fs->files/fs->dirs");
-    
+*/
+    file_t* file = entry;
+    directory_t *dir = entry;
+    if (file->verification!=0xBABAABAB)
+        panic("close: Referenced a file that is not a file!");
     if (listType == LIST_DIRECTORY)
-        ((directory_t*)(foundEntry->payload))->dops->close(((directory_t*)foundEntry->payload)->handle);
+        dir->dops->close(dir->handle);
     else
-        ((file_t*)(foundEntry->payload))->fops->close(((file_t*)foundEntry->payload)->handle);
+        file->fops->close(file->handle);
     
-    rootFs->files = listRemove(rootFs->files,foundEntry); //NOTE: listRemove will effectively de-init the list if it becomes empty
-    kFree(foundEntry);
+//    rootFs->files = listRemove(rootFs->files,foundEntry); //NOTE: listRemove will effectively de-init the list if it becomes empty
+//    kFree(foundEntry);
 
 /*    if (deInitTheList)
         if (listType == LIST_DIRECTORY)

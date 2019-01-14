@@ -24,8 +24,8 @@ extern "C" {
 
     typedef enum EPipeMode
     {
-        PIPEREAD,
-        PIPEWRITE
+        PIPEREAD = 1,
+        PIPEWRITE = 2
     } ePipeMode;
     
     typedef struct sPipe
@@ -33,10 +33,8 @@ extern "C" {
         file_t* file;       //This has to be the first field so I can use the pointer to create a pipe_t
         process_t* owner;
         ePipeMode mode;
-        uint32_t pos;
         uint32_t flags;
         uint32_t usecount;
-        char* buffer;
         fileops_t* fops;
         uint32_t check;
         //char* bufferptr; NOTE: Using file->currOffset instead of bufferptr
@@ -45,19 +43,20 @@ extern "C" {
 
     filesystem_t *initpipefs();
     void *pipeopen(void* filePtr, const char *mode);
-    void pipeclose();
+    void pipeclose(file_t *file);
     size_t piperead(void *buffer, int size, int length, void *f);
     size_t pipewrite(const void *buffer, int size, int count, void *f);
-    pipe_t *pipedup(void* path, const char *mode);
+    pipe_t *pipedup(void* path, const char *mode, file_t* file);
     int fs_pipe(int pipefd[2]);
     
     typedef struct
     {
         char* path;
         pipe_t* pipe;
+        file_t* file;
     } pipes_t;
     
-    pipes_t openPipes[1000];
+    pipes_t openPipes[10000];
     
 #ifdef __cplusplus
 }

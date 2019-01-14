@@ -21,6 +21,7 @@ extern "C" {
     void* open(char* path, const char* mode);
     void close(void* handle);
     int read(void* handle, void *buffer, int size, int length);
+    int write(void* handle, void *buffer, int size, int length);
     int getdir(char* path, char *buffer, int bufferCount);
 
 #ifdef __cplusplus
