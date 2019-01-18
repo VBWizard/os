@@ -512,9 +512,14 @@ uint32_t process_fork(process_t* currProcess)
     //Child task will return from child_task_forked with a 0 return value, whereas we will return with the child task PID
     newProcess->justForked=true;
     newProcess->parent = currProcess;
+    newProcess->childNumber = ++currProcess->lastChildNumber;
+    
     __asm__("cli\n");
-    CoWProcess(currProcess);
     dupPageTables(newProcess, currProcess); //Duplicates the current process' page tables to the new one
+    //CLR 01/17/2019: Changed order of dup & CoW and now CoWing the child instead of the parent.
+    //The parent will maintain direct access to all of its memory.  Whenever the child tries to access the paren't memory
+    //it is CoWed, so it is copied and the child gets access to the CoW page.
+    CoWProcess(newProcess);
 
     uint32_t tssFlags=ACS_TSS;
     uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;

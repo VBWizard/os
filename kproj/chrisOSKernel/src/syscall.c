@@ -60,8 +60,10 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_FORK:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            process=(process_t*)(findTaskByCR3(processCR3))->process;
-            retVal=process_fork(findTaskByCR3(processCR3)->process);
+            process=CURRENT_PROCESS;
+            printd(DEBUG_PROCESS,"syscall: Fork called by %s-%u\n", process->path, process->childNumber);
+            //process=(process_t*)(findTaskByCR3(processCR3))->process;
+            retVal=process_fork(process);
             if (process->lastChildCR3 > 0)
             {
                 uint32_t temp = process->lastChildCR3;

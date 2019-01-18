@@ -347,8 +347,9 @@ task_t* findTaskToRun()
         if (*queue!=0)
         {
             //This is where we increment all the runnable ticks, based on the process' priority
-            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s), priority=%u, old ticks=%u, new ticks=",
+            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s-%u), priority=%u, old ticks=%u, new ticks=",
                     ((task_t*)*queue)->taskNum, ((process_t*)((task_t*)*queue)->process)->path,
+                    ((process_t*)((task_t*)*queue)->process)->childNumber,
                     ((process_t*)((task_t*)*queue)->process)->priority,
                     ((task_t*)*queue)->prioritizedTicksInRunnable);
             if ( (task_t*)*queue!=kIdleTask)

@@ -73,6 +73,8 @@ extern "C" {
         char* realEnv;
         bool justForked;
         uint32_t lastChildCR3;
+        uint32_t childNumber;
+        uint32_t lastChildNumber;
     } process_t;
 
 

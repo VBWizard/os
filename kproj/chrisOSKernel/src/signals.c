@@ -241,8 +241,9 @@ scanSleep:
                 changeTaskQueue(task,TASK_RUNNABLE);
                 ((process_t*)(task->process))->signals.sigdata[SIGSLEEP]=0;
                 ((process_t*)(task->process))->signals.sigind&=~SIGSLEEP;
-                task->prioritizedTicksInRunnable=1000000;  //Make this the next chosen task
-                awoken=true;
+                //CLR 01/17/2019: Don't make sure the task is chosen next!
+                //task->prioritizedTicksInRunnable=1000000;  //Make this the next chosen task
+                //awoken=true;
             }
         }
         sleep++;

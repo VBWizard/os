@@ -16,6 +16,9 @@
 /*
  * 
  */
+
+int sharedCounter = 10;
+
 int main(int argc, char** argv) {
 
     int pid=0;
@@ -24,18 +27,30 @@ int main(int argc, char** argv) {
     if (pid==0)
     {
         //child executes here
-        for (int cnt=0;cnt<10;cnt++)
+        for (int sharedCounter=9;sharedCounter>=0;sharedCounter--)
         {
-            print("Child: Count = %u\n",cnt);
+            print("Child 1 counting: Count = %u\n",sharedCounter);
             sleep(1);
         }
         return 1;
     }
     //parent executes here
 
-    for (int cnt=0;cnt<10;cnt++)
+    pid=fork();
+    if (pid==0)
     {
-        print("Parent: Count = %u\n",cnt);
+        //child executes here
+        for (int sharedCounter=20;sharedCounter>=0;sharedCounter--)
+        {
+            print("Child 2 counting: Count = %u\n",sharedCounter);
+            sleep(1);
+        }
+        return 2;
+    }
+    
+    for (int sharedCounter=1;sharedCounter<=10;sharedCounter++)
+    {
+        print("Parent: Count = %u\n",sharedCounter);
         sleep(1);
     }
     return (0);
