@@ -28,8 +28,10 @@ extern task_t* submitNewTask(task_t *task);
 extern uint64_t kIdleTicks;
 extern uintptr_t *qRunnable;
 void CoWProcess(process_t* process);
+void dupPageTables(process_t* newProcess, process_t* currProcess);
 process_t* kKernelProcess;
 extern void _schedule();
+extern void child_task_forked();
 
 #define PAGE_USER_READABLE 0x4
 #define PAGE_USER_WRITABLE 0x6           //0x4 for "User" | 0x2 for "Writable"
@@ -212,9 +214,10 @@ void processExit()
             printd(DEBUG_PROCESS,"processExit: Executing exitHandler %u @ 0x%08X\n",lCounter,process->exitHandler[lCounter]);
             x();
         }
-    gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
+    //Can't save endTime here because we had to change VADDR to be read-only for ring 3
+    //gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
     
-     __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (SYSCALL_ENDPROCESS), "b" (lRetVal));
+     __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (SYSCALL_ENDPROCESS), "b" (process->pageDirPtr), "c" (lRetVal));
     //Free memory allocated to the process
      
      //freeMemory(process);
@@ -390,7 +393,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     process->processSyscallESP=process->task->tss->ESP1;
     process->priority=PROCESS_DEFAULT_PRIORITY;
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
-    pagingMapPage(process->task->tss->CR3,PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000,0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
+    pagingMapPage(process->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000, 0x5); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
+    pagingMapPage(process->task->tss->CR3, process->task, process->task, 0x5);
 
     //Take care of the special "idle" task 
     if (strncmp(process->path,"/sbin/idle",50)!=0)
@@ -472,90 +476,112 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
 }
 
 //Upon fork the child task's EIP will be set to child_task_forked
-uint32_t child_task_forked()
+/*uint32_t child_task_forked()
 {
     //Pop the EBP that is pushed when the child starts executing this method.
     //That way the automatic pop epb at the end of this method will simulate the pop ebp 
     //that would have happened at the end of process_fork if the child started where the parent forked it
-    __asm__("pop ebp\nmov esp,ebp\n");
+    __asm__("pop ebp\nmov esp, ebp");
+    //__asm__("leave\n");
     return 0;
-}
+}*/
 
 uint32_t process_fork(process_t* currProcess)
 {
     process_t* newProcess = allocPagesAndMap(sizeof(process_t));
     task_t* newTask;
-    uint32_t retVal;
-    
+    uint32_t retVal=0, returnCount = 0;
+
     //Duplicate the calling process
     memcpy(newProcess,currProcess,sizeof(process_t));
     
     //Create a new task.  Can't dup the task because it needs its own taskNum which is 
     newTask=getAvailableTask();
-    newTask->process = newProcess;
-    newTask->esp0Base = currProcess->task->esp0Base;
-    newTask->esp0Size = currProcess->task->esp0Size;
-    newTask->exited = 0;
-    newTask->kernel = currProcess->task->kernel;
-    newTask->kernelPageDirPtr = currProcess->task->kernelPageDirPtr;
-    newTask->lastRunEndTicks = currProcess->task->lastRunEndTicks;
-    newTask->lastRunStartTicks = currProcess->task->lastRunStartTicks;
+    uint32_t taskNum = newTask->taskNum;
     
-    newTask->pageDir = currProcess->task->pageDir;
-    newTask->prioritizedTicksInRunnable = currProcess->task->prioritizedTicksInRunnable; //so new task should run closely to old one
+    uint32_t* tss = newTask->tss;
+    memcpy(newTask, currProcess->task, sizeof(task_t));
+    newTask->tss = tss;
+    memcpy(newTask->tss,currProcess->task->tss,sizeof(tss_t)); //No need to malloc, getAvailableTask did that already
+    newTask->taskNum = taskNum;
+    newTask->process = newProcess;
+    newProcess->task = newTask;
+    newTask->exited = 0;
     newTask->taskState = TASK_RUNNABLE;
-    newTask->ticksSinceLastInterrupted = currProcess->task->ticksSinceLastInterrupted;
-    memcpy(newTask->tss,currProcess->task->tss,sizeof(tss_t));
+    newTask->ticksSinceLastInterrupted = currProcess->task->ticksSinceLastInterrupted+1;
     //Child task will return from child_task_forked with a 0 return value, whereas we will return with the child task PID
-    newTask->tss->EIP=(uint32_t)&child_task_forked;
-    __asm__("pushad\n");
-    __asm__("mov %0, [esp+28]\n": "=d" (newTask->tss->EAX));
-    __asm__("mov %0, [esp+24]\n": "=d" (newTask->tss->ECX));
-    __asm__("popad\n");
-    __asm__("pushad\n");
-    __asm__("mov %0, [esp+20]\n": "=d" (newTask->tss->EDX));
-    __asm__("mov %0, [esp+16]\n": "=d" (newTask->tss->EBX));
-    __asm__("mov %0, [esp+12]\n": "=d" (newTask->tss->ESP));
-    __asm__("mov %0, [esp+8]\n": "=d" (newTask->tss->EBP));
-    __asm__("mov %0, [esp+4]\n": "=d" (newTask->tss->ESI));
-    __asm__("mov %0, [esp]\n": "=d" (newTask->tss->EDI));
-    __asm__("mov %0, cs\n": "=d" (newTask->tss->CS));
-    __asm__("mov %0, ds\n": "=d" (newTask->tss->DS));
-    __asm__("mov %0, es\n": "=d" (newTask->tss->ES));
-    __asm__("mov %0, ss\n": "=d" (newTask->tss->SS));
-    __asm__("mov %0, cr3\n": "=d" (newTask->tss->CR3));
-    __asm__("popad\n");
-    newTask->tss->ESP=newTask->tss->EBP;
-    uint32_t temp = &child_task_forked;
-    //memcpy((void*)newTask->tss->ESP+4,&temp,4);
-    newTask->tss->EIP=temp;
-    //__asm__("mov %0, ecx":: "r" (newTask->tss->ESP), "c" (&child_task_forked));
-    //sys_mmapI(process, )
     newProcess->justForked=true;
+    newProcess->parent = currProcess;
     __asm__("cli\n");
     CoWProcess(currProcess);
+    dupPageTables(newProcess, currProcess); //Duplicates the current process' page tables to the new one
+
+    uint32_t tssFlags=ACS_TSS;
+    uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;
+    if (currProcess->task->kernel)
+    {
+        gdtFlags |= GDT_DPL0;
+        tssFlags |= ACS_DPL_0;
+    }
+    else
+    {
+        gdtFlags |= GDT_DPL3;
+        tssFlags |= ACS_DPL_3;
+    }
+    memset(newProcess->task->tss->IOs,0,200);
+    newProcess->task->tss->IOPB = sizeof(tss_t)-200;
+    gdtEntryOS(newProcess->task->taskNum,(uint32_t)newProcess->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
+    pagingMapPage(newProcess->task->tss->CR3,(uint32_t)newProcess->task->tss,newProcess->task->tss,0x7);
+
+
+    //Clone the parent's ESP Stack
+/*
+    newProcess->stackSize = currProcess->stackSize;
+    newProcess->stack1Size = currProcess->stack1Size;
+    ((process_t*)newTask->process)->stackStart=kMalloc(newProcess->stackSize);
+    //Make the physical addresses of the original ESP stack into virtual addresses in the child's task space
+    //So that we can use the cloned stack
+    pagingMapPageCount(newTask->tss->CR3,newProcess->stackStart, newProcess->stackStart,currProcess->stackSize/PAGE_SIZE,0x7);  
+    //Also map the parent's stack addresses into our space as virtual
+    //NOTE: YOu can not both virtually map and CoW an address :-)
+    //pagingMapPageCount(newTask->tss->CR3,currProcess->stackStart, newProcess->stackStart,currProcess->stackSize/PAGE_SIZE,0x7);  
+    pagingMapPageCount(newTask->tss->CR3,newTask->tss->ESP | KERNEL_PAGED_BASE_ADDRESS,newTask->tss->ESP,0x16,0x7);
+    pagingMapPageCount(KERNEL_CR3,newTask->tss->ESP,newTask->tss->ESP,0x16,0x7);
+    printd(DEBUG_PROCESS,"process_fork: Allocated task ESP at 0x%08X (0x%08X bytes)\n",newProcess->stackStart,newProcess->stackSize);
+    printd(DEBUG_PROCESS,"process_fork: Mapped parent's physical stack addresses to virtual in our address space. (0x%08X-0x%08X)\n",currProcess->stackStart, currProcess->stackStart + currProcess->stackSize);
+    memcpy(newProcess->stackStart, currProcess->stackStart, currProcess->stackSize);
+*/
     
-    newTask->tss->ESP0=kMalloc(0x10*0x1000);
-    ((process_t*)newTask->process)->stack1Start=newTask->tss->ESP0;
-    ((process_t*)newTask->process)->stack1Size=0x10*0x1000;
-    printd(DEBUG_TASK,"process_fork: ESP0 allocated at 0x%08X\n", newTask->tss->ESP0);
-    printd(DEBUG_TASK,"process_fork: Allocated task ESP0 for syscall at 0x%08X (0x%08X bytes)\n",newTask->tss->ESP0,0x10*0x1000);
-    memcpy(((process_t*)newTask->process)->stack1Start, currProcess->stack1Start, currProcess->stack1Size);
-    pagingMapPageCount(newTask->tss->CR3,newTask->tss->ESP0 | KERNEL_PAGED_BASE_ADDRESS,newTask->tss->ESP0,0x10,0x7);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
-    pagingMapPageCount(newTask->tss->CR3,newTask->tss->ESP0,newTask->tss->ESP0,0x10,0x7);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
-    uint32_t offset = newTask->tss->EBP - currProcess->stack1Start;
-    newTask->tss->ESP0 = ((process_t*)newTask->process)->stack1Start + offset;
-    newTask->tss->EBP = ((process_t*)newTask->process)->stack1Start + offset;
-    addToQ(qRunnable,newTask);
+    //Clone the parent's ESP1 Stack
+    ((process_t*)newTask->process)->stack1Start=kMalloc(newProcess->stack1Size);
+    newProcess->stack1Size = currProcess->stack1Size;
+    pagingMapPageCount(newTask->tss->CR3,newProcess->stack1Start, newProcess->stack1Start,currProcess->stack1Size / PAGE_SIZE,0x7);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
+    pagingMapPageCount(KERNEL_CR3,newProcess->stack1Start, newProcess->stack1Start,currProcess->stack1Size / PAGE_SIZE,0x7);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
+    pagingMapPageCount(newTask->tss->CR3,newProcess->stack1Start | KERNEL_PAGED_BASE_ADDRESS,newProcess->stack1Start,0x16,0x7);
+    printd(DEBUG_PROCESS,"process_fork: Allocated task ESP1 for syscall at 0x%08X (0x%08X bytes)\n",newProcess->stack1Start,currProcess->stack1Size);
+    newProcess->task->tss->ESP1 = newProcess->stack1Start + newProcess->stack1Size - 0x1000;
+    newProcess->processSyscallESP=newProcess->task->tss->ESP1;
     
-    //_schedule();
-    __asm__("sti\n");
-    return newTask->taskNum;
+    //Don't forget to map the new process to VADDR!
+    pagingMapPage(newProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)newProcess & 0xFFFFF000, 0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
     
+    currProcess->lastChildCR3 = newProcess->pageDirPtr;
+    newProcess->task->pageDir = (uint32_t*)newProcess->pageDirPtr;
+
+    submitNewTask(newTask);
+    returnCount = 0;
+    retVal = newTask->taskNum;      //parent gets this
+    triggerScheduler();
+    __asm__("sti\nhlt\nhlt\nhlt\n\n");
+    if (returnCount++ > 0)
+        return retVal;
+    else
+        return 0;
 }
 
 void CoWProcess(process_t* process)
 {
+    printd(DEBUG_PROCESS, "CoWing the process\n");
     //CoW the text segment
     if (process->elf->textAddress>0)
         sys_mmapI(process, (uintptr_t*)(process->elf->textAddress & 0xFFFFF000), process->elf->textSize, PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
@@ -570,6 +596,49 @@ void CoWProcess(process_t* process)
     //CoW the heap segment
     if (process->heapEnd - process->heapStart > 0)
     sys_mmapI(process, (uintptr_t*)(process->heapStart & 0xFFFFF000), process->heapEnd - process->heapStart, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-    //CoW the stack segment
+    //Don't CoW the stack segment. We're gunna create a private stack and clone the parent's!
     sys_mmapI(process, (uintptr_t*)(process->stackStart & 0xFFFFF000), process->stackSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+}
+
+void dupPageTables(process_t* newProcess, process_t* currProcess)
+{
+    newProcess->pageDirPtr = (uint32_t)pagingAllocatePagingTablePage();
+    memset(newProcess->pageDirPtr, 0, PAGE_SIZE);
+    newProcess->task->tss->CR3 = newProcess->pageDirPtr;
+    printd(DEBUG_PROCESS, "\tdupPageTables: Duping page tables from 0x%08X to 0x%08X\n",currProcess->pageDirPtr, newProcess->pageDirPtr);
+    pagingMapPage(KERNEL_CR3,newProcess->task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,newProcess->task->tss->CR3,0x3);
+    pagingMapPage(KERNEL_CR3,newProcess->task->tss->CR3, newProcess->task->tss->CR3,0x3);
+    pagingMapPage(newProcess->pageDirPtr,newProcess->task->tss->CR3, newProcess->task->tss->CR3,0x7);
+
+    uint32_t* oldCR3 = (uint32_t*)currProcess->pageDirPtr;
+    uint32_t* newCR3 = (uint32_t*)newProcess->pageDirPtr;
+    
+    //Iterate the current PDE creating a new page and pointing to it whenever you find an entry
+    for (int cr3Ptr=0;cr3Ptr<1024;cr3Ptr++)
+    {
+        //if the CR3 page directory has a value, dup the page table at this entry
+        if (oldCR3[cr3Ptr] != 0)
+        {
+            //Create the new page table and a reference to the old one
+            printd(DEBUG_PROCESS,"\tFound PT at 0x%08X to dup (addresses from 0x%08X to 0x%08X\n",&oldCR3[cr3Ptr], cr3Ptr*0x400000, cr3Ptr*0x400000 + 0x3fffff);
+            uint32_t *oldPT = oldCR3[cr3Ptr];
+            uint32_t *newPT = pagingAllocatePagingTablePage();
+            pagingMapPage(KERNEL_CR3,(uint32_t)newPT | KERNEL_PAGED_BASE_ADDRESS,(uint32_t)newPT | ((uint32_t)oldPT | 0x00000FFF),0x3);
+            pagingMapPage(KERNEL_CR3, newPT, newPT, (uint32_t)oldPT | 0x00000FFF);
+            pagingMapPage(newProcess->pageDirPtr,newPT, newPT,0x7);
+            
+            //Put the address of the page table in the CR3 page directory
+            newCR3[cr3Ptr] = (uint32_t)newPT | ((uint32_t)oldPT & 0x00000FFF);
+
+            //Now iterate the old page table creating entries on the new table where they exist on the old
+            //Now dup the page table
+            if (((uint32_t)oldPT & 0xFFFFF000) == 0x0115D000)
+            {
+                int a = 1;
+                a+=1-1+1;
+            }
+            memcpy(newPT, (uint32_t)oldPT & 0xFFFFF000, PAGE_SIZE);
+            printd(DEBUG_PROCESS,"\t\tDup'd PT from 0x%08X to 0x%08X\n",(uint32_t)oldPT & 0xFFFFF000, newPT);
+        }
+    }
 }

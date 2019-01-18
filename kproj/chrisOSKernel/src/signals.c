@@ -59,10 +59,6 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     typedef void sigHandler(void);
 
 
-#define CURRENT_TASK ({uint32_t task; \
-                  __asm__("str eax\nshr eax,3\n":"=a" (task));\
-                  task;})
-    
 //Process a sigaction against a process, called by sys_sigaction or the kernel
 void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t callerCR3)
 {
@@ -75,7 +71,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
         panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",callerCR3,signal,sigAction);
     if (currentTask!=0x17)
     {
-        p = findTaskByTaskNum(currentTask)->process;
+        p = CURRENT_PROCESS;
         callerCR3=p->pageDirPtr;
     }
     else
@@ -116,7 +112,7 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             __asm__("cli\n");
             triggerScheduler();
             __asm__("mov cr3,eax\nsti\n"::"a" (callerCR3));
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
+            __asm__("sti\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\n");      //Halt until the next tick when another task will take its place
             break;
         case SIGSTOP:
             printd(DEBUG_SIGNALS,"Signalling STOP for task 0x%04X, old sigind=0x%08X, ",p->task->taskNum,p->signals.sigind);
@@ -164,7 +160,7 @@ void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
 
     printd(DEBUG_PROCESS,"sys_sigaction(0x%08X,0x%08X,0x%08X,0x%08X)\n",signal,sigAction,sigData,oldCR3);
     void* retVal=sys_sigaction2(signal, sigAction, sigData, oldCR3);
-    __asm__("mov cr3,eax\nsti\n"::"a" (oldCR3));
+    __asm__("mov cr3,eax\n"::"a" (oldCR3));
     return retVal;
 }
 

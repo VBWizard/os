@@ -16,7 +16,6 @@
 .extern kKernelCR3
 .extern kKeyboardHandlerRoutine
 .extern call defaultISRHandler
-.extern forkReturn
 .extern schedStack
 .extern _schedule
 .extern schedulerTriggered

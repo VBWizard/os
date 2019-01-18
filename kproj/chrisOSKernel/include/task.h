@@ -12,6 +12,12 @@
 #include "tss.h"
 
 #define RESERVED_TASKS 32
+#define CURRENT_TASKNUM ({uint32_t taskNum; \
+                      __asm__("str eax\nshr eax,3\n":"=a" (taskNum));\
+                      taskNum;})
+
+#define CURRENT_TASK(t) ({uint32_t taskNum; \
+                      __asm__("str eax\nshr eax,3\n":"=a" (taskNum)); task_t *t=findTaskByTaskNum(taskNum);})
 
 typedef enum etaskstate
 {

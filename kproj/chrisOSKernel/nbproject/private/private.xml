@@ -19,9 +19,10 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/fs.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/pipe.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/fs.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/schedule.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/x86.s</file>
         </group>
     </open-files>
 </project-private>

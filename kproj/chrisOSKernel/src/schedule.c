@@ -25,7 +25,7 @@ uintptr_t *qStopped;
 uintptr_t *qUSleep;
 uintptr_t *qISleep;
 uintptr_t *qExited;
-bool forkReturn;
+uint32_t forkReturn;
 uint32_t nextTaskTSS;
 
 uint32_t kTaskSwitchCount;
@@ -141,9 +141,12 @@ void markTaskEnded(uint32_t cr3, uint32_t retval)
         panic("markTaskEnded: Could not find task for CR3=0x%08X to end\n",cr3);
     taskList->exited=true;
     //If the task being ended is running, trigger a schedule on the next tick to get rid of it
-    if (listNum==TASK_RUNNING)
-        nextScheduleTicks=*kTicksSinceStart;
     printd(DEBUG_PROCESS,"\tmarkTaskEnded: Marked task 0x%04X ended w/ retval=0x%08X, triggered scheduler\n",taskList->taskNum,retval);
+    //****DESTROY STUFF HERE****
+    //When a task is ended, the scheduler will deal with it on the next tick, so lets wait for that to happen
+    triggerScheduler();
+    __asm__("sysCallIdleLoop: sti\nhlt\njmp sysCallIdleLoop\n");
+
 }
 
 void storeISRSavedRegs(task_t* task)
@@ -173,7 +176,7 @@ void storeISRSavedRegs(task_t* task)
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%04X,",task->tss->SS);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%04X,",task->tss->DS);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBX=0x%08X,",task->tss->EBX);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
@@ -196,32 +199,59 @@ void loadISRSavedRegs(task_t* task)
     isrSavedEDX=task->tss->EDX;
     isrSavedESI=task->tss->ESI;
     isrSavedEDI=task->tss->EDI;
-    if ( ((process_t*)task->process)->justForked)
-        isrSavedESP=task->tss->ESP1;
-    else
-        isrSavedESP=task->tss->ESP;
+    isrSavedESP=task->tss->ESP;
     isrSavedEBP=task->tss->EBP;
     isrSavedFlags=task->tss->EFLAGS;
     isrSavedES=task->tss->ES;
     isrSavedFS=task->tss->FS;
     isrSavedGS=task->tss->GS;
     isrSavedCR3=task->tss->CR3;
+    if (((process_t*)task->process)->justForked)
+    {
+        printd(DEBUG_PROCESS,"loadISRSavedRegs: Fork return for newly spawned child\n");
+        process_t* parent = ((process_t*)task->process)->parent;
+        tss_t *parentTSS = findTaskByTaskNum(parent->task->taskNum)->tss;
+        isrSavedCS = parentTSS->CS;
+        isrSavedEIP = parentTSS->EIP;
+        isrSavedSS = parentTSS->SS;
+        isrSavedDS = parentTSS->DS;
+        isrSavedEAX = parentTSS->EAX;
+        isrSavedEBX = parentTSS->EBX;
+        isrSavedECX = parentTSS->ECX;
+        isrSavedEDX = parentTSS->EDX;
+        isrSavedESI = parentTSS->ESI;
+        isrSavedEDI = parentTSS->EDI;
+        isrSavedESP = task->tss->ESP1;
+        uint32_t parentESP1Offset = parentTSS->ESP - parent->stack1Start;
+        uint32_t parentEBPOffset = parentTSS->EBP - parent->stack1Start;
+        isrSavedESP = ((process_t*)task->process)->stack1Start + parentESP1Offset;
+        isrSavedEBP = ((process_t*)task->process)->stack1Start + parentEBPOffset;
+        isrSavedEBP = parentTSS->EBP;
+        isrSavedFlags = parentTSS->EFLAGS;
+        isrSavedES = parentTSS->ES;
+        isrSavedFS = parentTSS->FS;
+        isrSavedGS = parentTSS->GS;
+        //We need to load the CR3 because whatever CR3 the parent was using, that's what the child should use.
+        isrSavedCR3 = parentTSS->CR3; 
+        memcpy((uintptr_t*)((process_t*)task->process)->stackStart, (uintptr_t*)parent->stackStart, ((process_t*)task->process)->stackSize);
+        memcpy((uintptr_t*)((process_t*)task->process)->stack1Start, (uintptr_t*)parent->stack1Start, ((process_t*)task->process)->stack1Size);
+    }
 #ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\tLoad: ");
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X,",task->tss->CR3);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%04X,",task->tss->SS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%04X,",task->tss->DS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X,",isrSavedCR3);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",isrSavedCS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",isrSavedEIP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%04X,",isrSavedSS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%04X,",isrSavedDS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",isrSavedEAX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",isrSavedEBX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",isrSavedECX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08X,",isrSavedEDX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08X,",isrSavedESI);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08X,",isrSavedEDI);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",isrSavedESP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",isrSavedEBP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X\n",isrSavedFlags);
 #endif
 }
 
@@ -259,12 +289,15 @@ uintptr_t* getQ(eTaskState state)
 task_t* findOpenTaskSlot()
 {
 	task_t* list=kTaskList;
+        int slotNum = 0;
 	while (list!=(task_t*)NO_NEXT && list->taskNum!=0)
 	{
 		list++;
+                slotNum++;
 	}
 	if (list==(task_t*)NO_NEXT)
 		return NULL;
+        printd(DEBUG_PROCESS, "findOpenTaskSlot: Found process at slot # %u\n", slotNum);
 	return list;
 }
 void addToQ(uintptr_t* queue, task_t* taskPtr);
@@ -584,7 +617,7 @@ void runAnotherTask(bool schedulerRequested)
         
         if (((process_t*)taskToRun->process)->justForked)
         {
-            forkReturn = ((process_t*)taskToRun->process)->justForked;
+            forkReturn = isrSavedESP;
             ((process_t*)taskToRun->process)->justForked = 0;
         }
 

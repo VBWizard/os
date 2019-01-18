@@ -213,7 +213,7 @@ static inline void invlpg(void* m)
 
 void pagingMakePageCoW(uintptr_t* ptEntry, bool makeCoW)
 {
-    printd(DEBUG_COW,"pagingSetCowFlag: CoW 0x%08X? %c: before/after: 0x%08X/",*ptEntry, (makeCoW?'Y':'N'), *ptEntry);
+    printd(DEBUG_COW,"\tpagingSetCowFlag: CoW 0x%08X? %c: (after: ",*ptEntry, (makeCoW?'Y':'N'), *ptEntry);
     if (makeCoW)
     {
        *ptEntry|=COW_PAGE; //Set CoW (bit 9) flag
@@ -224,9 +224,7 @@ void pagingMakePageCoW(uintptr_t* ptEntry, bool makeCoW)
        *ptEntry&=(~COW_PAGE); //Unset CoW (bit 9) flag
        *ptEntry|=0x2;       //Set Read/Write (bit 1) flag
     }   
-    invlpg(ptEntry);
-    RELOAD_CR3
-    printd(DEBUG_COW,"0x%08X\n", *ptEntry);    
+    printd(DEBUG_COW,"0x%08X)\n", *ptEntry);    
 }
 
 void pagingSetAddressReadOnlyFlag(uintptr_t CR3, uintptr_t address, bool readOnly)

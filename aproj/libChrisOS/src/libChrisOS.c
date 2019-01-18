@@ -114,7 +114,10 @@ VISIBLE void modifySignal(int signal, void* sigHandler, int sigData)
 
 VISIBLE int fork()
 {
-    return do_syscall0(SYSCALL_FORK);
+    uint32_t retVal = 0;
+    //return do_syscall0(SYSCALL_FORK);
+    asm("call sysEnter_Vector\n":"=a" (retVal): "a" (SYSCALL_FORK));
+    return retVal;
 }
 
 VISIBLE int exec(char* path)

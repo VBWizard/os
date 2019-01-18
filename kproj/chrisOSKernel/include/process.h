@@ -31,6 +31,8 @@ extern "C" {
 #define PROCESS_MAX_ENVIRONMENT_VARIABLES 512
 #define PROCESS_STRUCT_VADDR 0xF000F000
 #define PROCESS_STRUCT_VADDR_THIS_OFFSET 0x4
+#define CURRENT_PROCESS ({uint32_t taskNum;\
+                      __asm__("str eax\nshr eax,3\n":"=a" (taskNum)); process_t *p=findTaskByTaskNum(taskNum)->process;p;})
     
     typedef void exitHandler(void);
     typedef void startHandler();
@@ -40,8 +42,8 @@ extern "C" {
     typedef struct sprocess
     {
         uint32_t processSyscallESP;         //NOTE: this must be the first item in the struct, as it is mapped into the process later
-        struct sprocess* this;                     //NOTE: This must remain the second item in the struct at offset +4
         uint32_t pageDirPtr;
+        struct sprocess* this;                     //NOTE: This must remain the second item in the struct at offset +4
         task_t* task;
         sGDT* gdtEntry;
         elfInfo_t* elf;
@@ -70,6 +72,7 @@ extern "C" {
         char* mappedEnv;
         char* realEnv;
         bool justForked;
+        uint32_t lastChildCR3;
     } process_t;
 
 

@@ -128,7 +128,7 @@ __asm__("cli\n");
     printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08X) into task and kernel\n", kKernelTask->tss);
     
     pagingMapPage(KERNEL_CR3,PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000,0x7); //CLR 1/10/2019: Changed perms from 0x7 to 0x5
-    printd(DEBUG_PROCESS,"pagingMapPage(0x%08X,0x%08X,0x%08X,0x%02X",KERNEL_CR3, PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000, 0x7);
+    printd(DEBUG_PROCESS,"pagingMapPage(0x%08X,0x%08X,0x%08X,0x%02X)\n",KERNEL_CR3, PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000, 0x7);
     gdtEntryOS(kKernelTask->taskNum,(uint32_t)kKernelTask->tss,sizeof(tss_t), ACS_TSS | ACS_DPL_0,GDT_GRANULAR | GDT_32BIT,true);
 
     
@@ -142,7 +142,7 @@ __asm__("cli\n");
     if (!kCPUFeatures.cpuid_feature_bits.sep)
         panic("CPU does not have syscall functionality, cannot continue to boot.");
 
-    wrmsr32(SYSENTER_CS_MSR,0x88,0x33);                      //Set sysenter CS(10) and SS(18), and return CS(3b) & SS(40)
+    wrmsr32(SYSENTER_CS_MSR,0x88,0x33);                      //Set sysenter CS(88) and SS(33), and return CS(93) & SS(3b)
     wrmsr32(SYSENTER_ESP_MSR,kKernelTask->tss->ESP1,0);     //Set sysenter ESP
     wrmsr32(SYSENTER_EIP_MSR,(uint32_t)&_sysEnter,0);       //Set sysenter EIP
     printd(DEBUG_PROCESS,"Setup SYSENTER MSRs as CS:EIP=0x%04X:0x%08X, ESP=0x%08X\n",0x88,&_sysEnter,kKernelTask->tss->ESP1);

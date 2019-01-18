@@ -54,9 +54,9 @@ overRestoreCR3:
     mov eax, scheduleIsKernelProcess
     cmp eax,1           
     jne overKernelReturn  
-    mov eax, forkReturn
-    cmp eax,1
-    je overKernelReturn
+    #mov eax, forkReturn
+    #cmp eax,0
+    #jne overKernelReturn
     #For kernel processes, we have to switch back to the process' SS:ESP and then iret
 
     mov eax, nextTaskTSS
@@ -102,6 +102,12 @@ newTaskLoaded:
     mov eax,0
     mov nextTaskTSS, eax
     mov schedulerTaskSwitched,eax
+    #mov eax,forkReturn
+    #cmp eax,0
+    #je doTheJump
+    #mov esp, eax #New stack pointer for the return
+    #mov eax, 0
+    #mov forkReturn,eax
 #    mov eax,kTaskSwitchCount
 #    inc eax
 #    mov kTaskSwitchCount,eax
