@@ -21,7 +21,7 @@ int sharedCounter = 10;
 
 int main(int argc, char** argv) {
 
-    int pid=0;
+    int pid=0, pid2=0;
     
     pid=fork();
     if (pid==0)
@@ -36,11 +36,11 @@ int main(int argc, char** argv) {
     }
     //parent executes here
 
-    pid=fork();
-    if (pid==0)
+    pid2=fork();
+    if (pid2==0)
     {
         //child executes here
-        for (int sharedCounter=20;sharedCounter>=0;sharedCounter--)
+        for (int sharedCounter=12;sharedCounter>=0;sharedCounter--)
         {
             print("Child 2 counting: Count = %u\n",sharedCounter);
             sleep(1);
@@ -48,11 +48,18 @@ int main(int argc, char** argv) {
         return 2;
     }
     
-    for (int sharedCounter=1;sharedCounter<=10;sharedCounter++)
+/*    for (int sharedCounter=1;sharedCounter<=10;sharedCounter++)
     {
         print("Parent: Count = %u\n",sharedCounter);
         sleep(1);
     }
+ * */
+    print("waiting for child 2 (PID=0x%04X\n", pid2);
+    uint32_t pid1Return = waitpid(pid2);
+    print("PID 2 returned %u\n",pid1Return);
+    print("waiting for child 1 (PID=0x%04X)\n", pid);
+    uint32_t pid0Return = waitpid(pid);
+    print("PID 1 returned %u\n",pid0Return);
     return (0);
 }
 

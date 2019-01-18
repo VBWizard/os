@@ -13,6 +13,7 @@
 #include "fs.h"
 #include "schedule.h"
 #include "filesystem/pipe.h"
+#include "kutility.h"
 
 //#include "fs.h" - CLR 04/23/2018: Commented out
 
@@ -37,11 +38,12 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     uint32_t retVal, retVal2;
     void* parentProcess;
     process_t* process;
+    task_t* task;
     char test[2][50];
     char* testp[2];
     uint32_t param4;
     uint32_t processCR3;  //NOTE: Moved from module level to here because this needs to be a stack variable for fork()
-    
+    bool taskExited = false;
     __asm__("mov eax,esi\n": "=a" (param4));
     __asm__("mov eax,cr3\n": "=a" (processCR3));
     __asm__("cli\n");
@@ -138,8 +140,25 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax"::"a" (processCR3));
             break;
         case SYSCALL_WAITFORPID:      //***waitForPID - param1=pid to check
-            printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08X) on pid=0x%04X.  Good night!\n",processCR3,param1);
-            retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1);
+            LOAD_KERNEL_CR3;
+            //Find out if the PID to be waited on has already exited
+            task = findTaskByTaskNum(param1);
+            //If it has
+            if (task->taskState == TASK_EXITED)
+            {
+                //Set the return value that we'll pass back
+                retVal = ((process_t*)task->process)->retVal;
+                taskExited = true;
+            }
+            else //Otherwise
+                taskExited = false;
+            LOAD_CR3(processCR3);
+            //Only wait for the PID if it hasn't already exited
+            if (!taskExited)
+            {
+                printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08X) on pid=0x%04X.  Good night!\n",processCR3,param1);
+                retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1);
+            }
             break;
         case SYSCALL_SETPRIORITY:      //***Set process priority - param1=new priority, returns old priority
             retVal=sys_setpriority(findTaskByCR3(processCR3)->process,param1);

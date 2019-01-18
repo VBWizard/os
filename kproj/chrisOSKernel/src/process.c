@@ -217,7 +217,7 @@ void processExit()
     //Can't save endTime here because we had to change VADDR to be read-only for ring 3
     //gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
     
-     __asm__("mov ecx,cs\ncall sysEnter_Vector\n"::"a" (SYSCALL_ENDPROCESS), "b" (process->pageDirPtr), "c" (lRetVal));
+     __asm__("call sysEnter_Vector\n"::"a" (SYSCALL_ENDPROCESS), "b" (process->pageDirPtr), "c" (lRetVal));
     //Free memory allocated to the process
      
      //freeMemory(process);
