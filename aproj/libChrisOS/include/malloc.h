@@ -52,7 +52,7 @@ extern "C" {
 uint32_t heapBase;    
 uint32_t heapCurr;
 uint32_t heapEnd;
-uint32_t libcTZ;
+long libcTZ;
 
 void initmalloc();
 void* malloc(size_t size);

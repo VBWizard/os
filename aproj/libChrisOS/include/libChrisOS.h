@@ -35,6 +35,7 @@ extern "C" {
 #define NULL ((void *) 0)
 #endif
 
+#define MAXPARAMLEN 255
 #define VISIBLE __attribute__((visibility("default")))
 #define SYSCALL0(a,b) {asm("call sysEnter_Vector\n":"=a" (b):"a" (a), "b" (0), "c" (0), "d" (0), "S" (0));}
 #define SYSCALL1(a,b,c) {asm("call sysEnter_Vector\n":"=a" (c):"a" (a), "b" (b), "c" (0), "d" (0), "S" (0));}
@@ -50,8 +51,9 @@ extern "C" {
     int do_syscall2(int callnum, uint32_t param1, uint32_t param2);
     int do_syscall3(int callnum, uint32_t param1, uint32_t param2, uint32_t param3);
     int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4);
+    char** cmdlineToArgv(char* cmdline, int *argc);
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
-    VISIBLE int printf(const char *format, ...);
+    int printf(const char *format, ...);
     int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
     unsigned int VISIBLE sleep (unsigned int __seconds);

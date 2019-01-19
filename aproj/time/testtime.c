@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 #ifdef DEBUG
     startTime = malloc(sizeof(struct tm));
     endTime = malloc(sizeof(struct tm));
-    execpgm = malloc(512);
+    execpgm = malloc(1024);
 //    print("Param count=%u\n",argc);
 //    for (int cnt=0;cnt<argc;cnt++)
 //        print("Param %u=%s\n",cnt,argv[cnt]);
@@ -39,24 +39,19 @@ int main(int argc, char** argv) {
         retVal=-1;
     }
 
-    if (retVal==0)
+    for (int cnt=1;cnt<argc;cnt++)
     {
-        strcpy(execpgm,argv[1]);
-        strtrim(execpgm);
-        if (strlen(execpgm)==0)
-        {
-            print("Parameter 2 must be a program name to run\n");
-            retVal=-2;
-        }
+        strcat(execpgm," ");
+        strcat(execpgm,argv[cnt]);
     }
     if (retVal==0)
     {
+        int argcl;
+        char** argvl;
+        
+        argvl = cmdlineToArgv(execpgm, &argcl);
+
         //print("executing %s with first parameter at 0x%08X (%u parameters)\n", execpgm, argv[1], argc-1);
-        for (int cnt=2;cnt<argc;cnt++)
-        {
-            strcat(execpgm," ");
-            strcat(execpgm,argv[cnt]);
-        }
         startTicks=getticks();
         gettime(startTime,true);
         //pid=execb(execpgm);
@@ -64,10 +59,10 @@ int main(int argc, char** argv) {
         pid = fork();
         if (pid==0)
         {
-            int childPid = exec(execpgm, 0, NULL);
+            int childPid = exec(argvl[0], argcl, argvl);
             if (childPid <= 0)
             {
-                print("Erorr exec'ing %s\n",execpgm);
+                print("Error exec'ing %s\n",execpgm);
                 return -1;
             }
             else
@@ -84,7 +79,7 @@ int main(int argc, char** argv) {
         else
         {
             retVal = waitpid(pid);
-            if (retVal == 0)
+            if (retVal >= 0)
             {
                 endTicks=getticks();
                 gettime(endTime,true);

@@ -195,12 +195,53 @@ VISIBLE int waitpid(uint32_t pid)
     return do_syscall1(SYSCALL_WAITFORPID,pid);
 }
 
+/*
 VISIBLE void exit(int exitCode)
 {
     
 }
+*/
 
 VISIBLE char* getcwd(char* buf, size_t size)
 {
     return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
+}
+
+char** cmdlineToArgvI(const char* cmdline, int *argc)
+{
+    char** argv;
+    char cmd[1024];
+    char *spacePtr=cmd, *lastSpacePtr=cmd;
+    *argc = 0;
+
+    strncpyI(cmd,cmdline,1024);
+    strtrimI(cmd);
+    do
+    {
+        spacePtr=strstrI(spacePtr," ");
+        *argc+=1;
+            
+    } while (spacePtr++);
+    
+    argv=mallocI((*argc*MAXPARAMLEN)+(*argc*sizeof(int)));
+    int argvPtr=4* *argc;
+    spacePtr=cmd;
+    for (int cnt=0;cnt<*argc; cnt++)
+    {
+        argv[cnt]=(char*)argv+argvPtr;
+        spacePtr=strstrI(spacePtr," ");
+        if (spacePtr)
+            strncpyI(argv[cnt],lastSpacePtr,spacePtr-lastSpacePtr);
+        else
+            strncpyI(argv[cnt],lastSpacePtr,strlenI(lastSpacePtr));
+        strtrimI(argv[cnt]);
+        lastSpacePtr=spacePtr++;
+        argvPtr+=MAXPARAMLEN;
+    }
+    return argv;
+}
+
+VISIBLE char** cmdlineToArgv(char* cmdline, int *argc)
+{
+    return cmdlineToArgvI(cmdline, argc);
 }
