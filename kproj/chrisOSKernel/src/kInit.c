@@ -19,6 +19,7 @@ extern void vector7();
 extern void vector13();
 extern void vector14();
 extern void vector32();
+extern void vector40();
 extern void vector128();
 extern void setupPagingHandler();
 
@@ -148,8 +149,24 @@ __asm__("cli\n");
     printd(DEBUG_PROCESS,"Setup SYSENTER MSRs as CS:EIP=0x%04X:0x%08X, ESP=0x%08X\n",0x88,&_sysEnter,kKernelTask->tss->ESP1);
 
     printk("Installing new IRQ0 handler\n");
-    idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
+    //idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
+    idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x7], 0x08, (int)&vector7, ACS_INT);
+    idt_set_gate (&idtTable[0x28], 0x08, (int)&vector40, ACS_INT); //RTC IRQ 8
+    idt_set_gate (&idtTable[0x2f], 0x08, (int)&vector40, ACS_INT); //RTC IRQ 8
+outb(0x70, 0x8B);		// select register B, and disable NMI
+char prev=inb(0x71);	// read the current value of register B
+outb(0x70, 0x8B);		// set the index again (a read will reset the index to register D)
+outb(0x71, prev | 0x40);	// write the previous value ORed with 0x40. This turns on bit 6 of register B
+uint32_t rate =15;
+outb(0x70, 0x8A);		// set index to register A, disable NMI
+prev=inb(0x71);	// get initial value of register A
+outb(0x70, 0x8A);		// reset index to A
+outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the bottom 4 bits.
+
+
+IRQ_clear_mask(2);
+IRQ_clear_mask(8);
     setupPagingHandler();
 
     __asm__("jmp 0x88:kernJump1\nkernJump1:\n");
@@ -184,4 +201,17 @@ void hardwareInit()
             "mov cr4, eax\n"
             ".noSSE:\n");
     
+}
+void IRQ_clear_mask(unsigned char IRQline) {
+    uint16_t port;
+    uint8_t value;
+ 
+    if(IRQline < 8) {
+        port = PIC1_DATA;
+    } else {
+        port = PIC2_DATA;
+        IRQline -= 8;
+    }
+    value = inb(port) & ~(1 << IRQline);
+    outb(port, value);        
 }

@@ -78,6 +78,14 @@ VISIBLE int print(const char *format, ...)
     return 0;
 }
 
+VISIBLE int printf(const char *format, ...)
+{
+    va_list args;
+    va_start( args, format );
+    do_syscall2(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
+    return 0;
+}
+
 int printI(const char *format, ...)
 {
     va_list args;
@@ -182,6 +190,11 @@ VISIBLE int execa(char* path, int argc, char** argv)
 VISIBLE int waitpid(uint32_t pid)
 {
     return do_syscall1(SYSCALL_WAITFORPID,pid);
+}
+
+VISIBLE void exit(int exitCode)
+{
+    
 }
 
 VISIBLE char* getcwd(char* buf, size_t size)

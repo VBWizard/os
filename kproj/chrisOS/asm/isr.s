@@ -6,6 +6,7 @@
 
 .extern activateDebugger, kStopDebugging
 .extern irq0_handler
+.extern irq8_handler
 .extern	kbd_handler
 .extern call_gate_proc
 .extern kTicksSinceStart
@@ -523,6 +524,50 @@ out 0x20,al
         pop ebp                         # restoring the regs
         sti
         iretd
+
+.global _irq8_handler
+_irq8_handler:                #remapped to 0x10?
+cli
+#cli;hlt;
+
+        push    ebp
+        pushf
+        mov     ebp, esp
+        add ebp,4
+        push eax
+        mov ax,0xFFFF
+cld
+#cld #C code following the sysV ABI requires DF to be clear on function entry
+        push    ebx
+        mov ebx, [ebp+12]
+        mov exceptionFlags, ebx
+        mov bx, [ebp+8]
+        mov exceptionCS, bx
+        mov ebx, [ebp+4]
+        mov exceptionEIP, ebx
+        pop ebx
+        pushad                          # other regs because its an ISR
+         mov     bx, 0x10
+        mov     ds, bx
+        mov     es, bx                  # load ds and es with valid selector
+	mov     gs, bx
+        call    irq8_handler          # call actual ISR code
+        popad  
+mov ax,0x0C
+nop
+out 0x70,ax
+nop
+in ax,0x71
+mov al,0x20
+out 0x20,al
+        sti
+//mov eax,0
+//mov [0xa000B0],eax
+        pop eax
+        popf
+        pop ebp                         # restoring the regs
+        iretd
+
 .global _isr_01_wrapper        
 _isr_01_wrapper:                #KEYBOARD HANDLER
 cli

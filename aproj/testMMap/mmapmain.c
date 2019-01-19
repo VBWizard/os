@@ -19,11 +19,51 @@
 
 int sharedCounter = 10;
 
+int doChild(int childNum)
+{
+        for (int sharedCounter=4;sharedCounter>=0;sharedCounter--)
+        {
+            printf("Child %u counting: Count = %u\n",childNum, sharedCounter);
+            sleep(1);
+        }
+        return childNum;
+}
+
 int main(int argc, char** argv) {
 
     int pid=0, pid2=0;
+    const int pidsToSpawn = 20;
+    int pids[pidsToSpawn];
+    int rets[pidsToSpawn];
+    int pidsP = 0;
+    int childNo = 0;
+    int pidCount = 0;
+    for (int cnt=0;cnt<pidsToSpawn;cnt++)
+    {
+         pid=fork();
+        childNo+=1;
+        if (pid==0)
+        {
+            int cn = doChild(childNo);
+            printf("Child %u quitting\n",cn);
+            return cn;
+        }
+        else
+            pids[pidsP++]=pid;
+        printf("Started PID %u\n",pid);
+    }
     
-    pid=fork();
+    while (pidCount<pidsToSpawn)
+    {
+        int thePid = pids[pidCount];
+        printf("Waiting for child %u (0x%04X)\n",pidCount+1, thePid);
+        rets[pidCount]=waitpid(thePid);
+        pidCount++;
+    }
+    for (int cnt=0;cnt<pidsToSpawn;cnt++)
+        printf("Child %u return %u\n",cnt+1,rets[cnt]);
+    return 0;
+/*    pid=fork();
     if (pid==0)
     {
         //child executes here
@@ -53,7 +93,6 @@ int main(int argc, char** argv) {
         print("Parent: Count = %u\n",sharedCounter);
         sleep(1);
     }
- * */
     print("waiting for child 2 (PID=0x%04X\n", pid2);
     uint32_t pid1Return = waitpid(pid2);
     print("PID 2 returned %u\n",pid1Return);
@@ -61,5 +100,6 @@ int main(int argc, char** argv) {
     uint32_t pid0Return = waitpid(pid);
     print("PID 1 returned %u\n",pid0Return);
     return (0);
+*/
 }
 

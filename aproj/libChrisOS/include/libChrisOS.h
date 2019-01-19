@@ -51,6 +51,7 @@ extern "C" {
     int do_syscall3(int callnum, uint32_t param1, uint32_t param2, uint32_t param3);
     int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4);
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
+    VISIBLE int printf(const char *format, ...);
     int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
     unsigned int VISIBLE sleep (unsigned int __seconds);
@@ -66,6 +67,7 @@ extern "C" {
     struct tm* gettime(struct tm *time, bool localTime);
     char* getcwd(char* buf, size_t size);
     bool strisnum(char* str);
+    int fork();
 
     char** processEnvp;
     

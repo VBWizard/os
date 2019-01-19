@@ -286,6 +286,7 @@ void wrmsr32(unsigned index, uint32_t loVal, uint32_t hiVal);
 uintptr_t idt_get_gate_address(int vector);
 
 void _irq0_handler();
+void _irq8_handler();
 void _isr_00_wrapper();                                 //used to be void prefix keyword
 void _isr_01_wrapper();
 void _isr_02_wrapper();

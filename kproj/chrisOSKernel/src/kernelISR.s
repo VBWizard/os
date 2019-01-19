@@ -6,6 +6,7 @@
 .extern isrSavedCS, isrSavedEIP, isrSavedErrorCode, isrSavedEAX, isrSavedEBX, isrSavedECX, isrSavedEDX, isrSavedESI, isrSavedEDI, isrSavedEBP, isrSavedCR0, isrSavedCR1, isrSavedCR4, isrSavedDS, isrSavedES, isrSavedFS, isrSavedGS, isrSavedSS, isrSavedNumber, isrSavedCR2, isrSavedESP, isrSavedFlags, isrSavedStack
 .extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, isrSavedTR
 .extern kIRQ0_handler
+.extern kIRQ8_handler
 .extern _sysCall
 .extern _schedule
 .extern schedulerTaskSwitched
@@ -217,6 +218,19 @@ notSysCallHandler:
 kbdError:
     jmp kbdError
 notKbdHandler:
+    cmp eax,0x28
+    jne notRTCHandler
+    #IRQ 8 RTC interrupt detected
+    call kIRQ8_handler
+    #Have to retrieve register C from the CMOS every time we service an IRQ8 RTC interrupt
+    mov al,0x0c
+    out 0x70,al
+    in al, 0x71
+    mov al,0x20
+    out 0xa0, al
+    out 0x20, al
+    jmp ckeckForIRQResponse
+notRTCHandler:
     call defaultISRHandler
 ckeckForIRQResponse:
     mov eax,isrNumber

@@ -39,6 +39,8 @@ extern uint32_t kCPUCyclesPerSecond;
 
 const char* TASK_STATE_NAMES[] = {"Zombie","Running","Runnable","Stopped","Uninterruptable Sleep","Interruptable Sleep","Exited","None"};
 
+bool schedulerEnabled=false;
+
 void changeTaskQueue(task_t* task, eTaskState newState);
 
 void initSched()

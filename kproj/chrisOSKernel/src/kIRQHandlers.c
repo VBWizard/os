@@ -7,12 +7,12 @@
 #include "kIRQHandlers.h"
 #include "printf.h"
 
-bool schedulerEnabled=false;
 extern uint32_t nextScheduleTicks;
 extern void processSignals();
 uint32_t kNextSignalCheckTicks=0;
 bool schedulerTriggered=false;
 bool signalCheckTriggered=false;
+extern bool schedulerEnabled;
 
 void kIRQ0_handler()
 {
@@ -66,4 +66,9 @@ static struct tm theDateTime;
             cursorRestorePosition();
         }
 #endif
+}
+
+void kIRQ8_handler()
+{
+    printd(DEBUG_EXCEPTIONS,"In kernel irq8 handler\n");
 }

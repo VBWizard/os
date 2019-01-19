@@ -62,6 +62,8 @@ struct gdt_ptr lGDT;
 //NOTE: This is a temporary idt pointer ... only used during init
 struct idt_ptr kInitialIDTReg;
 
+bool dupPrintKtoPrintD;
+
 //CLR 04/27/2016: Even though we are working on our cross compiler env, somehow __linus is set
 //so unset it
 #undef __linux__
@@ -236,9 +238,10 @@ void HIGH_CODE_SECTION testWPBit()
 }
 
 void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/) {
-    
 char currTime[150];
 struct tm theDateTime;
+
+    dupPrintKtoPrintD = true;
     //Zero out all of the memory we will be using as rebooting a computer doesn't necessarily clear memory
     memset((void*)KERNEL_OBJECT_BASE_ADDRESS,0,0x2000000);
     kBootCmd[0]=0x0;
@@ -276,7 +279,7 @@ gdt_init();
     PIC_remap(0x00+PIC_REMAP_OFFSET, 0x8+PIC_REMAP_OFFSET);
     IRQ_clear_mask(0);
     IRQ_clear_mask(1);
-    __asm__("sti\n");
+__asm__("sti\n");
 
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
@@ -414,6 +417,7 @@ overStuff:
         execInternalCommand("exec /kernel");
         }*/
 MAINLOOPv:
+        dupPrintKtoPrintD = false;
         bootShell();
     goto MAINLOOPv;
     __asm__("cli\nhlt\n");

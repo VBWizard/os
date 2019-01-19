@@ -40,6 +40,7 @@
 //extern bool pauseDisplay(bool offerToQuit);
 extern uint32_t kDebugLevel;
 extern uint32_t* kTicksSinceStart;
+extern bool dupPrintKtoPrintD;
 
 uint8_t printDLineCount;
 
@@ -230,6 +231,15 @@ int printk(const char *format, ...)
         va_list args;
         va_start( args, format );
         return printI(0, format, args);
+        if (dupPrintKtoPrintD)
+        {
+            if (kDebugLevel & DEBUG_PRINT_TO_PORT)
+            {
+
+                printTicks("%u: ",*kTicksSinceStart);
+                printp_valist(format/*I*/,args);
+            }
+        }
         //return printk_valist(format, args);
 }
 
