@@ -5,7 +5,6 @@
 #include "elfloader.h"
 #include "printf.h"
 #include "utility.h"
-#include "exec.h"
 #include "task.h"
 #include "strings.h"
 #include "../../chrisOS/include/init/ata_disk.h"

@@ -59,28 +59,47 @@ int main(int argc, char** argv) {
         }
         startTicks=getticks();
         gettime(startTime,true);
-        pid=exec(execpgm);
+        //pid=execb(execpgm);
+        //Execute the program
+        pid = fork();
         if (pid==0)
         {
-            print("Error executing %s\n",argv[1]);
+            int childPid = exec(execpgm, 0, NULL);
+            if (childPid <= 0)
+            {
+                print("Erorr exec'ing %s\n",execpgm);
+                return -1;
+            }
+            else
+            {
+                return waitpid(childPid);
+                
+            }
+        }
+        if (pid<0)
+        {
+            print("Error forking: %u\n",pid);
             retVal=-3;
         }
         else
         {
-            waitpid(pid);
-            endTicks=getticks();
-            gettime(endTime,true);
-            elapsed=(endTicks-startTicks);
-            retVal=elapsed;
-/*            totalTime=malloc(sizeof(struct tm));    
-            print("Start time: %02u:%02u:%02u\n",startTime->tm_hour, startTime->tm_min, startTime->tm_sec);
-            print("Elapsed ticks = %u\n",elapsed);
-            int ms=elapsed%TICKS_PER_SECOND*(TICKS_PER_SECOND/10);
-            elapsed/= TICKS_PER_SECOND;
-            gmtime_r(&elapsed,totalTime);
-            //print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
-*/
-//            free(totalTime);
+            retVal = waitpid(pid);
+            if (retVal == 0)
+            {
+                endTicks=getticks();
+                gettime(endTime,true);
+                elapsed=(endTicks-startTicks);
+                retVal=elapsed;
+    /*            totalTime=malloc(sizeof(struct tm));    
+                print("Start time: %02u:%02u:%02u\n",startTime->tm_hour, startTime->tm_min, startTime->tm_sec);
+                print("Elapsed ticks = %u\n",elapsed);
+                int ms=elapsed%TICKS_PER_SECOND*(TICKS_PER_SECOND/10);
+                elapsed/= TICKS_PER_SECOND;
+                gmtime_r(&elapsed,totalTime);
+                //print("Elapsed time = %02u:%02u:%02u.%03u\n",totalTime->tm_hour,totalTime->tm_min,totalTime->tm_sec,ms);
+    */
+    //            free(totalTime);
+            }
         }
     }
     free(startTime);

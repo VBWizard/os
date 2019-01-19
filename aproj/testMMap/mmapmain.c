@@ -24,7 +24,8 @@ int doChild(int childNum)
         for (int sharedCounter=4;sharedCounter>=0;sharedCounter--)
         {
             printf("Child %u counting: Count = %u\n",childNum, sharedCounter);
-            sleep(1);
+            if (sharedCounter > 0)
+                sleep(1);
         }
         return childNum;
 }
@@ -32,7 +33,7 @@ int doChild(int childNum)
 int main(int argc, char** argv) {
 
     int pid=0, pid2=0;
-    const int pidsToSpawn = 20;
+    const int pidsToSpawn = 5;
     int pids[pidsToSpawn];
     int rets[pidsToSpawn];
     int pidsP = 0;

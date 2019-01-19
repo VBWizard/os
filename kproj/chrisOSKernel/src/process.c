@@ -268,15 +268,13 @@ void processIdleLoop()
     }   
 }
 
-process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess)
+process_t *initializeProcess(bool isKernelProcess)
 {
-
     process_t* process;
 
-    printd(DEBUG_PROCESS,"Creating %s process for %s\n",isKernelProcess?"kernel":"user",path);
+    printd(DEBUG_PROCESS,"createProcess: Mallocing process_t\n");
     //NOTE: Using allocPages instead of malloc because we need the process struct to start on a page boundary for paging reasons, and
     //      allocPages always allocates entire pages
-    printd(DEBUG_PROCESS,"createProcess: Mallocing process_t\n");
     process=allocPagesAndMap(sizeof(process_t));
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process\n",process);
     memset(process,0,sizeof(process_t));
@@ -285,9 +283,64 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;
     process->path=(char*)kMalloc(0x1000); 
-    process->startHandlerPtr=0; //CLR 12/23/2018: Initialize the start handler pointer to the first entry
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
-    //strcpy(process->path,path);
+    process->cwd=allocPagesAndMap(PAGE_SIZE);
+    process->task->process=process;
+    process->processSyscallESP=process->task->tss->ESP1;
+    process->priority=PROCESS_DEFAULT_PRIORITY;
+    printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
+    pagingMapPage(process->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000, 0x5); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
+    pagingMapPage(process->task->tss->CR3, process->task, process->task, 0x5);
+
+    uint32_t tssFlags=ACS_TSS;
+    uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;
+    if (process->task->kernel)
+    {
+        gdtFlags |= GDT_DPL0;
+        tssFlags |= ACS_DPL_0;
+    }
+    else
+    {
+        gdtFlags |= GDT_DPL3;
+        tssFlags |= ACS_DPL_3;
+    }
+    memset(process->task->tss->IOs,0,200);
+    process->task->tss->IOPB = sizeof(tss_t)-200;
+    gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
+    process->execDontSaveRegisters = false;
+    return process;
+}
+
+//NOTE: if initialize parameter is passed as false, parentProcessPtr is the pointer to the process to use
+//NOT to its parent. In this case:
+//      1) If the process' real parent is NULL then we will free some resources
+//      2) We will leave the environment alone (i.e. not pass argc and argv)
+//      3) 
+process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess, bool useExistingProcess)
+{
+
+    process_t* process;
+
+    if (useExistingProcess)
+        __asm__("cli\n");
+    
+    //TODO: If useExistingProcess, we should remove the text, data, tdata and bss mappings from the CR3 
+    //since we're replacing those segments
+    
+    printd(DEBUG_PROCESS,"Creating %s process for %s\n",isKernelProcess?"kernel":"user",path);
+    
+    //If useExistingProcess then we'll not initialize a new one
+    if (useExistingProcess)
+        process = parentProcessPtr;
+    else
+        process = initializeProcess(isKernelProcess);
+    
+    //We will always load startHandlers whether we're createing a process or just loading into it
+    process->startHandlerPtr=0; //CLR 12/23/2018: Initialize the start handler pointer to the first entry
+
+    process->path=(char*)kMalloc(0x1000); 
+
+    //Copy the path (parameter) value from the parent's memory.
     if (parentProcessPtr!=NULL && parentProcessPtr->pageDirPtr!=0)
     {
         if (parentProcessPtr->pageDirPtr!=KERNEL_CR3)
@@ -296,38 +349,39 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     else
         strcpy(process->path,path);
     printd(DEBUG_PROCESS,"process->path (0x%08X)=%s\n",process->path,process->path);
+   
+    //Always set the elf to NULL, even when useExistingProcess, because we don't want to disturb the paren't elf
     process->elf=NULL;
     gmtime_r((time_t*)&kSystemCurrentTime,&process->startTime);
     
     //Initialize the current working directory and set it to '/'
-    process->cwd=allocPagesAndMap(PAGE_SIZE);
     memset(process->cwd,0,PAGE_SIZE);
     strcpy(process->cwd,"/");
     
-    process->parent=parentProcessPtr;
-    if (process->parent!=NULL)
+    if (parentProcessPtr != NULL && !useExistingProcess)
     {
-        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
-//        process->stdin=((process_t*)parentProcessPtr)->stdin;
-//        process->stdin=((process_t*)parentProcessPtr)->stdout;
-//        process->stdin=((process_t*)parentProcessPtr)->stderr;
+       process->parent=parentProcessPtr;
+       process->kernelProcess=((process_t*)process->parent)->kernelProcess;
        process->stdin=((process_t*)parentProcessPtr)->stdin;
        process->stdout=((process_t*)parentProcessPtr)->stdout;
        process->stderr=((process_t*)parentProcessPtr)->stderr;
     }
     else
     {
-        process->kernelProcess=isKernelProcess;
-//        process->stdin=((process_t*)parentProcessPtr)->stdin=STDIN_FILE;
-//        process->stdin=((process_t*)parentProcessPtr)->stdout=STDOUT_FILE;
-//        process->stdin=((process_t*)parentProcessPtr)->stderr=STDERR_FILE;
-    }  
+       process->kernelProcess=isKernelProcess;
+       process->stdin=0;
+       process->stdout=1;
+       process->stderr=2;
+    }
+    
+    //Not sure if this should be re-initialized for execve'd program
     process->mmaps=kMalloc(sizeof(dllist_t));
     
     process->argv=argv;
     uint32_t argvVirt=0x6f000000;
     if (process->parent!=NULL)
     {
+        process->argc = argc;
         printd(DEBUG_PROCESS,"Mapping parent's argv into our memory\n");
         //Map the parent's argv into our paging table
         if (process->parent!=kKernelProcess)
@@ -356,10 +410,25 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         argc=0;
     }
 
+    if (argc==0)
+    {
+        process->argc=1;
+        process->argv=(uintptr_t)allocPages(50*1+(4*1));
+        uint32_t argvVal=(char*)process->argv;
+        pagingMapPageCount(KERNEL_CR3,process->argv,process->argv,((50*argc+(4*argc))/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(process->task->tss->CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(KERNEL_CR3,argvVirt,process->argv,((50*argc)/PAGE_SIZE)+1,0x7);
+        uint32_t argcPtr=1*4; //start at the end of the pointer
+        process->argv[0]=(char*)process->argv+argcPtr;
+        strcpy(process->argv[0],path);
+        process->argv[0]=(char*)argcPtr+argvVirt;
+    }
+        
     uint32_t envpVirt=0x6f050000;
     uint32_t envVirt = 0x6f060000;
 
-    if (parentProcessPtr != 0 && parentProcessPtr->mappedEnvp != 0)
+    //Only copy the parent's environment if we're not replacing a process
+    if (parentProcessPtr != 0 && parentProcessPtr->mappedEnvp != 0 && !useExistingProcess)
     {
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
         process->mappedEnvp=(char**)allocPagesAndMap(50*4);
@@ -389,15 +458,12 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
             }
         }
     }
-    process->task->process=process;
-    process->processSyscallESP=process->task->tss->ESP1;
-    process->priority=PROCESS_DEFAULT_PRIORITY;
-    printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
-    pagingMapPage(process->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000, 0x5); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
-    pagingMapPage(process->task->tss->CR3, process->task, process->task, 0x5);
+
 
     //Take care of the special "idle" task 
-    if (strncmp(process->path,"/sbin/idle",50)!=0)
+    if (strncmp(process->path,"/sbin/idle",50)==0)
+        process->task->tss->EIP=(uintptr_t)&processIdleLoop;
+    else
     {
         process->elf=sysLoadElf(process->path, process->elf, process->task->tss->CR3);
         if (!process->elf->loadCompleted)
@@ -420,10 +486,6 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
             }
         }
     }
-    else    //Configure the idle process
-    {
-        process->task->tss->EIP=(uintptr_t)&processIdleLoop;
-    }
 
     //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
     printd(DEBUG_PROCESS,"Setting up the stack\n");
@@ -435,12 +497,18 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     else
         realESP=process->task->tss->ESP;
     //Per the above, the stack will start at -0x100 from where we write the CS/EIP/FLAGS/SS/ESP, so put our params around there
-    memcpy((void*)realESP-4,process,4);
-    memcpy((void*)realESP,&process->entryPoint,4);
-    memcpy((void*)realESP+4,&processExitAddress,4);
-    memcpy((void*)realESP+8,&argc,4);
-    memcpy((void*)realESP+12,&argvVirt,4);
-    memcpy((void*)realESP+16,&envpVirt,4);
+//    memcpy((void*)realESP-4,process,4);
+    copyFromKernel(process, realESP-4, process, 4);
+//    memcpy((void*)realESP,&process->entryPoint,4);
+    copyFromKernel(process, realESP, &process->entryPoint, 4);
+//    memcpy((void*)realESP+4,&processExitAddress,4);
+    copyFromKernel(process, realESP+4, &processExitAddress, 4);
+//    memcpy((void*)realESP+8,&argc,4);
+    copyFromKernel(process, realESP+8, &process->argc, 4);
+//    memcpy((void*)realESP+12,&argvVirt,4);
+    copyFromKernel(process, realESP+12, &argvVirt, 4);
+//    memcpy((void*)realESP+16,&envpVirt,4);
+    copyFromKernel(process, realESP+16, &envpVirt, 4);
     
     //With the new scheduler return logic, we IRETD to kernel proceses, so the EIP/CS/FLAGS/ESP/SS have to be on the stack
     if (isKernelProcess)  
@@ -455,36 +523,22 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     printd(DEBUG_PROCESS,"Return point for process is 0x%08X\n",&processExit);
     printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
  
-    uint32_t tssFlags=ACS_TSS;
-    uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;
-    if (process->task->kernel)
+    if (useExistingProcess) //Process is already scheduled if useExistingProcess
     {
-        gdtFlags |= GDT_DPL0;
-        tssFlags |= ACS_DPL_0;
+        task_t *t;
+        CURRENT_TASK(t);
+        t->process=process;
+        process->execDontSaveRegisters = true;
+        triggerScheduler();
+        __asm__("sti\nhlt\nhlt\nhlt\nhlt\nhlt\n");
     }
     else
     {
-        gdtFlags |= GDT_DPL3;
-        tssFlags |= ACS_DPL_3;
+        process->task=submitNewTask(process->task);
+        printd(DEBUG_PROCESS,"Submitted process 0x%04X to be run\n",process->task->taskNum);
     }
-    memset(process->task->tss->IOs,0,200);
-    process->task->tss->IOPB = sizeof(tss_t)-200;
-    gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
-    process->task=submitNewTask(process->task);
-    printd(DEBUG_PROCESS,"Submitted process 0x%04X to be run\n",process->task->taskNum);
     return process;
 }
-
-//Upon fork the child task's EIP will be set to child_task_forked
-/*uint32_t child_task_forked()
-{
-    //Pop the EBP that is pushed when the child starts executing this method.
-    //That way the automatic pop epb at the end of this method will simulate the pop ebp 
-    //that would have happened at the end of process_fork if the child started where the parent forked it
-    __asm__("pop ebp\nmov esp, ebp");
-    //__asm__("leave\n");
-    return 0;
-}*/
 
 uint32_t process_fork(process_t* currProcess)
 {

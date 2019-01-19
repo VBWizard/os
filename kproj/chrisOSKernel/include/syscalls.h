@@ -45,7 +45,8 @@ extern "C" {
         SYSCALL_PRINTD			= 0x301,
         SYSCALL_HLT			= 0x302,
         SYSCALL_MASKSIG                 = 0x303,
-        SYSCALL_GETDENTS                = 0x304
+        SYSCALL_GETDENTS                = 0x304,
+        SYSCALL_EXECNEW			= 0x305
     } E_SYSCALLS;
 
 

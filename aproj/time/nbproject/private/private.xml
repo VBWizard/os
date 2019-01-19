@@ -9,6 +9,8 @@
         <group name="os">
             <file>file:/home/yogi/src/os/aproj/time/testtime.c</file>
         </group>
-        <group/>
+        <group>
+            <file>file:/home/yogi/src/os/aproj/time/testtime.c</file>
+        </group>
     </open-files>
 </project-private>

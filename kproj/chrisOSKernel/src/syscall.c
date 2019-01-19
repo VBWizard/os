@@ -44,6 +44,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     uint32_t param4;
     uint32_t processCR3;  //NOTE: Moved from module level to here because this needs to be a stack variable for fork()
     bool taskExited = false;
+    bool useExisting = false;
+    
     __asm__("mov eax,esi\n": "=a" (param4));
     __asm__("mov eax,cr3\n": "=a" (processCR3));
     __asm__("cli\n");
@@ -125,11 +127,16 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_GETCWD:    //param1=buffer *, param2=size of buffer
             retVal=(uint32_t)processGetCWD((char*)param1,param2);
             break;
-        case SYSCALL_EXEC:      //***exec: param1=program path
+        case SYSCALL_EXEC:
+        case SYSCALL_EXECNEW:      //***exec: param1=program path
+            if (callNum == SYSCALL_EXEC)
+                useExisting = true;
+            else
+                useExisting = false;
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            parentProcess=(process_t*)(findTaskByCR3(processCR3))->process;
-            printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08X,0x%08X,0x%08X,false)\n",param1,param2,param3,parentProcess);
-            process = createProcess((char*)param1, param2, (char**)param3, parentProcess, false);
+            parentProcess=CURRENT_PROCESS;
+            printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08X,0x%08X,0x%08X,%u)\n",param1,param2,param3,parentProcess, useExisting);
+            process = createProcess((char*)param1, param2, (char**)param3, parentProcess, false, useExisting);
             if (process!=NULL)
             {
                 retVal=process->task->taskNum;

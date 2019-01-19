@@ -153,23 +153,31 @@ void markTaskEnded(uint32_t cr3, uint32_t retval)
 
 void storeISRSavedRegs(task_t* task)
 {
-    task->tss->CS=isrSavedCS;
-    task->tss->EIP=isrSavedEIP;
-    task->tss->SS=isrSavedSS;
-    task->tss->DS=isrSavedDS;
-    task->tss->EAX=isrSavedEAX;
-    task->tss->EBX=isrSavedEBX;
-    task->tss->ECX=isrSavedECX;
-    task->tss->EDX=isrSavedEDX;
-    task->tss->ESI=isrSavedESI;
-    task->tss->EDI=isrSavedEDI;
-    task->tss->ESP=isrSavedESP;
-    task->tss->EBP=isrSavedEBP;
-    task->tss->EFLAGS=isrSavedFlags;
-    task->tss->ES=isrSavedES;
-    task->tss->FS=isrSavedFS;
-    task->tss->GS=isrSavedGS;
-    task->tss->CR3=isrSavedCR3;
+    if (((process_t*)task->process)->execDontSaveRegisters)
+    {
+        printd(DEBUG_PROCESS, "* ***Process exec'd, not saving registers***");
+        ((process_t*)task->process)->execDontSaveRegisters = false;
+    }
+    else
+    {
+        task->tss->CS=isrSavedCS;
+        task->tss->EIP=isrSavedEIP;
+        task->tss->SS=isrSavedSS;
+        task->tss->DS=isrSavedDS;
+        task->tss->EAX=isrSavedEAX;
+        task->tss->EBX=isrSavedEBX;
+        task->tss->ECX=isrSavedECX;
+        task->tss->EDX=isrSavedEDX;
+        task->tss->ESI=isrSavedESI;
+        task->tss->EDI=isrSavedEDI;
+        task->tss->ESP=isrSavedESP;
+        task->tss->EBP=isrSavedEBP;
+        task->tss->EFLAGS=isrSavedFlags;
+        task->tss->ES=isrSavedES;
+        task->tss->FS=isrSavedFS;
+        task->tss->GS=isrSavedGS;
+        task->tss->CR3=isrSavedCR3;
+    }
 #ifdef SCHEDULER_DEBUG
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\tSave: ");
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X,",task->tss->CR3);

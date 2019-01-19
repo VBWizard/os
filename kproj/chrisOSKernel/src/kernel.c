@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     //console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);
     
     kIdleTicks=0;
-    kIdleProcess=createProcess("/sbin/idle",0,NULL,NULL,true);
+    kIdleProcess=createProcess("/sbin/idle", 0, NULL, NULL, true, false);
     kIdleTask=kIdleProcess->task;
     //Need to let the idle task run once so that it initializes, so make sure it is the first task to run when the scheduler starts
     kIdleTask->prioritizedTicksInRunnable = 0xDFFFFFFF;
@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
     args[0]=params[0];
     args[1]=params[1];
     
-    process_t* process = createProcess(program, 2, args, kKernelProcess, false);
+    process_t* process = createProcess(program, 2, args, kKernelProcess, false, false);
     schedulerEnabled=true;
 /*#define pcount 3
     char* param1[pcount][10];

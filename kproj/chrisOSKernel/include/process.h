@@ -75,10 +75,11 @@ extern "C" {
         uint32_t lastChildCR3;
         uint32_t childNumber;
         uint32_t lastChildNumber;
+        bool execDontSaveRegisters;
     } process_t;
 
 
-    process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess);
+    process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess, bool useExistingProcess);
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);

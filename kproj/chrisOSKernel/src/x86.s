@@ -142,10 +142,3 @@ idt_load:
 saved_eax:
         .word 0
         .word 0
-
-.globl child_task_forked
-.type child_task_forked, @function
-child_task_forked:
-    mov esp, ebp
-    pop ebp
-    ret
