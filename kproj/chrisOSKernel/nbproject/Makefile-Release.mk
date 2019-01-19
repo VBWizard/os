@@ -74,6 +74,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/device.o \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
+	${OBJECTDIR}/src/drivers/terminal.o \
 	${OBJECTDIR}/src/exceptions.o \
 	${OBJECTDIR}/src/filesystem/pipe.o \
 	${OBJECTDIR}/src/fs.o \
@@ -313,6 +314,11 @@ ${OBJECTDIR}/src/drivers/drv_genKeyboard.o: src/drivers/drv_genKeyboard.c
 	${MKDIR} -p ${OBJECTDIR}/src/drivers
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drivers/drv_genKeyboard.o src/drivers/drv_genKeyboard.c
+
+${OBJECTDIR}/src/drivers/terminal.o: src/drivers/terminal.c
+	${MKDIR} -p ${OBJECTDIR}/src/drivers
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drivers/terminal.o src/drivers/terminal.c
 
 ${OBJECTDIR}/src/exceptions.o: src/exceptions.c
 	${MKDIR} -p ${OBJECTDIR}/src

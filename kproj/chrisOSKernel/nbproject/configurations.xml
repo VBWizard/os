@@ -66,6 +66,7 @@
       <itemPath>include/syscalls.h</itemPath>
       <itemPath>include/sysloader.h</itemPath>
       <itemPath>include/task.h</itemPath>
+      <itemPath>include/devices/terminal.h</itemPath>
       <itemPath>include/thesignals.h</itemPath>
       <itemPath>../../chrisOS/include/time_os.h</itemPath>
       <itemPath>include/tss.h</itemPath>
@@ -129,6 +130,7 @@
       <itemPath>src/syscall.c</itemPath>
       <itemPath>src/sysloader.c</itemPath>
       <itemPath>src/task.c</itemPath>
+      <itemPath>src/drivers/terminal.c</itemPath>
       <itemPath>../chrisOS/src/time.c</itemPath>
       <itemPath>../chrisOS/src/init/utility.c</itemPath>
       <itemPath>src/x86.s</itemPath>
@@ -336,6 +338,8 @@
       </item>
       <item path="include/device.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/devices/terminal.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/dllist.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
@@ -389,6 +393,8 @@
       <item path="src/dllist.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/drivers/terminal.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -629,6 +635,8 @@
       </item>
       <item path="include/device.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/devices/terminal.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/dllist.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
@@ -682,6 +690,8 @@
       <item path="src/dllist.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/drivers/terminal.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
       </item>
