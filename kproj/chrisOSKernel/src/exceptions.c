@@ -108,8 +108,8 @@ void setupPagingHandler()
 {
     pagingExceptionTSS = allocPages(sizeof(tss_t));
     printd(DEBUG_PROCESS, "Allocated TSS for paging exception task gate at 0x%08X",pagingExceptionTSS);
-    pagingMapPageCount(KERNEL_CR3,((uint32_t)pagingExceptionTSS | KERNEL_PAGED_BASE_ADDRESS),(uint32_t)pagingExceptionTSS,0x1,0x7);
-    pagingMapPageCount(KERNEL_CR3,((uint32_t)pagingExceptionTSS),(uint32_t)pagingExceptionTSS,0x1,0x7);
+    pagingMapPageCount(KERNEL_CR3, ((uint32_t)pagingExceptionTSS | KERNEL_PAGED_BASE_ADDRESS),(uint32_t)pagingExceptionTSS,0x1,0x7,true);
+    pagingMapPageCount(KERNEL_CR3, ((uint32_t)pagingExceptionTSS),(uint32_t)pagingExceptionTSS,0x1,0x7,true);
     memset(pagingExceptionTSS, 0, sizeof(tss_t));
     pagingExceptionTSS->CR3=KERNEL_CR3;
     pagingExceptionTSS->CS=0x8;
@@ -125,16 +125,16 @@ void setupPagingHandler()
 
     pagingExceptionTSS->ESP0=allocPagesAndMap(0x16000);
     printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for paging exception handler ESP0\n",pagingExceptionTSS->ESP0);
-    pagingMapPageCount(KERNEL_CR3,pagingExceptionTSS->ESP0 | KERNEL_PAGED_BASE_ADDRESS,pagingExceptionTSS->ESP0,0x16,0x7);
-    pagingMapPageCount(KERNEL_CR3,pagingExceptionTSS->ESP0,pagingExceptionTSS->ESP0,0x16,0x7);
+    pagingMapPageCount(KERNEL_CR3, pagingExceptionTSS->ESP0 | KERNEL_PAGED_BASE_ADDRESS, pagingExceptionTSS->ESP0, 0x16, 0x7, true);
+    pagingMapPageCount(KERNEL_CR3, pagingExceptionTSS->ESP0, pagingExceptionTSS->ESP0, 0x16, 0x7, true);
     pagingExceptionTSS->ESP0+=0x10000;
     printd(DEBUG_PROCESS,"Offset paging exception handler ESP0 to 0x%08X\n",pagingExceptionTSS->ESP0);
     
     
     pagingExceptionTSS->ESP=allocPagesAndMap(0x16000);
     printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for paging exception handler ESP\n",pagingExceptionTSS->ESP);
-    pagingMapPageCount(KERNEL_CR3,pagingExceptionTSS->ESP | KERNEL_PAGED_BASE_ADDRESS,pagingExceptionTSS->ESP,0x16,0x7);
-    pagingMapPageCount(KERNEL_CR3,pagingExceptionTSS->ESP ,pagingExceptionTSS->ESP,0x16,0x7);
+    pagingMapPageCount(KERNEL_CR3, pagingExceptionTSS->ESP | KERNEL_PAGED_BASE_ADDRESS, pagingExceptionTSS->ESP, 0x16, 0x7, true);
+    pagingMapPageCount(KERNEL_CR3, pagingExceptionTSS->ESP , pagingExceptionTSS->ESP, 0x16, 0x7, true);
     pagingExceptionTSS->ESP+=0x10000;
     printd(DEBUG_PROCESS,"Offset paging exception handler ESP to 0x%08X\n",pagingExceptionTSS->ESP);
 
@@ -262,6 +262,7 @@ void pagingExceptionHandlerMain(uint32_t pagingExceptionCR2, int ErrorCode, proc
         }
     }
 
+    printd(DEBUG_EXCEPTIONS,"Page %s cow\n",isCow?"is":"isn't");
     if (isCow)
     {
         uintptr_t exceptionPhysicalCR2Address=pagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2) & 0xFFFFF000;

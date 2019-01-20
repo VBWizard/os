@@ -326,10 +326,16 @@ void pagingMapPageRange(uintptr_t pageDirAddress, uintptr_t startVirtualAddress,
                 startPhysicalAddress+=0x1000,
                 flags);
 }
-void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress,int pageCount, uint8_t flags)
+
+//CLR 01/20/2019: Added incrementPhysical parameter so that when we are un-mapping (setting all phys to 0), phys doesn't increment!
+void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, int pageCount, uint8_t flags, bool incrementPhysical)
 {
     for (int cnt=0;cnt<pageCount;cnt++)
-        pagingMapPage(pageDirAddress,virtualAddress+(0x1000*cnt),physicalAddress+(0x1000*cnt),flags);
+    {
+        //Doing this check first makes (especially) un-mapping pages much quicker. (didn't really work)
+        //if (pagingGet4kPTEntryValueCR3(pageDirAddress, virtualAddress+(0x1000*cnt)) != physicalAddress+(incrementPhysical?0x1000:0))
+            pagingMapPage(pageDirAddress,virtualAddress+(0x1000*cnt),physicalAddress+((incrementPhysical?0x1000:0)*cnt),flags);
+    }
 }
 
 //Can only be called by kernel code

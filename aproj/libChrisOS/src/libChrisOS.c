@@ -7,7 +7,6 @@
 #include "libChrisOS.h"
 #include "syscalls.h"
 #include "time.h"
-#include "stdio.h"
 
 extern void sysEnter_Vector();
 bool libcInitialized = false;
@@ -195,16 +194,70 @@ VISIBLE int waitpid(uint32_t pid)
     return do_syscall1(SYSCALL_WAITFORPID,pid);
 }
 
-/*
-VISIBLE void exit(int exitCode)
+
+VISIBLE void exit (int status)
 {
-    
+    do_syscall2(SYSCALL_ENDPROCESS, 0, status);
 }
-*/
+
 
 VISIBLE char* getcwd(char* buf, size_t size)
 {
     return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
+}
+
+
+size_t splitI(char *buffer, char *argv[], size_t argv_size)
+{
+    char *p, *start_of_word;
+    int c;
+    enum states { DULL, IN_WORD, IN_STRING } state = DULL;
+    size_t argc = 0;
+
+    for (p = buffer; argc < argv_size && *p != '\0'; p++) {
+        c = (unsigned char) *p;
+        switch (state) {
+        case DULL:
+            if (ISSPACE(c)) {
+                continue;
+            }
+
+            if (c == '"') {
+                state = IN_STRING;
+                start_of_word = p + 1; 
+                continue;
+            }
+            state = IN_WORD;
+            start_of_word = p;
+            continue;
+
+        case IN_STRING:
+            if (c == '"') {
+                *p = 0;
+                argv[argc++] = start_of_word;
+                state = DULL;
+            }
+            continue;
+
+        case IN_WORD:
+            if (ISSPACE(c)) {
+                *p = 0;
+                argv[argc++] = start_of_word;
+                state = DULL;
+            }
+            continue;
+        }
+    }
+
+    if (state != DULL && argc < argv_size)
+        argv[argc++] = start_of_word;
+
+    return argc;
+}
+
+VISIBLE size_t split(char *buffer, char *argv[], size_t argv_size)
+{
+    return splitI(buffer, argv, argv_size);
 }
 
 char** cmdlineToArgvI(const char* cmdline, int *argc)
@@ -213,14 +266,14 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
     char cmd[1024];
     char *spacePtr=cmd, *lastSpacePtr=cmd;
     *argc = 0;
-
+    
     strncpyI(cmd,cmdline,1024);
     strtrimI(cmd);
     do
     {
         spacePtr=strstrI(spacePtr," ");
         *argc+=1;
-            
+    
     } while (spacePtr++);
     
     argv=mallocI((*argc*MAXPARAMLEN)+(*argc*sizeof(int)));

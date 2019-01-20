@@ -11,6 +11,7 @@
 #include "libChrisOS.h"
 #include <stddef.h>
 
+#define ISSPACE(c) ({bool isspace = c==' '?true:false;isspace;})
 #define ISDIGIT(c) ((c) - '0' + 0U <= 9U)
 #define ISALPHA(c) (((c) | 32) - 'a' + 0U <= 'z' - 'a' + 0U)
 #define ISCAPITALHEX(c) ((((((c) - 48U) & 255) * 23 / 22 + 4) / 7 ^ 1) <= 2U)

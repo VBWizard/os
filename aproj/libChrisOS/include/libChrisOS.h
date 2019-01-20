@@ -71,7 +71,8 @@ extern "C" {
     char* getcwd(char* buf, size_t size);
     bool strisnum(char* str);
     int fork();
-
+    size_t split(char *buffer, char *argv[], size_t argv_size);
+    void exit (int status);
     char** processEnvp;
     
 #ifdef __cplusplus

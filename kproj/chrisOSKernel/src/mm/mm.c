@@ -176,6 +176,6 @@ bool mmInitMMapPages(uintptr_t cr3, uintptr_t startVirt, int count, bool writabl
     //Set the user and write flags, but omit the present flag
     //We'll temporarily fill the physical address with the virtual address
     //Later the paging exception code will fill in the physical address
-    pagingMapPageCount(cr3,startVirt,startVirt,count,0x4 | writable<<1);
+    pagingMapPageCount(cr3, startVirt, startVirt, count, 0x4 | writable<<1, true);
     return true;
 }

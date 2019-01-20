@@ -62,7 +62,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time: ../libChrisOS/dist/Debug/GNU-Li
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -T linker.ld
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/time ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib
 
 ${OBJECTDIR}/testtime.o: testtime.c
 	${MKDIR} -p ${OBJECTDIR}

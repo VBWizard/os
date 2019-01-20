@@ -12,8 +12,8 @@ pathMid=dist/${buildType^}/GNU-Linux #GNU-Linux
 
 declare -a kernProgArray=("chrisOS" "chrisOSKernel")
 declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")
-declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat")
-declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat")
+declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat" "echo")
+declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat" "echo/$pathMid/echo")
 sudo mount /dev/disk/by-id/ata-ST31000528AS_5VP8R4ME-part6 /mnt/loop/
 basePath=/home/yogi/src/os/kproj/
 tabs 5,36,50,70

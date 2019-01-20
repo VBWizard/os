@@ -70,10 +70,10 @@ int kexec(char* path, int argc, char** argv, bool background)
 
 }
 
-void execTime(char* cmdline, bool timeIt)
+int execTime(char* cmdline, bool timeIt)
 {
     bool background=false;
-    uint32_t pid=0;
+    int forkPid=0;
     char* tok;
     char* pgm=NULL;
 
@@ -87,47 +87,50 @@ void execTime(char* cmdline, bool timeIt)
     if (paramCount==0)
         return;
 
-    tok=strtok(cmdline,delim);
-    while (tok!=NULL)
-    {
-        if (strncmp(tok,"b",2)==0)
-        {
-            background=true;
-            execParamCount++;
-        }
-        else if (pgm==NULL)
-        {
-            char path[50];
-            bool retVal = getenv("CWD",path);
-            pgm=malloc(strlen(tok)+1+(retVal?strlen(path):0));  //NOTE: +1 is for the terminating \0
-            
-            if (retVal)
-                strcpy(pgm,path);
-            strcat(pgm,tok);
-        }
-        pcount++;
-        tok=strtok(0,delim);
-    }
+    int argc = 0;
+    char **argv;
     
-    char** prms=malloc(sizeof(char*)*pcount);
-    paramsToArgv(paramCount-execParamCount,&params[execParamCount][0], prms);
-
+    argv = cmdlineToArgv(cmdline, &argc);
+            
 //    print ("Executing %s\n",pgm);
-    if (timeIt)
-        startTicks=getticks();
-
-    pid=kexec(pgm,paramCount-execParamCount,prms,background);
-    if (timeIt)
+    startTicks=getticks();
+    
+    forkPid = fork();
+    
+    if (forkPid == 0)
     {
-        endTicks=getticks();
-        print("%u ticks\n",endTicks-startTicks);
+        int retVal;
+        int childPid = exec(argv[0], argc, argv);
+        
+        if (childPid > 0)
+        {
+            retVal = waitpid(childPid);
+        }
+        else
+            retVal = 0xBADBADBA;
+        exit(retVal);
+    }
+    else if (forkPid < 0)
+        printf("Fork error %u", forkPid);
+    else
+    {
+            lastExecExitCode = waitpid(forkPid);
+            if (lastExecExitCode == 0xBADBADBA)
+                printf("Cannot execute %s\n",argv[0]);
+            if (timeIt)
+            {
+                endTicks=getticks();
+                print("%u ticks\n",endTicks-startTicks);
+            }
+            char ret[10];
+            itoa(lastExecExitCode,ret);
+            setenv("LASTEXIT",ret);    
     }
     //Its ok to free arguments now because they are copied by the kernel to pgm's memory
-    freeArgV(paramCount-1, (char**)prms);       
+    free(argv);
     free(pgm);
     
 }
-
 void cmdTime(char* cmdline)
 {
     execTime(cmdline,true);

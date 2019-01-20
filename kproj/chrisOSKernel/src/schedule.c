@@ -47,7 +47,7 @@ void initSched()
 {
     kPagingExceptionCount = 0;
     schedStack = kMalloc(0x16000);
-    pagingMapPageCount(KERNEL_CR3, schedStack, schedStack, 0x16000/PAGE_SIZE, 0x7);
+    pagingMapPageCount(KERNEL_CR3, schedStack, schedStack, 0x16000/PAGE_SIZE, 0x7, true);
     NO_PREV = 0xFFFFFFFF;
     NO_NEXT = 0xFFFFFFFF;
     kTaskList=kMalloc(1000*sizeof(task_t));
@@ -155,7 +155,7 @@ void storeISRSavedRegs(task_t* task)
 {
     if (((process_t*)task->process)->execDontSaveRegisters)
     {
-        printd(DEBUG_PROCESS, "* ***Process exec'd, not saving registers***");
+        printd(DEBUG_PROCESS, "* ***Process %u exec'd, not saving registers***\n", task->taskNum);
         ((process_t*)task->process)->execDontSaveRegisters = false;
     }
     else
@@ -179,7 +179,7 @@ void storeISRSavedRegs(task_t* task)
         task->tss->CR3=isrSavedCR3;
     }
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\tSave: ");
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\tSave (or not): ");
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X,",task->tss->CR3);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
@@ -459,6 +459,16 @@ void triggerScheduler()
      nextScheduleTicks=*kTicksSinceStart-1;
 }
 
+void enableScheduler()
+{
+    schedulerEnabled = true;
+}
+
+void disableScheduler()
+{
+    schedulerEnabled = false;
+}
+
 void checkUSleepTasks(task_t* taskToStop, uint32_t retVal)
 {
     uintptr_t* q=qUSleep;
@@ -593,6 +603,12 @@ void runAnotherTask(bool schedulerRequested)
     if (taskToRun!=NULL && taskToRun->taskNum==taskToStop->taskNum)
     {
         printd(DEBUG_PROCESS,"*No new task to run, continuing with the current task\n");
+        if (((process_t*)taskToStop)->execDontSaveRegisters)
+        {
+            printd(DEBUG_PROCESS,"Task to keep running was just exec'd, loading registers from tss\n");
+            loadISRSavedRegs(taskToStop);
+            ((process_t*)taskToStop)->execDontSaveRegisters = false;
+        }
         changeTaskQueue(taskToStop,TASK_RUNNING);   //switch it back to the running queue
         printd(DEBUG_PROCESS,"CS: 0x%08x, EIP: 0x%08x, DS: 0x%08x\n",taskToStop->tss->CS, taskToStop->tss->EIP, taskToStop->tss->DS);
     }

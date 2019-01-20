@@ -57,7 +57,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_ENDPROCESS:       //***exit
             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
              __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
-             printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08X\n",processCR3);
+             if (param1==0)
+                 param1=processCR3;
+             printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08X with return value %u\n",param1,param2);
              markTaskEnded(param1, param2);
              panic("_syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here

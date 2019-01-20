@@ -120,7 +120,7 @@ void mapLibraryIntoProcess(uint32_t CR3,elfInfo_t* searchElf)
     elfPageInfo_t* pt=searchElf->elfLoadedPages;
     while (pt->pages!=0)
     {
-        pagingMapPageCount(CR3,pt->startVirt,pt->startPhys,pt->pages,0x7);
+        pagingMapPageCount(CR3, pt->startVirt, pt->startPhys, pt->pages, 0x7, true);
         printd(DEBUG_ELF_LOADER,"mapLibraryIntoProcess: V=0x%08X mapped to P=0x%08X, 0x%04X pages (CR3=0x%08X)\n",pt->startVirt,pt->startPhys,pt->pages,CR3);
         pt++;
     }
@@ -428,10 +428,10 @@ bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFr
     {
         startPhysAddr=(uintptr_t)allocPages(size+(PAGE_SIZE-(size%PAGE_SIZE))) | (startVirtAddr & 0x00000FFF);
         printd(DEBUG_ELF_LOADER,"Mapping v=0x%08X to p=0x%08X via cr3=0x%08X\n",startVirtAddr,startPhysAddr,CR3);
-        pagingMapPageCount(CR3,startVirtAddr,startPhysAddr,(size/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(CR3, startVirtAddr, startPhysAddr, (size/PAGE_SIZE)+1, 0x7, true);
         printd(DEBUG_ELF_LOADER,"Also mapping v=0x%08X to p=0x%08X via cr3=0x%08X\n",startVirtAddr,startPhysAddr,KERNEL_CR3);
-        pagingMapPageCount(KERNEL_CR3,startPhysAddr,startPhysAddr,(size/PAGE_SIZE)+1,0x7);
-        pagingMapPageCount(KERNEL_CR3,startVirtAddr,startPhysAddr,(size/PAGE_SIZE)+1,0x7);
+        pagingMapPageCount(KERNEL_CR3, startPhysAddr, startPhysAddr, (size/PAGE_SIZE)+1, 0x7, true);
+        pagingMapPageCount(KERNEL_CR3, startVirtAddr, startPhysAddr, (size/PAGE_SIZE)+1, 0x7, true);
         printd(DEBUG_ELF_LOADER,"putDataOnPages2: %s 0x%08X bytes to v=0x%08X/p=0x%08X\n",writeFromFile?"Writing":"Zeroing",size, startVirtAddr,startPhysAddr);
         addElfLoadInfo(elf, startVirtAddr & 0xFFFFF000, startPhysAddr & 0xFFFFF000, size+(PAGE_SIZE-(size%PAGE_SIZE)));
         if (writeFromFile)

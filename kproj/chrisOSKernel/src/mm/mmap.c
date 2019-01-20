@@ -76,7 +76,9 @@ void* sys_mmapI (process_t* p, void *addr,size_t len,int prot,int flags,int fd,o
             //FIXED + ANONYMOUS = Cow existing pages!
             for (uint32_t addressToCow=(uint32_t)addr;addressToCow<(uint32_t)addr+len;addressToCow+=PAGE_SIZE)
             {
-                pagingMakePageCoW((uintptr_t*)pagingGet4kPTEntryAddressCR3((uint32_t)p->pageDirPtr,addressToCow),true);
+                uintptr_t currPageEntry = pagingGet4kPTEntryValueCR3(p->pageDirPtr, addressToCow);
+                if ( currPageEntry != 0 && (currPageEntry & 0x200)!= 0x200)
+                    pagingMakePageCoW((uintptr_t*)pagingGet4kPTEntryAddressCR3((uint32_t)p->pageDirPtr,addressToCow),true);
             }
             return addr;
         }

@@ -18,7 +18,7 @@
 
     void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, uint8_t flags);
     void pagingMapPageRange(uintptr_t pageDirAddress, uintptr_t startVirtualAddress, uintptr_t endVirtualAddress, uintptr_t startPhysicalAddress,uint8_t flags);
-    void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress,int pageCount, uint8_t flags);
+    void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, int pageCount, uint8_t flags, bool incrementPhysical);
     uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToFind);
     uint32_t pagingGet4kPDEntryValueCR3(uintptr_t PageDirAddress, uint32_t address);
     uint32_t pagingGet4kPDEntryValue(uint32_t address);

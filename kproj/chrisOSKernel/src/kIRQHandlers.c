@@ -24,7 +24,7 @@ static struct tm theDateTime;
         kSystemCurrentTime++;
     if (schedulerEnabled)
     {
-        if(*kTicksSinceStart>=nextScheduleTicks)
+        if(*kTicksSinceStart>=nextScheduleTicks && schedulerEnabled)
         {
             printd(DEBUG_PROCESS,"kIRQ0_Handler: triggering scheduler\n");
             schedulerTriggered=true;

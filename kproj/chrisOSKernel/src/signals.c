@@ -18,6 +18,7 @@ extern uintptr_t *qISleep;
 extern uint32_t* kTicksSinceStart;
 extern task_t* findTaskByCR3(uint32_t cr3);
 extern task_t* findTaskByTaskNum(uint32_t taskNum);
+extern task_t *kTaskList;
 
 //Set a signal but don't trigger the scheduler
 void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
@@ -129,7 +130,20 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             printd(DEBUG_EXCEPTIONS,"Signaling SEGV for cr3=0x%08X, signald before=0x%08X processing signal\n",callerCR3,p->signals.sigind);
             //No CLI necessary as the exception 0xe handler has already done that
             p->signals.sigind|=SIGSEGV;
-            printd(DEBUG_EXCEPTIONS,"SEGV signalled for cr3=0x%08X, signald after=0x%08X processing signal\n",callerCR3,p->signals.sigind);
+            printd(DEBUG_EXCEPTIONS,"Searching for children to SEGV\n");
+            for (int cnt=0;cnt<1000;cnt++)
+            {
+                if (kTaskList[cnt].taskNum != 0)
+                {
+                    process_t* pc = ((process_t*)kTaskList[cnt].process);
+                    if (((process_t*)pc->parent)->task->taskNum==pc->task->taskNum)
+                    {
+                        p->signals.sigind|=SIGSEGV;
+                        printd(DEBUG_EXCEPTIONS,"SEGVing child task %s (0x%04X)\n",pc->path, pc->task->taskNum);
+                    }
+                }
+            }
+            printd(DEBUG_EXCEPTIONS,"SEGV signaled for cr3=0x%08X, signald after=0x%08X processing signal\n",callerCR3,p->signals.sigind);
             //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
             return;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
