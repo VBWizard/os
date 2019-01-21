@@ -16,6 +16,7 @@
 extern void _sysCall();
 extern void _sysEnter();
 extern void vector7();
+extern void vector10();
 extern void vector13();
 extern void vector14();
 extern void vector32();
@@ -131,6 +132,7 @@ __asm__("cli\n");
     pagingMapPage(KERNEL_CR3,PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000,0x7); //CLR 1/10/2019: Changed perms from 0x7 to 0x5
     printd(DEBUG_PROCESS,"pagingMapPage(0x%08X,0x%08X,0x%08X,0x%02X)\n",KERNEL_CR3, PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000, 0x7);
     gdtEntryOS(kKernelTask->taskNum,(uint32_t)kKernelTask->tss,sizeof(tss_t), ACS_TSS | ACS_DPL_0,GDT_GRANULAR | GDT_32BIT,true);
+    __asm__("ltr ax\n"::"a" (kKernelTask->taskNum << 3));
 
     
     //idt_set_gate (&idtTable[0x80], 0x8, (int)&_sysCall, ACS_INT | ACS_DPL_3);
@@ -150,6 +152,8 @@ __asm__("cli\n");
 
     printk("Installing new IRQ0 handler\n");
     //idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
+    idt_set_gate (&idtTable[0xa], 0x08, (int)&vector10, ACS_INT); //Scheduler is on IRQ 0
+    idt_set_gate (&idtTable[0xd], 0x08, (int)&vector13, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x7], 0x08, (int)&vector7, ACS_INT);
     idt_set_gate (&idtTable[0x28], 0x08, (int)&vector40, ACS_INT); //RTC IRQ 8

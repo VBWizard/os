@@ -50,6 +50,7 @@ pagingExceptionHandler:
 .globl alltraps
 .type alltraps, @function
 alltraps:
+cli
     #NOTE: CLI not necessary, Interrupt Gate
     push eax
     push ebx

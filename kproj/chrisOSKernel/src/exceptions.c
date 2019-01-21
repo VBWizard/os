@@ -75,7 +75,7 @@ void defaultISRHandler()
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
         printk("Exception handler called for exception # 0x%02x\n\n", isrNumber);
-        //printDumpedRegs();
+        printDumpedRegs();
         printd(DEBUG_EXCEPTIONS,"handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
 #endif
@@ -330,7 +330,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     lPTEValue=kPagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
     elfInfo_t* elf=victimProcess->elf;
     //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X)\n",exceptionCR2,exceptionCR3);
-    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08X in task 0x%04X, for 0x%08X, error code 0x%08X (CR3=0x%08X)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
+    printk(0,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08X in task 0x%04X, for 0x%08X, error code 0x%08X (CR3=0x%08X)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
     printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08X)\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
     pageVirtAddress=lPTEValue&0xFFFFF000;

@@ -44,7 +44,7 @@ uint32_t saveESP;
 uint32_t kKernelCR3=KERNEL_CR3;
 void* kKeyboardHandlerRoutine=NULL;
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)  {
     printk("\nkernel loaded ... \n");
 /*    printk("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
@@ -54,6 +54,7 @@ int main(int argc, char** argv) {
         //    break;
     }
 */
+    __asm__("cli\n");
     kNextSignalCheckTicks = *kTicksSinceStart;
     kbd_handler_generic_init();
     printk("Kernel loaded...\n");
@@ -106,9 +107,13 @@ int main(int argc, char** argv) {
     char* args[2];
     args[0]=params[0];
     args[1]=params[1];
+
     
     process_t* process = createProcess(program, 2, args, kKernelProcess, false, false);
+    printk("KSHELL LOADED!!!");
+//    waitTicks(3);
     schedulerEnabled=true;
+    sys_sigaction(SIGUSLEEP,0,0x21);
 /*#define pcount 3
     char* param1[pcount][10];
     char* param2[pcount][10];
@@ -124,8 +129,6 @@ int main(int argc, char** argv) {
     }
 */
 
-    waitTicks(3);
-    sys_sigaction(SIGUSLEEP,0,process->task->taskNum);
     printk("\n\nLast task was killed, shutting down the kernel ...\n");
     schedulerEnabled=false;
     printk("Disabled scheduler ...\n");

@@ -262,8 +262,8 @@ void processIdleLoop()
     sys_masksig(SIGINT,1);
     while (1==1)
     {
-        if (++kIdleTicks % 10 == 0)
-            printd(DEBUG_PROCESS,"IDLE TASK: Idle ticks = %u\n",kIdleTicks);
+/*        if (++kIdleTicks % 10 == 0)
+            printd(DEBUG_PROCESS,"IDLE TASK: Idle ticks = %u\n",kIdleTicks);*/
         __asm__("sti;hlt;");
     }   
 }
@@ -468,6 +468,18 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         process->task->tss->EIP=(uintptr_t)&processIdleLoop;
     else
     {
+        //The reason kSHell throws a paging exception when you type an invalid filename is because we remove the program segment mappings
+        //before attempting to load the new executable, so if the new executable fails to load and we try to return to the calling program,
+        //we can't.  (our program was unmapped!)
+        //This is our temporary fix to the problem.  Try to open the file and if it fails, return before unmapping!
+        void* fPtr=fs_open(process->path, "r");
+        if (fPtr==0)
+        {
+            if (useExistingProcess)
+                enableScheduler();
+            return NULL;
+        }
+        fs_close(fPtr);
         if (useExistingProcess)
            removeProgramSegmentMappings(process->parent, process);
         process->elf=sysLoadElf(process->path, process->elf, process->task->tss->CR3);
@@ -694,6 +706,14 @@ void dupPageTables(process_t* newProcess, process_t* currProcess)
 
     uint32_t* oldCR3 = (uint32_t*)currProcess->pageDirPtr;
     uint32_t* newCR3 = (uint32_t*)newProcess->pageDirPtr;
+    uint32_t textMin = currProcess->elf->textAddress;
+    uint32_t textMax = currProcess->elf->textAddress + currProcess->elf->textSize;
+    uint32_t dataMin = currProcess->elf->dataAddress;
+    uint32_t dataMax = currProcess->elf->dataAddress + currProcess->elf->dataSize;
+    uint32_t tdataMin = currProcess->elf->tdataAddress;
+    uint32_t tdataMax = currProcess->elf->tdataAddress + currProcess->elf->tdataSize;
+    uint32_t bssMin = currProcess->elf->bssAddress;
+    uint32_t bssMax = currProcess->elf->bssAddress + currProcess->elf->bssSize;
     
     //Iterate the current PDE creating a new page and pointing to it whenever you find an entry
     for (int cr3Ptr=0;cr3Ptr<1024;cr3Ptr++)
@@ -714,25 +734,52 @@ void dupPageTables(process_t* newProcess, process_t* currProcess)
 
             //Now iterate the old page table creating entries on the new table where they exist on the old
             //Now dup the page table
-            if (((uint32_t)oldPT & 0xFFFFF000) == 0x0115D000)
-            {
-                int a = 1;
-                a+=1-1+1;
-            }
             memcpy(newPT, (uint32_t)oldPT & 0xFFFFF000, PAGE_SIZE);
             printd(DEBUG_PROCESS,"\t\tDup'd PT from 0x%08X to 0x%08X\n",(uint32_t)oldPT & 0xFFFFF000, newPT);
         }
     }
 }
 
-void removeProgramSegmentMappings(process_t *parent, process_t *child)
+void removeProgramSegmentMappings(process_t *currProcess, process_t *newProcess)
 {
-    if (parent->elf->textAddress>0)
-        pagingMapPageCount(child->pageDirPtr, parent->elf->textAddress, 0, parent->elf->textSize/PAGE_SIZE, 0, false);
-    if (parent->elf->dataAddress>0)
-        pagingMapPageCount(child->pageDirPtr, parent->elf->dataAddress, 0, parent->elf->dataSize/PAGE_SIZE, 0, false);
-    if (parent->elf->tdataAddress>0)
-        pagingMapPageCount(child->pageDirPtr, parent->elf->tdataAddress, 0, parent->elf->tdataSize/PAGE_SIZE, 0, false);
-    if (parent->elf->bssAddress>0)
-        pagingMapPageCount(child->pageDirPtr, parent->elf->bssAddress, 0, parent->elf->bssSize/PAGE_SIZE, 0, false);
+    if (currProcess->elf->textAddress>0)
+        pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->textAddress, 0, currProcess->elf->textSize/PAGE_SIZE+1, 0, false);
+    if (currProcess->elf->dataAddress>0)
+        pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->dataAddress, 0, currProcess->elf->dataSize/PAGE_SIZE+1, 0, false);
+    if (currProcess->elf->tdataAddress>0)
+        pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->tdataAddress, 0, currProcess->elf->tdataSize/PAGE_SIZE+1, 0, false);
+    if (currProcess->elf->bssAddress>0)
+        pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->bssAddress, 0, currProcess->elf->bssSize/PAGE_SIZE+1, 0, false);
+
+ 
+/*    uint32_t* newCR3 = (uint32_t*)newProcess->pageDirPtr;
+    uint32_t textMin = currProcess->elf->textAddress;
+    uint32_t textMax = currProcess->elf->textAddress + currProcess->elf->textSize;
+    uint32_t dataMin = currProcess->elf->dataAddress;
+    uint32_t dataMax = currProcess->elf->dataAddress + currProcess->elf->dataSize;
+    uint32_t tdataMin = currProcess->elf->tdataAddress;
+    uint32_t tdataMax = currProcess->elf->tdataAddress + currProcess->elf->tdataSize;
+    uint32_t bssMin = currProcess->elf->bssAddress;
+    uint32_t bssMax = currProcess->elf->bssAddress + currProcess->elf->bssSize;
+    for (int cr3Ptr=0;cr3Ptr<1024;cr3Ptr++)
+    {
+        //if the CR3 page directory has a value, dup the page table at this entry
+        if (newCR3[cr3Ptr] != 0)
+        {
+            for (int page=0;page<1024;page++)
+            {
+                uintptr_t currPage = (cr3Ptr*0x400000) + (page * 4096) ;
+   
+                if ( (currPage >= textMin && currPage < textMax)
+                  || (currPage >= dataMin && currPage < dataMax)
+                  || (currPage >= tdataMin && currPage < tdataMax)
+                  || (currPage >=  bssMin && currPage < bssMax) )
+                {
+                    uint32_t *newPT = newCR3[cr3Ptr];
+                    newPT[page] = 0;
+                }
+            }
+        }
+    }
+ */
 }

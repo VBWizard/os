@@ -169,6 +169,9 @@
             <pElem>../chrisOS/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -masm=intel</commandLine>
+          <preprocessorList>
+            <Elem>KERNEL_LOADED</Elem>
+          </preprocessorList>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>

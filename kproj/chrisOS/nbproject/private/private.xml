@@ -15,6 +15,9 @@
         </group>
         <group name="aproj"/>
         <group>
+            <file>file:/home/yogi/src/os/kproj/chrisOS/asm/asmFunctions.s</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOS/src/newloader.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOS/src/block/ahci.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOS/include/config.h</file>
         </group>
     </open-files>
