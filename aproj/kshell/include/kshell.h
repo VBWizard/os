@@ -24,6 +24,7 @@ typedef struct
 } command_table_t;
 
     void cmdHelp(char *cmdline);
+    void cmdClearScreen();
     void cmdExit(char *cmdline);
     void cmdExecp(char* cmdline);
     void cmdSleep(char *cmdline);
@@ -47,6 +48,7 @@ typedef struct
     char cwd[256];
     
 static command_table_t cmds[] = { 
+        {"clear","Clear the screen",cmdClearScreen,0},
         {"env","Print environment",cmdPrintEnv,0},
         {"exec","Execute a program",cmdExecp,1},
         {"exit","Exit kshell",cmdExit,1},

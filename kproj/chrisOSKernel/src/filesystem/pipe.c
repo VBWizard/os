@@ -10,7 +10,6 @@
 #include "utility.h"
 #include "errors.h"
 #include "printf.h"
-#include "strings.h"
 
 extern filesystem_t* pipeFs;
 
@@ -35,6 +34,8 @@ void *pipeopen(void* filePtr, const char *mode)
 {
     file_t *file = filePtr;
     pipe_t *pipe = kMalloc(sizeof(pipe_t));
+    memset(pipe, 0, sizeof(pipe_t));
+    
     char* fileContents;
     char temp[50];
     
@@ -57,8 +58,15 @@ void *pipeopen(void* filePtr, const char *mode)
         file->bufferPtr=kMalloc(4);
         *file->bufferPtr = file->buffer;
     }
-    pipe->mode = *mode;
-    pipe->flags = (*mode=='r'?PIPEREAD:PIPEWRITE);
+    strcpy(pipe->mode, mode);
+    if (strstr((char*)pipe->mode,"r"))
+        pipe->flags |= PIPEREAD;
+    else
+        pipe->flags |= PIPEWRITE;
+    
+    if (strstr(pipe->mode,"n"))
+        pipe->flags |= PIPENOBLOCK;
+    
     pipe->file = file;
     pipe->file->pipe = pipe;
     
@@ -102,7 +110,7 @@ size_t piperead(void *buffer, int size, int length, void *f)
     if (pipe==NULL)
         panic("piperead: NULL pipe detected on read\n");
 
-    if (pipe->mode & PIPEREAD==0)
+    if (pipe->flags & PIPEREAD==0)
         return ERROR_FS_FILE_INVALID_OPERATION;
     
     do
@@ -110,20 +118,26 @@ size_t piperead(void *buffer, int size, int length, void *f)
         copySize = size * length;
         if (copySize > (uintptr_t)*file->bufferPtr - (uintptr_t)file->buffer)
             copySize = (uintptr_t)*file->bufferPtr - (uintptr_t)file->buffer;
-        if (copySize == 0)
+        if (copySize < size * length)
         {
+            if (pipe->flags & PIPENOBLOCK) //Pipe doesn't block so oh well if the copy size is less than the caller wants
+                break;
             //yield here
             triggerScheduler();
             __asm__("sti\nhlt"); //Wait for the scheduler
         }
        
-    } while (copySize==0);
+    } while (copySize < size * length);
     
-    //Copy X bytes from pipe memory to the caller's buffer
-    memcpy(buffer, file->buffer, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
-    //Move the contents beyond what is being returned, to the beginning of the buffer
-    memcpy(file->buffer, *file->bufferPtr, PIPE_FILE_SIZE-copySize);
-    *file->bufferPtr-=copySize;  
+    if (copySize > 0)
+    {
+        //Copy X bytes from pipe memory to the caller's buffer
+        memcpy(buffer, file->buffer, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
+        //Move the contents beyond what is being returned, to the beginning of the buffer
+        memcpy(file->buffer, *file->bufferPtr, PIPE_FILE_SIZE-copySize);
+        *file->bufferPtr-=copySize;  
+    }
+    return copySize;
 }
 
 size_t pipewrite(const void *data, int size, int count, void *f)
@@ -134,21 +148,24 @@ size_t pipewrite(const void *data, int size, int count, void *f)
     int copySize = size*count;
 
     if (pipe==NULL)
-        panic("piperead: NULL pipe detected on write\n");
+        panic("pipewrite: NULL pipe detected on write\n");
     
-    if ((pipe->mode & PIPEWRITE)==0)
+    if ((pipe->flags & PIPEWRITE)==0)
         return ERROR_FS_FILE_INVALID_OPERATION;
+
+    __asm__("CLI\n"); //for now we'll CLI and STI so the process doesn't switch to the reader and spoil all our work.  Later we can use locks!
 
     //If there isn't as much data as the caller wanted, give them what we have
     int available = (uintptr_t)file->buffer + PIPE_FILE_SIZE - (uintptr_t)*file->bufferPtr;
     if (copySize > available)
         copySize = available;
-    
+//***TODO: OTHERWISE BLOCK UNTIL ENOUGH DATA IS AVAILABLE UNLESS 'n'
     if (copySize==0)
         return 0;
 
     memcpy(*file->bufferPtr, data, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
     *file->bufferPtr+=copySize;    
+    __asm__("STI\n");
 }
 
 pipe_t *pipedup(void* path, const char *mode, file_t* file)
@@ -158,13 +175,21 @@ pipe_t *pipedup(void* path, const char *mode, file_t* file)
     
     for (int cnt=0;cnt < 1000;cnt++)
     {
-        if (strcmp(openPipes[cnt].path, path)==0)
+        if (strncmp(openPipes[cnt].path, path,256)==0)
         {
             pipe = kMalloc(sizeof(pipe_t));
             memcpy(pipe, openPipes[cnt].pipe, sizeof(pipe_t));
             pipe->fops = pipeFs->fops;
-            pipe->mode = *mode;
-            pipe->flags = (*mode=='r'?PIPEREAD:PIPEWRITE);
+            strcpy(pipe->mode, mode);
+            pipe->flags = 0;
+            if (strstr(mode, "r"))
+                pipe->flags |= PIPEREAD;
+            else
+                pipe->flags |= PIPEWRITE;
+            
+            if (strstr(pipe->mode,"n"))
+                pipe->flags |= PIPENOBLOCK;
+            
             for (int cnt2=0;cnt2<1000;cnt2++)
             {
                 if (openPipes[cnt2].pipe==NULL)
@@ -186,10 +211,23 @@ pipe_t *pipedup(void* path, const char *mode, file_t* file)
 
 int fs_pipe(int pipefd[2])
 {
-    file_t *filer, *filew;
+
+    int flags = PIPENOBLOCK;
     
-    filer = fs_open("/pipe/","r");
-    filew = fs_open(filer->f_path,"w");
+    return 0;
+}
+
+int fs_pipeA(int pipefd[2], int flags)
+{
+    file_t *filer, *filew;
+    char mode[10];
+    
+    strcpy(mode, "r");
+    if (flags & PIPENOBLOCK)
+        strcat(mode, "n");
+    filer = fs_open("/pipe/",mode);
+    strcpy(mode, "w");
+    filew = fs_open(filer->f_path,mode);
     
     pipefd[0] = (int)filer;
     pipefd[1] = (int)filew;

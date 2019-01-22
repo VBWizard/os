@@ -16,9 +16,6 @@
                       __asm__("str eax\nshr eax,3\n":"=a" (taskNum));\
                       taskNum;})
 
-#define CURRENT_TASK(t) ({uint32_t taskNum; \
-                      __asm__("str eax\nshr eax,3\n":"=a" (taskNum)); task_t *t=findTaskByTaskNum(taskNum);})
-
 typedef enum etaskstate
 {
     TASK_ZOMBIE = 0,
@@ -49,9 +46,10 @@ typedef struct s_task
     uint32_t esp0Base, esp0Size;
 } task_t;
 
-task_t* createTask(void* process, bool kernelTSS);
-task_t* getAvailableTask();
+task_t *createTask(void* process, bool kernelTSS);
+task_t *getAvailableTask();
 void freeTask(uint32_t taskNum);
+task_t *getCurrentTask();
 
 #endif	/* TASK_H */
 

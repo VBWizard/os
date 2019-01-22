@@ -66,6 +66,8 @@ VISIBLE int gets(char* buffer, int maxlen, int stream)
         }
         else
             asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
+            asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
+            asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
 
     }
 }

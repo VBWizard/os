@@ -85,6 +85,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/strings/strncpy.o \
 	${OBJECTDIR}/src/strings/stroul.o \
 	${OBJECTDIR}/src/strings/strparts.o \
+	${OBJECTDIR}/src/strings/strstr.o \
 	${OBJECTDIR}/src/strings/strtol.o \
 	${OBJECTDIR}/src/strings/strtrim.o \
 	${OBJECTDIR}/src/time.o
@@ -359,6 +360,11 @@ ${OBJECTDIR}/src/strings/strparts.o: src/strings/strparts.c nbproject/Makefile-$
 	${MKDIR} -p ${OBJECTDIR}/src/strings
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strparts.o src/strings/strparts.c
+
+${OBJECTDIR}/src/strings/strstr.o: src/strings/strstr.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/strings
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strstr.o src/strings/strstr.c
 
 ${OBJECTDIR}/src/strings/strtol.o: src/strings/strtol.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src/strings

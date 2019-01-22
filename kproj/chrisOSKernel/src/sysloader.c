@@ -1,7 +1,6 @@
 #define USE_FILELIB_STDIO_COMPAT_NAMES 1
 #include "chrisos.h"
 #include <elf.h>
-#include <string.h>
 #include "elfloader.h"
 #include "printf.h"
 #include "utility.h"

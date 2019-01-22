@@ -66,7 +66,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_FORK:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            process=CURRENT_PROCESS;
+            process=getCurrentProcess();
             printd(DEBUG_PROCESS,"syscall: Fork called by %s-%u\n", process->path, process->childNumber);
             //process=(process_t*)(findTaskByCR3(processCR3))->process;
             retVal=process_fork(process);
@@ -94,28 +94,24 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_READ:       //***read from descriptor, param1 = descriptor #
             if (param1==STDIN_FILE)
                 retVal=(uint32_t)getc();
-            else
+            if (retVal==0)
             {
-                __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-                process=(process_t*)(findTaskByCR3(processCR3))->process;
-                retVal=fs_read(process, (void*)param1, (void*)param2, param3, 1);
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+                uintptr_t *file = (uintptr_t*)param1;
+                if (file == (uintptr_t*)0)
+                    file = getCurrentProcess()->stdin;
+                retVal=fs_read(process, (void*)file, (void*)param2, param3, 1);
                 __asm__("mov cr3,eax\n"::"a" (processCR3));
             }
             break;
         case SYSCALL_WRITE:       //***write to descriptor, param1 = descriptor #, param2 = string to write
-            if (param1==STDOUT_FILE)
-            {
-                //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
-                printf((char*)param2,"");
-                //printu((const char*)param2, NULL);
-            }
-            else
-            {
-                __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-                process=(process_t*)(findTaskByCR3(processCR3))->process;
-                retVal=fs_write(process, (void*)param1, (void*)param2, param3, 1);
-                __asm__("mov cr3,eax\n"::"a" (processCR3));
-            }
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
+            uintptr_t *file = (uintptr_t*)param1;
+            if (file == (uintptr_t*)1)
+                file = process->stdout;
+            retVal=fs_write(process, file, (void*)param2, param3, 1);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_PIPE:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
@@ -136,7 +132,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             else
                 useExisting = false;
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            parentProcess=CURRENT_PROCESS;
+            parentProcess=getCurrentProcess();
             printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08X,0x%08X,0x%08X,%u)\n",param1,param2,param3,parentProcess, useExisting);
             process = createProcess((char*)param1, param2, (char**)param3, parentProcess, false, useExisting);
             if (process!=NULL)

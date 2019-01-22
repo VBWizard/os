@@ -3,11 +3,13 @@
 .extern isrSavedCS, isrSavedEIP, isrSavedErrorCode, isrSavedEAX, isrSavedEBX, isrSavedECX, isrSavedEDX, isrSavedESI, isrSavedEDI, isrSavedEBP, isrSavedCR0, isrSavedCR1, isrSavedCR4, isrSavedDS, isrSavedES, isrSavedFS, isrSavedGS, isrSavedSS, isrSavedNumber, isrSavedCR2, isrSavedESP, isrSavedFlags, isrSavedStack
 .extern forkReturn
 .extern nextTaskTSS;
+.extern updateTerms
 
 .globl _schedule
 .type _schedule, @function
 _schedule:
     call    scheduler
+    call updateTerms
     mov eax, isrSavedCS
     and eax, 2
     cmp eax, 2

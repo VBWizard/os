@@ -57,5 +57,7 @@ size_t strlen(const char* str);
     int strcspn(char* string, char* chars);
     char* strstr(char* string, char* substring);
     char* strstrI(char* string, char* substring);
+    int sprintf(char *buf, const char *fmt, ...);
+    int vsprintf(char *buf, const char *fmt, va_list args);
 #endif	/* STRINGS_H */
 

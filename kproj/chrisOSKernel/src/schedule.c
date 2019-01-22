@@ -16,6 +16,7 @@ extern bool schedulerTaskSwitched;
 extern task_t* kKernelTask;
 extern task_t* kIdleTask;
 extern sGDT* bootGdt;
+extern uint32_t kCPUCyclesPerSecond;
 
 task_t *kTaskList;
 uintptr_t *qZombie;
@@ -35,7 +36,8 @@ uintptr_t* schedStack; //Loaded by scheduler when it is called
 
 uint32_t nextScheduleTicks;
 uint32_t kPagingExceptionCount;
-extern uint32_t kCPUCyclesPerSecond;
+
+file_t *activeSTDOUT;
 
 const char* TASK_STATE_NAMES[] = {"Zombie","Running","Runnable","Stopped","Uninterruptable Sleep","Interruptable Sleep","Exited","None"};
 
@@ -331,7 +333,7 @@ task_t* submitNewTask(task_t *task)
 }
 
 //Find a task in the running list to replace
-task_t* findRunningTaskToReplace()
+task_t* findRunningTask()
 {
     uintptr_t* queue=qRunning;
     
@@ -530,7 +532,7 @@ void runAnotherTask(bool schedulerRequested)
             :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
     printd(DEBUG_PROCESS,"\n****************************** SCHEDULER *******************************\n");
     //Get task to stop
-    task_t* taskToStop=findRunningTaskToReplace();
+    task_t* taskToStop=findRunningTask();
     if (taskToStop==NULL)
         panic("Can't find the running task in the running queue  ... unpossible!!!\n");
 
@@ -619,6 +621,7 @@ void runAnotherTask(bool schedulerRequested)
         storeISRSavedRegs(taskToStop);              //we're taking it off the cpu so save the registers
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
+        activeSTDOUT = ((process_t *)taskToRun->process)->stdout;
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08X\n",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
@@ -651,7 +654,7 @@ void runAnotherTask(bool schedulerRequested)
     }
     else
     {
-        __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (oldCR3));
+        //__asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (oldCR3));
     }
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
     return;
@@ -665,6 +668,7 @@ void scheduler()
     runAnotherTask(true);
     kSchedulerCallCount++;
     
+
     uint64_t ticksAfter=rdtsc();
     
 #ifdef SCHEDULER_DEBUG

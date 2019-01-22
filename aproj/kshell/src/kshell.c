@@ -411,7 +411,8 @@ getAKey:
         else
         {
             lCommand[lCurrKeyCount++]=lCurrKey;
-            reprintCommand(lCommand);
+            //reprintCommand(lCommand);
+            printf("%c",lCurrKey);
             //Reset pointer to command buffer so that this possibly modified command gets written as a new one
             commandWasFromThisBufferPtr=-1;
         }

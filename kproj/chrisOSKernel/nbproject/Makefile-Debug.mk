@@ -43,15 +43,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/101a755a/bits.o \
 	${OBJECTDIR}/_ext/101a755a/gdt.o \
 	${OBJECTDIR}/_ext/101a755a/msr.o \
-	${OBJECTDIR}/_ext/101a7ecb/fat_access.o \
-	${OBJECTDIR}/_ext/101a7ecb/fat_cache.o \
-	${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o \
-	${OBJECTDIR}/_ext/101a7ecb/fat_format.o \
-	${OBJECTDIR}/_ext/101a7ecb/fat_misc.o \
-	${OBJECTDIR}/_ext/101a7ecb/fat_string.o \
-	${OBJECTDIR}/_ext/101a7ecb/fat_table.o \
-	${OBJECTDIR}/_ext/101a7ecb/fat_write.o \
-	${OBJECTDIR}/_ext/101a7ecb/taskSwitch.o \
 	${OBJECTDIR}/_ext/f336e79e/ata_disk.o \
 	${OBJECTDIR}/_ext/f336e79e/kpaging.o \
 	${OBJECTDIR}/_ext/f336e79e/utility.o \
@@ -66,6 +57,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strncpy.o \
 	${OBJECTDIR}/_ext/3e0a6d34/stroul.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strparts.o \
+	${OBJECTDIR}/_ext/3e0a6d34/strstr.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strtol.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strtrim.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
@@ -73,10 +65,19 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/device.o \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
-	${OBJECTDIR}/src/drivers/terminal.o \
+	${OBJECTDIR}/src/drivers/terminal/termdrv.o \
+	${OBJECTDIR}/src/drivers/terminal/tty_driver.o \
 	${OBJECTDIR}/src/exceptions.o \
+	${OBJECTDIR}/src/fat/fat_access.o \
+	${OBJECTDIR}/src/fat/fat_cache.o \
+	${OBJECTDIR}/src/fat/fat_filelib.o \
+	${OBJECTDIR}/src/fat/fat_format.o \
+	${OBJECTDIR}/src/fat/fat_misc.o \
+	${OBJECTDIR}/src/fat/fat_string.o \
+	${OBJECTDIR}/src/fat/fat_table.o \
+	${OBJECTDIR}/src/fat/fat_write.o \
+	${OBJECTDIR}/src/fat/taskSwitch.o \
 	${OBJECTDIR}/src/filesystem/pipe.o \
-	${OBJECTDIR}/src/fs.o \
 	${OBJECTDIR}/src/kIRQHandlers.o \
 	${OBJECTDIR}/src/kInit.o \
 	${OBJECTDIR}/src/kernel.o \
@@ -94,6 +95,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
+	${OBJECTDIR}/src/vfs.o \
 	${OBJECTDIR}/src/x86.o \
 	${OBJECTDIR}/src/x86idt.o
 
@@ -120,7 +122,7 @@ LDLIBSOPTIONS=-L/usr/local/lib -L/home/yogi/opt/cross/lib
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib -lgcc
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel ${OBJECTFILES} ${LDLIBSOPTIONS} -T linker.ld -ffreestanding -nostdlib
 
 ${OBJECTDIR}/_ext/9e029b58/asmFunctions.o: ../chrisOS/asm/asmFunctions.s nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e029b58
@@ -160,50 +162,6 @@ ${OBJECTDIR}/_ext/101a755a/msr.o: ../chrisOS/src/cpu/msr.c nbproject/Makefile-${
 	${MKDIR} -p ${OBJECTDIR}/_ext/101a755a
 	${RM} "$@.d"
 	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a755a/msr.o ../chrisOS/src/cpu/msr.c
-
-${OBJECTDIR}/_ext/101a7ecb/fat_access.o: ../chrisOS/src/fat/fat_access.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_access.o ../chrisOS/src/fat/fat_access.c
-
-${OBJECTDIR}/_ext/101a7ecb/fat_cache.o: ../chrisOS/src/fat/fat_cache.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_cache.o ../chrisOS/src/fat/fat_cache.c
-
-${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o: ../chrisOS/src/fat/fat_filelib.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_filelib.o ../chrisOS/src/fat/fat_filelib.c
-
-${OBJECTDIR}/_ext/101a7ecb/fat_format.o: ../chrisOS/src/fat/fat_format.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_format.o ../chrisOS/src/fat/fat_format.c
-
-${OBJECTDIR}/_ext/101a7ecb/fat_misc.o: ../chrisOS/src/fat/fat_misc.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_misc.o ../chrisOS/src/fat/fat_misc.c
-
-${OBJECTDIR}/_ext/101a7ecb/fat_string.o: ../chrisOS/src/fat/fat_string.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_string.o ../chrisOS/src/fat/fat_string.c
-
-${OBJECTDIR}/_ext/101a7ecb/fat_table.o: ../chrisOS/src/fat/fat_table.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_table.o ../chrisOS/src/fat/fat_table.c
-
-${OBJECTDIR}/_ext/101a7ecb/fat_write.o: ../chrisOS/src/fat/fat_write.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/101a7ecb/fat_write.o ../chrisOS/src/fat/fat_write.c
-
-${OBJECTDIR}/_ext/101a7ecb/taskSwitch.o: ../chrisOS/src/fat/taskSwitch.s nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/_ext/101a7ecb
-	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/_ext/101a7ecb/taskSwitch.o ../chrisOS/src/fat/taskSwitch.s
 
 ${OBJECTDIR}/_ext/f336e79e/ata_disk.o: ../chrisOS/src/init/ata_disk.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/f336e79e
@@ -275,6 +233,11 @@ ${OBJECTDIR}/_ext/3e0a6d34/strparts.o: ../chrisOS/src/strings/strparts.c nbproje
 	${RM} "$@.d"
 	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strparts.o ../chrisOS/src/strings/strparts.c
 
+${OBJECTDIR}/_ext/3e0a6d34/strstr.o: ../chrisOS/src/strings/strstr.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strstr.o ../chrisOS/src/strings/strstr.c
+
 ${OBJECTDIR}/_ext/3e0a6d34/strtol.o: ../chrisOS/src/strings/strtol.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
@@ -309,25 +272,69 @@ ${OBJECTDIR}/src/drivers/drv_genKeyboard.o: src/drivers/drv_genKeyboard.c nbproj
 	${RM} "$@.d"
 	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drivers/drv_genKeyboard.o src/drivers/drv_genKeyboard.c
 
-${OBJECTDIR}/src/drivers/terminal.o: src/drivers/terminal.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/src/drivers
+${OBJECTDIR}/src/drivers/terminal/termdrv.o: src/drivers/terminal/termdrv.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/drivers/terminal
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drivers/terminal.o src/drivers/terminal.c
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drivers/terminal/termdrv.o src/drivers/terminal/termdrv.c
+
+${OBJECTDIR}/src/drivers/terminal/tty_driver.o: src/drivers/terminal/tty_driver.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/drivers/terminal
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drivers/terminal/tty_driver.o src/drivers/terminal/tty_driver.c
 
 ${OBJECTDIR}/src/exceptions.o: src/exceptions.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/exceptions.o src/exceptions.c
 
+${OBJECTDIR}/src/fat/fat_access.o: src/fat/fat_access.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_access.o src/fat/fat_access.c
+
+${OBJECTDIR}/src/fat/fat_cache.o: src/fat/fat_cache.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_cache.o src/fat/fat_cache.c
+
+${OBJECTDIR}/src/fat/fat_filelib.o: src/fat/fat_filelib.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_filelib.o src/fat/fat_filelib.c
+
+${OBJECTDIR}/src/fat/fat_format.o: src/fat/fat_format.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_format.o src/fat/fat_format.c
+
+${OBJECTDIR}/src/fat/fat_misc.o: src/fat/fat_misc.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_misc.o src/fat/fat_misc.c
+
+${OBJECTDIR}/src/fat/fat_string.o: src/fat/fat_string.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_string.o src/fat/fat_string.c
+
+${OBJECTDIR}/src/fat/fat_table.o: src/fat/fat_table.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_table.o src/fat/fat_table.c
+
+${OBJECTDIR}/src/fat/fat_write.o: src/fat/fat_write.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fat/fat_write.o src/fat/fat_write.c
+
+${OBJECTDIR}/src/fat/taskSwitch.o: src/fat/taskSwitch.s nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/fat
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/src/fat/taskSwitch.o src/fat/taskSwitch.s
+
 ${OBJECTDIR}/src/filesystem/pipe.o: src/filesystem/pipe.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src/filesystem
 	${RM} "$@.d"
 	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/filesystem/pipe.o src/filesystem/pipe.c
-
-${OBJECTDIR}/src/fs.o: src/fs.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fs.o src/fs.c
 
 ${OBJECTDIR}/src/kIRQHandlers.o: src/kIRQHandlers.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -412,6 +419,11 @@ ${OBJECTDIR}/src/task.o: src/task.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/task.o src/task.c
+
+${OBJECTDIR}/src/vfs.o: src/vfs.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/vfs.o src/vfs.c
 
 ${OBJECTDIR}/src/x86.o: src/x86.s nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src

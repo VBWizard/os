@@ -27,6 +27,13 @@ task_t* getAvailableTask();
 //max tasks = max GDT entries (256) - 32 reserved tasks
 #define MAXTASKS 224 
 
+task_t* getCurrentTask()
+{
+    uint32_t taskNum; 
+    __asm__("str eax\nshr eax,3\n":"=a" (taskNum)); 
+    return findTaskByTaskNum(taskNum);
+}
+
 //TODO: Replace current list with dllist_t!
 
 uint32_t firstTaskTSS=0,firstTaskESP0=0;

@@ -26,6 +26,8 @@
 #include "../../chrisOS/src/fat/fat_filelib.h"
 #include "fs.h"
 #include "filesystem/pipe.h"
+#include "drivers/termdrv.h"
+#include "drivers/tty_driver.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -34,8 +36,12 @@ bool schedulerTaskSwitched=0;
 extern uint32_t* isrSavedStack; 
 extern uint32_t kNextSignalCheckTicks;
 extern void keyboardInit();
+extern void initTerm();
+extern int initTTY();
 
 filesystem_t *rootFs, *pipeFs;
+terminfo_t *sysConsole;
+ttydevice_t *tty1;
 process_t* kIdleProcess;
 task_t* kIdleTask;
 uint64_t kIdleTicks=0;
@@ -89,12 +95,19 @@ int main(int argc, char** argv)  {
     rootFs = kRegisterFileSystem("/",&fops);
     pipeFs = initpipefs();
     
+    initTerm();
+    initTTY();
+    sysConsole = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 0, 80, 50, "Main system console 0");
+    tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 0);
+    kKernelProcess->stdout = tty1->pipew;
+    kKernelProcess->stdin = tty1->piper;
+    
     keyboardInit();
     //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS
     //console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);
     
     kIdleTicks=0;
-    kIdleProcess=createProcess("/sbin/idle", 0, NULL, NULL, true, false);
+    kIdleProcess=createProcess("/sbin/idle", 0, NULL, kKernelProcess, true, false);
     kIdleTask=kIdleProcess->task;
     //Need to let the idle task run once so that it initializes, so make sure it is the first task to run when the scheduler starts
     kIdleTask->prioritizedTicksInRunnable = 0xDFFFFFFF;

@@ -31,8 +31,6 @@ extern "C" {
 #define PROCESS_MAX_ENVIRONMENT_VARIABLES 512
 #define PROCESS_STRUCT_VADDR 0xF000F000
 #define PROCESS_STRUCT_VADDR_THIS_OFFSET 0x4
-#define CURRENT_PROCESS ({uint32_t taskNum;\
-                      __asm__("str eax\nshr eax,3\n":"=a" (taskNum)); process_t *p=findTaskByTaskNum(taskNum)->process;p;})
     
     typedef void exitHandler(void);
     typedef void startHandler();
@@ -53,7 +51,7 @@ extern "C" {
         uint32_t heapStart, heapEnd, stackStart, stackSize, stack1Start, stack1Size, stack0Start, stack0Size;
         short priority;           //-20=highest, 20=lowest
         void* exitHandler[PROCESS_MAX_EXIT_HANDLERS];
-        void* parent;
+        struct sprocess* parent;
         bool kernelProcess;
         struct tm startTime, endTime;
         uint32_t totalRunTicks;
@@ -86,6 +84,8 @@ extern "C" {
     char* processGetCWD(char* buf, unsigned long size);
     void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size); //Copy memory from kernel to user space (assumes dest is user page)
     void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size); //Copy memory from user space to kernel (assumes dest is kernel page)
+    process_t *getCurrentProcess ();
+
 #define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus
 }

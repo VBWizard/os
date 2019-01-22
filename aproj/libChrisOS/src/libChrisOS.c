@@ -7,9 +7,11 @@
 #include "libChrisOS.h"
 #include "syscalls.h"
 #include "time.h"
+#include "strings.h"
 
 extern void sysEnter_Vector();
 bool libcInitialized = false;
+char *printBuffer;
 
 
 int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4)
@@ -58,6 +60,7 @@ VISIBLE void __attribute__((constructor)) libc_init()
         do_syscall0(SYSCALL_INVALID);
         do_syscall1(SYSCALL_REGEXITHANDLER,(uint32_t)&libc_cleanup);
         libcInitialized = true;
+        printBuffer = mallocI(0x1000);
         printdI(DEBUG_LIBC,"***libc_init completed\n");
     }
     else
@@ -73,7 +76,9 @@ VISIBLE int print(const char *format, ...)
 {
     va_list args;
     va_start( args, format );
-    do_syscall2(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
+    
+    int size = vsprintf(printBuffer, format, args);
+    do_syscall3(SYSCALL_WRITE, 1, (uint32_t)printBuffer, size);
     return 0;
 }
 
@@ -81,7 +86,10 @@ VISIBLE int printf(const char *format, ...)
 {
     va_list args;
     va_start( args, format );
-    do_syscall2(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
+    
+    int size = vsprintf(printBuffer, format, args);
+    do_syscall3(SYSCALL_WRITE, 1, (uint32_t)printBuffer, size);
+    //do_syscall2(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
     return 0;
 }
 

@@ -25,14 +25,15 @@ extern "C" {
     typedef enum EPipeMode
     {
         PIPEREAD = 1,
-        PIPEWRITE = 2
+        PIPEWRITE = 2,
+        PIPENOBLOCK = 4
     } ePipeMode;
     
     typedef struct sPipe
     {
         file_t* file;       //This has to be the first field so I can use the pointer to create a pipe_t
         process_t* owner;
-        ePipeMode mode;
+        char mode[10];
         uint32_t flags;
         uint32_t usecount;
         fileops_t* fops;
@@ -48,6 +49,7 @@ extern "C" {
     size_t pipewrite(const void *buffer, int size, int count, void *f);
     pipe_t *pipedup(void* path, const char *mode, file_t* file);
     int fs_pipe(int pipefd[2]);
+    int fs_pipeA(int pipefd[2], int flags);
     
     typedef struct
     {

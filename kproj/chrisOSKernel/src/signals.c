@@ -72,7 +72,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
         panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",callerCR3,signal,sigAction);
     if (currentTask!=0x17)
     {
-        p = CURRENT_PROCESS;
+        p = getCurrentProcess();
         callerCR3=p->pageDirPtr;
     }
     else

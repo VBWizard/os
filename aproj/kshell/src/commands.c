@@ -7,6 +7,11 @@
 
 #include "kshell.h"
 
+void cmdClearScreen()
+{
+    printf("\033[2J");
+}
+
 void cmdPrintEnv()
 {
     for (int cnt=0;cnt<100;cnt++)
@@ -85,7 +90,7 @@ int execTime(char* cmdline, bool timeIt)
     uint32_t startTicks, endTicks;
     
     if (paramCount==0)
-        return;
+        return -3;
 
     int argc = 0;
     char **argv;
@@ -111,12 +116,12 @@ int execTime(char* cmdline, bool timeIt)
         exit(retVal);
     }
     else if (forkPid < 0)
-        printf("Fork error %u", forkPid);
+        print("Fork error %u", forkPid);
     else
     {
             lastExecExitCode = waitpid(forkPid);
             if (lastExecExitCode == 0xBADBADBA)
-                printf("Cannot execute %s\n",argv[0]);
+                print("Cannot execute %s\n",argv[0]);
             if (timeIt)
             {
                 endTicks=getticks();
@@ -173,8 +178,10 @@ void cmdHelp(char *cmdline)
                 print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
         }
         else
+        {
             print("\t%s: %s\n", cmds[cnt].name, cmds[cnt].description);
-        
+        }
+    
 }
 
 void cmdPwd()

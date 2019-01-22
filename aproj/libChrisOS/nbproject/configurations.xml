@@ -55,6 +55,7 @@
       <itemPath>src/memset.c</itemPath>
       <itemPath>src/mmap.c</itemPath>
       <itemPath>src/pipe.c</itemPath>
+      <itemPath>src/sprintf.c</itemPath>
       <itemPath>src/stdio.c</itemPath>
       <itemPath>src/time.c</itemPath>
     </logicalFolder>
@@ -167,6 +168,8 @@
       <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/pipe.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/sprintf.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/stdio.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -296,6 +299,8 @@
       <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/pipe.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/sprintf.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/stdio.c" ex="false" tool="0" flavor2="0">
       </item>

@@ -41,13 +41,15 @@ extern time_t kSystemCurrentTime;
 extern void getDateTimeString(char *s);
 extern uint32_t exceptionSavedStack;
 extern uint64_t kCPUCyclesPerSecond;
-
+extern void IRQ_clear_mask(unsigned char IRQline);;
 struct idt_entry* idtTable=(struct idt_entry*)IDT_TABLE_ADDRESS;
+
 dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call listInit and pass the first item (a dllist_t*) to it
 
 char env[50][50];
 char* envs[100];
 tss_t* pagingExceptionTSS;
+
 
 void initKernelInternals()
 {
@@ -156,7 +158,9 @@ __asm__("cli\n");
     idt_set_gate (&idtTable[0xd], 0x08, (int)&vector13, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x7], 0x08, (int)&vector7, ACS_INT);
-    idt_set_gate (&idtTable[0x28], 0x08, (int)&vector40, ACS_INT); //RTC IRQ 8
+    
+    //Unremark to enable irq 8
+/*    idt_set_gate (&idtTable[0x28], 0x08, (int)&vector40, ACS_INT); //RTC IRQ 8
     idt_set_gate (&idtTable[0x2f], 0x08, (int)&vector40, ACS_INT); //RTC IRQ 8
 outb(0x70, 0x8B);		// select register B, and disable NMI
 char prev=inb(0x71);	// read the current value of register B
@@ -167,11 +171,10 @@ outb(0x70, 0x8A);		// set index to register A, disable NMI
 prev=inb(0x71);	// get initial value of register A
 outb(0x70, 0x8A);		// reset index to A
 outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the bottom 4 bits.
-
-
 IRQ_clear_mask(2);
 IRQ_clear_mask(8);
-    setupPagingHandler();
+*/
+      setupPagingHandler();
 
     __asm__("jmp 0x88:kernJump1\nkernJump1:\n");
 
@@ -205,17 +208,4 @@ void hardwareInit()
             "mov cr4, eax\n"
             ".noSSE:\n");
     
-}
-void IRQ_clear_mask(unsigned char IRQline) {
-    uint16_t port;
-    uint8_t value;
- 
-    if(IRQline < 8) {
-        port = PIC1_DATA;
-    } else {
-        port = PIC2_DATA;
-        IRQline -= 8;
-    }
-    value = inb(port) & ~(1 << IRQline);
-    outb(port, value);        
 }

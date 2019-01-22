@@ -118,10 +118,10 @@ void* fs_open(char* path, const char* mode)
                     return ERROR_FS_PIPE_DOESNT_EXIST;
                 ((pipe_t *)file->pipe)->file = file;
             }
-            else if (*mode=='r')
-                file->pipe = pipeFs->fops->open(file,"r");
+            else if (strstr(mode,"r"))
+                file->pipe = pipeFs->fops->open(file,mode);
             else
-                file->pipe = pipeFs->fops->open(file,"w");
+                file->pipe = pipeFs->fops->open(file,mode);
         }
         else
         {
@@ -152,11 +152,17 @@ void* fs_open(char* path, const char* mode)
     return NULL;
 }
 
+//NOTE: if less than size+length is available, the call will block until it is available
+//     unless the pipe was opened with the "n" flag meaning don't block, in which case
+//     we'll return whatever is available, or nothing
 int fs_read(process_t* process, void* file, void * buffer, int size, int length)
 {
     file_t* theFile = file;
     int retVal = 0;
     char* lBuffer;
+    
+    if (size * length == 0)
+        return 0;
     
     if (theFile->verification!=0xBABAABAB)
         panic("fs_read: Referenced a file that is not a file");
@@ -164,7 +170,8 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
         return theFile->fops->read(buffer, size, length, theFile->handle);
     
-    lBuffer = allocPagesAndMap(size*length);
+    if (lBuffer==NULL)
+        lBuffer = allocPagesAndMap(size*length);
     retVal = theFile->fops->read(lBuffer, size, length, theFile->handle);
     copyFromKernel(process, buffer, lBuffer, size*length);
     kFree(lBuffer);
@@ -185,7 +192,7 @@ int fs_write(process_t* process, void* file, void * buffer, int size, int length
     
     lBuffer = allocPagesAndMap(size*length);
     copyToKernel(process, lBuffer, buffer, size*length);
-    retVal = theFile->fops->write(buffer, size, length, theFile->handle);
+    retVal = theFile->fops->write(lBuffer, size, length, theFile->handle);
     kFree(lBuffer);
     return retVal;
 }

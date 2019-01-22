@@ -41,5 +41,6 @@ long strtol(const char *nptr, char **endptr, register int base);
 unsigned long strtoul(const char *nptr, char **endptr, register int base);
 char* strcat (char *dest, const char *src);
 char* strleft(char* val, int cnt);
+char* strstr(const char* string, char* substring);
 #endif	/* STRINGS_H */
 

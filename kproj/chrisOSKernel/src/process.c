@@ -41,6 +41,14 @@ extern void child_task_forked();
 
 uintptr_t userCR3=0;
 
+process_t *getCurrentProcess()
+{
+    uint32_t taskNum;
+    __asm__("str eax\nshr eax,3\n":"=a" (taskNum)); 
+    return findTaskByTaskNum(taskNum)->process;
+}
+
+
 //NOTE: Assumes contiguous memory area
 void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size) //Copy memory from user space to kernel (assumes dest is kernel page)
 {
@@ -358,7 +366,15 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     memset(process->cwd,0,PAGE_SIZE);
     strcpy(process->cwd,"/");
     
-    if (parentProcessPtr != NULL && !useExistingProcess)
+    if (useExistingProcess)
+    {
+       process->parent=parentProcessPtr->parent;
+       process->kernelProcess=((process_t*)process->parent)->kernelProcess;
+       process->stdin=((process_t*)parentProcessPtr)->stdin;
+       process->stdout=((process_t*)parentProcessPtr)->stdout;
+       process->stderr=((process_t*)parentProcessPtr)->stderr;
+    }
+    else if (parentProcessPtr != NULL)
     {
        process->parent=parentProcessPtr;
        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
@@ -544,8 +560,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
  
     if (useExistingProcess) //Process is already scheduled if useExistingProcess
     {
-        task_t *t;
-        CURRENT_TASK(t);
+        task_t *t = getCurrentTask();
         t->process=process;
         process->execDontSaveRegisters = true;
         enableScheduler();

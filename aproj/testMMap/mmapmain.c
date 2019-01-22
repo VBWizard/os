@@ -23,7 +23,7 @@ int doChild(int childNum)
 {
         for (int sharedCounter=4;sharedCounter>=0;sharedCounter--)
         {
-            printf("Child %u counting: Count = %u\n",childNum, sharedCounter);
+            print("Child %u counting: Count = %u\n",childNum, sharedCounter);
             if (sharedCounter > 0)
                 sleep(1);
         }
@@ -46,23 +46,23 @@ int main(int argc, char** argv) {
         if (pid==0)
         {
             int cn = doChild(childNo);
-            printf("Child %u quitting\n",cn);
+            print("Child %u quitting\n",cn);
             return cn;
         }
         else
             pids[pidsP++]=pid;
-        printf("Started PID %u\n",pid);
+        print("Started PID %u\n",pid);
     }
     
     while (pidCount<pidsToSpawn)
     {
         int thePid = pids[pidCount];
-        printf("Waiting for child %u (0x%04X)\n",pidCount+1, thePid);
+        print("Waiting for child %u (0x%04X)\n",pidCount+1, thePid);
         rets[pidCount]=waitpid(thePid);
         pidCount++;
     }
     for (int cnt=0;cnt<pidsToSpawn;cnt++)
-        printf("Child %u return %u\n",cnt+1,rets[cnt]);
+        print("Child %u return %u\n",cnt+1,rets[cnt]);
     return 0;
 /*    pid=fork();
     if (pid==0)
