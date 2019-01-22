@@ -347,7 +347,12 @@ getAKey:
                 {
                     strcpy(lCommand,commandHistory[--commandHistoryPtr]);
                     commandWasFromThisBufferPtr=commandHistoryPtr;
-                    reprintCommand(lCommand);
+                    while (lCurrKeyCount>0)
+                    {
+                        printf(KEY_BACKSPACE);
+                        lCurrKeyCount--;
+                    }
+                    printf("%s",lCommand);
                     lCurrKeyCount=strlen(lCommand);
                 }
                 goto getAKey;
@@ -360,13 +365,16 @@ getAKey:
             if (commandHistoryPtr>=0)
             {
                 //int lTemp=cursorGetPosY();
-                if (commandHistoryPtr+1<=commandHistoryMax)
+                if (commandHistoryPtr+1<commandHistoryMax)
                 {
                     strcpy(lCommand,commandHistory[++commandHistoryPtr]);
                     commandWasFromThisBufferPtr=commandHistoryPtr;
-                    if (commandHistoryPtr>=commandHistoryMax)
-                        commandWasFromThisBufferPtr=-1;
-                    reprintCommand(lCommand);
+                    while (lCurrKeyCount>0)
+                    {
+                        printf(KEY_BACKSPACE);
+                        lCurrKeyCount--;
+                    }
+                    printf("%s",lCommand);
                     lCurrKeyCount=strlen(lCommand);
                 }
                 goto getAKey;
@@ -379,29 +387,22 @@ getAKey:
             if (lCurrKeyCount>0)
             {
                 print("\033[1D");
-                lCurrKeyCount--;
             }
              
             goto getAKey;
         }
         else if (lCurrKey==0xcd) //right
         {
+            print("\033[1C");
         }
         else if (lCurrKey=='\b') //backspace
         {
-            lCurrKeyCount--;
-            lCommand[lCurrKeyCount]='\0';
-            if (lCurrKeyCount>0)
+            if (lCurrKeyCount-1 >= 0)
             {
-                //putc('\b');
-                /*int lTemp=cursorGetPosY();
-
-                cursorMoveTo(cursorGetPosX()-1,lTemp);
-                putc('\t');
-                cursorMoveTo(cursorGetPosX()-1,lTemp);*/
+                lCurrKeyCount--;
+                lCommand[lCurrKeyCount]='\0';
+                printf(KEY_BACKSPACE);
             }
-            else
-                goto getAKey;
         }
         else if (lCurrKey==0xa) //Enter
         {

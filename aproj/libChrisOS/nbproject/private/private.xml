@@ -17,6 +17,10 @@
             <file>file:/home/yogi/src/os/aproj/libChrisOS/src/stdio.c</file>
             <file>file:/home/yogi/src/os/aproj/libChrisOS/src/strings/strcpy.c</file>
         </group>
-        <group/>
+        <group>
+            <file>file:/home/yogi/src/os/aproj/libChrisOS/src/sprintf.c</file>
+            <file>file:/home/yogi/src/os/aproj/libChrisOS/src/input/input.c</file>
+            <file>file:/home/yogi/src/os/aproj/libChrisOS/src/libChrisOS.c</file>
+        </group>
     </open-files>
 </project-private>

@@ -13,7 +13,7 @@
 #define INITIAL_MAXARGC 20
 #define EOS '\0'
 #define NUMBER_OF_COMMANDS sizeof(cmds)/sizeof(command_table_t)
-
+#define KEY_BACKSPACE "\033[1D \033[1D"
 
 typedef struct
 {

@@ -85,6 +85,19 @@ int unregisterTerminal(terminfo_t* term)
     memset(term->description, 0, 255);
 }
 
+void cursor_update(terminfo_t* term)
+ {
+    unsigned short position=(term->cursorY*80) + term->cursorX;
+ 
+    // cursor LOW port to vga INDEX register
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (unsigned char)(position&0xFF));
+    // cursor HIGH port to vga INDEX register
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (unsigned char )((position>>8)&0xFF));
+    //Move the cursor in the bios data area
+ }
+
 void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* term, char charToPrint)
 {
     if (charToPrint==0x9)
@@ -110,7 +123,9 @@ void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* te
         //Move up 1 line by copying from the 2nd line of the screen down, to the first line
         memcpy(term->screenBuffer, term->screenBuffer + (term->width * 2), term->width * term->height * 2);
         if (device->pipew == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+        {
             memcpy(console, console + (term->width * 2), term->width * term->height * 2);
+        }
         term->cursorY--;
     }
 }
@@ -154,19 +169,30 @@ void updateTermBuffer(ttydevice_t *device)
                     processCharacter(device, term, ' ');
                     curr = 0;
                 break;
-            case 0x1b:  //ANSI escape sequence
+            case 0x1b:                                                  //ANSI escape sequence
                 if (pipeContents[cnt+1] == '[')
                 {
-                    switch (pipeContents[cnt+2])
+                    switch (pipeContents[cnt+3])
                     {
-                        case '2':
-                            if (pipeContents[cnt+3]=='J') //Clear screen
+                        case 'J':
+                            if (pipeContents[cnt+2]=='2')               //Clear screen
                             {
                                 clearScreen(term, term->screenBuffer);
                                 if (device->pipew == activeSTDOUT)
                                     clearScreen(term, console);
-                                cnt+=4;
+                                cnt+=3;
+                                curr = 0;
                             }
+                            break;
+                        case 'D':
+                            term->cursorX-=pipeContents[cnt+2]-48;
+                            cnt+=3;
+                            curr = 0;
+                            break;
+                        case 'C':
+                            term->cursorX+=pipeContents[cnt+2]-48;
+                            cnt+=3;
+                            curr = 0;
                             break;
                         default:
                             break;
@@ -178,6 +204,8 @@ void updateTermBuffer(ttydevice_t *device)
             processCharacter(device, term, curr);
         }
     }
+    if (device->pipew == activeSTDOUT)
+        cursor_update(term);
 }
 
 void updateTerms()
