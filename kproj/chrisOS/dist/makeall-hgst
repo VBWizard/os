@@ -1,0 +1,82 @@
+#!/bin/bash
+clear
+echo "Initiating builds"
+if [ "$1" != "" ]
+then
+	buildType=$1
+else
+	buildType="debug"
+fi
+
+pathMid=dist/${buildType^}/GNU-Linux #GNU-Linux
+
+declare -a kernProgArray=("chrisOS" "chrisOSKernel")
+declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")
+declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat" "echo")
+declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat" "echo/$pathMid/echo")
+sudo mount /dev/disk/by-id/ata-HGST_HTS541075A9E680_JD12021A0DR07L-part2 /mnt/loop/
+basePath=/home/yogi/src/os/kproj/
+tabs 5,36,50,70
+echo "Build environment: ${buildType^}"
+echo
+echo "Making kernel projects"
+for i in "${kernProgArray[@]}"
+do
+	cd $basePath/$i/
+	echo "  Make $i"
+	./make_$buildType > /dev/null
+	if [ $? -eq 0 ] 
+	then
+		echo -en "\tMake $i ... \tsuccess!\n"
+	else
+		echo -en "\tMake $i ... \tfailed\n"
+		echo 
+		echo 
+		sudo umount /mnt/loop
+		tabs -8
+		exit -1
+	fi
+done
+
+echo
+echo "Making application projects"
+basePath=/home/yogi/src/os/aproj/
+for i in "${appProgArray[@]}"
+do
+	cd $basePath/$i/
+	echo "  Make $i"
+	./make_$buildType > /dev/null
+	if [ $? -eq 0 ] 
+	then
+		echo -en "\tMake $i ... \tsuccess!\n"
+	else
+		echo -en "\tMake $i ... \tfailed"
+		echo 
+		echo 
+		sudo umount /mnt/loop
+		tabs -8
+		exit -2
+	fi
+done
+
+echo "Done making projects"
+echo "Copying output to disk and ISO directory"
+basePath=/home/yogi/src/os/kproj
+for i in "${kernOutputArray[@]}"
+do
+	sudo cp $basePath/$i /mnt/loop/
+	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
+	echo -en "\t$i ...done\n"
+done
+basePath=/home/yogi/src/os/aproj
+for i in "${appOutputArray[@]}"
+do
+	sudo cp $basePath/$i /mnt/loop/
+	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
+	echo -en "\t$i ... done\n"
+done
+echo "Copying done"
+echo "Builds complete"
+tabs -8
+sudo umount /mnt/loop
+

@@ -1,0 +1,3 @@
+#!/bin/bash
+#make -j6 CONF=Debug clean
+make CONF=Debug build
