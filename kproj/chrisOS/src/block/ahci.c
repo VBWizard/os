@@ -794,7 +794,8 @@ Pos1:
         wait(20); /* wait for BSY to show up */
         while (1) {
                 uint8_t sts = p->tfd.AsUchar;
-                if (sts & 1) {
+                if (sts & 1) 
+                {
                         /* something went wrong! */
                         if (sts == 0x7f) /* no device */
                                 break;

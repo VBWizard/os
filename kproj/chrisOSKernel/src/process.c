@@ -31,7 +31,6 @@ void CoWProcess(process_t* process);
 void dupPageTables(process_t* newProcess, process_t* currProcess);
 process_t* kKernelProcess;
 extern void _schedule();
-extern void child_task_forked();
 
 #define PAGE_USER_READABLE 0x4
 #define PAGE_USER_WRITABLE 0x6           //0x4 for "User" | 0x2 for "Writable"
@@ -581,6 +580,8 @@ uint32_t process_fork(process_t* currProcess)
     task_t* newTask;
     uint32_t retVal=0, returnCount = 0;
 
+    printd(DEBUG_PROCESS, "process_fork: Creating a new task and duplicating the process\n");
+    
     //Duplicate the calling process
     memcpy(newProcess,currProcess,sizeof(process_t));
     
@@ -588,7 +589,7 @@ uint32_t process_fork(process_t* currProcess)
     newTask=getAvailableTask();
     uint32_t taskNum = newTask->taskNum;
     
-    uint32_t* tss = newTask->tss;
+    tss_t* tss = newTask->tss;
     memcpy(newTask, currProcess->task, sizeof(task_t));
     newTask->tss = tss;
     memcpy(newTask->tss,currProcess->task->tss,sizeof(tss_t)); //No need to malloc, getAvailableTask did that already
@@ -605,6 +606,7 @@ uint32_t process_fork(process_t* currProcess)
     
     __asm__("cli\n");
     dupPageTables(newProcess, currProcess); //Duplicates the current process' page tables to the new one
+
     //CLR 01/17/2019: Changed order of dup & CoW and now CoWing the child instead of the parent.
     //The parent will maintain direct access to all of its memory.  Whenever the child tries to access the paren't memory
     //it is CoWed, so it is copied and the child gets access to the CoW page.
@@ -624,8 +626,8 @@ uint32_t process_fork(process_t* currProcess)
     }
     memset(newProcess->task->tss->IOs,0,200);
     newProcess->task->tss->IOPB = sizeof(tss_t)-200;
-    gdtEntryOS(newProcess->task->taskNum,(uint32_t)newProcess->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
-    pagingMapPage(newProcess->task->tss->CR3,(uint32_t)newProcess->task->tss,newProcess->task->tss,0x7);
+    gdtEntryOS(newProcess->task->taskNum,(uintptr_t)newProcess->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
+    pagingMapPage(newProcess->task->tss->CR3,(uintptr_t)newProcess->task->tss,(uintptr_t)newProcess->task->tss,0x7);
 
 
     //Clone the parent's ESP Stack
@@ -675,7 +677,7 @@ uint32_t process_fork(process_t* currProcess)
 
 void CoWProcess(process_t* process)
 {
-    printd(DEBUG_PROCESS, "CoWing the process\n");
+    printd(DEBUG_PROCESS, "CoWing the child process' copy of the parent's memory\n");
     //CoW the text segment
     if (process->elf->textAddress>0)
     {
