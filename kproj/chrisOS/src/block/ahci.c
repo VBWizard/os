@@ -74,6 +74,9 @@ int AhciIssueCmd(volatile HBA_PORT *port,int cmdslot)
             break;
     }
 
+    if (port->tfd.BSY)
+        printd(DEBUG_AHCI, "AhciIssueCmd: WARNING - port busy after waiting\n");
+    
     // Wait for completion
     delay = 5000;
     while (delay > 0) {
@@ -94,6 +97,10 @@ int AhciIssueCmd(volatile HBA_PORT *port,int cmdslot)
     if (port->tfd.ERR || delay == 0)
         Status = -2;
 
+    if (Status != true)
+        panic("AhciIssueCmd: Status is non-zero");
+        //printd(DEBUG_AHCI, "AhciIssueCmd: WARNING - port busy after waiting\n");
+    
     return Status;
 }
 

@@ -11,6 +11,8 @@
 #include "charDev.h"
 #include "kbd.h"
 #include "signals.h"
+#include "filesystem/pipe.h"
+#include "drivers/tty_driver.h"
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
@@ -18,7 +20,7 @@
 unsigned volatile char kKeyChar=0;
 unsigned volatile char kKeyStatus[11];
 extern volatile char* kKbdBuffCurrTop;
-extern volatile uint32_t kDebugLevel;
+extern uint32_t kDebugLevel;
 extern volatile uint32_t exceptionErrorCode;
 extern volatile uint16_t exceptionNumber;
 extern volatile uint32_t exceptionCS;
@@ -31,6 +33,8 @@ extern volatile uint32_t* kTicksSinceStart;
 extern void* kKeyboardHandlerRoutine;
 extern struct idt_entry* idtTable;
 extern void vector21();
+extern ttydevice_t *tty1;
+        
 uint32_t kbdTop=KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE;
 
 void kbd_handler_generic()
@@ -41,16 +45,16 @@ void kbd_handler_generic()
 
     rawKey = inb(KEYB_DATA_PORT);
     kKeyChar = rawKey;//& 0x80;
-    printd(DEBUG_KEYBOARD,"got a key: %c (0x%04X)\n",kKeyChar,kKeyChar);
+    //printd(DEBUG_KEYBOARD,"got a key: %c (0x%04X)\n",kKeyChar,kKeyChar);
     switch(rawKey)
     {
     case KEY_SHIFT_DN:
         kKeyStatus[INDEX_SHIFT]=1;
-        printd(DEBUG_KEYBOARD,"Shift down\n");
+        //printd(DEBUG_KEYBOARD,"Shift down\n");
         return;
     case KEY_SHIFT_UP:
         kKeyStatus[INDEX_SHIFT]=0;
-        printd(DEBUG_KEYBOARD,"Shift up\n");
+        //printd(DEBUG_KEYBOARD,"Shift up\n");
         return;
     case KEY_CTRL_DN:
                 cursorSavePosition();
@@ -58,7 +62,7 @@ void kbd_handler_generic()
                 printk("%c",'c');
                 cursorRestorePosition();
         kKeyStatus[INDEX_CTRL]=1;
-        printd(DEBUG_KEYBOARD,"Ctrl down\n");
+        //printd(DEBUG_KEYBOARD,"Ctrl down\n");
         return;
     case KEY_CTRL_UP:
                 cursorSavePosition();
@@ -66,19 +70,19 @@ void kbd_handler_generic()
                 printk("%c",' ');
                 cursorRestorePosition();
         kKeyStatus[INDEX_CTRL]=0;
-        printd(DEBUG_KEYBOARD,"Ctrl up\n");
+        //printd(DEBUG_KEYBOARD,"Ctrl up\n");
         return;
     case KEY_ALT_DN:
         kKeyStatus[INDEX_ALT]=1;
-        printd(DEBUG_KEYBOARD,"Alt down\n");
+        //printd(DEBUG_KEYBOARD,"Alt down\n");
         return;
     case KEY_ALT_UP:
         kKeyStatus[INDEX_ALT]=0;
-        printd(DEBUG_KEYBOARD,"Alt up\n");
+        //printd(DEBUG_KEYBOARD,"Alt up\n");
         return;
     case KEY_CAPSLOCK_UP:
         kKeyStatus[INDEX_CAPSLOCK]=!kKeyStatus[INDEX_CAPSLOCK];
-        printd(DEBUG_KEYBOARD,"Capslock\n");
+        //printd(DEBUG_KEYBOARD,"Capslock\n");
         return;
 //        case MAKE_RIGHT: kKeyStatus[INDEX_RIGHT]=0;break;
 //        case MAKE_LEFT: kKeyStatus[INDEX_LEFT]=0;break;
@@ -87,12 +91,14 @@ void kbd_handler_generic()
     }
     //changed from if rawkey & 0x80, so that keydown triggers the key being input
     if (rawKey==BREAK_RIGHT || rawKey==BREAK_LEFT || rawKey==BREAK_UP || rawKey==BREAK_DOWN)
-        if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
-            //CLR 01/10/2017: Increment the buffer pointer first
+        if (tty1->stdInWritePipe)
         {
-            kKbdBuffCurrTop++;
-            *kKbdBuffCurrTop=rawKey;
+            pipewrite(&rawKey, 1, 1, tty1->stdInWritePipe);
+            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Raw key '%u' delivered to stdin pipe 0x%08X\n",rawKey, tty1->stdInWritePipe);
         }
+        else
+            panic("kbd_handler_generic: STDIN pipe is null! (1)\n");
+            
     if (!(rawKey & 0x80))
     {
         //rawKey &= 0x7f;
@@ -103,53 +109,27 @@ void kbd_handler_generic()
         }
         else
             translatedKeypress=keyboard_map[rawKey];
-#ifndef DEBUG_NONE
-//                 if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-//                 {
-//                      printf("%u, %u, %c\n",kKeyChar, rawKey, translatedKeypress);
-//                 }
-#endif
         if (kKeyStatus[INDEX_CTRL])
         {
             //printk("^");
             if (translatedKeypress=='c') //CLR 12/30/2018: ^C pressed
             {
                 sys_sigaction(SIGINT, NULL, 0);
+                goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
             }
         }
 
         if (translatedKeypress==124)
             translatedKeypress=34;
-        if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
+        //CLR 01/24/2019: Added stdin check because we don't care how full the keyboard buffer is if we're going to write the results to the STDIN pipe
+        if (tty1->stdInWritePipe)
         {
             //CLR 01/10/2017: Increment the buffer pointer first
-            {
-                kKbdBuffCurrTop++;
-                *kKbdBuffCurrTop=translatedKeypress;
-            }
-#ifndef DEBUG_NONE
-            if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-            {
-                cursorSavePosition();
-                cursorMoveTo(78,0);
-                printk("%c",'k');
-                cursorRestorePosition();
-            }
-#endif
+            pipewrite(&translatedKeypress, 1, 1, tty1->stdInWritePipe);
+            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Translated key '%c' delivered to stdin pipe 0x%08X\n",translatedKeypress, tty1->stdInWritePipe);
         }
         else
-        {
-#ifndef DEBUG_NONE
-            if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-            {
-                printk("noRoomForKey: Top=0x%08X Max=0x%08X\n",kKbdBuffCurrTop,KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE);
-                cursorSavePosition();
-                cursorMoveTo(78,0);
-                printk("%c",'K');
-                cursorRestorePosition();
-            }
-#endif
-        }
+            panic("kbd_handler_generic: STDIN pipe is null! (2)\n");
         //Debug
         if (kKeyStatus[INDEX_ALT] && translatedKeypress==0x6A)
         {
@@ -190,6 +170,7 @@ void kbd_handler_generic()
         }
     }
 
+timeToReturn:
     lKeyControlVal = inb(KEYB_CTRL_PORT);
     lKeyControlVal |= 0x82;
     outb(KEYB_CTRL_PORT, lKeyControlVal);

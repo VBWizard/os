@@ -44,9 +44,9 @@ static struct tm theDateTime;
             SAVE_CURRENT_CR3(currCR3);
             LOAD_KERNEL_CR3
             __asm__("CLI\n");
-            printd(DEBUG_PROCESS,"Starting term update @ 0x%08X\n",sysConsole->updateTerminal);
+            printd(DEBUG_PROCESS,"Starting term update @ 0x%08x\n",sysConsole->updateTerminal);
             sysConsole->updateTerminal();
-            printd(DEBUG_PROCESS,"Term update done @ 0x%08X\n",sysConsole->updateTerminal);
+            printd(DEBUG_PROCESS,"Term update done @ 0x%08x\n",sysConsole->updateTerminal);
             __asm__("STI\n");
             LOAD_CR3(currCR3);
 */        }
@@ -69,7 +69,7 @@ static struct tm theDateTime;
         {
             cursorSavePosition();
             cursorMoveTo(55,SYS_VGA_HEIGHT-1);
-            //printf("0x%04X:0x%08X 0x%08X",exceptionCS, exceptionEIP, exceptionFlags);
+            //printf("0x%04X:0x%08x 0x%08x",exceptionCS, exceptionEIP, exceptionFlags);
             //kTermMoveTo(65,0);
             printk("%u",*kTicksSinceStart);
             printk("-%c-%04X:%08X",(isrSavedFlags & 0x200)==0x200?'I':'i',isrSavedCS, isrSavedEIP);

@@ -21,7 +21,8 @@
     typedef struct sTTYDriver
     {
         int termDeviceMajor, termDeviceMinor;
-        file_t* piper, *pipew;
+        file_t* stdOutReadPipe, *stdOutWritePipe;
+        file_t* stdInReadPipe, *stdInWritePipe;
     } ttydevice_t;
 
     ttydevice_t *ttyDevices;

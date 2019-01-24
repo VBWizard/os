@@ -5,7 +5,6 @@
  */
 
 #include "libChrisOS.h"
-#include "syscalls.h"
 #include "time.h"
 #include "strings.h"
 

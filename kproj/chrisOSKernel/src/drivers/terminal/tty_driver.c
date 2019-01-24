@@ -34,12 +34,17 @@ int initTTY()
 ttydevice_t *registerTTY(int deviceMajor, int deviceMinor)
 {
     ttydevice_t *device = &ttyDevices[ttysRegistered++];
-    int pipes[2];
+    int stdOutPipes[2];
+    int stdInPipes[2];
     device->termDeviceMajor = deviceMajor;
     device->termDeviceMinor= deviceMinor;
-    fs_pipeA(pipes,PIPENOBLOCK); //n for no blocking
-    device->piper = (file_t*)pipes[0];
-    device->pipew = (file_t*)pipes[1];
+    fs_pipeA(NULL, stdOutPipes,PIPENOBLOCK); //n for no blocking
+    device->stdOutReadPipe = (file_t*)stdOutPipes[0];
+    device->stdOutWritePipe = (file_t*)stdOutPipes[1];
+    fs_pipeA(NULL, stdInPipes, 0); //we want this one to block!
+    device->stdInReadPipe = (file_t*)stdInPipes[0];
+    device->stdInWritePipe = (file_t*)stdInPipes[1];
+    
     return device;
 }
 
@@ -49,7 +54,7 @@ void unregisterTTY(int deviceMajor, int deviceMinor)
         if (ttyDevices[cnt].termDeviceMajor == deviceMajor &&
                 ttyDevices[cnt].termDeviceMinor == deviceMinor)
         {
-            fs_close(ttyDevices[cnt].piper);
+            fs_close(ttyDevices[cnt].stdOutReadPipe);
             ttyDevices[cnt].termDeviceMajor = 0;
             ttyDevices[cnt].termDeviceMinor = 0;
             return;

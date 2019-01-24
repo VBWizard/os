@@ -35,7 +35,7 @@ char* processGetCWD(char* buf, unsigned long size);
 void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
 {
     va_list ap;
-    uint32_t retVal, retVal2;
+    uint32_t retVal = 0;
     void* parentProcess;
     process_t* process;
     task_t* task;
@@ -45,6 +45,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     uint32_t processCR3;  //NOTE: Moved from module level to here because this needs to be a stack variable for fork()
     bool taskExited = false;
     bool useExisting = false;
+    uintptr_t *genericFileHandle;
     
     __asm__("mov eax,esi\n": "=a" (param4));
     __asm__("mov eax,cr3\n": "=a" (processCR3));
@@ -52,14 +53,14 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     switch (callNum)
     {
         case 0x0:       //***Invalid call #
-            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08X, invalid call number. (cr3=0x%08X)\n",callNum,processCR3);
+            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08x, invalid call number. (cr3=0x%08x)\n",callNum,processCR3);
             break;
         case SYSCALL_ENDPROCESS:       //***exit
             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
              __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
              if (param1==0)
                  param1=processCR3;
-             printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08X with return value %u\n",param1,param2);
+             printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08x with return value %u\n",param1,param2);
              markTaskEnded(param1, param2);
              panic("_syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
@@ -92,30 +93,27 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_READ:       //***read from descriptor, param1 = descriptor #
-            if (param1==STDIN_FILE)
-                retVal=(uint32_t)getc();
-            if (retVal==0)
-            {
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-                uintptr_t *file = (uintptr_t*)param1;
-                if (file == (uintptr_t*)0)
-                    file = getCurrentProcess()->stdin;
-                retVal=fs_read(process, (void*)file, (void*)param2, param3, 1);
+            process=getCurrentProcess();
+            genericFileHandle = (uintptr_t*)param1;
+            if (genericFileHandle == (uintptr_t*)STDIN_FILE)
+                genericFileHandle = process->stdin;
+            retVal=fs_read(process, genericFileHandle, (void*)param2, param3, 1);
                 __asm__("mov cr3,eax\n"::"a" (processCR3));
-            }
             break;
         case SYSCALL_WRITE:       //***write to descriptor, param1 = descriptor #, param2 = string to write
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
-            uintptr_t *file = (uintptr_t*)param1;
-            if (file == (uintptr_t*)1)
-                file = process->stdout;
-            retVal=fs_write(process, file, (void*)param2, param3, 1);
+            genericFileHandle = (uintptr_t*)param1;
+            if (genericFileHandle == (uintptr_t*)1)
+                genericFileHandle = process->stdout;
+            retVal=fs_write(process, genericFileHandle, (void*)param2, param3, 1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_PIPE:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            retVal = fs_pipe((int*)param1);
+            process=getCurrentProcess();
+            retVal = fs_pipe(process, (int*)param1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_GETDENTS:
@@ -133,7 +131,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 useExisting = false;
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             parentProcess=getCurrentProcess();
-            printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08X,0x%08X,0x%08X,%u)\n",param1,param2,param3,parentProcess, useExisting);
+            printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08x,0x%08x,0x%08x,%u)\n",param1,param2,param3,parentProcess, useExisting);
             process = createProcess((char*)param1, param2, (char**)param3, parentProcess, false, useExisting);
             if (process!=NULL)
             {
@@ -161,7 +159,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             //Only wait for the PID if it hasn't already exited
             if (!taskExited)
             {
-                printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08X) on pid=0x%04X.  Good night!\n",processCR3,param1);
+                printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08x) on pid=0x%04X.  Good night!\n",processCR3,param1);
                 retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1);
             }
             break;
@@ -175,22 +173,22 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_FREE:     //***free - free system mory
             //__asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            printd(DEBUG_PROCESS,"_syscall: free(0x%08X) called, NOT IMPLEMENTED (cr3=0x%08X)\n",param1,processCR3);
+            printd(DEBUG_PROCESS,"_syscall: free(0x%08x) called, NOT IMPLEMENTED (cr3=0x%08x)\n",param1,processCR3);
             //__asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_ALLOC:     //***mallocI - allocate system memory
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             retVal=(uint32_t)mallocI(processCR3,param1);
-            printd(DEBUG_PROCESS,"_syscall: malloc(0x%08X) returned 0x%08X (cr3=0x%08X)\n",param1,retVal,processCR3);
-            //printd(DEBUG_PROCESS,"_syscall: malloc returning 0x%08X\n",retVal);
+            printd(DEBUG_PROCESS,"_syscall: malloc(0x%08x) returned 0x%08x (cr3=0x%08x)\n",param1,retVal,processCR3);
+            //printd(DEBUG_PROCESS,"_syscall: malloc returning 0x%08x\n",retVal);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SLEEP:     //***sleep - sleep until kTicksSinceStart==param1
-            printd(DEBUG_PROCESS,"_syscall: sleep(0x%08X) called (cr3=0x%08X)\n",param1,processCR3);
+            printd(DEBUG_PROCESS,"_syscall: sleep(0x%08x) called (cr3=0x%08x)\n",param1,processCR3);
             sys_sigaction(SIGSLEEP,0,param1);
             break;
         case SYSCALL_SETSIGACTION:     //***setsigaction
-            printd(DEBUG_PROCESS,"_syscall: sys_setsigaction(0x%08X, 0x%08X, 0x%08X) called\n",param1,param2,param3);
+            printd(DEBUG_PROCESS,"_syscall: sys_setsigaction(0x%08x, 0x%08x, 0x%08x) called\n",param1,param2,param3);
             sys_setsigaction(param1,(uintptr_t*)param2,param3);
             break;
         case SYSCALL_STOP:     //******stop - put process in STOPPED queue
@@ -206,7 +204,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_PRINT:     //sys_print (prints to screen)
             va_copy(ap,(va_list*)(param2));
-            //printd(DEBUG_PROCESS,"_syscall: print(0x%08X,0x%08X)\n",param1,&param2,processCR3);
+            //printd(DEBUG_PROCESS,"_syscall: print(0x%08x,0x%08x)\n",param1,&param2,processCR3);
             //printf((char*)param1, ap);
             char printf_buf[1024];
             memset(printf_buf,0,1024);
@@ -216,7 +214,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             //printu((const char*)param1, ap);
             break;
         case SYSCALL_PRINTD: //printd: Debug print - param1 debuglevel, param2 format, param3 args
-            //printd(DEBUG_PROCESS,"_syscall: printd(0x%08X,0x%08X,0x%08X)\n",param1,&param2,param3);
+            //printd(DEBUG_PROCESS,"_syscall: printd(0x%08x,0x%08x,0x%08x)\n",param1,&param2,param3);
             printdExternal(param1, (const char*)param2, param3);
             break;
         case SYSCALL_HLT:     //***hlt - execute hlt instruction

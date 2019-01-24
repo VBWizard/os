@@ -213,9 +213,7 @@ notSysCallHandler:
     cmp eax,0
     je  kbdError
     call eax
-    mov al,0x20
-    out 0x20,al
-    jmp noIRQResponseRequired
+    jmp ckeckForIRQResponse
 kbdError:
     jmp kbdError
 notKbdHandler:
@@ -236,10 +234,14 @@ notRTCHandler:
 ckeckForIRQResponse:
     mov eax,isrNumber
     cmp eax,0x20                    #If this is the IRQ0 exception, respond to the PIC
+    je irqResponseRequired
+    cmp eax, 21
     jne noIRQResponseRequired
+irqResponseRequired:
     mov al,0x20
     out 0x20,al
 noIRQResponseRequired:
+cli
     popad                           # restoring the regs - only EBX and ESP modified after this point
     #dont' need to release vector parameters because we did when we saved the ESP
     #add esp,8                   #release the vector parameters from the stack

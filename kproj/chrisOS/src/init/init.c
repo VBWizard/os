@@ -71,7 +71,7 @@ bool dupPrintKtoPrintD;
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
 #endif
-#define __i386__
+//#define __i386__
 /* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
 #error "This operating system needs to be compiled with a ix86-elf compiler"

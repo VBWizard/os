@@ -62,9 +62,9 @@ __asm__("cli\n");
     isrSavedStack = (uint32_t *)SAVED_STACK_FOR_EXCEPTIONS_ADDRESS;
     
     kKernelTask=getAvailableTask();
-    printd(DEBUG_PROCESS,"Allocated kernel task at 0x%08X\n",kKernelTask);
+    printd(DEBUG_PROCESS,"Allocated kernel task at 0x%08x\n",kKernelTask);
     kKernelProcess=(process_t*)allocPagesAndMap(sizeof(process_t));
-    printd(DEBUG_PROCESS,"Allocated kernel process at 0x%08X\n",kKernelProcess);
+    printd(DEBUG_PROCESS,"Allocated kernel process at 0x%08x\n",kKernelProcess);
     kKernelProcess->task=kKernelTask;
     kKernelProcess->priority=16;    //Set kernel task to low priority
     kKernelTask->process=kKernelProcess;
@@ -85,21 +85,21 @@ __asm__("cli\n");
     kKernelTask->esp0Size=0x18000;
     kKernelTask->esp0Base=allocPages(0x20000);
     kKernelTask->tss->ESP0=kKernelTask->esp0Base;
-    printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for kernel task ESP0\n",kKernelTask->tss->ESP0);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for kernel task ESP0\n",kKernelTask->tss->ESP0);
     pagingMapPageCount(KERNEL_CR3, kKernelTask->tss->ESP0 | KERNEL_PAGED_BASE_ADDRESS, kKernelTask->tss->ESP0, 0x16, 0x7, true);
     pagingMapPageCount(KERNEL_CR3, kKernelTask->tss->ESP0, kKernelTask->tss->ESP0, 0x16, 0x7, true);
     kKernelTask->tss->ESP0+=0x15000;
-    printd(DEBUG_PROCESS,"Adjusted kernel task ESP0 to 0x%08X\n",kKernelTask->tss->ESP0);
+    printd(DEBUG_PROCESS,"Adjusted kernel task ESP0 to 0x%08x\n",kKernelTask->tss->ESP0);
     kKernelTask->tss->ESP1=allocPages(0x16000);           //Syscall stack
     pagingMapPageCount(KERNEL_CR3, kKernelTask->tss->ESP1 | KERNEL_PAGED_BASE_ADDRESS, kKernelTask->tss->ESP1, 0x16, 0x7, true);
     pagingMapPageCount(KERNEL_CR3, kKernelTask->tss->ESP1, kKernelTask->tss->ESP1, 0x16, 0x7, true);
-    printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for (ESP1) sysEnter\n",kKernelTask->tss->ESP1);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for (ESP1) sysEnter\n",kKernelTask->tss->ESP1);
     kKernelTask->tss->ESP1+=0x15000;
     kKernelTask->tss->EFLAGS=0x200207;
     kKernelTask->tss->ESP=allocPages(0x16000);
     pagingMapPageCount(KERNEL_CR3, kKernelTask->tss->ESP | KERNEL_PAGED_BASE_ADDRESS, kKernelTask->tss->ESP, 0x16, 0x7, true);
     pagingMapPageCount(KERNEL_CR3, kKernelTask->tss->ESP, kKernelTask->tss->ESP, 0x16, 0x7, true);
-    printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for (ESP)\n",kKernelTask->tss->ESP);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for (ESP)\n",kKernelTask->tss->ESP);
     kKernelTask->tss->ESP+=0x15000;
     kKernelTask->tss->LINK=0x0;
     kKernelTask->tss->IOPB=0;
@@ -109,7 +109,7 @@ __asm__("cli\n");
     
     kKernelProcess->path=allocPagesAndMap(0x255);
     strcpy(kKernelProcess->path,"/kernel");
-    printd(DEBUG_PROCESS,"Allocated memory at 0x%08X for kernel path and set to %s\n",(uint32_t*)kKernelProcess->path,kKernelProcess->path);
+    printd(DEBUG_PROCESS,"Allocated memory at 0x%08x for kernel path and set to %s\n",(uint32_t*)kKernelProcess->path,kKernelProcess->path);
     strcpy(env[0],"PATH=/");
     strcpy(env[1],"HOSTNAME=localhost.localdomain");
     strcpy(env[2],"CWD=/");
@@ -125,14 +125,14 @@ __asm__("cli\n");
     pagingMapPage(KERNEL_CR3, isrSavedStack,isrSavedStack,0x7);
     pagingMapPage(KERNEL_CR3, (uint32_t)isrSavedStack | 0xC0000000,(uintptr_t)isrSavedStack,0x7);
 
-    printd(DEBUG_TASK,"Set up isrSavedStack at 0x%08X (and in the kernel)\n",isrSavedStack);
+    printd(DEBUG_TASK,"Set up isrSavedStack at 0x%08x (and in the kernel)\n",isrSavedStack);
     
     pagingMapPage(kKernelTask->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
     pagingMapPage(KERNEL_CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
-    printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08X) into task and kernel\n", kKernelTask->tss);
+    printd(DEBUG_TASK,"Mapped tss of the first task run (0x%08x) into task and kernel\n", kKernelTask->tss);
     
     pagingMapPage(KERNEL_CR3,PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000,0x7); //CLR 1/10/2019: Changed perms from 0x7 to 0x5
-    printd(DEBUG_PROCESS,"pagingMapPage(0x%08X,0x%08X,0x%08X,0x%02X)\n",KERNEL_CR3, PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000, 0x7);
+    printd(DEBUG_PROCESS,"pagingMapPage(0x%08x,0x%08x,0x%08x,0x%02X)\n",KERNEL_CR3, PROCESS_STRUCT_VADDR, (uint32_t)kKernelProcess & 0xFFFFF000, 0x7);
     gdtEntryOS(kKernelTask->taskNum,(uint32_t)kKernelTask->tss,sizeof(tss_t), ACS_TSS | ACS_DPL_0,GDT_GRANULAR | GDT_32BIT,true);
     __asm__("ltr ax\n"::"a" (kKernelTask->taskNum << 3));
 
@@ -150,7 +150,7 @@ __asm__("cli\n");
     wrmsr32(SYSENTER_CS_MSR,0x88,0x33);                      //Set sysenter CS(88) and SS(33), and return CS(93) & SS(3b)
     wrmsr32(SYSENTER_ESP_MSR,kKernelTask->tss->ESP1,0);     //Set sysenter ESP
     wrmsr32(SYSENTER_EIP_MSR,(uint32_t)&_sysEnter,0);       //Set sysenter EIP
-    printd(DEBUG_PROCESS,"Setup SYSENTER MSRs as CS:EIP=0x%04X:0x%08X, ESP=0x%08X\n",0x88,&_sysEnter,kKernelTask->tss->ESP1);
+    printd(DEBUG_PROCESS,"Setup SYSENTER MSRs as CS:EIP=0x%04X:0x%08x, ESP=0x%08x\n",0x88,&_sysEnter,kKernelTask->tss->ESP1);
 
     printk("Installing new IRQ0 handler\n");
     //idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers

@@ -99,8 +99,8 @@ int main(int argc, char** argv)  {
     initTTY();
     sysConsole = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 0, 80, 50, "Main system console 0");
     tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 0);
-    kKernelProcess->stdout = tty1->pipew;
-    kKernelProcess->stdin = tty1->piper;
+    kKernelProcess->stdout = tty1->stdOutWritePipe;
+    kKernelProcess->stdin = tty1->stdInReadPipe;
     
     keyboardInit();
     //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS

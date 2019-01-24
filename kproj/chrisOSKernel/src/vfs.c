@@ -17,6 +17,7 @@ extern filesystem_t* rootFs;
 extern filesystem_t* pipeFs;
 
 uint32_t pipeFileHandle = 0xFFFFFFFF;
+char* lBuffer;
 
 filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
 {
@@ -42,7 +43,7 @@ filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
     
     fs->fops = kMalloc(sizeof(fileops_t));
     memcpy(fs->fops, fops, sizeof(fileops_t));
-   
+    lBuffer = NULL;
     return fs;
 }
 
@@ -145,7 +146,7 @@ void* fs_open(char* path, const char* mode)
             listAdd(rootFs->files,list,file);
 */
         file->verification=0xBABAABAB;
-        printd(DEBUG_FILESYS, "\tfs_open: returning handle 0x%08X\n",handle);
+        printd(DEBUG_FILESYS, "\tfs_open: returning handle 0x%08x\n",handle);
         return file;
     }
     printd(DEBUG_FILESYS, "\tfs_open: returning NULL\n",handle);
@@ -159,7 +160,6 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
 {
     file_t* theFile = file;
     int retVal = 0;
-    char* lBuffer;
     
     if (size * length == 0)
         return 0;
@@ -173,8 +173,10 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     if (lBuffer==NULL)
         lBuffer = allocPagesAndMap(size*length);
     retVal = theFile->fops->read(lBuffer, size, length, theFile->handle);
-    copyFromKernel(process, buffer, lBuffer, size*length);
-    kFree(lBuffer);
+    if (retVal > 0)
+        copyFromKernel(process, buffer, lBuffer, retVal);
+    else
+        retVal = 0; //Regardless of what our disk driver returns for EOF, we return 0
     return retVal;
 }
 

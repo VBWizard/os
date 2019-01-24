@@ -87,7 +87,7 @@ void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
                 bool sectionIsCOW=false;
                 if (strncmp(strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),".bss",255)==0)
                 {
-                    printd(DEBUG_COW,"\tFound bss segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    printd(DEBUG_COW,"\tFound bss segment, address 0x%08x, size 0x%08x.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
                     elf->bssAddress=elf->secHdrTable[cnt].sh_addr;
                     elf->bssSize=elf->secHdrTable[cnt].sh_size;
                     if (elf->isLibrary)
@@ -96,14 +96,14 @@ void elfSetupCoWPages(uint32_t cr3, elfInfo_t* elf)
                 }
                 else if (strncmp(strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),".data",255)==0)
                 {
-                    printd(DEBUG_COW,"\tFound data segment, address 0x%08X, size 0x%08X.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    printd(DEBUG_COW,"\tFound data segment, address 0x%08x, size 0x%08x.\n",elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
                     elf->dataAddress=elf->secHdrTable[cnt].sh_addr;
                     elf->dataSize=elf->secHdrTable[cnt].sh_size;
                     if (elf->isLibrary)
                         sectionIsCOW=true;
                 }
                 else
-                    printd(DEBUG_COW,"\tFound (%s) (NOBITS) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),elf->secHdrTable[cnt].sh_type,elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
+                    printd(DEBUG_COW,"\tFound (%s) (NOBITS) section (type=0x%08x)address 0x%08x, size 0x%08x.\n",strTabEntry(elf->sectionNameStringTable,elf,elf->secHdrTable[cnt].sh_name),elf->secHdrTable[cnt].sh_type,elf->secHdrTable[cnt].sh_addr,elf->secHdrTable[cnt].sh_size);
 
                 if (sectionIsCOW)
                 {
@@ -120,7 +120,7 @@ void mapLibraryIntoProcess(uint32_t CR3,elfInfo_t* searchElf)
     while (pt->pages!=0)
     {
         pagingMapPageCount(CR3, pt->startVirt, pt->startPhys, pt->pages, 0x7, true);
-        printd(DEBUG_ELF_LOADER,"mapLibraryIntoProcess: V=0x%08X mapped to P=0x%08X, 0x%04X pages (CR3=0x%08X)\n",pt->startVirt,pt->startPhys,pt->pages,CR3);
+        printd(DEBUG_ELF_LOADER,"mapLibraryIntoProcess: V=0x%08x mapped to P=0x%08x, 0x%04X pages (CR3=0x%08x)\n",pt->startVirt,pt->startPhys,pt->pages,CR3);
         pt++;
     }
 }
@@ -128,7 +128,7 @@ void mapLibraryIntoProcess(uint32_t CR3,elfInfo_t* searchElf)
 uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
 {
     Elf32_Dyn* dyn=(Elf32_Dyn*)elfInfo->dynamicSectionAddress;
-    printd(DEBUG_ELF_LOADER,"Processing ELF Dynamic section at 0x%08X, %u records\n",elfInfo->dynamicSectionAddress,elfInfo->dynamicRecordCount);
+    printd(DEBUG_ELF_LOADER,"Processing ELF Dynamic section at 0x%08x, %u records\n",elfInfo->dynamicSectionAddress,elfInfo->dynamicRecordCount);
     //Next process the rest of the dynamic section entries
     elfInfo->dynamicInfo.neededCount=0;
     LOAD_ZERO_BASED_DS
@@ -138,7 +138,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
         {
             //DT_NEEDED is a library which we need to load
             case DT_NEEDED:
-                printd(DEBUG_ELF_LOADER,"ELF at: 0x%08X, copy to: 0x%08X, neededCount=0x%08X\n",
+                printd(DEBUG_ELF_LOADER,"ELF at: 0x%08x, copy to: 0x%08x, neededCount=0x%08x\n",
                         elfInfo, elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount],++elfInfo->dynamicInfo.neededCount);
                 printd(DEBUG_ELF_LOADER,"Reading NEEDED name from string table index 0x%04X (0x%04X)\n",dyn[cnt].d_un.d_val, dyn[cnt].d_un.d_ptr);
                 printd(DEBUG_ELF_LOADER,"Needed name = %s\n",strTabEntry(elfInfo->dynamicNameStringTable,elfInfo,dyn[cnt].d_un.d_val));
@@ -147,6 +147,8 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                         strTabEntry(elfInfo->dynamicNameStringTable,elfInfo,dyn[cnt].d_un.d_val));
                 char fileName[100]="/";
                 strcat(fileName,elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount]);
+                if (strncmp(fileName,"/",2)==0)
+                    panic("processELFDynamicSection: NEEDED library name is blank!\n");
                 printd(DEBUG_ELF_LOADER,"Found NEEDED, library name='%s', checking to see if it is already loaded.\n",
                         fileName);
                 if (strcmp(fileName,"/")==0)
@@ -205,15 +207,15 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                 break;
             case DT_PLTRELSZ:
                 elfInfo->dynamicInfo.pltGOTTableTableSize=dyn[cnt].d_un.d_val;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_PLT_RELSZ",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_PLT_RELSZ",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_PLTGOT:
                 elfInfo->dynamicInfo.pltGOTTableAddress=dyn[cnt].d_un.d_ptr;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_PLTGOT",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_PLTGOT",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_HASH:
                 elfInfo->dynamicInfo.hashTableAddress=dyn[cnt].d_un.d_ptr;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_HASH",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_HASH",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_STRTAB:
                 //This is the general string table
@@ -224,79 +226,79 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
                 break;
             case DT_RELA:
                 //elfInfo->dynamicInfo.relATableAddress=dyn[cnt].d_un.d_ptr;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_RELA",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_RELA",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_RELASZ:
                 //elfInfo->dynamicInfo.relATableSize=dyn[cnt].d_un.d_val;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_RELASZ",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_RELASZ",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_RELAENT:
                 elfInfo->dynamicInfo.relAEntrySize=dyn[cnt].d_un.d_val;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_RELAENT",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_RELAENT",dyn[cnt].d_un.d_ptr);
                 break;
 //            case DT_STRSZ:
 //                elfInfo->dynamicInfo.strTableSize=dyn[cnt].d_un.d_val;
                 break;
             case DT_SYMENT:
                 elfInfo->dynamicInfo.symEntrySize=dyn[cnt].d_un.d_val;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_SYMENT",dyn[cnt].d_un.d_val);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_SYMENT",dyn[cnt].d_un.d_val);
                 break;
             case DT_INIT:
                 elfInfo->dynamicInfo.initFunctionAddress=dyn[cnt].d_un.d_ptr;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_INIT",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_INIT",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_FINI:
                 elfInfo->dynamicInfo.termFunctionAddress=dyn[cnt].d_un.d_ptr;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_FINI",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_FINI",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_SONAME:
                 //
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_SONAME",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_SONAME",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_REL:
                 //Can't find the relocation section this way, using section headers
                 //elfInfo->dynamicInfo.relTableAddress=dyn[cnt].d_un.d_ptr;
-                //printk("%s: Found DT_REL, address=0x%08X (0x%08X)\n",isLibrary?"library":"executable",dyn[cnt].d_un.d_ptr,elfInfo->dynamicInfo.relTableAddress);
+                //printk("%s: Found DT_REL, address=0x%08x (0x%08x)\n",isLibrary?"library":"executable",dyn[cnt].d_un.d_ptr,elfInfo->dynamicInfo.relTableAddress);
                 break;
             case DT_RELSZ:
                 elfInfo->dynamicInfo.relTableSize=dyn[cnt].d_un.d_val;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_RELSZ",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_RELSZ",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_RELENT:
                 elfInfo->dynamicInfo.relEntrySize=dyn[cnt].d_un.d_val;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_RELENT",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_RELENT",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_PLTREL:
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_PLTREL",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_PLTREL",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_TEXTREL:
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_TEXTREL",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_TEXTREL",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_JMPREL:
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_JMPREL",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_JMPREL",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_BIND_NOW:
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_BIND_NOW",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_BIND_NOW",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_INIT_ARRAY:
                 elfInfo->dynamicInfo.initFunctionAddress=dyn[cnt].d_un.d_ptr;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_INIT_ARRAY",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_INIT_ARRAY",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_FINI_ARRAY:
                 elfInfo->dynamicInfo.termFunctionAddress=dyn[cnt].d_un.d_ptr;
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_FIN_ARRAY",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_FIN_ARRAY",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_INIT_ARRAYSZ:
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_INIT_ARRYSZ",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_INIT_ARRYSZ",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_FINI_ARRAYSZ:
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_FINI_ARRAYSZ",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_FINI_ARRAYSZ",dyn[cnt].d_un.d_ptr);
                 break;
             case DT_FLAGS:
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08X\n","DT_FLAGS",dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag '%s', pointer=0x%08x\n","DT_FLAGS",dyn[cnt].d_un.d_ptr);
                 break;
             default:
-                printd(DEBUG_ELF_LOADER,"Found dynamic tag (0x%08x), pointer=0x%08X\n",dyn[cnt].d_tag,dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Found dynamic tag (0x%08x), pointer=0x%08x\n",dyn[cnt].d_tag,dyn[cnt].d_un.d_ptr);
                 break;
         }
     }
@@ -306,7 +308,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
 
 void addElfLoadInfo(elfInfo_t* elf, uint32_t startVirt, uint32_t startPhys, uint32_t pages)
 {
-    printd(DEBUG_ELF_LOADER,"addElfLoadInfo(0x%08X, 0x%08X, 0x%08X, 0x%08X)\n",elf, startPhys, startVirt, pages);
+    printd(DEBUG_ELF_LOADER,"addElfLoadInfo(0x%08x, 0x%08x, 0x%08x, 0x%08x)\n",elf, startPhys, startVirt, pages);
     if (pages==0)
         pages=1;
     elfPageInfo_t* pi=elf->elfLoadedPages;
@@ -325,7 +327,7 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
     int totalLeftToWrite=size;
     while(totalLeftToWrite>0)
     {
-        printd(DEBUG_ELF_LOADER,"putDataOnPages: Bytes left to go: 0x%08X\n",totalLeftToWrite);
+        printd(DEBUG_ELF_LOADER,"putDataOnPages: Bytes left to go: 0x%08x\n",totalLeftToWrite);
         //If either the write doesn't start at the beginning of the page, or there is less than a page left to write
         if ((startVirtAddr%PAGE_SIZE!=0) || (totalLeftToWrite < PAGE_SIZE))
         {
@@ -333,30 +335,30 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
                 countToWrite=PAGE_SIZE-(startVirtAddr%PAGE_SIZE);
             else
                 countToWrite=totalLeftToWrite;
-            printd(DEBUG_ELF_LOADER,"putDataOnPages: Non-aligned or not full page write, writing 0x%08X bytes to 0x%08X\n",countToWrite,startVirtAddr);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: Non-aligned or not full page write, writing 0x%08x bytes to 0x%08x\n",countToWrite,startVirtAddr);
         }
         else
         {
                 countToWrite=PAGE_SIZE;
-                printd(DEBUG_ELF_LOADER,"putDataOnPages: Full page write, writing 1 page to 0x%08X\n",startVirtAddr);
+                printd(DEBUG_ELF_LOADER,"putDataOnPages: Full page write, writing 1 page to 0x%08x\n",startVirtAddr);
         }
         
         //find out if page is mapped
-        //printd(DEBUG_ELF_LOADER,"isPageMapped returning %s for startVirtAddr=0x%08X\n",isPageMapped(CR3,startVirtAddr)==true?"true":"false",startVirtAddr);
+        //printd(DEBUG_ELF_LOADER,"isPageMapped returning %s for startVirtAddr=0x%08x\n",isPageMapped(CR3,startVirtAddr)==true?"true":"false",startVirtAddr);
         if (isPageMapped(CR3,startVirtAddr))
         {
             startPhysAddr=pagingGet4kPTEntryValueCR3(CR3,startVirtAddr) & 0xFFFFF000;  //Clear the last 3 bytes of the 
             startPhysAddr |= (startVirtAddr & 0x00000FFF);
-            printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08X already mapped to P=0x%08X\n",startVirtAddr,startPhysAddr);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08x already mapped to P=0x%08x\n",startVirtAddr,startPhysAddr);
         }
         else
         {
             startPhysAddr=(uintptr_t)allocPages(countToWrite) | (startVirtAddr & 0x00000FFF);
             pagingMapPage(CR3,startVirtAddr,startPhysAddr,0x7);
-            printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08X not mapped, mapped to P=0x%08X (CR3=0x%08X)\n",startVirtAddr,startPhysAddr,CR3);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08x not mapped, mapped to P=0x%08x (CR3=0x%08x)\n",startVirtAddr,startPhysAddr,CR3);
             pagingMapPage(previousCR3,startVirtAddr,startPhysAddr,0x7);
             pagingMapPage(previousCR3,startPhysAddr,startPhysAddr,0x7);
-            printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08X also mapped to KP=0x%08X (CR3=0x%08X)\n",startVirtAddr,startPhysAddr,previousCR3);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08x also mapped to KP=0x%08x (CR3=0x%08x)\n",startVirtAddr,startPhysAddr,previousCR3);
             addElfLoadInfo(elf, startVirtAddr & 0xFFFFF000, startPhysAddr & 0xFFFFF000, countToWrite/PAGE_SIZE);
         }
         //if page is not mapped, map it!
@@ -365,16 +367,16 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
         {
             //fl_fread((void*)startPhysAddr, 1, countToWrite, file);
             fs_read(NULL, file, (void*)startPhysAddr, 1, countToWrite);
-            printd(DEBUG_ELF_LOADER,"putDataOnPages: Reading %u bytes to 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: Reading %u bytes to 0x%08x (0x%08x)\n",countToWrite,startVirtAddr,startPhysAddr);
         }
         else
         {
             memset((void*)startPhysAddr,nonFileWriteValue,countToWrite);
-            printd(DEBUG_ELF_LOADER,"putDataOnPages: Zeroed %u bytes at 0x%08X (0x%08X)\n",countToWrite,startVirtAddr,startPhysAddr);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages: Zeroed %u bytes at 0x%08x (0x%08x)\n",countToWrite,startVirtAddr,startPhysAddr);
         }
         //Decrement the total left to write by the count written
         totalLeftToWrite-=countToWrite;
-        printd(DEBUG_ELF_LOADER,"putDataOnPages: Page written, 0x%08X bytes left to go\n",totalLeftToWrite);
+        printd(DEBUG_ELF_LOADER,"putDataOnPages: Page written, 0x%08x bytes left to go\n",totalLeftToWrite);
         startVirtAddr+=countToWrite;
         startPhysAddr+=countToWrite;
     }
@@ -409,7 +411,7 @@ bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFr
         if (countToWrite==0)
         {
             startPhysAddr=(pagingGet4kPTEntryValueCR3(CR3,startVirtAddr) & 0xFFFFF000) | (startVirtAddr&0x00000FFF);  //Clear the last 3 bytes of the 
-            printd(DEBUG_ELF_LOADER,"putDataOnPages2: Entire write area (startVirtAddr=0x%08X) already mapped.  %s 0x%08X bytes to 0x%08X\n",startVirtAddr, writeFromFile?"Writing":"Zeroing", size, startPhysAddr);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages2: Entire write area (startVirtAddr=0x%08x) already mapped.  %s 0x%08x bytes to 0x%08x\n",startVirtAddr, writeFromFile?"Writing":"Zeroing", size, startPhysAddr);
             if (writeFromFile)
                 //fl_fread((void*)startPhysAddr, size, 1, file);
                 fs_read(NULL, file, (void*)startPhysAddr, size, 1);
@@ -419,19 +421,19 @@ bool putDataOnPages2(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFr
         }
         else
         {
-            printd(DEBUG_ELF_LOADER,"putDataOnPages2: Entire area starting at 0x%08X for 0x%08X bytes isn't mapped, falling back to putDataOnPages\n",startVirtAddr,size);
+            printd(DEBUG_ELF_LOADER,"putDataOnPages2: Entire area starting at 0x%08x for 0x%08x bytes isn't mapped, falling back to putDataOnPages\n",startVirtAddr,size);
             return putDataOnPages(CR3, virtAddr, file, writeFromFile, size, nonFileWriteValue, mapOnly, elf);   //Everything is not mapped, fallback to page-at-a-time strategy
         }
     }
     else        //alloc, map, write
     {
         startPhysAddr=(uintptr_t)allocPages(size+(PAGE_SIZE-(size%PAGE_SIZE))) | (startVirtAddr & 0x00000FFF);
-        printd(DEBUG_ELF_LOADER,"Mapping v=0x%08X to p=0x%08X via cr3=0x%08X\n",startVirtAddr,startPhysAddr,CR3);
+        printd(DEBUG_ELF_LOADER,"Mapping v=0x%08x to p=0x%08x via cr3=0x%08x\n",startVirtAddr,startPhysAddr,CR3);
         pagingMapPageCount(CR3, startVirtAddr, startPhysAddr, (size/PAGE_SIZE)+1, 0x7, true);
-        printd(DEBUG_ELF_LOADER,"Also mapping v=0x%08X to p=0x%08X via cr3=0x%08X\n",startVirtAddr,startPhysAddr,KERNEL_CR3);
+        printd(DEBUG_ELF_LOADER,"Also mapping v=0x%08x to p=0x%08x via cr3=0x%08x\n",startVirtAddr,startPhysAddr,KERNEL_CR3);
         pagingMapPageCount(KERNEL_CR3, startPhysAddr, startPhysAddr, (size/PAGE_SIZE)+1, 0x7, true);
         pagingMapPageCount(KERNEL_CR3, startVirtAddr, startPhysAddr, (size/PAGE_SIZE)+1, 0x7, true);
-        printd(DEBUG_ELF_LOADER,"putDataOnPages2: %s 0x%08X bytes to v=0x%08X/p=0x%08X\n",writeFromFile?"Writing":"Zeroing",size, startVirtAddr,startPhysAddr);
+        printd(DEBUG_ELF_LOADER,"putDataOnPages2: %s 0x%08x bytes to v=0x%08x/p=0x%08x\n",writeFromFile?"Writing":"Zeroing",size, startVirtAddr,startPhysAddr);
         addElfLoadInfo(elf, startVirtAddr & 0xFFFFF000, startPhysAddr & 0xFFFFF000, size+(PAGE_SIZE-(size%PAGE_SIZE)));
         if (writeFromFile)
             //fl_fread((void*)startPhysAddr, size, 1, file);
@@ -488,20 +490,20 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
     elfInfo->secHdrRecordCount= elfInfo->hdr.e_shnum;
 
     printd(DEBUG_ELF_LOADER,"e_shentsize=%u, oursize=%u\n", elfInfo->hdr.e_shentsize, sizeof(Elf32_Shdr) );
-    printd(DEBUG_ELF_LOADER,"seeking to 0x%08X ...",elfInfo->hdr.e_shoff);
+    printd(DEBUG_ELF_LOADER,"seeking to 0x%08x ...",elfInfo->hdr.e_shoff);
     fs_seek(file, elfInfo->hdr.e_shoff,SEEK_SET);
-    printd(DEBUG_ELF_LOADER,"reading SHOFF: 0x%08X bytes (s=0x%08X*n=0x%08X), to 0x%08X\n",elfInfo->hdr.e_shentsize*elfInfo->hdr.e_shnum,elfInfo->hdr.e_shentsize,elfInfo->hdr.e_shnum,elfInfo->secHdrTable);
+    printd(DEBUG_ELF_LOADER,"reading SHOFF: 0x%08x bytes (s=0x%08x*n=0x%08x), to 0x%08x\n",elfInfo->hdr.e_shentsize*elfInfo->hdr.e_shnum,elfInfo->hdr.e_shentsize,elfInfo->hdr.e_shnum,elfInfo->secHdrTable);
     //fl_fread(elfInfo->secHdrTable, elfInfo->hdr.e_shentsize,elfInfo->hdr.e_shnum,file);
     fs_read(NULL, file, elfInfo->secHdrTable, elfInfo->hdr.e_shentsize, elfInfo->hdr.e_shnum);
     //Get the program header table
-    printd(DEBUG_ELF_LOADER,"seeking to 0x%08X ...",elfInfo->hdr.e_phoff);
-    printd(DEBUG_ELF_LOADER,"reading PHOFF: 0x%08X bytes (s=0x%08X*n=0x%08X), to 0x%08X\n",elfInfo->hdr.e_phentsize*elfInfo->hdr.e_phnum,elfInfo->hdr.e_phentsize,elfInfo->hdr.e_phnum,elfInfo->pgmHdrTable);
+    printd(DEBUG_ELF_LOADER,"seeking to 0x%08x ...",elfInfo->hdr.e_phoff);
+    printd(DEBUG_ELF_LOADER,"reading PHOFF: 0x%08x bytes (s=0x%08x*n=0x%08x), to 0x%08x\n",elfInfo->hdr.e_phentsize*elfInfo->hdr.e_phnum,elfInfo->hdr.e_phentsize,elfInfo->hdr.e_phnum,elfInfo->pgmHdrTable);
     fs_seek(file, elfInfo->hdr.e_phoff, SEEK_SET);
     //fl_fread(elfInfo->pgmHdrTable, elfInfo->hdr.e_phentsize,elfInfo->hdr.e_phnum,file);
     fs_read(NULL, file, elfInfo->pgmHdrTable, elfInfo->hdr.e_phentsize, elfInfo->hdr.e_phnum);
     //Process the program header table and load all of the sections in the file into memory
 //    char dumpPCmdLine[100];
-//    sprintf(dumpPCmdLine,"x /100bx 0x%08X v",&elfInfo->pgmHdrTable[0]);
+//    sprintf(dumpPCmdLine,"x /100bx 0x%08x v",&elfInfo->pgmHdrTable[0]);
 //    dumpP(dumpPCmdLine);
     for (int pgmSectionNum=0;pgmSectionNum<elfInfo->hdr.e_phnum;pgmSectionNum++)
     {
@@ -514,23 +516,23 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
 
         if (virtualLoadAddress==(uint32_t)&KERNEL_DATA_LOAD_ADDRESS)
         {
-            printd(DEBUG_ELF_LOADER,"Section %u load address is kernel data base address (0x%08X), skipping load\n",pgmSectionNum,virtualLoadAddress);
+            printd(DEBUG_ELF_LOADER,"Section %u load address is kernel data base address (0x%08x), skipping load\n",pgmSectionNum,virtualLoadAddress);
             continue;
         }
         else if (elfInfo->pgmHdrTable[pgmSectionNum].p_offset==elfInfo->hdr.e_phoff)
         {
-            printd(DEBUG_ELF_LOADER,"Section %u file offset is program header address (0x%08X),skipping load\n",pgmSectionNum,elfInfo->pgmHdrTable[pgmSectionNum].p_offset);
+            printd(DEBUG_ELF_LOADER,"Section %u file offset is program header address (0x%08x),skipping load\n",pgmSectionNum,elfInfo->pgmHdrTable[pgmSectionNum].p_offset);
             continue;
         }
         if (virtualLoadAddress!=0 && elfInfo->libLoadAddress==0 && (elfInfo->hdr.e_type!=ET_REL && elfInfo->hdr.e_type!=ET_DYN))
         {
             elfInfo->libLoadAddress=(uintptr_t)virtualLoadAddress;
-            printd(DEBUG_ELF_LOADER,"Setting main load address to 0x%08X\n",virtualLoadAddress);
+            printd(DEBUG_ELF_LOADER,"Setting main load address to 0x%08x\n",virtualLoadAddress);
             
         }
         if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz>0)
         {
-            printd(DEBUG_ELF_LOADER,"Section %u, load fsize=0x%04X,msize=0x%04X to 0x%08X, seeking to 0x%08X ...\n",
+            printd(DEBUG_ELF_LOADER,"Section %u, load fsize=0x%04X,msize=0x%04X to 0x%08x, seeking to 0x%08x ...\n",
                     pgmSectionNum,
                     elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
                     elfInfo->pgmHdrTable[pgmSectionNum].p_memsz,
@@ -543,11 +545,11 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
             if (!putDataOnPages(CR3, virtualLoadAddress, file, true, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 0, elfInfo->mapMemoryOnly, elfInfo))
                 return false;
             
-            printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08X bytes at 0x%08X\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, virtualLoadAddress);
+            printd(DEBUG_ELF_LOADER,"Section %u loaded 0x%08x bytes at 0x%08x\n", pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, virtualLoadAddress);
             
             if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz<elfInfo->pgmHdrTable[pgmSectionNum].p_memsz)
             {
-                printd(DEBUG_ELF_LOADER,"Section %u has uninitialized data (msize>fsize), zeroing 0x%08X bytes at 0x%08X\n", 
+                printd(DEBUG_ELF_LOADER,"Section %u has uninitialized data (msize>fsize), zeroing 0x%08x bytes at 0x%08x\n", 
                         pgmSectionNum, 
                         elfInfo->pgmHdrTable[pgmSectionNum].p_memsz-elfInfo->pgmHdrTable[pgmSectionNum].p_filesz, 
                         virtualLoadAddress+elfInfo->pgmHdrTable[pgmSectionNum].p_filesz);
@@ -563,13 +565,13 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
         }
         else if (elfInfo->pgmHdrTable[pgmSectionNum].p_memsz>0)
         {
-            printd(DEBUG_ELF_LOADER,"Section %u not loadable (fsize=0,msize>0), zeroed 0x%08X bytes at 0x%08X\n",pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, virtualLoadAddress);
+            printd(DEBUG_ELF_LOADER,"Section %u not loadable (fsize=0,msize>0), zeroed 0x%08x bytes at 0x%08x\n",pgmSectionNum, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, virtualLoadAddress);
             putDataOnPages(CR3, virtualLoadAddress, NULL, false, elfInfo->pgmHdrTable[pgmSectionNum].p_memsz, 0, elfInfo->mapMemoryOnly, elfInfo);
             
         }
 #ifndef DEBUG_NONE
         else
-            printd(DEBUG_ELF_LOADER,"Section %u @ 0x%08X : file/mem sizes=0x%X/0x%X, not loading\n", 
+            printd(DEBUG_ELF_LOADER,"Section %u @ 0x%08x : file/mem sizes=0x%X/0x%X, not loading\n", 
                     pgmSectionNum, 
                     &elfInfo->pgmHdrTable[pgmSectionNum],
                     elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
@@ -620,7 +622,7 @@ uint32_t elfLookUpSymVal(elfInfo_t* elf, char* symName)
             strcpy(symNameToLinkTo,strTabEntry(lib->symStrTabLink, lib, symToFind->st_name));
             if (strncmp(symNameToLinkTo, symName,255)==0)
             {
-                printd(DEBUG_ELF_LOADER,"elfLookupSymVal: Found symbol '%s', value=0x%08X\n",symNameToLinkTo,symToFind->st_value);
+                printd(DEBUG_ELF_LOADER,"elfLookupSymVal: Found symbol '%s', value=0x%08x\n",symNameToLinkTo,symToFind->st_value);
                 return symToFind->st_value;
             }
         }
@@ -637,7 +639,7 @@ void elfDumpSymbols(elfInfo_t* elf)
     for (int symNum=0;symNum<elf->symTableRecordCount;symNum++)
     {
         symToFind=&elf->symTable[symNum];
-        printd(DEBUG_ELF_LOADER,"\t%u: %s @ 0x%08X (size=0x%08X)\n",symNum,strTabEntry(elf->symStrTabLink, elf, symToFind->st_name),symToFind->st_value, symToFind->st_size);
+        printd(DEBUG_ELF_LOADER,"\t%u: %s @ 0x%08x (size=0x%08x)\n",symNum,strTabEntry(elf->symStrTabLink, elf, symToFind->st_name),symToFind->st_value, symToFind->st_size);
     }
     printd(DEBUG_ELF_LOADER,"Done dumping ELF Symbol Table\n");
 }
@@ -647,38 +649,38 @@ static int elf_relocate(elfInfo_t* elf) {
     uint32_t symValPtr;
 
     LOAD_ZERO_BASED_DS
-    printd(DEBUG_ELF_LOADER,"Processing relocation (REL) table at 0x%08X, record count=0x%08X\n",elf->dynamicInfo.relTable, elf->dynamicInfo.relTableSize/sizeof(Elf32_Rel));
+    printd(DEBUG_ELF_LOADER,"Processing relocation (REL) table at 0x%08x, record count=0x%08x\n",elf->dynamicInfo.relTable, elf->dynamicInfo.relTableSize/sizeof(Elf32_Rel));
     printd(DEBUG_ELF_LOADER, "NOTE: Only processing REL tables, TODO: process RELA tables\n");
     if (elf->dynamicInfo.relTableSize>0)
     {
         for (int cnt=0;cnt<(elf->dynamicInfo.relTableSize / sizeof(Elf32_Rel))+1;cnt++)
         {
             relEntry=&elf->dynamicInfo.relTable[cnt];
-                printd(DEBUG_ELF_LOADER,"Found relocation entry type 0x%02X with offset 0x%08X, dynamic symbol table entry 0x%02X\n",
+                printd(DEBUG_ELF_LOADER,"Found relocation entry type 0x%02X with offset 0x%08x, dynamic symbol table entry 0x%02X\n",
                         ELF32_R_TYPE(relEntry->r_info), 
                         relEntry->r_offset,
                         ELF32_R_SYM(relEntry->r_info));
             if (ELF32_R_SYM(relEntry->r_info) != SHN_UNDEF)
             {
                 //NOTE: I don't know why I had to subtract 1 from the entry number
-                printd(DEBUG_ELF_LOADER," Getting symbol entry number from 0x%08X\n",&elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value);
+                printd(DEBUG_ELF_LOADER," Getting symbol entry number from 0x%08x\n",&elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value);
                 uint32_t symEntryNum=elf->symTable[ELF32_R_SYM(relEntry->r_info)].st_value;
                 Elf32_Sym* sym = (Elf32_Sym*)(elf->dynamicSymbolAddress+((ELF32_R_SYM(relEntry->r_info))*sizeof(Elf32_Sym)));
-/*                printd(DEBUG_ELF_LOADER,"sizeof Elf32_Sym=0x%08X, symTable=0x%08X, symEntryNum=0x%04X, symPtr=0x%08X, base+symPtr=0x%08X\n",
+/*                printd(DEBUG_ELF_LOADER,"sizeof Elf32_Sym=0x%08x, symTable=0x%08x, symEntryNum=0x%04X, symPtr=0x%08x, base+symPtr=0x%08x\n",
                         sizeof(Elf32_Sym), 
                         elf->dynamicSymbolAddress,
                         symEntryNum,
                         (symEntryNum*sizeof(Elf32_Sym)),
                         elf->dynamicSymbolAddress+(symEntryNum*sizeof(Elf32_Sym)));
 */                symValPtr=sym->st_value;
-                printd(DEBUG_ELF_LOADER," Symbol Name '%s', Symbol value=0x%08X (addr=0x%08X)\n",
+                printd(DEBUG_ELF_LOADER," Symbol Name '%s', Symbol value=0x%08x (addr=0x%08x)\n",
                         strTabEntry(elf->dynamicNameStringTable,elf,sym->st_name), 
                         symValPtr,
                         sym);
                 if (symValPtr==0)
                     symValPtr=elfLookUpSymVal(elf,strTabEntry(elf->dynamicNameStringTable,elf,sym->st_name));
                 uint32_t* rel=relEntry->r_offset;
-                printd(DEBUG_ELF_LOADER," Writing 0x%08X to memory address 0x%08X.\n\tValue before/after=0x%08X/ ",symValPtr,rel,*rel);
+                printd(DEBUG_ELF_LOADER," Writing 0x%08x to memory address 0x%08x.\n\tValue before/after=0x%08x/ ",symValPtr,rel,*rel);
                 switch(ELF32_R_TYPE(relEntry->r_info)) {
 		case R_386_NONE:
                     // No relocation
@@ -687,16 +689,16 @@ static int elf_relocate(elfInfo_t* elf) {
                 case R_386_GLOB_DAT:        //CLR 03/24/2017: Added glob dat
                     // Symbol + Offset
                     *rel = DO_386_32(symValPtr, *rel);
-                    printd(DEBUG_ELF_LOADER,"0x%08X (using R_386_32)\n",*rel);
+                    printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_32)\n",*rel);
                     break;
                 case R_386_JMP_SLOT:
                     *rel = symValPtr;
-                    printd(DEBUG_ELF_LOADER,"0x%08X (using R_386_JMP_SLOT)\n",*rel);
+                    printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_JMP_SLOT)\n",*rel);
                     break;
 		case R_386_PC32:
                     // Symbol + Offset - Section Offset
                     *rel = DO_386_PC32(symValPtr, *rel, (int)rel);
-                    printd(DEBUG_ELF_LOADER,"0x%08X (using R_386_PC32)\n",*rel);
+                    printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_PC32)\n",*rel);
                     break;
 		default:
 			// Relocation type not supported, display error and return
@@ -733,7 +735,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     memset(&elfInfo->dynamicInfo,0,sizeof(elfDynamic_t));
     elfInfo->elfLoadedPages=allocPagesAndMap(PAGE_SIZE);
     memset(elfInfo->elfLoadedPages,0,PAGE_SIZE);
-    printd(DEBUG_ELF_LOADER,"alloc'd elfLoadPages @ 0x%08X\n",elfInfo->elfLoadedPages);
+    printd(DEBUG_ELF_LOADER,"alloc'd elfLoadPages @ 0x%08x\n",elfInfo->elfLoadedPages);
     //NOTE: Any elfInfo_t added to the kLoadedElfInfo list must exist (not be free()d until after it is removed from the list!
     if (kLoadedElfInfo->next==0)
         kLoadedElfInfo=listInit(&elfInfo->loadedListItem,elfInfo);
@@ -774,26 +776,26 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         {
             fs_seek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
             elfInfo->dynamicInfo.strTableAddress[cnt]=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
-            printd(DEBUG_ELF_LOADER,"Mapping string table @ 0x%08X (0x%08X) for 0x%08X bytes into kernel\n",
+            printd(DEBUG_ELF_LOADER,"Mapping string table @ 0x%08x (0x%08x) for 0x%08x bytes into kernel\n",
                     elfInfo->dynamicInfo.strTableAddress[cnt], 
                     (uint32_t)(elfInfo->dynamicInfo.strTableAddress[cnt]) | KERNEL_PAGED_BASE_ADDRESS,
                     elfInfo->secHdrTable[cnt].sh_size/0x1000+0x1000);
             elfInfo->dynamicInfo.strTableName[cnt]=elfInfo->secHdrTable[cnt].sh_name;
             //uint32_t lResult=fl_fread((char*)elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,1,fPtr);
             uint32_t lResult=fs_read(NULL, fPtr, (char*)elfInfo->dynamicInfo.strTableAddress[cnt], elfInfo->secHdrTable[cnt].sh_size, 1);
-            printd(DEBUG_ELF_LOADER,"Reading string table to 0x%08X, 0x%08X bytes, result=0x%08X\n",elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,lResult);
+            printd(DEBUG_ELF_LOADER,"Reading string table to 0x%08x, 0x%08x bytes, result=0x%08x\n",elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,lResult);
             elfInfo->dynamicInfo.strTableFilePtr[cnt]=elfInfo->secHdrTable[cnt].sh_offset;
             elfInfo->dynamicInfo.strTableSize[cnt]=elfInfo->secHdrTable[cnt].sh_size;
             tabCount++;
             //break;
         }
     }    
-    printd(DEBUG_ELF_LOADER,"Found %u string tables, index of section header table=0x%08X\n",tabCount,elfInfo->sectionNameStringTable);
+    printd(DEBUG_ELF_LOADER,"Found %u string tables, index of section header table=0x%08x\n",tabCount,elfInfo->sectionNameStringTable);
     for (int cnt=0;cnt<50;cnt++)
     {
         if (elfInfo->dynamicInfo.strTableName[cnt])
         {
-                printd(DEBUG_ELF_LOADER,"Found string (STRTAB) table 0x%04X named %s, read to address 0x%08X, size=0x%08X\n",
+                printd(DEBUG_ELF_LOADER,"Found string (STRTAB) table 0x%04X named %s, read to address 0x%08x, size=0x%08x\n",
                 cnt,
                 strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),
                 elfInfo->dynamicInfo.strTableAddress[cnt], elfInfo->dynamicInfo.strTableSize[cnt]);
@@ -822,13 +824,13 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
             fs_read(NULL, fPtr, elfInfo->symTable, elfInfo->secHdrTable[cnt].sh_size, 1);
             elfInfo->symTableRecordCount=(elfInfo->secHdrTable[cnt].sh_size / sizeof(Elf32_Sym));
             elfInfo->symStrTabLink=elfInfo->secHdrTable[cnt].sh_link;
-            printd(DEBUG_ELF_LOADER,"Found symbol table (SYMTAB) using string table 0x%02X, read %u bytes to 0x%08X\n",elfInfo->symStrTabLink,elfInfo->secHdrTable[cnt].sh_size, elfInfo->symTable);
+            printd(DEBUG_ELF_LOADER,"Found symbol table (SYMTAB) using string table 0x%02X, read %u bytes to 0x%08x\n",elfInfo->symStrTabLink,elfInfo->secHdrTable[cnt].sh_size, elfInfo->symTable);
         }
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_DYNAMIC)
         {
             elfInfo->dynamicSectionAddress=elfInfo->secHdrTable[cnt].sh_addr;
             elfInfo->dynamicRecordCount=elfInfo->secHdrTable[cnt].sh_size/sizeof(Elf32_Dyn);
-            printd(DEBUG_ELF_LOADER,"Found section %s (DYNAMIC) table address 0x%08X.\n",
+            printd(DEBUG_ELF_LOADER,"Found section %s (DYNAMIC) table address 0x%08x.\n",
                     strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
                     elfInfo->dynamicSectionAddress);
         }
@@ -836,7 +838,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         {
             elfInfo->dynamicSymbolAddress=elfInfo->secHdrTable[cnt].sh_addr;
             elfInfo->dynamicSymbolRecordCount=elfInfo->secHdrTable[cnt].sh_size/sizeof(Elf32_Dyn);
-            printd(DEBUG_ELF_LOADER,"Found %s (DYNSYM) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
+            printd(DEBUG_ELF_LOADER,"Found %s (DYNSYM) section address 0x%08x.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
         }
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_RELA)
         {
@@ -845,7 +847,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
             elfInfo->dynamicInfo.relATableSize=elfInfo->secHdrTable[cnt].sh_size;
             //fl_fread(elfInfo->dynamicInfo.relATable,elfInfo->dynamicInfo.relATableSize,1,fPtr);
             fs_read(NULL, fPtr, elfInfo->dynamicInfo.relATable, elfInfo->dynamicInfo.relATableSize, 1);
-            printd(DEBUG_ELF_LOADER,"Found %s (RELA) section, read %u bytes to 0x%08X.\n",
+            printd(DEBUG_ELF_LOADER,"Found %s (RELA) section, read %u bytes to 0x%08x.\n",
                     strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
                     elfInfo->dynamicInfo.relATableSize,
                     elfInfo->dynamicInfo.relATable);
@@ -858,18 +860,18 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
             elfInfo->dynamicInfo.relTable_symTableLink=elfInfo->secHdrTable[cnt].sh_link;
             //fl_fread(elfInfo->dynamicInfo.relTable,elfInfo->secHdrTable[cnt].sh_size,1,fPtr);
             fs_read(NULL, fPtr, elfInfo->dynamicInfo.relTable, elfInfo->secHdrTable[cnt].sh_size, 1);
-            printd(DEBUG_ELF_LOADER,"Found %s (REL) section, read %u bytes to 0x%08X.\n",
+            printd(DEBUG_ELF_LOADER,"Found %s (REL) section, read %u bytes to 0x%08x.\n",
                     strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),
                     elfInfo->dynamicInfo.relTableSize,
                     elfInfo->dynamicInfo.relTable);
         }
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_HASH)
         {
-            printd(DEBUG_ELF_LOADER,"Found %s (HASH) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
+            printd(DEBUG_ELF_LOADER,"Found %s (HASH) section address 0x%08x.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
         }
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_NOTE)
         {
-            printd(DEBUG_ELF_LOADER,"Found %s (NOTE) section address 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
+            printd(DEBUG_ELF_LOADER,"Found %s (NOTE) section address 0x%08x.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_addr);
         }
         else if (elfInfo->secHdrTable[cnt].sh_type==SHT_NOBITS || elfInfo->secHdrTable[cnt].sh_type==SHT_PROGBITS)
         {
@@ -879,7 +881,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
 
             if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".bss",255)==0)
             {
-                printd(DEBUG_ELF_LOADER,"Found bss segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                printd(DEBUG_ELF_LOADER,"Found bss segment, address 0x%08x, size 0x%08x.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
                 elfInfo->bssAddress=elfInfo->secHdrTable[cnt].sh_addr;
                 elfInfo->bssSize=elfInfo->secHdrTable[cnt].sh_size;
                 if (elfInfo->isLibrary)
@@ -890,7 +892,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
             }
             else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".data",255)==0)
             {
-                printd(DEBUG_ELF_LOADER,"Found data segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                printd(DEBUG_ELF_LOADER,"Found data segment, address 0x%08x, size 0x%08x.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
                 elfInfo->dataAddress=elfInfo->secHdrTable[cnt].sh_addr;
                 elfInfo->dataSize=elfInfo->secHdrTable[cnt].sh_size;
                 if (elfInfo->isLibrary)
@@ -900,7 +902,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
             }
             else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),".tdata",255)==0)
             {
-                printd(DEBUG_ELF_LOADER,"Found tdata segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                printd(DEBUG_ELF_LOADER,"Found tdata segment, address 0x%08x, size 0x%08x.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
                 elfInfo->tdataAddress=elfInfo->secHdrTable[cnt].sh_addr;
                 elfInfo->tdataSize=elfInfo->secHdrTable[cnt].sh_size;
                 if (elfInfo->isLibrary)
@@ -912,10 +914,10 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
             {
                 elfInfo->textAddress=elfInfo->secHdrTable[cnt].sh_addr;
                 elfInfo->textSize=elfInfo->secHdrTable[cnt].sh_size;
-                printd(DEBUG_ELF_LOADER,"Found text segment, address 0x%08X, size 0x%08X.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                printd(DEBUG_ELF_LOADER,"Found text segment, address 0x%08x, size 0x%08x.\n",elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
             }
             else
-                printd(DEBUG_ELF_LOADER,"Found (%s) (NOBITS) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+                printd(DEBUG_ELF_LOADER,"Found (%s) (NOBITS) section (type=0x%08x)address 0x%08x, size 0x%08x.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
 
             if (sectionIsCOW)
             {
@@ -925,7 +927,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
         }
         else
         {
-            printd(DEBUG_ELF_LOADER,"Found (%s) section (type=0x%08X)address 0x%08X, size 0x%08X.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
+            printd(DEBUG_ELF_LOADER,"Found (%s) section (type=0x%08x)address 0x%08x, size 0x%08x.\n",strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->secHdrTable[cnt].sh_name),elfInfo->secHdrTable[cnt].sh_type,elfInfo->secHdrTable[cnt].sh_addr,elfInfo->secHdrTable[cnt].sh_size);
         }
 
     }
@@ -944,7 +946,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     uint32_t err=processELFDynamicSection(elfInfo,CR3);
      if (err)
      {
-         printd(DEBUG_ELF_LOADER,"Failed to process ELF dynamic section, error=0x%08X\n",err);
+         printd(DEBUG_ELF_LOADER,"Failed to process ELF dynamic section, error=0x%08x\n",err);
         fs_close(fPtr);
         elfInfo->loadCompleted=false;
         __asm__("pop ds");                  //clr 09/24/2017: Restore the DS since we blew it up

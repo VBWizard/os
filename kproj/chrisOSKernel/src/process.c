@@ -43,8 +43,10 @@ uintptr_t userCR3=0;
 process_t *getCurrentProcess()
 {
     uint32_t taskNum;
+    process_t* process;
     __asm__("str eax\nshr eax,3\n":"=a" (taskNum)); 
-    return findTaskByTaskNum(taskNum)->process;
+    process = findTaskByTaskNum(taskNum)->process;
+    return process;
 }
 
 
@@ -80,7 +82,7 @@ void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned 
             srcProcess->errno=ERROR_DEST_ADDRESS_NOT_WRITABLE;
         if (srcProcess->errno)
         {
-            printd(DEBUG_PROCESS,"copyToKernel: Error! %d, cr3=0x%08X, src=0x%08X, srcPagedAddress=0x%08X\n",srcProcess->errno,srcCR3, workingSrcAddr, srcPagedAddress);
+            printd(DEBUG_PROCESS,"copyToKernel: Error! %d, cr3=0x%08x, src=0x%08x, srcPagedAddress=0x%08x\n",srcProcess->errno,srcCR3, workingSrcAddr, srcPagedAddress);
             return NULL;
         }
         
@@ -200,7 +202,7 @@ void processStart()
         {
             uint32_t* handlers = (uint32_t*)process->startHandler[lCounter];
             startHandler* x=(void*)handlers[lCounter];
-            printd(DEBUG_PROCESS,"processStart: Executing startHandler %u @ 0x%08X\n",lCounter,process->startHandler[lCounter]);
+            printd(DEBUG_PROCESS,"processStart: Executing startHandler %u @ 0x%08x\n",lCounter,process->startHandler[lCounter]);
             x();
         }
     return;
@@ -218,7 +220,7 @@ void processExit()
         if (process->exitHandler[lCounter]!=NULL)
         {
             exitHandler* x=process->exitHandler[lCounter];
-            printd(DEBUG_PROCESS,"processExit: Executing exitHandler %u @ 0x%08X\n",lCounter,process->exitHandler[lCounter]);
+            printd(DEBUG_PROCESS,"processExit: Executing exitHandler %u @ 0x%08x\n",lCounter,process->exitHandler[lCounter]);
             x();
         }
     //Can't save endTime here because we had to change VADDR to be read-only for ring 3
@@ -236,7 +238,7 @@ bool processRegExit(process_t* process, void* routineAddr)
         if (process->exitHandler[cnt]==NULL)
         {
             process->exitHandler[cnt]=routineAddr;
-            printd(DEBUG_PROCESS,"processRegExit: Registered exitHandler %u @ 0x%08X\n",cnt,process->exitHandler[cnt]);
+            printd(DEBUG_PROCESS,"processRegExit: Registered exitHandler %u @ 0x%08x\n",cnt,process->exitHandler[cnt]);
             return true;
         }
     return false;
@@ -283,19 +285,19 @@ process_t *initializeProcess(bool isKernelProcess)
     //NOTE: Using allocPages instead of malloc because we need the process struct to start on a page boundary for paging reasons, and
     //      allocPages always allocates entire pages
     process=allocPagesAndMap(sizeof(process_t));
-    printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process\n",process);
+    printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08x for process\n",process);
     memset(process,0,sizeof(process_t));
     process->task=createTask(process, isKernelProcess);
     process->pageDirPtr=process->task->tss->CR3;
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;
     process->path=(char*)kMalloc(0x1000); 
-    printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08X for process->path\n",process->path);
+    printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08x for process->path\n",process->path);
     process->cwd=allocPagesAndMap(PAGE_SIZE);
     process->task->process=process;
     process->processSyscallESP=process->task->tss->ESP1;
     process->priority=PROCESS_DEFAULT_PRIORITY;
-    printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08X, p=0x%08X\n",PROCESS_STRUCT_VADDR,process);
+    printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08x, p=0x%08x\n",PROCESS_STRUCT_VADDR,process);
     pagingMapPage(process->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000, 0x5); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
     pagingMapPage(process->task->tss->CR3, process->task, process->task, 0x5);
 
@@ -355,7 +357,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     }
     else
         strcpy(process->path,path);
-    printd(DEBUG_PROCESS,"process->path (0x%08X)=%s\n",process->path,process->path);
+    printd(DEBUG_PROCESS,"process->path (0x%08x)=%s\n",process->path,process->path);
    
     //Always set the elf to NULL, even when useExistingProcess, because we don't want to disturb the paren't elf
     process->elf=NULL;
@@ -521,7 +523,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         }
     }
 
-    //printk("ESP-20=0x%08X, &schedulerEnabled=0x%08X",process->task->tss->ESP+20,&schedulerEnabled);
+    //printk("ESP-20=0x%08x, &schedulerEnabled=0x%08x",process->task->tss->ESP+20,&schedulerEnabled);
     printd(DEBUG_PROCESS,"Setting up the stack\n");
     void* processExitAddress=&processExit;
 
@@ -554,8 +556,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         memcpy((void*)process->task->tss->ESP+16,&process->task->tss->SS,4);
     }
     //Set the return point since the task will simply ret to exit
-    printd(DEBUG_PROCESS,"Return point for process is 0x%08X\n",&processExit);
-    printd(DEBUG_PROCESS,"Created Process @ 0x%08X\n",process);
+    printd(DEBUG_PROCESS,"Return point for process is 0x%08x\n",&processExit);
+    printd(DEBUG_PROCESS,"Created Process @ 0x%08x\n",process);
  
     if (useExistingProcess) //Process is already scheduled if useExistingProcess
     {
@@ -643,8 +645,8 @@ uint32_t process_fork(process_t* currProcess)
     //pagingMapPageCount(newTask->tss->CR3,currProcess->stackStart, newProcess->stackStart,currProcess->stackSize/PAGE_SIZE,0x7);  
     pagingMapPageCount(newTask->tss->CR3,newTask->tss->ESP | KERNEL_PAGED_BASE_ADDRESS,newTask->tss->ESP,0x16,0x7);
     pagingMapPageCount(KERNEL_CR3,newTask->tss->ESP,newTask->tss->ESP,0x16,0x7);
-    printd(DEBUG_PROCESS,"process_fork: Allocated task ESP at 0x%08X (0x%08X bytes)\n",newProcess->stackStart,newProcess->stackSize);
-    printd(DEBUG_PROCESS,"process_fork: Mapped parent's physical stack addresses to virtual in our address space. (0x%08X-0x%08X)\n",currProcess->stackStart, currProcess->stackStart + currProcess->stackSize);
+    printd(DEBUG_PROCESS,"process_fork: Allocated task ESP at 0x%08x (0x%08x bytes)\n",newProcess->stackStart,newProcess->stackSize);
+    printd(DEBUG_PROCESS,"process_fork: Mapped parent's physical stack addresses to virtual in our address space. (0x%08x-0x%08x)\n",currProcess->stackStart, currProcess->stackStart + currProcess->stackSize);
     memcpy(newProcess->stackStart, currProcess->stackStart, currProcess->stackSize);
 */
     
@@ -654,7 +656,7 @@ uint32_t process_fork(process_t* currProcess)
     pagingMapPageCount(newTask->tss->CR3, newProcess->stack1Start, newProcess->stack1Start, currProcess->stack1Size / PAGE_SIZE, 0x7, true);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
     pagingMapPageCount(KERNEL_CR3, newProcess->stack1Start, newProcess->stack1Start, currProcess->stack1Size / PAGE_SIZE, 0x7, true);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
     pagingMapPageCount(newTask->tss->CR3, newProcess->stack1Start | KERNEL_PAGED_BASE_ADDRESS, newProcess->stack1Start, 0x16, 0x7, true);
-    printd(DEBUG_PROCESS,"process_fork: Allocated task ESP1 for syscall at 0x%08X (0x%08X bytes)\n",newProcess->stack1Start,currProcess->stack1Size);
+    printd(DEBUG_PROCESS,"process_fork: Allocated task ESP1 for syscall at 0x%08x (0x%08x bytes)\n",newProcess->stack1Start,currProcess->stack1Size);
     newProcess->task->tss->ESP1 = newProcess->stack1Start + newProcess->stack1Size - 0x1000;
     newProcess->processSyscallESP=newProcess->task->tss->ESP1;
     
@@ -682,33 +684,33 @@ void CoWProcess(process_t* process)
     if (process->elf->textAddress>0)
     {
         sys_mmapI(process, (uintptr_t*)(process->elf->textAddress & 0xFFFFF000), process->elf->textSize, PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-        printd(DEBUG_PROCESS, "\tCoW'd the .text at 0x%08X for 0x%08X bytes\n",process->elf->textAddress, process->elf->textSize);
+        printd(DEBUG_PROCESS, "\tCoW'd the .text at 0x%08x for 0x%08x bytes\n",process->elf->textAddress, process->elf->textSize);
     }
     //CoW the bss segment
     if (process->elf->bssAddress>0)
     {
         sys_mmapI(process, (uintptr_t*)(process->elf->bssAddress & 0xFFFFF000), process->elf->bssSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-        printd(DEBUG_PROCESS, "\tCoW'd the .bss at 0x%08X for 0x%08X bytes\n",process->elf->bssAddress, process->elf->bssSize);
+        printd(DEBUG_PROCESS, "\tCoW'd the .bss at 0x%08x for 0x%08x bytes\n",process->elf->bssAddress, process->elf->bssSize);
     }
     //CoW the data/tata segments
     if (process->elf->dataAddress>0)
     {
         sys_mmapI(process, (uintptr_t*)(process->elf->dataAddress & 0xFFFFF000), process->elf->dataSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-        printd(DEBUG_PROCESS, "\tCoW'd the .data at 0x%08X for 0x%08X bytes\n",process->elf->dataAddress, process->elf->dataSize);
+        printd(DEBUG_PROCESS, "\tCoW'd the .data at 0x%08x for 0x%08x bytes\n",process->elf->dataAddress, process->elf->dataSize);
     }
     if (process->elf->tdataAddress>0)
     {
         sys_mmapI(process, (uintptr_t*)(process->elf->tdataAddress & 0xFFFFF000), process->elf->tdataSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-        printd(DEBUG_PROCESS, "\tCoW'd the .tdata at 0x%08X for 0x%08X bytes\n",process->elf->tdataAddress, process->elf->tdataSize);
+        printd(DEBUG_PROCESS, "\tCoW'd the .tdata at 0x%08x for 0x%08x bytes\n",process->elf->tdataAddress, process->elf->tdataSize);
     }
     //CoW the heap segment
     if (process->heapEnd - process->heapStart > 0)
     {
         sys_mmapI(process, (uintptr_t*)(process->heapStart & 0xFFFFF000), process->heapEnd - process->heapStart, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-        printd(DEBUG_PROCESS, "\tCoW'd the .heap at 0x%08X for 0x%08X bytes\n",process->heapStart, process->heapEnd - process->heapStart);
+        printd(DEBUG_PROCESS, "\tCoW'd the .heap at 0x%08x for 0x%08x bytes\n",process->heapStart, process->heapEnd - process->heapStart);
     }
     sys_mmapI(process, (uintptr_t*)(process->stackStart & 0xFFFFF000), process->stackSize, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-    printd(DEBUG_PROCESS, "\tCoW'd the stack at 0x%08X for 0x%08X bytes\n",process->stackStart, process->stackSize);
+    printd(DEBUG_PROCESS, "\tCoW'd the stack at 0x%08x for 0x%08x bytes\n",process->stackStart, process->stackSize);
 }
 
 void dupPageTables(process_t* newProcess, process_t* currProcess)
@@ -716,7 +718,7 @@ void dupPageTables(process_t* newProcess, process_t* currProcess)
     newProcess->pageDirPtr = (uint32_t)pagingAllocatePagingTablePage();
     memset(newProcess->pageDirPtr, 0, PAGE_SIZE);
     newProcess->task->tss->CR3 = newProcess->pageDirPtr;
-    printd(DEBUG_PROCESS, "\tdupPageTables: Duping page tables from 0x%08X to 0x%08X\n",currProcess->pageDirPtr, newProcess->pageDirPtr);
+    printd(DEBUG_PROCESS, "\tdupPageTables: Duping page tables from 0x%08x to 0x%08x\n",currProcess->pageDirPtr, newProcess->pageDirPtr);
     pagingMapPage(KERNEL_CR3,newProcess->task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,newProcess->task->tss->CR3,0x3);
     pagingMapPage(KERNEL_CR3,newProcess->task->tss->CR3, newProcess->task->tss->CR3,0x3);
     pagingMapPage(newProcess->pageDirPtr,newProcess->task->tss->CR3, newProcess->task->tss->CR3,0x7);
@@ -739,7 +741,7 @@ void dupPageTables(process_t* newProcess, process_t* currProcess)
         if (oldCR3[cr3Ptr] != 0)
         {
             //Create the new page table and a reference to the old one
-            printd(DEBUG_PROCESS,"\tFound PT at 0x%08X to dup (addresses from 0x%08X to 0x%08X\n",&oldCR3[cr3Ptr], cr3Ptr*0x400000, cr3Ptr*0x400000 + 0x3fffff);
+            printd(DEBUG_PROCESS,"\tFound PT at 0x%08x to dup (addresses from 0x%08x to 0x%08x\n",&oldCR3[cr3Ptr], cr3Ptr*0x400000, cr3Ptr*0x400000 + 0x3fffff);
             uint32_t *oldPT = oldCR3[cr3Ptr];
             uint32_t *newPT = pagingAllocatePagingTablePage();
             pagingMapPage(KERNEL_CR3,(uint32_t)newPT | KERNEL_PAGED_BASE_ADDRESS,(uint32_t)newPT | ((uint32_t)oldPT | 0x00000FFF),0x3);
@@ -752,7 +754,7 @@ void dupPageTables(process_t* newProcess, process_t* currProcess)
             //Now iterate the old page table creating entries on the new table where they exist on the old
             //Now dup the page table
             memcpy(newPT, (uint32_t)oldPT & 0xFFFFF000, PAGE_SIZE);
-            printd(DEBUG_PROCESS,"\t\tDup'd PT from 0x%08X to 0x%08X\n",(uint32_t)oldPT & 0xFFFFF000, newPT);
+            printd(DEBUG_PROCESS,"\t\tDup'd PT from 0x%08x to 0x%08x\n",(uint32_t)oldPT & 0xFFFFF000, newPT);
         }
     }
 }

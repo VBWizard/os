@@ -10,6 +10,6 @@ SECTIONS
 	sysEnter_Vector = .;
         /* Begin putting sections at 1 MiB, a conventional place for kernels to be
            loaded at by the bootloader. */
-        . = 0x30000000;
+        . = 0x9f000000;
 }
 

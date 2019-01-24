@@ -33,27 +33,30 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     process_t *p=findTaskByCR3(oldCR3)->process;
 
     //CLR 12/24/2018: Removed sigind's as we don't want to trigger signals, just set their actions
-    printd(DEBUG_SIGNALS,"Handling signal 0x%08X\n",signal);
+    printd(DEBUG_SIGNALS,"Handling signal 0x%08x\n",signal);
+    printd(DEBUG_SIGNALS,"Set signal 0x%08x, action=*0x%08x, sigData=0x%08x\n",signal,sigAction,sigData);
     switch (signal)
     {
         case SIGSEGV:
-            printd(DEBUG_SIGNALS,"Set signal 0x%08X, action=*0x%08X, sigData=0x%08X\n",signal,sigAction,sigData);
             //p->signals.sigind|=SIG_SEGV;
             p->signals.sighandler[SIGSEGV]=sigAction;
             p->signals.sigdata[SIGSEGV]=sigData;
             break; 
         case SIGSLEEP:
-            printd(DEBUG_SIGNALS,"Set signal 0x%08X, action=*0x%08X, sigData=0x%08X\n",signal,sigAction,sigData);
             //p->signals.sigind|=SIG_SLEEP;
             p->signals.sighandler[SIGSLEEP]=sigAction;
             p->signals.sigdata[SIGSLEEP]=sigData;
             triggerScheduler();
             break;
+        case SIGINT:
+            p->signals.sighandler[SIGINT]=sigAction;
+            p->signals.sigdata[SIGINT]=sigData;
+            break;
         default:
-            panic("sys_setsigaction: Unhandled signal 0x%08X, sigAction 0x%08X\n",signal,sigAction);
+            panic("sys_setsigaction: Unhandled signal 0x%08x, sigAction 0x%08x\n",signal,sigAction);
             break;
     }
-    printd(DEBUG_SIGNALS,"Setting CR3 back to 0x%08X\n",oldCR3);
+    printd(DEBUG_SIGNALS,"Setting CR3 back to 0x%08x\n",oldCR3);
     __asm__("mov cr3,eax\nsti\n"::"a" (oldCR3));
 }
 
@@ -69,7 +72,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
     __asm__("str eax\nshr eax,3\n":"=a" (currentTask));
     printd(DEBUG_PROCESS, "current task = 0x%04X\n",currentTask);
     if (!currentTask)
-        panic("Could not find task with CR3 of 0x%08X for signal 0x%08X, sigAction 0x%08X\n",callerCR3,signal,sigAction);
+        panic("Could not find task with CR3 of 0x%08x for signal 0x%08x, sigAction 0x%08x\n",callerCR3,signal,sigAction);
     if (currentTask!=0x17)
     {
         p = getCurrentProcess();
@@ -80,15 +83,15 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
         p = findTaskByCR3(callerCR3)->process;
     }
     
-    printd(DEBUG_SIGNALS, "sys_sigAction2(0x%08X, 0x%08X, 0x%08X, 0x%08X)\n"
+    printd(DEBUG_SIGNALS, "sys_sigAction2(0x%08x, 0x%08x, 0x%08x, 0x%08x)\n"
             ,signal, sigAction, sigData,callerCR3);
-    printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08X, task 0x%04X for cr3 of 0x%08X\n",p,p->task->taskNum,callerCR3);
+    printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08x, task 0x%04X for cr3 of 0x%08x\n",p,p->task->taskNum,callerCR3);
     switch (signal)
     {
         case SIGUSLEEP:    //Put task to sleep until a situation occurs.  For now its only when another task ends
             p->signals.sigind|=SIGUSLEEP;
             p->signals.sigdata[SIGUSLEEP]=sigData;
-            printd(DEBUG_SIGNALS,"Signalling USLEEP for cr3=0x%08X, sigData=0x%08X, sigind=0x%08X\n",callerCR3,sigData,p->signals.sigind);
+            printd(DEBUG_SIGNALS,"Signalling USLEEP for cr3=0x%08x, sigData=0x%08x, sigind=0x%08x\n",callerCR3,sigData,p->signals.sigind);
             triggerScheduler();
             __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
             __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
@@ -109,16 +112,16 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
         case SIGSLEEP:
             p->signals.sigind|=SIGSLEEP;
             p->signals.sigdata[SIGSLEEP]=sigData;
-            printd(DEBUG_SIGNALS,"Signalling SLEEP for task 0x%04X, wakeTicks=0x%08X\n",p->task->taskNum,sigData);
+            printd(DEBUG_SIGNALS,"Signalling SLEEP for task 0x%04X, wakeTicks=0x%08x\n",p->task->taskNum,sigData);
             __asm__("cli\n");
             triggerScheduler();
             __asm__("mov cr3,eax\nsti\n"::"a" (callerCR3));
             __asm__("sti\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\n");      //Halt until the next tick when another task will take its place
             break;
         case SIGSTOP:
-            printd(DEBUG_SIGNALS,"Signalling STOP for task 0x%04X, old sigind=0x%08X, ",p->task->taskNum,p->signals.sigind);
+            printd(DEBUG_SIGNALS,"Signalling STOP for task 0x%04X, old sigind=0x%08x, ",p->task->taskNum,p->signals.sigind);
             p->signals.sigind|=SIGSTOP;
-            printd(DEBUG_SIGNALS,"new sigind=0x%08X\n",p->signals.sigind);
+            printd(DEBUG_SIGNALS,"new sigind=0x%08x\n",p->signals.sigind);
             __asm__("cli\n");
             triggerScheduler();
             printd(DEBUG_SIGNALS,"Scheduler triggered, halting until next tick\n");
@@ -127,7 +130,7 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             printd(DEBUG_SIGNALS,"Process resumed from SIG_STOP");
             break;
         case SIGSEGV:
-            printd(DEBUG_EXCEPTIONS,"Signaling SEGV for cr3=0x%08X, signald before=0x%08X processing signal\n",callerCR3,p->signals.sigind);
+            printd(DEBUG_EXCEPTIONS,"Signaling SEGV for cr3=0x%08x, signald before=0x%08x processing signal\n",callerCR3,p->signals.sigind);
             //No CLI necessary as the exception 0xe handler has already done that
             p->signals.sigind|=SIGSEGV;
             printd(DEBUG_EXCEPTIONS,"Searching for children to SEGV\n");
@@ -143,7 +146,7 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
                     }
                 }
             }
-            printd(DEBUG_EXCEPTIONS,"SEGV signaled for cr3=0x%08X, signald after=0x%08X processing signal\n",callerCR3,p->signals.sigind);
+            printd(DEBUG_EXCEPTIONS,"SEGV signaled for cr3=0x%08x, signald after=0x%08x processing signal\n",callerCR3,p->signals.sigind);
             //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
             return;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
@@ -152,13 +155,13 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             if (!(p->signals.sigmask & (SIGINT)))
             {
                 p->signals.sigind|=SIGINT;
-                printd(DEBUG_EXCEPTIONS,"SIGINT signalled for cr3=0x%08X (signald=0x%08X, sigmask=0x%08X) processing signal\n",callerCR3,p->signals.sigind,p->signals.sigmask);
+                printd(DEBUG_EXCEPTIONS,"SIGINT signalled for cr3=0x%08x (signald=0x%08x, sigmask=0x%08x) processing signal\n",callerCR3,p->signals.sigind,p->signals.sigmask);
             }
             else
-                printd(DEBUG_EXCEPTIONS,"SIGINT signalled for cr3=0x%08X but blocked (sigmask=0x%08X), ignoring signal.\n",callerCR3,p->signals.sigmask);
+                printd(DEBUG_EXCEPTIONS,"SIGINT signalled for cr3=0x%08x but blocked (sigmask=0x%08x), ignoring signal.\n",callerCR3,p->signals.sigmask);
             break;
         default:
-            panic("sys_sigaction2: Unhandled signal 0x%08X, sigAction 0x%08X\n",signal,sigAction);
+            panic("sys_sigaction2: Unhandled signal 0x%08x, sigAction 0x%08x\n",signal,sigAction);
     }
     return NULL;
 }
@@ -172,7 +175,7 @@ void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     __asm__("cli\n");
     __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
 
-    printd(DEBUG_PROCESS,"sys_sigaction(0x%08X,0x%08X,0x%08X,0x%08X)\n",signal,sigAction,sigData,oldCR3);
+    printd(DEBUG_PROCESS,"sys_sigaction(0x%08x,0x%08x,0x%08x,0x%08x)\n",signal,sigAction,sigData,oldCR3);
     void* retVal=sys_sigaction2(signal, sigAction, sigData, oldCR3);
     __asm__("mov cr3,eax\n"::"a" (oldCR3));
     return retVal;
@@ -197,12 +200,12 @@ void sys_masksig(signals signal, bool mask)
 
     process_t *p=findTaskByCR3(oldCR3)->process;
     
-    printd(DEBUG_PROCESS,"sys_masksig: Old sigmask = 0x%08X\n",p->signals.sigmask);
+    printd(DEBUG_PROCESS,"sys_masksig: Old sigmask = 0x%08x\n",p->signals.sigmask);
     if (mask)
         p->signals.sigmask |= signal;
     else
         p->signals.sigmask &= ~(signal);
-    printd(DEBUG_PROCESS,"sys_masksig: New sigmask = 0x%08X\n",p->signals.sigmask);
+    printd(DEBUG_PROCESS,"sys_masksig: New sigmask = 0x%08x\n",p->signals.sigmask);
     
     __asm__("mov cr3,eax\nsti\n"::"a" (oldCR3));
 }
@@ -251,7 +254,7 @@ scanSleep:
             task_t* task=(task_t*)*sleep;
             if (((process_t*)(task->process))->signals.sigdata[SIGSLEEP]<*kTicksSinceStart)
             {
-                printd(DEBUG_SIGNALS,"\tWaking task 0x%04X as wakeTicks (0x%08X) < kTicksSinceStart (0x%08X)\n",task->taskNum,((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
+                printd(DEBUG_SIGNALS,"\tWaking task 0x%04X as wakeTicks (0x%08x) < kTicksSinceStart (0x%08x)\n",task->taskNum,((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
                 changeTaskQueue(task,TASK_RUNNABLE);
                 ((process_t*)(task->process))->signals.sigdata[SIGSLEEP]=0;
                 ((process_t*)(task->process))->signals.sigind&=~SIGSLEEP;

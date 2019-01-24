@@ -36,18 +36,18 @@ void printList(dllist_t* listHead, char* whence, dllist_t* item)
 {
     dllist_t *itemT = listHead;
     
-    printd(DEBUG_PROCESS, "%s: Start removing 0x%08X (%s)!\n", whence, item, ((file_t*)item->payload)->f_path);
+    printd(DEBUG_PROCESS, "%s: Start removing 0x%08x (%s)!\n", whence, item, ((file_t*)item->payload)->f_path);
     if (listHead==NULL)
     {
         printd(DEBUG_PROCESS, "%s: Listhead is NULL, list is empty\n", whence);
         return;
     }
         
-    printd(DEBUG_PROCESS, "\t%s: item->prev=0x%08X, item=0x%08X, item->next=0x%08X\n", whence, itemT->prev, itemT, itemT->next);
+    printd(DEBUG_PROCESS, "\t%s: item->prev=0x%08x, item=0x%08x, item->next=0x%08x\n", whence, itemT->prev, itemT, itemT->next);
     while (itemT->next != itemT) 
     {
         itemT=itemT->next;
-        printd(DEBUG_PROCESS, "\t%s: item->prev=0x%08X, item=0x%08X, item->next=0x%08X\n", whence, itemT->prev, itemT, itemT->next);
+        printd(DEBUG_PROCESS, "\t%s: item->prev=0x%08x, item=0x%08x, item->next=0x%08x\n", whence, itemT->prev, itemT, itemT->next);
     } 
     printd(DEBUG_PROCESS, "%s: DONE!\n", whence);
     

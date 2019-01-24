@@ -121,7 +121,7 @@ int execTime(char* cmdline, bool timeIt)
     {
             lastExecExitCode = waitpid(forkPid);
             if (lastExecExitCode == 0xBADBADBA)
-                print("Cannot execute %s\n",argv[0]);
+                print("execTime: Cannot execute %s\n",argv[0]);
             if (timeIt)
             {
                 endTicks=getticks();
@@ -139,6 +139,29 @@ int execTime(char* cmdline, bool timeIt)
 void cmdTime(char* cmdline)
 {
     execTime(cmdline,true);
+}
+
+void cmdRepeat(char * cmdline)
+{
+    int argc = 0;
+    char **argv;
+    int count = 0;
+    char *newCmdLine=cmdline+2;
+    argv = cmdlineToArgv(cmdline, &argc);
+    
+    count = atoi(argv[0]);
+
+    for (int cnt=0;cnt<count;cnt++)
+    {
+        printf("*************** REPEAT EXECUTION #%u of %u ***************\n",cnt+1,count);
+        execTime(newCmdLine,false);
+        if (bSigIntReceived)
+        {
+            processSignal(SIGINT);
+            break;
+        }
+    }
+    
 }
 
 void cmdExecp(char* cmdline)

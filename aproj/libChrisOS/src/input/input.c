@@ -26,11 +26,19 @@ VISIBLE void putc(char c)
     PUTSTRING(&buffer);
 }
 
-VISIBLE char getc()
+
+
+VISIBLE char getchar()
 {
     char c;
-    READCHAR(c)
-    return c;
+    while (1==1)
+    {
+        READCHAR(c);
+        if (c)
+            return c;
+        asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
+    }
+    return 0; //Should not get here
 }
 
 //Get a string of {maxlen} characters, returning when the # of characters is reached or enter is pressed
@@ -66,8 +74,9 @@ VISIBLE int gets(char* buffer, int maxlen, int stream)
         }
         else
             asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
-            asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
-            asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
+        //added these for 1000 hertz clock, not needed for 100 hertz
+/*            asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt
+            asm("call sysEnter_Vector\n"::"a" (0x302)); //hlt*/
 
     }
 }

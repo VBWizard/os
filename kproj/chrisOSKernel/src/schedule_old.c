@@ -99,7 +99,7 @@ task_t* findTaskInList(task_t* taskList, uint32_t taskNum)
 {
 /*    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskinList: Finding 0x%04X in list %s (%u)",taskNum, taskListName(taskList),taskList->taskState);
     taskList=findFirstActiveTaskInListL(taskList);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,", starting at 0x%08X\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,", starting at 0x%08x\n",taskList);
     if (taskList==NULL)
         panic("findTaskinList: Couldn't find the first task in the list.");
     while (taskList->next!=NO_NEXT)
@@ -108,7 +108,7 @@ task_t* findTaskInList(task_t* taskList, uint32_t taskNum)
             printd(DEBUG_PROCESS | DEBUG_DETAILED,"Comparing task 0x%04X to our task (0x%04X)\n",taskList->taskNum,taskNum);
         if (taskList->taskNum==taskNum)
         {
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskinList: Found task 0x%04X @ 0x%08X\n",taskNum,taskList);
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskinList: Found task 0x%04X @ 0x%08x\n",taskNum,taskList);
             return taskList;
         }
         if (taskList->next==0)
@@ -135,7 +135,7 @@ void removeTaskFromList(task_t* taskList)
 {
     task_t* prev=NULL, *next=NULL;
     
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"removeTaskFromList: Removing task @ 0x%08X\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"removeTaskFromList: Removing task @ 0x%08x\n",taskList);
     //PAUSEHERE
     //NOTE: Don't update the first (NO_PREV) or last (NO_NEXT) list items
     if (taskList->prev!=0 && taskList->prev!=NO_PREV)
@@ -149,7 +149,7 @@ void removeTaskFromList(task_t* taskList)
             prev->next=next;
         else
             prev->next=0;
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"removeTaskFromList: Set previous task (0x%08X)->next to 0x%08X\n",prev,next);
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"removeTaskFromList: Set previous task (0x%08x)->next to 0x%08x\n",prev,next);
     }
     
     if (next!=NULL)
@@ -158,24 +158,24 @@ void removeTaskFromList(task_t* taskList)
             next->prev=prev;
         else
             next->prev=0;
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"removeTaskFromList: Set next task (0x%08X)->prev to 0x%08X\n",next,prev);
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"removeTaskFromList: Set next task (0x%08x)->prev to 0x%08x\n",next,prev);
     }
     //PAUSEHERE
     memset(taskList,0,sizeof(task_t));
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"removeTaskFromList: Zeroed out memory of the task @ 0x%08X\n\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"removeTaskFromList: Zeroed out memory of the task @ 0x%08x\n\n",taskList);
 }
 
 //Set up the new task in the Destination list, and clears the Source list entry
 void moveTask(task_t* destTask, task_t* srcTask, eTaskState state)
 {
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"moveTask: Moving task 0x%04X from %s(0x%08X) to %s(0x%08X)\n",
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"moveTask: Moving task 0x%04X from %s(0x%08x) to %s(0x%08x)\n",
             srcTask->taskNum,
             taskListName(srcTask),srcTask,
             taskListName(destTask),destTask);
     memcpy(destTask,srcTask,sizeof(task_t));    
     destTask->taskState=state;
     setTaskNextAndPrev(destTask);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"moveTask: Set moved task's prev and next to 0x%08X and 0x%08X\n\n",destTask->prev,destTask->next);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"moveTask: Set moved task's prev and next to 0x%08x and 0x%08x\n\n",destTask->prev,destTask->next);
     removeTaskFromList(srcTask);
     //PAUSEHERE
 }
@@ -184,7 +184,7 @@ task_t* findFirstSlotInList(task_t* taskList)
 {
     while (taskList->prev != NO_PREV)
         taskList--;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFirstSlotInList: Found the first slot in the list @ 0x%08X\n\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFirstSlotInList: Found the first slot in the list @ 0x%08x\n\n",taskList);
     return taskList;
 }
 
@@ -225,11 +225,11 @@ void setTaskNextAndPrev(task_t* task)
     if (taskList->taskNum==task->taskNum)
     {
         taskList=findFirstSlotInList(taskList);
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"setTaskNextAndPrev: Found task was parameter task so I got the first task in list @ 0x%08X\n",taskList);
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"setTaskNextAndPrev: Found task was parameter task so I got the first task in list @ 0x%08x\n",taskList);
     }
     taskList->next=task;
     task->prev=taskList;
-//    printd(DEBUG_PROCESS | DEBUG_DETAILED,"setTaskNextAndPrev: Task 0x%04X @ 0x%08X->next set to 0x%08X.  Task 0x%04X@ 0x%08X->prev set to 0x%08X\n\n",
+//    printd(DEBUG_PROCESS | DEBUG_DETAILED,"setTaskNextAndPrev: Task 0x%04X @ 0x%08x->next set to 0x%08x.  Task 0x%04X@ 0x%08x->prev set to 0x%08x\n\n",
 //            taskList->taskNum,taskList,task,
 //          task->taskNum,task,taskList);
 }
@@ -237,7 +237,7 @@ void setTaskNextAndPrev(task_t* task)
 task_t* findFreeTaskSlot(task_t* taskList)
 {
     taskList++; //always skip the first task as we can't set its PREV (must always be NO_PREV)
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFreeTaskSlot: Skipped first entry, starting search @ 0x%08X\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFreeTaskSlot: Skipped first entry, starting search @ 0x%08x\n",taskList);
     while (taskList->next!=NO_NEXT)    //Find an empty task in the list
     {
         if (taskList->taskNum==0 && taskList->prev==0 && taskList->next==0)
@@ -248,7 +248,7 @@ task_t* findFreeTaskSlot(task_t* taskList)
         panic("Cannot find a free task in list %u\n");
     else if (taskList->next==NO_NEXT)
         panic("All slots are in use, cannot find a free one");
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFreeTaskSlot: Found slot at 0x%08X\n\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFreeTaskSlot: Found slot at 0x%08x\n\n",taskList);
     return taskList;                                                    //NOTE: May return NO_TASK slot
 }
 
@@ -287,20 +287,20 @@ task_t* changeTaskState(task_t* taskToStateChange, eTaskState newState)
 
     //Find the source task
     srcTaskList=findTaskInList(srcTaskList,taskToStateChange->taskNum);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"changeTaskState: Found source task @ 0x%08X (state=%u)\n",srcTaskList,srcTaskList->taskState);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"changeTaskState: Found source task @ 0x%08x (state=%u)\n",srcTaskList,srcTaskList->taskState);
     if (srcTaskList==NULL)
         panic("changeTaskState: Could not find task 0x%04X to change the state of in its old list\n",taskToStateChange->taskNum);
 
     //Find an open task in the new task state's list
     if (newState!=TASK_EXITED)
         destTaskList=findFreeTaskSlot(destTaskList);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"changeTaskState: free slot found in list @ 0x%08X\n",destTaskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"changeTaskState: free slot found in list @ 0x%08x\n",destTaskList);
 
     //Move the task into place
     if (newState!=TASK_EXITED)
     {
         moveTask(destTaskList,srcTaskList,TASK_RUNNING);
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"changeTaskState: Task moved from 0x%08X to 0x%08X (new prev=0x%08X, next=0x%08X)\n",srcTaskList,destTaskList,destTaskList->prev,destTaskList->prev);
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"changeTaskState: Task moved from 0x%08x to 0x%08x (new prev=0x%08x, next=0x%08x)\n",srcTaskList,destTaskList,destTaskList->prev,destTaskList->prev);
     }
     if (newState==TASK_EXITED)
         return NULL;
@@ -331,7 +331,7 @@ task_t* findTaskByCR3(uint32_t cr3, int *listNum)
     {
         *listNum=cnt;
         taskList=kTaskList[cnt];
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Searching list %u starting at 0x%08X\n",cnt,taskList);
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Searching list %u starting at 0x%08x\n",cnt,taskList);
         do
         {
             if (taskList->tss->CR3==cr3)
@@ -343,7 +343,7 @@ task_t* findTaskByCR3(uint32_t cr3, int *listNum)
             break;
     }
         
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Found task @ 0x%08X\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Found task @ 0x%08x\n",taskList);
     return taskList;
 }
 
@@ -356,7 +356,7 @@ task_t* findTaskByTaskNum(uint32_t taskNum,int *listNum)
     {
         *listNum=cnt;
         taskList=kTaskList[cnt];
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Searching list %u starting at 0x%08X\n",cnt,taskList);
+        printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Searching list %u starting at 0x%08x\n",cnt,taskList);
         do
         {
             if (taskList->taskNum==taskNum)
@@ -368,7 +368,7 @@ task_t* findTaskByTaskNum(uint32_t taskNum,int *listNum)
             break;
     }
         
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Found task @ 0x%08X\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskByNum: Found task @ 0x%08x\n",taskList);
     return taskList;
 }
 
@@ -378,7 +378,7 @@ void markTaskEnded(uint32_t cr3)
     task_t* taskList=findTaskByCR3(cr3,&listNum);
 
     if (taskList->tss->CR3!=cr3)
-        printd(DEBUG_PROCESS,"endTaskByTaskNum: Could not find task for CR3=0x%08X to end\n");
+        printd(DEBUG_PROCESS,"endTaskByTaskNum: Could not find task for CR3=0x%08x to end\n");
     else
     {
         taskList->exited=true;
@@ -395,7 +395,7 @@ task_t* findRunningTaskToReplace()
     task_t* currTask=kTaskList[TASK_RUNNING];
 
     currTask=findFirstActiveTaskInListL(currTask);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskToReplace: Finding task starting at 0x%08X\n",currTask);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskToReplace: Finding task starting at 0x%08x\n",currTask);
 
     while (currTask->next != NO_NEXT)
     {
@@ -414,7 +414,7 @@ task_t* findRunningTaskToReplace()
         printd(DEBUG_PROCESS | DEBUG_DETAILED,"findRunningTaskToReplace: Could not find a RUNNING task\n");
         return NULL;   //Return null pointer
     }
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskToReplace: Found task @ 0x%08X\n",targetTask);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findTaskToReplace: Found task @ 0x%08x\n",targetTask);
     return targetTask;
 }
 
@@ -424,29 +424,29 @@ void storeISRSavedRegs(task_t* task)
     task->tss->CS=isrSavedCS;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
     task->tss->EIP=isrSavedEIP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08x,",task->tss->EIP);
     task->tss->SS=isrSavedSS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08x,",task->tss->SS);
     task->tss->DS=isrSavedDS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08x,",task->tss->DS);
     task->tss->EAX=isrSavedEAX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08x,",task->tss->EAX);
     task->tss->EBX=isrSavedEBX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08X,",task->tss->EBX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08x,",task->tss->EBX);
     task->tss->ECX=isrSavedECX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08x,",task->tss->ECX);
     task->tss->EDX=isrSavedEDX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08x,",task->tss->EDX);
     task->tss->ESI=isrSavedESI;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08x,",task->tss->ESI);
     task->tss->EDI=isrSavedEDI;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08x,",task->tss->EDI);
     task->tss->ESP=isrSavedESP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08x,",task->tss->ESP);
     task->tss->EBP=isrSavedEBP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08x,",task->tss->EBP);
     task->tss->EFLAGS=isrSavedFlags;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X\n",task->tss->EFLAGS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08x\n",task->tss->EFLAGS);
     task->tss->ES=isrSavedES;
     task->tss->FS=isrSavedFS;
     task->tss->GS=isrSavedGS;
@@ -460,34 +460,34 @@ void loadISRSavedRegs(task_t* task)
     isrSavedCS=task->tss->CS;
     printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
     isrSavedEIP=task->tss->EIP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08X,",task->tss->EIP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08x,",task->tss->EIP);
     isrSavedSS=task->tss->SS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08X,",task->tss->SS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%08x,",task->tss->SS);
     isrSavedDS=task->tss->DS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08X,",task->tss->DS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%08x,",task->tss->DS);
     isrSavedEAX=task->tss->EAX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08X,",task->tss->EAX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08x,",task->tss->EAX);
     isrSavedEBX=task->tss->EBX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBX=0x%08X,",task->tss->EBX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBX=0x%08x,",task->tss->EBX);
     isrSavedECX=task->tss->ECX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08X,",task->tss->ECX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08x,",task->tss->ECX);
     isrSavedEDX=task->tss->EDX;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08X,",task->tss->EDX);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08x,",task->tss->EDX);
     isrSavedESI=task->tss->ESI;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08X,",task->tss->ESI);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08x,",task->tss->ESI);
     isrSavedEDI=task->tss->EDI;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08X,",task->tss->EDI);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08x,",task->tss->EDI);
     isrSavedESP=task->tss->ESP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08X,",task->tss->ESP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08x,",task->tss->ESP);
     isrSavedEBP=task->tss->EBP;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08X,",task->tss->EBP);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08x,",task->tss->EBP);
     isrSavedFlags=task->tss->EFLAGS;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08X,",task->tss->EFLAGS);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08x,",task->tss->EFLAGS);
     isrSavedES=task->tss->ES;
     isrSavedFS=task->tss->FS;
     isrSavedGS=task->tss->GS;
     isrSavedCR3=task->tss->CR3;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08X\n",task->tss->CR3);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08x\n",task->tss->CR3);
 }
 
 task_t* findFirstActiveTaskInListL(task_t* taskList)
@@ -497,7 +497,7 @@ task_t* findFirstActiveTaskInListL(task_t* taskList)
     while (taskList->prev!=NO_PREV)
         taskList--;
     
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFirstActiveTaskInListL: Finding task starting at 0x%08X\n",taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFirstActiveTaskInListL: Finding task starting at 0x%08x\n",taskList);
         
     while (taskList->next!=NO_NEXT)
     {
@@ -514,7 +514,7 @@ task_t* findFirstActiveTaskInListL(task_t* taskList)
         return NULL;
     }
     
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFirstActiveTaskInListL: Found task 0x%04X @ 0x%08X, returning it.\n",taskList->taskNum,taskList);
+    printd(DEBUG_PROCESS | DEBUG_DETAILED,"findFirstActiveTaskInListL: Found task 0x%04X @ 0x%08x, returning it.\n",taskList->taskNum,taskList);
     return taskList;
 }
 
@@ -561,7 +561,7 @@ void scheduler()
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
             :"=b" (oldCR3):[cr3Val] "r" (KERNEL_CR3));
     printd(DEBUG_PROCESS,"\n****************************** TASK SWITCH ******************************\n");
-    printd(DEBUG_PROCESS,"*Looking through TASK_RUNNABLE for a process to run @ 0x%08X ticks\n",*kTicksSinceStart);
+    printd(DEBUG_PROCESS,"*Looking through TASK_RUNNABLE for a process to run @ 0x%08x ticks\n",*kTicksSinceStart);
     //Only scheduling on CPU 0 for now
     taskToRun=findTaskToRun();
     if (taskToRun->taskNum) //If =0 then no runnable tasks, so do not switch tasks
@@ -571,7 +571,7 @@ void scheduler()
         taskToStop=findRunningTaskToReplace();
         if (taskToStop!=NULL)                                             //There might not be a prior task if this is the first time through the routine
         {
-            printd(DEBUG_PROCESS,"*Found process (0x%04X) to replace @0x%04X:0x%08X (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
+            printd(DEBUG_PROCESS,"*Found process (0x%04X) to replace @0x%04X:0x%08x (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
             //save old task's state
             if (taskToStop->exited)
             {
@@ -591,7 +591,7 @@ void scheduler()
         //Move the new task onto the CPU
         taskToRun=changeTaskState(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
-        printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08X",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
+        printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08x",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
         schedulerTaskSwitched=true;
 //        kTaskSwitchCount++;
         //For each task in the runnable list, increment its ticksSinceLastInterrupted 

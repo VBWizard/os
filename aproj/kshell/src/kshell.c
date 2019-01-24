@@ -16,6 +16,7 @@
 char commandHistory[500][MAX_PARAM_WIDTH];
 int commandHistoryPtr=0;
 int commandHistoryMax=0;
+char lCommand[256];
 
 void execInternalCommand(char lCommand[256]);
 int findCommand(char* command);
@@ -302,15 +303,35 @@ int reprintCommand(char* command)
  
 }
 
+int handleSignals(int signal)
+{
+    switch (signal)
+    {
+        case SIGINT:
+            bSigIntReceived = true;
+            break;
+    }
+}
+
+void processSignal(int signal)
+{
+    switch (signal)
+    {
+        case SIGINT:
+            printf("^C\n");
+            bSigIntReceived = false;
+            break;
+    }
+}
 
 int kShell(int argc, char** argv, char** envp)
 {
-    char lCommand[256];
     uint8_t lCurrKey=0;
     int lCurrKeyCount=0;
     int commandWasFromThisBufferPtr=0;
     char ansiSeq[20];
 
+    bSigIntReceived = false;
     exitCode = 0;
     timeToExit = false;
     strcpy(delim," \t\n-,");
@@ -321,6 +342,8 @@ int kShell(int argc, char** argv, char** envp)
     strcpy(sExecutingProgram,sKShellProgramName);
     //puts("\nWelcome to kShell ... hang a while!\n");
 
+    modifySignal(SIGINT, handleSignals, SIGINT);
+    
     while (!timeToExit)
     {
 getACommand:
@@ -335,7 +358,15 @@ getAKey:
         lCurrKey=0;
         while(lCurrKey==0)
         {
-            gets(&lCurrKey,1,1);
+            read(STDIN, &lCurrKey, 1, 1); //Reading from STDIN blocks until a key is available
+//            gets(&lCurrKey,1,1);
+            if (bSigIntReceived)
+            {
+                processSignal(SIGINT);
+                lCommand[0] = 0x0;
+                lCurrKeyCount = 0;
+                prompt();
+            }
         }
         //print("key='%08X'",lCurrKey);
         if((unsigned short)lCurrKey==0xc8) //up

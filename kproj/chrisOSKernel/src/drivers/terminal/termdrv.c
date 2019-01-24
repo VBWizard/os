@@ -108,7 +108,7 @@ void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* te
     }
     term->screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
     term->screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
-    if (device->pipew == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
     {
         console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
         console[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
@@ -122,7 +122,7 @@ void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* te
     {
         //Move up 1 line by copying from the 2nd line of the screen down, to the first line
         memcpy(term->screenBuffer, term->screenBuffer + (term->width * 2), term->width * term->height * 2);
-        if (device->pipew == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+        if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
         {
             memcpy(console, console + (term->width * 2), term->width * term->height * 2);
         }
@@ -178,7 +178,7 @@ void updateTermBuffer(ttydevice_t *device)
                             if (pipeContents[cnt+2]=='2')               //Clear screen
                             {
                                 clearScreen(term, term->screenBuffer);
-                                if (device->pipew == activeSTDOUT)
+                                if (device->stdOutWritePipe == activeSTDOUT)
                                     clearScreen(term, console);
                                 cnt+=3;
                                 curr = 0;
@@ -204,7 +204,7 @@ void updateTermBuffer(ttydevice_t *device)
             processCharacter(device, term, curr);
         }
     }
-    if (device->pipew == activeSTDOUT)
+    if (device->stdOutWritePipe == activeSTDOUT)
         cursor_update(term);
 }
 
@@ -217,7 +217,7 @@ void updateTerms()
             if (kTermLock==0)
                 while (__sync_lock_test_and_set(&kTermLock, 1));
         //while (__sync_lock_test_and_set(&kTermLock, 1));
-            pipeReadSize = piperead(pipeContents, PIPE_FILE_SIZE,1, ttyDevices[cnt].piper);
+            pipeReadSize = piperead(pipeContents, PIPE_FILE_SIZE,1, ttyDevices[cnt].stdOutReadPipe);
             //pipeReadSize = fs_read(NULL, ttyDevices[cnt].piper, pipeContents, PIPE_FILE_SIZE, 1);
             if (pipeReadSize > 0)
             {

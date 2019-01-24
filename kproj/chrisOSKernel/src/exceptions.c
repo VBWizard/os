@@ -97,7 +97,7 @@ void doubleFaultHandler()
         printk ("Stack:\n");
         for (int cnt=0;cnt<10;cnt++)
         {
-            printk("\t0x%08X%: 0x%08X\n",esp, exceptionSavedStack[cnt]);
+            printk("\t0x%08x%: 0x%08x\n",esp, exceptionSavedStack[cnt]);
             esp+=4;
         }
     __asm__("cli");
@@ -107,7 +107,7 @@ void doubleFaultHandler()
 void setupPagingHandler()
 {
     pagingExceptionTSS = allocPages(sizeof(tss_t));
-    printd(DEBUG_PROCESS, "Allocated TSS for paging exception task gate at 0x%08X",pagingExceptionTSS);
+    printd(DEBUG_PROCESS, "Allocated TSS for paging exception task gate at 0x%08x",pagingExceptionTSS);
     pagingMapPageCount(KERNEL_CR3, ((uint32_t)pagingExceptionTSS | KERNEL_PAGED_BASE_ADDRESS),(uint32_t)pagingExceptionTSS,0x1,0x7,true);
     pagingMapPageCount(KERNEL_CR3, ((uint32_t)pagingExceptionTSS),(uint32_t)pagingExceptionTSS,0x1,0x7,true);
     memset(pagingExceptionTSS, 0, sizeof(tss_t));
@@ -124,19 +124,19 @@ void setupPagingHandler()
     pagingExceptionTSS->SS0=kKernelTask->tss->SS0;
 
     pagingExceptionTSS->ESP0=allocPagesAndMap(0x16000);
-    printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for paging exception handler ESP0\n",pagingExceptionTSS->ESP0);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for paging exception handler ESP0\n",pagingExceptionTSS->ESP0);
     pagingMapPageCount(KERNEL_CR3, pagingExceptionTSS->ESP0 | KERNEL_PAGED_BASE_ADDRESS, pagingExceptionTSS->ESP0, 0x16, 0x7, true);
     pagingMapPageCount(KERNEL_CR3, pagingExceptionTSS->ESP0, pagingExceptionTSS->ESP0, 0x16, 0x7, true);
     pagingExceptionTSS->ESP0+=0x10000;
-    printd(DEBUG_PROCESS,"Offset paging exception handler ESP0 to 0x%08X\n",pagingExceptionTSS->ESP0);
+    printd(DEBUG_PROCESS,"Offset paging exception handler ESP0 to 0x%08x\n",pagingExceptionTSS->ESP0);
     
     
     pagingExceptionTSS->ESP=allocPagesAndMap(0x16000);
-    printd(DEBUG_PROCESS,"Allocated pages at 0x%08X for paging exception handler ESP\n",pagingExceptionTSS->ESP);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for paging exception handler ESP\n",pagingExceptionTSS->ESP);
     pagingMapPageCount(KERNEL_CR3, pagingExceptionTSS->ESP | KERNEL_PAGED_BASE_ADDRESS, pagingExceptionTSS->ESP, 0x16, 0x7, true);
     pagingMapPageCount(KERNEL_CR3, pagingExceptionTSS->ESP , pagingExceptionTSS->ESP, 0x16, 0x7, true);
     pagingExceptionTSS->ESP+=0x10000;
-    printd(DEBUG_PROCESS,"Offset paging exception handler ESP to 0x%08X\n",pagingExceptionTSS->ESP);
+    printd(DEBUG_PROCESS,"Offset paging exception handler ESP to 0x%08x\n",pagingExceptionTSS->ESP);
 
     pagingExceptionTSS->SS1=pagingExceptionTSS->SS0;
     pagingExceptionTSS->ESP1=pagingExceptionTSS->ESP0;
@@ -174,9 +174,9 @@ void pagingExceptionHandlerMain(uint32_t pagingExceptionCR2, int ErrorCode, proc
     lPDEValue=kPagingGet4kPDEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
     lPTEValue=kPagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
     elfInfo_t* elf=victimProcess->elf;
-    //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X)\n",exceptionCR2,exceptionCR3);
-    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08X in task 0x%04X, for 0x%08X, error code 0x%08X (CR3=0x%08X)\n",victimProcess->task->tss->CS, victimProcess->task->tss->EIP, victimProcess->task->taskNum, pagingExceptionCR2,pagingExceptionCR3, ErrorCode);
-    printd(DEBUG_EXCEPTIONS,"\tProcess=%s-%u (0x%04X)\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",victimProcess->path, victimProcess->childNumber, victimProcess->task->taskNum, lPTEValue);
+    //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08x (CR3=0x%08x)\n",exceptionCR2,exceptionCR3);
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimProcess->task->tss->CS, victimProcess->task->tss->EIP, victimProcess->task->taskNum, pagingExceptionCR2,pagingExceptionCR3, ErrorCode);
+    printd(DEBUG_EXCEPTIONS,"\tProcess=%s-%u (0x%04X)\n\tChecking for uninitialized mmap page, pt entry=0x%08x\n",victimProcess->path, victimProcess->childNumber, victimProcess->task->taskNum, lPTEValue);
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
     pageVirtAddress=lPTEValue&0xFFFFF000;
     if ( (pageVirtAddress==(pagingExceptionCR2&0xFFFFF000)) 
@@ -197,7 +197,7 @@ void pagingExceptionHandlerMain(uint32_t pagingExceptionCR2, int ErrorCode, proc
                 mmaps=mmaps->next;
             }
             if (mmap==NULL)
-                panic("kPagingExceptionHandler: Could not find mmap for address 0x%08X\n",pagingExceptionCR2);
+                panic("kPagingExceptionHandler: Could not find mmap for address 0x%08x\n",pagingExceptionCR2);
             printd(DEBUG_EXCEPTIONS,"\t\tFound corrrect mmap.  Will map this page and add to mmap->mmappedPages\n");
             pagePhysAddr=(uint32_t)allocPages(PAGE_SIZE);
             pagingMapPage(pagingExceptionCR3,pageVirtAddress,pagePhysAddr,0x7);  //Map page read/write
@@ -206,7 +206,7 @@ void pagingExceptionHandlerMain(uint32_t pagingExceptionCR2, int ErrorCode, proc
             mappedPage->loaded=true;
             dllist_t* mapList=&mmap->mmappedPages->listItem;
             listAdd(mapList,&mappedPage->listItem,mappedPage);
-            printd(DEBUG_EXCEPTIONS,"\tMapped v=0x%08X to p=0x%08X (CR3=0x%08X)\n",pageVirtAddress,pagePhysAddr,pagingExceptionCR3);
+            printd(DEBUG_EXCEPTIONS,"\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x)\n",pageVirtAddress,pagePhysAddr,pagingExceptionCR3);
             //NOTE: Later we'll add loading from a file if one is defined in the mmap
             __asm__("xor ebx,ebx\nmov cr2,ebx\nmov cr3,eax\n"::"a" (pagingExceptionCR3));
         }
@@ -223,11 +223,11 @@ void pagingExceptionHandlerMain(uint32_t pagingExceptionCR2, int ErrorCode, proc
     if (cowPTE & COW_PAGE)
     {
         isCow=true;
-        printd(DEBUG_EXCEPTIONS,"\t\tAddress is CoW per PTE (0x%08X=0x%08X)\n",cowPTEp, cowPTE);
+        printd(DEBUG_EXCEPTIONS,"\t\tAddress is CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
     }
     else
     {
-        printd(DEBUG_EXCEPTIONS,"\t\tAddress is not CoW per PTE (0x%08X=0x%08X)\n",cowPTEp, cowPTE);
+        printd(DEBUG_EXCEPTIONS,"\t\tAddress is not CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
     }
 
     if (!isCow)
@@ -237,7 +237,7 @@ void pagingExceptionHandlerMain(uint32_t pagingExceptionCR2, int ErrorCode, proc
         for (int cnt=0;cnt<victimProcess->elf->libraryElfCount;cnt++)
         {
             elfInfo_t* lib=elf->libraryElfPtr[cnt];
-            printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08X, bss=0x%08X/0x%08X, data=0x%08X/0x%08X, tdata=0x%08X/0x%08X\n",
+            printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08x, bss=0x%08x/0x%08x, data=0x%08x/0x%08x, tdata=0x%08x/0x%08x\n",
                     lib,
                     lib->bssAddress,
                     lib->bssSize,
@@ -248,14 +248,14 @@ void pagingExceptionHandlerMain(uint32_t pagingExceptionCR2, int ErrorCode, proc
             if (lib->bssAddress<=pagingExceptionCR2 && lib->bssAddress+lib->bssSize>pagingExceptionCR2)
             {
                 //CLR 01/04/2019: lib->fileName suddenly is 0x50000000, so can't use it???
-                printd(DEBUG_EXCEPTIONS,"\t\tThe page with address 0x%08X is a CoW .bss page from library %s\n",pagingExceptionCR2,""/*lib->fileName*/);
+                printd(DEBUG_EXCEPTIONS,"\t\tThe page with address 0x%08x is a CoW .bss page from library %s\n",pagingExceptionCR2,""/*lib->fileName*/);
                 isCow=true;
                 break;
             }
             else if (lib->dataAddress<=pagingExceptionCR2 && lib->dataAddress+lib->dataSize>pagingExceptionCR2)
             {
                 //CLR 01/04/2019: lib->fileName suddenly is 0x50000000, so can't use it???
-                printd(DEBUG_EXCEPTIONS,"\t\tPage (0x%08X) is CoW .data page from library %s\n",pagingExceptionCR2,""/*lib->fileName*/);
+                printd(DEBUG_EXCEPTIONS,"\t\tPage (0x%08x) is CoW .data page from library %s\n",pagingExceptionCR2,""/*lib->fileName*/);
                 isCow=true;
                 break;
             }
@@ -270,23 +270,23 @@ void pagingExceptionHandlerMain(uint32_t pagingExceptionCR2, int ErrorCode, proc
         pagingMapPage(KERNEL_CR3,newPhys,newPhys,0x7);
         memcpy((void*)newPhys,(void*)(exceptionPhysicalCR2Address),PAGE_SIZE);
         pagingMapPage(pagingExceptionCR3,pagingExceptionCR2 & 0xFFFFF000,newPhys,0x7);
-        printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08X (0x%08X) with writable page 0x%08X (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
+        printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08x (0x%08x) with writable page 0x%08x (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
         __asm__("xor ebx,ebx\nmov cr2,ebx\n");
         return;
     }
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
           printk("\nPaging handler: Exception for virtual address 0x%02X\n",pagingExceptionCR2);
-          printk("PDE@0x%08X=0x%08X, PTE@0x%08X=0x%08X\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
+          printk("PDE@0x%08x=0x%08x, PTE@0x%08x=0x%08x\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
           printPagingExceptionRegs(victimProcess->task, pagingExceptionCR2, ErrorCode, false);
           //printPagingExceptionRegs(victimProcess->task, pagingExceptionCR2, ErrorCode, true);
           printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
-          printk("Finding symbol for 0x%08X ...\n",pagingExceptionCR2);
+          printk("Finding symbol for 0x%08x ...\n",pagingExceptionCR2);
     }
     
     kPagingExceptionsSinceStart++;
-    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08X\n",pagingExceptionCR3);
-    printk("segfault in '%s' at 0x%08X (cr2=0x%08X)\n",victimProcess->path,victimProcess->task->tss->EIP,pagingExceptionCR2);
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08x\n",pagingExceptionCR3);
+    printk("segfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimProcess->task->tss->EIP,pagingExceptionCR2);
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
     sys_sigaction2(SIGSEGV,0,0xe,pagingExceptionCR3);
 
@@ -312,7 +312,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     uint32_t victimTaskNum = ourTSS->LINK;
     victimTaskNum >>= 3;
     if (victimTaskNum==0x17 || victimTaskNum==0)
-        panic("Paging exception in paging exception handler at 0x%08X, error 0x%08X",pagingExceptionCR2, ErrorCode);
+        panic("Paging exception in paging exception handler at 0x%08x, error 0x%08x",pagingExceptionCR2, ErrorCode);
     task_t* victimTask = findTaskByTaskNum(victimTaskNum);
     process_t* victimProcess = victimTask->process;
     uint32_t pagingExceptionCR3 = victimTask->tss->CR3;
@@ -329,10 +329,10 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     lPDEValue=kPagingGet4kPDEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
     lPTEValue=kPagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
     elfInfo_t* elf=victimProcess->elf;
-    //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08X (CR3=0x%08X)\n",exceptionCR2,exceptionCR3);
-    printk(0,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08X in task 0x%04X, for 0x%08X, error code 0x%08X (CR3=0x%08X)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
-    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08X in task 0x%04X, for 0x%08X, error code 0x%08X (CR3=0x%08X)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
-    printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08X)\n\tChecking for uninitialized mmap page, pt entry=0x%08X\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
+    //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08x (CR3=0x%08x)\n",exceptionCR2,exceptionCR3);
+    printk(0,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
+    printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08x)\n\tChecking for uninitialized mmap page, pt entry=0x%08x\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
     pageVirtAddress=lPTEValue&0xFFFFF000;
     if ( (pageVirtAddress==(pagingExceptionCR2&0xFFFFF000)) 
@@ -353,7 +353,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
                 mmaps=mmaps->next;
             }
             if (mmap==NULL)
-                panic("kPagingExceptionHandler: Could not find mmap for address 0x%08X\n",pagingExceptionCR2);
+                panic("kPagingExceptionHandler: Could not find mmap for address 0x%08x\n",pagingExceptionCR2);
             printd(DEBUG_EXCEPTIONS,"\t\tFound corrrect mmap.  Will map this page and add to mmap->mmappedPages\n");
             pagePhysAddr=(uint32_t)allocPages(PAGE_SIZE);
             pagingMapPage(pagingExceptionCR3,pageVirtAddress,pagePhysAddr,0x7);  //Map page read/write
@@ -362,7 +362,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             mappedPage->loaded=true;
             dllist_t* mapList=&mmap->mmappedPages->listItem;
             listAdd(mapList,&mappedPage->listItem,mappedPage);
-            printd(DEBUG_EXCEPTIONS,"\tMapped v=0x%08X to p=0x%08X (CR3=0x%08X)\n",pageVirtAddress,pagePhysAddr,pagingExceptionCR3);
+            printd(DEBUG_EXCEPTIONS,"\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x)\n",pageVirtAddress,pagePhysAddr,pagingExceptionCR3);
             //NOTE: Later we'll add loading from a file if one is defined in the mmap
             __asm__("xor ebx,ebx\nmov cr2,ebx\nmov cr3,eax\n"::"a" (pagingExceptionCR3));
         }
@@ -379,11 +379,11 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     if (cowPTE & COW_PAGE)
     {
         isCow=true;
-        printd(DEBUG_EXCEPTIONS,"\t\tAddress is CoW per PTE (0x%08X=0x%08X)\n",cowPTEp, cowPTE);
+        printd(DEBUG_EXCEPTIONS,"\t\tAddress is CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
     }
     else
     {
-        printd(DEBUG_EXCEPTIONS,"\t\tAddress is not CoW per PTE (0x%08X=0x%08X)\n",cowPTEp, cowPTE);
+        printd(DEBUG_EXCEPTIONS,"\t\tAddress is not CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
     }
 
     if (!isCow)
@@ -393,7 +393,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
         for (int cnt=0;cnt<victimProcess->elf->libraryElfCount;cnt++)
         {
             elfInfo_t* lib=elf->libraryElfPtr[cnt];
-            printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08X, bss=0x%08X/0x%08X, data=0x%08X/0x%08X, tdata=0x%08X/0x%08X\n",
+            printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08x, bss=0x%08x/0x%08x, data=0x%08x/0x%08x, tdata=0x%08x/0x%08x\n",
                     lib,
                     lib->bssAddress,
                     lib->bssSize,
@@ -404,14 +404,14 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             if (lib->bssAddress<=pagingExceptionCR2 && lib->bssAddress+lib->bssSize>pagingExceptionCR2)
             {
                 //CLR 01/04/2019: lib->fileName suddenly is 0x50000000, so can't use it???
-                printd(DEBUG_EXCEPTIONS,"\t\tThe page with address 0x%08X is a CoW .bss page from library %s\n",pagingExceptionCR2,""/*lib->fileName*/);
+                printd(DEBUG_EXCEPTIONS,"\t\tThe page with address 0x%08x is a CoW .bss page from library %s\n",pagingExceptionCR2,""/*lib->fileName*/);
                 isCow=true;
                 break;
             }
             else if (lib->dataAddress<=pagingExceptionCR2 && lib->dataAddress+lib->dataSize>pagingExceptionCR2)
             {
                 //CLR 01/04/2019: lib->fileName suddenly is 0x50000000, so can't use it???
-                printd(DEBUG_EXCEPTIONS,"\t\tPage (0x%08X) is CoW .data page from library %s\n",pagingExceptionCR2,""/*lib->fileName*/);
+                printd(DEBUG_EXCEPTIONS,"\t\tPage (0x%08x) is CoW .data page from library %s\n",pagingExceptionCR2,""/*lib->fileName*/);
                 isCow=true;
                 break;
             }
@@ -425,23 +425,23 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
         pagingMapPage(KERNEL_CR3,newPhys,newPhys,0x7);
         memcpy((void*)newPhys,(void*)(exceptionPhysicalCR2Address),PAGE_SIZE);
         pagingMapPage(pagingExceptionCR3,pagingExceptionCR2 & 0xFFFFF000,newPhys,0x7);
-        printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08X (0x%08X) with writable page 0x%08X (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
+        printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08x (0x%08x) with writable page 0x%08x (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
         __asm__("xor ebx,ebx\nmov cr2,ebx\n");
         return;
     }
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
           printk("\nPaging handler: Exception for virtual address 0x%02X\n",pagingExceptionCR2);
-          printk("PDE@0x%08X=0x%08X, PTE@0x%08X=0x%08X\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
+          printk("PDE@0x%08x=0x%08x, PTE@0x%08x=0x%08x\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
           printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, false);
           //printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, true);
           printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
-          printk("Finding symbol for 0x%08X ...\n",pagingExceptionCR2);
+          printk("Finding symbol for 0x%08x ...\n",pagingExceptionCR2);
     }
     
     kPagingExceptionsSinceStart++;
-    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08X\n",pagingExceptionCR3);
-    printk("segfault in '%s' at 0x%08X (cr2=0x%08X)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08x\n",pagingExceptionCR3);
+    printk("segfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
     sys_sigaction2(SIGSEGV,0,0xe,pagingExceptionCR3);
 

@@ -9,6 +9,7 @@
 #define	BISHELL_H
 /*Parts from: http://wiki.osdev.org/Creating_A_Shell*/
 #include "libChrisOS.h"
+#include "../../../kproj/chrisOSKernel/include/signals.h"
 
 #define INITIAL_MAXARGC 20
 #define EOS '\0'
@@ -32,12 +33,14 @@ typedef struct
     void cmdPrintEnv();
     void cmdPwd();
     void cmdSetEnv(char *cmdline);
+    void cmdRepeat(char *cmdline);
     void (*command_function)(void);
     void (*command_function_p)(char*);
     bool getEnvVariableValue(char* evName, char* value);
     char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char** pptr);
     void freeArgV(int pcount, char **params);
     int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size);
+    void processSignal(int signal);
     
     char sExecutingProgram[512];
     char* sKShellProgramName;
@@ -46,7 +49,8 @@ typedef struct
     uint32_t exitCode, lastExecExitCode;
     bool timeToExit;
     char cwd[256];
-    
+    bool bSigIntReceived;
+
 static command_table_t cmds[] = { 
         {"clear","Clear the screen",cmdClearScreen,0},
         {"env","Print environment",cmdPrintEnv,0},
@@ -54,6 +58,7 @@ static command_table_t cmds[] = {
         {"exit","Exit kshell",cmdExit,1},
         {"help","Get help (this information)",cmdHelp,1},
         {"pwd","Print working directory",cmdPwd,0},
+        {"repeat","Repeat a command x times",cmdRepeat,1},
         {"set","Set an environment variable",cmdSetEnv,1},
         {"sleep","Sleep for x seconds",cmdSleep,1},
         {"time","Time a program while it runs.\n\t\tUsage: time program [parameters]",cmdTime,1}

@@ -13,6 +13,8 @@
 
 extern filesystem_t* pipeFs;
 
+volatile int kPipeWriteLock;
+
 filesystem_t *initpipefs()
 {
     filesystem_t* fs;
@@ -27,6 +29,7 @@ filesystem_t *initpipefs()
     fs = kRegisterFileSystem("/pipe/",fops);
     fs->files = kMalloc(sizeof(dllist_t));
     memset(openPipes,0,sizeof(pipes_t)*1000);
+    kPipeWriteLock = 0;
     return fs;
 }
 
@@ -113,6 +116,8 @@ size_t piperead(void *buffer, int size, int length, void *f)
     if (pipe->flags & PIPEREAD==0)
         return ERROR_FS_FILE_INVALID_OPERATION;
     
+    //kPipeWriteLock
+    
     do
     {
         copySize = size * length;
@@ -153,19 +158,18 @@ size_t pipewrite(const void *data, int size, int count, void *f)
     if ((pipe->flags & PIPEWRITE)==0)
         return ERROR_FS_FILE_INVALID_OPERATION;
 
-    __asm__("CLI\n"); //for now we'll CLI and STI so the process doesn't switch to the reader and spoil all our work.  Later we can use locks!
-
+    while (__sync_lock_test_and_set(&kPipeWriteLock, 1));
     //If there isn't as much data as the caller wanted, give them what we have
     int available = (uintptr_t)file->buffer + PIPE_FILE_SIZE - (uintptr_t)*file->bufferPtr;
     if (copySize > available)
         copySize = available;
 //***TODO: OTHERWISE BLOCK UNTIL ENOUGH DATA IS AVAILABLE UNLESS 'n'
-    if (copySize==0)
-        return 0;
+    
 
     memcpy(*file->bufferPtr, data, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
     *file->bufferPtr+=copySize;    
-    __asm__("STI\n");
+    __sync_lock_release(&kPipeWriteLock);   
+    return copySize;
 }
 
 pipe_t *pipedup(void* path, const char *mode, file_t* file)
@@ -209,18 +213,19 @@ pipe_t *pipedup(void* path, const char *mode, file_t* file)
     return NULL;
 }
 
-int fs_pipe(int pipefd[2])
+int fs_pipe(process_t *process, int pipefd[2])
 {
 
     int flags = PIPENOBLOCK;
-    
+    fs_pipeA(process, pipefd, flags);
     return 0;
 }
 
-int fs_pipeA(int pipefd[2], int flags)
+int fs_pipeA(process_t *process, int pipefd[2], int flags)
 {
     file_t *filer, *filew;
     char mode[10];
+    int pipes[2];
     
     strcpy(mode, "r");
     if (flags & PIPENOBLOCK)
@@ -229,8 +234,14 @@ int fs_pipeA(int pipefd[2], int flags)
     strcpy(mode, "w");
     filew = fs_open(filer->f_path,mode);
     
+    pipes[0] = (int)filer;
+    pipes[1] = (int)filew;
+    if (process != NULL)
+        copyFromKernel(process, pipefd, pipes, sizeof(int)*2);
+    else
+    {
     pipefd[0] = (int)filer;
     pipefd[1] = (int)filew;
-    
+    }    
     return 0;
 }
