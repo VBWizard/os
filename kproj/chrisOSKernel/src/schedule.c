@@ -8,7 +8,7 @@
 #include "strings.h"
 
 #define SCHEDULER_DEBUG 1
-#define MAX_TASKS 1000
+#define MAX_TASKS 50
 
 extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t* kTicksSinceStart;
@@ -310,7 +310,7 @@ task_t* findOpenTaskSlot()
                 slotNum++;
 	}
 	if (list==(task_t*)NO_NEXT)
-		return NULL;
+            panic("No free task slots to assign to new task.  Increase scheduler MAX_TASKS to fix this\n");
         printd(DEBUG_PROCESS, "findOpenTaskSlot: Found process at slot # %u\n", slotNum);
 	return list;
 }
@@ -351,31 +351,36 @@ task_t* findRunningTask()
 //Using the fairness doctrine for now, so task with most ticks in runnable gets to run
 task_t* findTaskToRun()
 {
-    uint32_t mostIdleTicks=0;
-    task_t* taskToRun=NULL;
-
+    uint32_t mostIdleTicks=0, oldTicks;
+    task_t* taskToRun=NULL, *task;
+    process_t* process;
     uintptr_t* queue=qRunnable;
     
     while (*queue!=NO_NEXT)
     {
         if (*queue!=0)
         {
+            task = (task_t*)*queue;
+            process = task->process;
+            
+            oldTicks=task->prioritizedTicksInRunnable;
             //This is where we increment all the runnable ticks, based on the process' priority
-            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s-%u), priority=%u, old ticks=%u, new ticks=",
-                    ((task_t*)*queue)->taskNum, ((process_t*)((task_t*)*queue)->process)->path,
-                    ((process_t*)((task_t*)*queue)->process)->childNumber,
-                    ((process_t*)((task_t*)*queue)->process)->priority,
-                    ((task_t*)*queue)->prioritizedTicksInRunnable);
-            if ( (task_t*)*queue!=kIdleTask)
-                ((task_t*)*queue)->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-((process_t*)((task_t*)*queue)->process)->priority)+1;
-            printd(DEBUG_PROCESS,"%u",((task_t*)*queue)->prioritizedTicksInRunnable);
-            if ( (task_t*)*queue==kIdleTask)
+            if ( task!=kIdleTask || (task==kIdleTask) && task->prioritizedTicksInRunnable==0)
+                task->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-process->priority)+1;
+            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s-%u[%s]), priority=%u, old ticks=%u, new ticks=%u %s\n",
+                    task->taskNum, process->exename,
+                    process->childNumber,
+                    process->parent->exename,
+                    process->priority,
+                    oldTicks,
+                    task->prioritizedTicksInRunnable, task==kIdleTask?"(idle task)":"");
+            if ( task==kIdleTask)
                 printd(DEBUG_PROCESS," (idle task)");
             printd(DEBUG_PROCESS,"\n");
-            if ( ((task_t*)*queue)->prioritizedTicksInRunnable >= mostIdleTicks)
+            if ( task->prioritizedTicksInRunnable >= mostIdleTicks)
             {
-                taskToRun=(task_t*)*queue;
-                mostIdleTicks=((task_t*)*queue)->prioritizedTicksInRunnable;
+                taskToRun=task;
+                mostIdleTicks=task->prioritizedTicksInRunnable;
             }
         }
         queue++;
@@ -491,32 +496,6 @@ void checkUSleepTasks(task_t* taskToStop, uint32_t retVal)
                 printd(DEBUG_PROCESS,"\tFound process 0x%04X in usleep queue waiting for process 0x%04X, moving to Runnable queue\n",task->taskNum,taskToStop->taskNum);
                 process->signals.sigdata[SIGUSLEEP]=0;
                 process->signals.sigind &=~SIGUSLEEP;
-                //Write retVal from the child process in the parent process' environment
-/*                for (int cnt=0;cnt<50;cnt++)
-                {
-                    if (((char**)process->realEnvp)[cnt]!=0)
-                    {
-                        if (strncmp(((char**)process->realEnvp)[cnt],"RETVAL",6)==0)
-                        {
-                            strcpy(((char**)process->realEnvp)[cnt],"RETVAL=");
-                            char str[20];
-                            itoa(retVal,str);
-                            strcat(((char**)process->realEnvp)[cnt],str);
-                            break;
-                        }
-                    }
-                    else if (((char**)process->realEnvp)[cnt]==0)
-                    {
-                        //(char**)env = 
-                        ((char**)process->realEnvp)[cnt]=allocPagesAndMapI(task->tss->CR3,20);
-                        strcpy(((char**)process->realEnvp)[cnt],"RETVAL=");
-                        char str[20];
-                        itoa(retVal,str);
-                        strcat(((char**)process->realEnvp)[cnt],str);
-                        break;
-                    }
-                }
-*/
                 printd(DEBUG_PROCESS,"\tProcess 0x%04X, sigind=0x%08x\n",task->taskNum,process->signals.sigind);
                 changeTaskQueue(task,TASK_RUNNABLE);
             }
@@ -628,6 +607,7 @@ void runAnotherTask(bool schedulerRequested)
         loadISRSavedRegs(taskToRun);
         activeSTDOUT = ((process_t *)taskToRun->process)->stdout;
         activeSTDIN = ((process_t *)taskToRun->process)->stdin;
+        printd(DEBUG_PROCESS,"Active STDIN = 0x%08X\n",activeSTDIN);
         activeSTDERR = ((process_t *)taskToRun->process)->stderr;
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG

@@ -44,7 +44,7 @@ terminfo_t *sysConsole;
 ttydevice_t *tty1;
 process_t* kIdleProcess;
 task_t* kIdleTask;
-uint64_t kIdleTicks=0;
+uint32_t kIdleTicks=0;
 uint64_t kCPUCyclesPerSecond;
 uint32_t saveESP;
 uint32_t kKernelCR3=KERNEL_CR3;
@@ -101,6 +101,9 @@ int main(int argc, char** argv)  {
     tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 0);
     kKernelProcess->stdout = tty1->stdOutWritePipe;
     kKernelProcess->stdin = tty1->stdInReadPipe;
+    
+    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X", 
+            tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);
     
     keyboardInit();
     //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS

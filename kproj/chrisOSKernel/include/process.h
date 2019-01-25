@@ -41,6 +41,7 @@ extern "C" {
     {
         uint32_t processSyscallESP;         //NOTE: this must be the first item in the struct, as it is mapped into the process later
         uint32_t pageDirPtr;
+        char exename[128];
         struct sprocess* this;                     //NOTE: This must remain the second item in the struct at offset +4
         task_t* task;
         sGDT* gdtEntry;
@@ -74,6 +75,7 @@ extern "C" {
         uint32_t childNumber;
         uint32_t lastChildNumber;
         bool execDontSaveRegisters;
+        bool foreground;
     } process_t;
 
 

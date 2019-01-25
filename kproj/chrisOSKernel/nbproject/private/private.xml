@@ -19,11 +19,7 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernel.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/drivers/terminal/tty_driver.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/drivers/drv_genKeyboard.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/pipe.c</file>
         </group>
     </open-files>
 </project-private>

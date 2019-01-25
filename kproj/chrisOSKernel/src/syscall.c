@@ -99,15 +99,17 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             if (genericFileHandle == (uintptr_t*)STDIN_FILE)
                 genericFileHandle = process->stdin;
             retVal=fs_read(process, genericFileHandle, (void*)param2, param3, 1);
+            printd(DEBUG_FILESYS, "_sysCall: read() returning %u bytes to %s from %s\n",retVal, process->exename, ((file_t*)genericFileHandle)->f_path);
                 __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_WRITE:       //***write to descriptor, param1 = descriptor #, param2 = string to write
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             genericFileHandle = (uintptr_t*)param1;
-            if (genericFileHandle == (uintptr_t*)1)
+            if (genericFileHandle == (uintptr_t*)STDOUT_FILE)
                 genericFileHandle = process->stdout;
             retVal=fs_write(process, genericFileHandle, (void*)param2, param3, 1);
+            printd(DEBUG_FILESYS, "_sysCall: write() wrote %u bytes to %s from %s\n",retVal, ((file_t*)genericFileHandle)->f_path, process->exename);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_PIPE:

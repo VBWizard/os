@@ -65,6 +65,7 @@ __asm__("cli\n");
     printd(DEBUG_PROCESS,"Allocated kernel task at 0x%08x\n",kKernelTask);
     kKernelProcess=(process_t*)allocPagesAndMap(sizeof(process_t));
     printd(DEBUG_PROCESS,"Allocated kernel process at 0x%08x\n",kKernelProcess);
+    strcpy(kKernelProcess->exename, "kprocess");
     kKernelProcess->task=kKernelTask;
     kKernelProcess->priority=16;    //Set kernel task to low priority
     kKernelTask->process=kKernelProcess;

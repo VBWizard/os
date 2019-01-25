@@ -31,7 +31,7 @@ extern "C" {
     
     typedef struct sPipe
     {
-        file_t* file;       //This has to be the first field so I can use the pointer to create a pipe_t
+        file_t *file[2];       //This has to be the first field so I can use the pointer to create a pipe_t
         process_t* owner;
         char mode[10];
         uint32_t flags;

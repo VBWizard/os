@@ -25,7 +25,7 @@
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
-extern uint64_t kIdleTicks;
+extern uint32_t kIdleTicks;
 extern uintptr_t *qRunnable;
 void CoWProcess(process_t* process);
 void dupPageTables(process_t* newProcess, process_t* currProcess);
@@ -271,6 +271,9 @@ void processIdleLoop()
     sys_masksig(SIGINT,1);
     while (1==1)
     {
+        kIdleTicks++;
+        if (kIdleTicks%10==0)
+        printd(DEBUG_PROCESS, "tick (%u)\n",kIdleTicks);
 /*        if (++kIdleTicks % 10 == 0)
             printd(DEBUG_PROCESS,"IDLE TASK: Idle ticks = %u\n",kIdleTicks);*/
         __asm__("sti;hlt;");
@@ -357,6 +360,20 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     }
     else
         strcpy(process->path,path);
+    
+    char *slash=path, *slash2=path;
+    
+    while (slash)
+    {
+        slash = strstr(slash2+1, "/");
+        if (slash)
+            slash2 = slash;
+        else
+            slash2+=1;
+    }
+
+    strcpy(process->exename, slash2);
+    
     printd(DEBUG_PROCESS,"process->path (0x%08x)=%s\n",process->path,process->path);
    
     //Always set the elf to NULL, even when useExistingProcess, because we don't want to disturb the paren't elf

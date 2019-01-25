@@ -115,9 +115,13 @@ void* fs_open(char* path, const char* mode)
             if (strlen(path)>7)
             {
                 file->pipe = (void*)pipedup(path, mode, file);
+                file->f_path = path;
                 if (!file->pipe)
                     return ERROR_FS_PIPE_DOESNT_EXIST;
-                ((pipe_t *)file->pipe)->file = file;
+                if (strstr(mode,"r"))
+                    ((pipe_t *)file->pipe)->file[0] = file;
+                else
+                    ((pipe_t *)file->pipe)->file[1] = file;
             }
             else if (strstr(mode,"r"))
                 file->pipe = pipeFs->fops->open(file,mode);

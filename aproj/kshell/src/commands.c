@@ -55,7 +55,7 @@ void cmdSetEnv(char* cmdline)
         cmdPrintEnv();
 }
 
-int kexec(char* path, int argc, char** argv, bool background)
+int kexec2(char* path, int argc, char** argv, bool background)
 {
     int pid=execa(path,argc,argv);
 
@@ -75,7 +75,7 @@ int kexec(char* path, int argc, char** argv, bool background)
 
 }
 
-int execTime(char* cmdline, bool timeIt)
+int kexec(char* cmdline, bool timeIt)
 {
     bool background=false;
     int forkPid=0;
@@ -96,8 +96,17 @@ int execTime(char* cmdline, bool timeIt)
     char **argv;
     
     argv = cmdlineToArgv(cmdline, &argc);
-            
-//    print ("Executing %s\n",pgm);
+
+    if (argc<1)
+    {
+        printf("kexec: Invalid command\n");
+        return -5;
+    }
+    
+    if (*argv[argc-1]=='&')
+        background=true;
+
+    
     startTicks=getticks();
     
     forkPid = fork();
@@ -119,26 +128,30 @@ int execTime(char* cmdline, bool timeIt)
         print("Fork error %u", forkPid);
     else
     {
+        if (!background)
+        {
             lastExecExitCode = waitpid(forkPid);
             if (lastExecExitCode == 0xBADBADBA)
                 print("execTime: Cannot execute %s\n",argv[0]);
-            if (timeIt)
-            {
-                endTicks=getticks();
-                print("%u ticks\n",endTicks-startTicks);
-            }
-            char ret[10];
-            itoa(lastExecExitCode,ret);
-            setenv("LASTEXIT",ret);    
+        }
+        if (timeIt)
+        {
+            endTicks=getticks();
+            print("\n%u ticks\n",endTicks-startTicks);
+        }
+        char ret[10];
+        itoa(lastExecExitCode,ret);
+        setenv("LASTEXIT",ret);    
     }
     //Its ok to free arguments now because they are copied by the kernel to pgm's memory
     free(argv);
     free(pgm);
     
 }
+
 void cmdTime(char* cmdline)
 {
-    execTime(cmdline,true);
+    kexec(cmdline,true);
 }
 
 void cmdRepeat(char * cmdline)
@@ -153,8 +166,8 @@ void cmdRepeat(char * cmdline)
 
     for (int cnt=0;cnt<count;cnt++)
     {
-        printf("*************** REPEAT EXECUTION #%u of %u ***************\n",cnt+1,count);
-        execTime(newCmdLine,false);
+        printf("\n*************** REPEAT EXECUTION #%u of %u ***************\n",cnt+1,count);
+        kexec(newCmdLine,false);
         if (bSigIntReceived)
         {
             processSignal(SIGINT);
@@ -166,7 +179,7 @@ void cmdRepeat(char * cmdline)
 
 void cmdExecp(char* cmdline)
 {
-    execTime(cmdline,false);
+    kexec(cmdline,false);
 }
 
 void cmdExit(char *cmdline)

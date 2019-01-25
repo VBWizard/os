@@ -14,6 +14,7 @@
 extern filesystem_t* pipeFs;
 
 volatile int kPipeWriteLock;
+volatile int kPipeReadLock;
 
 filesystem_t *initpipefs()
 {
@@ -30,6 +31,7 @@ filesystem_t *initpipefs()
     fs->files = kMalloc(sizeof(dllist_t));
     memset(openPipes,0,sizeof(pipes_t)*1000);
     kPipeWriteLock = 0;
+    kPipeReadLock = 0;
     return fs;
 }
 
@@ -63,15 +65,21 @@ void *pipeopen(void* filePtr, const char *mode)
     }
     strcpy(pipe->mode, mode);
     if (strstr((char*)pipe->mode,"r"))
+    {
         pipe->flags |= PIPEREAD;
+        pipe->file[0] = file;
+        pipe->file[0]->pipe = pipe;
+    }
     else
+    {
         pipe->flags |= PIPEWRITE;
+        pipe->file[1] = file;
+        pipe->file[1]->pipe = pipe;
+    }
     
     if (strstr(pipe->mode,"n"))
         pipe->flags |= PIPENOBLOCK;
     
-    pipe->file = file;
-    pipe->file->pipe = pipe;
     
     pipes_t *op;
     for (int cnt=0;cnt<1000;cnt++)
@@ -116,8 +124,6 @@ size_t piperead(void *buffer, int size, int length, void *f)
     if (pipe->flags & PIPEREAD==0)
         return ERROR_FS_FILE_INVALID_OPERATION;
     
-    //kPipeWriteLock
-    
     do
     {
         copySize = size * length;
@@ -128,8 +134,8 @@ size_t piperead(void *buffer, int size, int length, void *f)
             if (pipe->flags & PIPENOBLOCK) //Pipe doesn't block so oh well if the copy size is less than the caller wants
                 break;
             //yield here
-            triggerScheduler();
-            __asm__("sti\nhlt"); //Wait for the scheduler
+            //triggerScheduler();
+            __asm__("sti\nhlt\nhlt\nhlt"); //Wait for the scheduler
         }
        
     } while (copySize < size * length);
@@ -137,10 +143,15 @@ size_t piperead(void *buffer, int size, int length, void *f)
     if (copySize > 0)
     {
         //Copy X bytes from pipe memory to the caller's buffer
+        while (__sync_lock_test_and_set(&kPipeReadLock, 1));
         memcpy(buffer, file->buffer, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
-        //Move the contents beyond what is being returned, to the beginning of the buffer
-        memcpy(file->buffer, *file->bufferPtr, PIPE_FILE_SIZE-copySize);
-        *file->bufferPtr-=copySize;  
+        //Move the contents beyond what is being returned, to the beginning of the buffer, but only the length that has been written to the buffer
+        memcpy(file->buffer, file->buffer+copySize, *file->bufferPtr-file->buffer-copySize);
+        *file->bufferPtr-=copySize; 
+        __sync_lock_release(&kPipeReadLock);   
+        printd(DEBUG_FILESYS, "piperead: Returning %u bytes from pipe %s (0x%08X), %u bytes available\n",copySize, pipe->file[0]->f_path, pipe->file,
+            pipe->file, (uint32_t)*file->bufferPtr - (uint32_t)file->buffer);
+
     }
     return copySize;
 }
@@ -169,6 +180,10 @@ size_t pipewrite(const void *data, int size, int count, void *f)
     memcpy(*file->bufferPtr, data, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
     *file->bufferPtr+=copySize;    
     __sync_lock_release(&kPipeWriteLock);   
+    
+    printd(DEBUG_FILESYS, "pipewrite: Wrote %u bytes to pipe %s (0x%08X), %u bytes available\n",copySize, pipe->file[1]->f_path, 
+            pipe->file, (uint32_t)*file->bufferPtr - (uint32_t)file->buffer);
+
     return copySize;
 }
 
@@ -203,9 +218,9 @@ pipe_t *pipedup(void* path, const char *mode, file_t* file)
                     break;
                 }
             }
-            file->buffer = openPipes[cnt].pipe->file->buffer;
+            file->buffer = openPipes[cnt].pipe->file[0]->buffer;
             file->fops = pipeFs->fops;
-            file->bufferPtr = openPipes[cnt].pipe->file->bufferPtr;
+            file->bufferPtr = openPipes[cnt].pipe->file[0]->bufferPtr;
 
             return(pipe);
         }
@@ -226,6 +241,7 @@ int fs_pipeA(process_t *process, int pipefd[2], int flags)
     file_t *filer, *filew;
     char mode[10];
     int pipes[2];
+    pipe_t pipe;
     
     strcpy(mode, "r");
     if (flags & PIPENOBLOCK)
@@ -242,6 +258,19 @@ int fs_pipeA(process_t *process, int pipefd[2], int flags)
     {
     pipefd[0] = (int)filer;
     pipefd[1] = (int)filew;
-    }    
+    } 
+    
+    pipe.owner = process;
+    
+    pipe.file[0] = filer;
+    pipe.file[1] = filew;
+    
+    pipe.owner = process;
+    printd(DEBUG_FILESYS, "Created pipe pair %s/%s (0x%08X/0x%08X) for %s\n", 
+            pipe.file[0]->f_path, 
+            pipe.file[1]->f_path, 
+            pipe.file[0], 
+            pipe.file[1], 
+            process->exename);
     return 0;
 }

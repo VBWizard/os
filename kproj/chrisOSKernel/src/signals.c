@@ -52,6 +52,7 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
             p->signals.sighandler[SIGINT]=sigAction;
             p->signals.sigdata[SIGINT]=sigData;
             break;
+        //case SIGIO:
         default:
             panic("sys_setsigaction: Unhandled signal 0x%08x, sigAction 0x%08x\n",signal,sigAction);
             break;
@@ -93,16 +94,6 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
             p->signals.sigdata[SIGUSLEEP]=sigData;
             printd(DEBUG_SIGNALS,"Signalling USLEEP for cr3=0x%08x, sigData=0x%08x, sigind=0x%08x\n",callerCR3,sigData,p->signals.sigind);
             triggerScheduler();
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
             __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
 __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
             //Since SIGUSLEEP can be used to wait for a child task, we'll return the exit code from the child task
