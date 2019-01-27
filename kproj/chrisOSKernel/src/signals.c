@@ -16,7 +16,6 @@ extern uintptr_t *qRunning;
 extern uintptr_t *qRunnable;
 extern uintptr_t *qISleep;
 extern uint32_t* kTicksSinceStart;
-extern task_t* findTaskByCR3(uint32_t cr3);
 extern task_t* findTaskByTaskNum(uint32_t taskNum);
 extern task_t *kTaskList;
 
@@ -30,7 +29,7 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
     __asm__("mov eax,%[newCR3]\n"
             "mov cr3,eax\n"::[newCR3] "r" (KERNEL_CR3));
     
-    process_t *p=findTaskByCR3(oldCR3)->process;
+    process_t *p=getCurrentProcess();
 
     //CLR 12/24/2018: Removed sigind's as we don't want to trigger signals, just set their actions
     printd(DEBUG_SIGNALS,"Handling signal 0x%08x\n",signal);
@@ -81,7 +80,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
     }
     else
     {
-        p = findTaskByCR3(callerCR3)->process;
+        p = getCurrentProcess();
     }
     
     printd(DEBUG_SIGNALS, "sys_sigAction2(0x%08x, 0x%08x, 0x%08x, 0x%08x)\n"
@@ -189,7 +188,7 @@ void sys_masksig(signals signal, bool mask)
     __asm__("cli\n");
     __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
 
-    process_t *p=findTaskByCR3(oldCR3)->process;
+    process_t *p=getCurrentProcess();
     
     printd(DEBUG_PROCESS,"sys_masksig: Old sigmask = 0x%08x\n",p->signals.sigmask);
     if (mask)

@@ -35,6 +35,8 @@ extern "C" {
 
 #define MAX_PARAM_COUNT 10
 #define MAX_PARAM_WIDTH 128
+
+#define FS_LAZY_LOAD
     
 /* ***NOTE: If DEBUG_NONE is defined then there will be no debugging*** */
 //#define DEBUG_NONE 0
@@ -69,10 +71,11 @@ extern "C" {
 #define DEBUG_COW 1<<28
 #define DEBUG_MAX 0XFFFFFFFF            //0XFFFF TO TURN ON
     //NOTE: Turning off detailed and/or process causes everything to crash
-#define KDEBUGLEVEL  DEBUG_EXCEPTIONS |DEBUG_PRINT_TO_PORT |DEBUG_KEYBOARD | DEBUG_FILESYS
-            //| DEBUG_COW | DEBUG_LIBC | DEBUG_TASK |  DEBUG_PROCESS | DEBUG_DETAILED
-    // | DEBUG_ELF_LOADER| DEBUG_AHCI
+#define KDEBUGLEVEL  DEBUG_EXCEPTIONS |DEBUG_PRINT_TO_PORT |DEBUG_KEYBOARD |  DEBUG_PROCESS | DEBUG_DETAILED| DEBUG_TASK 
+            //| DEBUG_COW | DEBUG_LIBC | DEBUG_FILESYS
+    //| DEBUG_AHCI
     //| DEBUG_MALLOC
+    // | DEBUG_ELF_LOADER 
 #ifdef __cplusplus
 }
 #endif

@@ -160,8 +160,6 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     uint32_t lPDEAddress=0, lPTEAddress=0;
     uint32_t lOldDebugLevel=0;
     bool isCow=false, isMMap=false;
-    uint32_t pagePhysAddr=lPTEValue&0xFFFFF000;
-    uint32_t pageFlags=lPTEValue&0x00000FFF;
     uint32_t pageVirtAddress;
     tss_t* ourTSS = pagingExceptionTSS;
     uint32_t victimTaskNum = ourTSS->LINK;
@@ -187,12 +185,14 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
 
     
     //Don't forget to map the victim process to VADDR!
-    pagingMapPage(victimProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)victimProcess & 0xFFFFF000, 0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
+    pagingMapPage(victimProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)victimProcess & 0xFFFFF000, (uint16_t)0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
    __asm__("clts\n"); //TODO: Didn't save fpu registers
    lPTEAddress=kPagingGet4kPTEntryAddressCR3(pagingExceptionCR3,pagingExceptionCR2);
     lPDEAddress=kPagingGet4kPDEntryAddressCR3(pagingExceptionCR3,pagingExceptionCR2);
     lPDEValue=kPagingGet4kPDEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
     lPTEValue=kPagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
+    uint32_t pagePhysAddr=lPTEValue&0xFFFFF000;
+    uint32_t pageFlags=lPTEValue&0x00000FFF;
     elfInfo_t* elf=victimProcess->elf;
     //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08x (CR3=0x%08x)\n",exceptionCR2,exceptionCR3);
     printk(0,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
@@ -201,31 +201,31 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
 
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
     pageVirtAddress=lPTEValue&0xFFFFF000;
-/*    if ( (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))
+    if ( (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))
     {
         printd(DEBUG_EXCEPTIONS,"\t\tFound uninitialized mmap page\n",victimProcess->path,lPTEValue);
-        bool handled = handleMMapPagingException(victimProcess, pagingExceptionCR2, lPTEValue, ErrorCode);
-        if (handled)
-            isMMap=true;
-    }
+        isMMap = handleMMapPagingException(victimProcess, pagingExceptionCR2, lPTEValue, ErrorCode);
+    }  
     else
         printd(DEBUG_EXCEPTIONS,"\t\tNot mmap page\n",victimProcess->path,lPTEValue);
-*/
-    //Check for page tagged as COW (bit 9)
-    printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bits\n");
-    uint32_t cowPTEp = pagingGet4kPTEntryAddressCR3((uint32_t)pagingExceptionCR3,pagingExceptionCR2);
-    uint32_t cowPTE = pagingGet4kPTEntryValueCR3((uint32_t)pagingExceptionCR3,pagingExceptionCR2);
-    if (cowPTE & PAGE_COW_FLAG)
-    {
-        isCow=true;
-        printd(DEBUG_EXCEPTIONS,"\t\tAddress is CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
-    }
-    else
-    {
-        printd(DEBUG_EXCEPTIONS,"\t\tAddress is not CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
-    }
 
-    if (!isCow)
+    if (!isMMap)
+    {
+        //Check for page tagged as COW (bit 9)
+        printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bits\n");
+        uint32_t cowPTEp = pagingGet4kPTEntryAddressCR3((uint32_t)pagingExceptionCR3,pagingExceptionCR2);
+        uint32_t cowPTE = pagingGet4kPTEntryValueCR3((uint32_t)pagingExceptionCR3,pagingExceptionCR2);
+        if (cowPTE & PAGE_COW_FLAG)
+        {
+            isCow=true;
+            printd(DEBUG_EXCEPTIONS,"\t\tAddress is CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
+        }
+        else
+        {
+            printd(DEBUG_EXCEPTIONS,"\t\tAddress is not CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
+        }
+    }
+    if (!isMMap && !isCow)
     {
         //Check for CoW pages in libraries
         printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bss/data in libraries\n",victimProcess->path);
@@ -261,12 +261,12 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     {
         if (isCow) //if isMMap then the page was already fixed.  This is the "success" exit point, so skip fixing up the page, clear the CR2 and exit
         {
-            pagingMapPage(KERNEL_CR3,0x07663000, 0x07663000,0x7);
             uintptr_t exceptionPhysicalCR2Address=pagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2) & 0xFFFFF000;
             uint32_t newPhys=(uint32_t)allocPages(PAGE_SIZE);
-            pagingMapPage(KERNEL_CR3,newPhys,newPhys,0x7);
+            pagingMapPage(KERNEL_CR3,exceptionPhysicalCR2Address,exceptionPhysicalCR2Address,(uint16_t)0x7);
+            pagingMapPage(KERNEL_CR3,newPhys,newPhys,(uint16_t)0x7);
             memcpy((void*)newPhys,(void*)(exceptionPhysicalCR2Address),PAGE_SIZE);
-            pagingMapPage(pagingExceptionCR3,pagingExceptionCR2 & 0xFFFFF000,newPhys,0x7);
+            pagingMapPage(pagingExceptionCR3,pagingExceptionCR2 & 0xFFFFF000,newPhys,(uint16_t)0x7);
             printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08x (0x%08x) with writable page 0x%08x (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
         }
         __asm__("xor ebx,ebx\nmov cr2,ebx\n");

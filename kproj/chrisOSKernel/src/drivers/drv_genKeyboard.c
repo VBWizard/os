@@ -13,6 +13,8 @@
 #include "signals.h"
 #include "filesystem/pipe.h"
 #include "drivers/tty_driver.h"
+#include "alloc.h"
+#include "kutility.h"
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
@@ -42,7 +44,10 @@ void kbd_handler_generic()
     unsigned char lKeyControlVal=0;
     unsigned char rawKey=0;
     unsigned char translatedKeypress=0;
-
+    uintptr_t cr3;
+    
+    SAVE_CURRENT_CR3(cr3);
+    LOAD_KERNEL_CR3;
     rawKey = inb(KEYB_DATA_PORT);
     kKeyChar = rawKey;//& 0x80;
     //printd(DEBUG_KEYBOARD,"got a key: %c (0x%04X)\n",kKeyChar,kKeyChar);
@@ -51,11 +56,11 @@ void kbd_handler_generic()
     case KEY_SHIFT_DN:
         kKeyStatus[INDEX_SHIFT]=1;
         //printd(DEBUG_KEYBOARD,"Shift down\n");
-        return;
+        goto timeToReturn;
     case KEY_SHIFT_UP:
         kKeyStatus[INDEX_SHIFT]=0;
         //printd(DEBUG_KEYBOARD,"Shift up\n");
-        return;
+        goto timeToReturn;
     case KEY_CTRL_DN:
                 cursorSavePosition();
                 cursorMoveTo(74,0);
@@ -63,7 +68,7 @@ void kbd_handler_generic()
                 cursorRestorePosition();
         kKeyStatus[INDEX_CTRL]=1;
         //printd(DEBUG_KEYBOARD,"Ctrl down\n");
-        return;
+        goto timeToReturn;
     case KEY_CTRL_UP:
                 cursorSavePosition();
                 cursorMoveTo(74,0);
@@ -71,19 +76,19 @@ void kbd_handler_generic()
                 cursorRestorePosition();
         kKeyStatus[INDEX_CTRL]=0;
         //printd(DEBUG_KEYBOARD,"Ctrl up\n");
-        return;
+        goto timeToReturn;
     case KEY_ALT_DN:
         kKeyStatus[INDEX_ALT]=1;
         //printd(DEBUG_KEYBOARD,"Alt down\n");
-        return;
+        goto timeToReturn;
     case KEY_ALT_UP:
         kKeyStatus[INDEX_ALT]=0;
         //printd(DEBUG_KEYBOARD,"Alt up\n");
-        return;
+        goto timeToReturn;
     case KEY_CAPSLOCK_UP:
         kKeyStatus[INDEX_CAPSLOCK]=!kKeyStatus[INDEX_CAPSLOCK];
         //printd(DEBUG_KEYBOARD,"Capslock\n");
-        return;
+        goto timeToReturn;
 //        case MAKE_RIGHT: kKeyStatus[INDEX_RIGHT]=0;break;
 //        case MAKE_LEFT: kKeyStatus[INDEX_LEFT]=0;break;
 //        case MAKE_UP: kKeyStatus[INDEX_UP]=0;break;
@@ -126,7 +131,7 @@ void kbd_handler_generic()
         {
             //CLR 01/10/2017: Increment the buffer pointer first
             pipewrite(&translatedKeypress, 1, 1, tty1->stdInWritePipe);
-            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Translated key '%c' delivered to stdin pipe 0x%08X\n",translatedKeypress, tty1->stdInWritePipe);
+            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Translated key '%c' delivered to stdin pipe 0x%08X (CR3=0x%08X)\n",translatedKeypress, tty1->stdInWritePipe, CURRENT_CR3);
         }
         else
             panic("kbd_handler_generic: STDIN pipe is null! (2)\n");
@@ -171,6 +176,7 @@ void kbd_handler_generic()
     }
 
 timeToReturn:
+    LOAD_CR3(cr3);
     lKeyControlVal = inb(KEYB_CTRL_PORT);
     lKeyControlVal |= 0x82;
     outb(KEYB_CTRL_PORT, lKeyControlVal);

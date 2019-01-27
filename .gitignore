@@ -73,3 +73,5 @@ gdb_history
 /aproj/time/build/
 /aproj/cat/build/
 /aproj/cat/dist/
+/aproj/echo/build/
+/aproj/echo/dist/

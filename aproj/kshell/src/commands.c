@@ -232,6 +232,16 @@ void cmdSleep(char *cmdline)
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
 
+    int size = 100000/4; //147400;
+    int test[size];
+    
+    for (int cnt=0;cnt<size;cnt++)
+        test[cnt]=cnt;
+    
+    for (int cnt=0;cnt<size;cnt++)
+        if (test[cnt]!=cnt)
+            printf("uh oh!");
+    
     if (params[0][0]==0)
     {
         print("Requires 1 parameter which is the number of seconds to sleep\n");

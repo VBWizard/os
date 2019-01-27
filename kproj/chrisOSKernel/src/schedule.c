@@ -245,9 +245,9 @@ void loadISRSavedRegs(task_t* task)
         isrSavedES = parentTSS->ES;
         isrSavedFS = parentTSS->FS;
         isrSavedGS = parentTSS->GS;
-        //We need to load the CR3 because whatever CR3 the parent was using, that's what the child should use.
+        //We need to load the CR3 because whatever CR3 the parent was using, that's what the child should use for the FIRST return from syscall.
         isrSavedCR3 = parentTSS->CR3; 
-        memcpy((uintptr_t*)((process_t*)task->process)->stackStart, (uintptr_t*)parent->stackStart, ((process_t*)task->process)->stackSize);
+//        memcpy((uintptr_t*)((process_t*)task->process)->stackStart, (uintptr_t*)parent->stackStart, ((process_t*)task->process)->stackSize);
         memcpy((uintptr_t*)((process_t*)task->process)->stack1Start, (uintptr_t*)parent->stack1Start, ((process_t*)task->process)->stack1Size);
     }
 #ifdef SCHEDULER_DEBUG

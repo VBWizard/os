@@ -12,7 +12,7 @@
 #include "strings.h"
 #include "charDev.h"
 #include "i386/kPaging.h"
-
+#include "../../../chrisOSKernel/include/paging.h"
 extern int kTimeZone;
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
@@ -193,8 +193,13 @@ char * strtoupper(char* pointerToString)
 void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bool toLog)
 {
     tss_t* tss = task->tss;
-    uint32_t *espP = (uint32_t*)tss->ESP;
+    uint32_t esp = tss->ESP;
     
+#ifdef KERNEL_LOADED
+    uint32_t *espP = (pagingGet4kPTEntryValueCR3(task->tss->CR3,tss->ESP) & 0xFFFFF000) | (esp & 0x00000FFF);
+#else
+    uint32_t *espP = (uint32_t*)tss->ESP;
+#endif    
     char content[5000];
     memset(content, 0, 5000);
     char *contentP=content;
@@ -216,15 +221,17 @@ LOAD_ZERO_BASED_DS
 //              printk("%02X ", lCSIPPtr[cnt]);
 //          printk("\n");
     contentP=content+strlen(content);
-    sprintf(contentP, "Stack (ss:ebp) @ 0x%08x:0x%08X:\n",tss->SS, espP);
-    uint32_t hardStop = ((uint32_t)espP & 0xFFFFF000) + 0x1000;
+    sprintf(contentP, "Stack (ss:ebp) @ 0x%08x:0x%08X:\n",tss->SS, esp);
     for (int cnt=0;cnt<20;cnt++)
     {
-        if ((uint32_t)espP >= hardStop)
+#ifdef KERNEL_LOADED
+        int pte=pagingGet4kPTEntryValueCR3(task->tss->CR3,espP);
+        if (!(pte & 0x1))
             break;
-printd(DEBUG_EXCEPTIONS, "espP (0x%08X) and hardStop (0x%08X)\n", espP, hardStop);
-        sprintf(contentP, "\t0x%08X: 0x%08X\n",espP, *espP);
+#endif
+        sprintf(contentP, "\t0x%08X: 0x%08X\n",esp, *espP);
         espP++;
+        esp++;
         contentP=content+strlen(content);
     }
     if (toLog)

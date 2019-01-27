@@ -102,7 +102,7 @@ int main(int argc, char** argv)  {
     kKernelProcess->stdout = tty1->stdOutWritePipe;
     kKernelProcess->stdin = tty1->stdInReadPipe;
     
-    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X", 
+    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
             tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);
     
     keyboardInit();

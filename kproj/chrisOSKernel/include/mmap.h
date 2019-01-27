@@ -39,7 +39,8 @@ extern "C" {
         MAP_PRIVATE = 1,
         MAP_SHARED = 2,
         MAP_ANONYMOUS = 3,
-        MAP_FIXED = 4 //MAP_FIXED has to be the largest value
+        MAP_STACK = 4,
+        MAP_FIXED = 0x10 //MAP_FIXED has to be the largest value
     } eMapFlags;
 
     typedef struct smmappedpage
@@ -65,7 +66,8 @@ extern "C" {
 
     typedef struct smemorymapping memmap_t;
 
-    void * sys_mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset);
+    void * sys_mmap (process_t* p, void *addr,size_t len,int prot,int flags,int fd,off_t offset);
+    bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExceptionCR2, uint32_t pteValue, int errorCode);
     
 #ifdef __cplusplus
 }

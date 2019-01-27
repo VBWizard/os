@@ -303,5 +303,12 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
 
 VISIBLE char** cmdlineToArgv(char* cmdline, int *argc)
 {
+    do_syscall0(0);
+
     return cmdlineToArgvI(cmdline, argc);
+}
+
+VISIBLE int test()
+{
+    return do_syscall0(0);
 }

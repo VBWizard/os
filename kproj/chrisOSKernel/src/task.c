@@ -10,6 +10,7 @@
 #include "paging.h"
 #include "alloc.h"
 #include "process.h"
+#include "mmap.h"
 
 extern uint32_t* kTaskSlotAvailableInd;
 extern tss_t* kTSSTable;
@@ -77,8 +78,8 @@ task_t* getAvailableTask()
             printd(DEBUG_TASK,"getAvailableTask: Marking TSS %u used\n",slot);
             bitsReset(ptr,slot);
             task->tss=allocPages(PAGE_SIZE); //&kTSSTable[slot];
-            pagingMapPage(KERNEL_CR3,(uint32_t)task->tss | KERNEL_PAGED_BASE_ADDRESS,task->tss,0x7);
-            pagingMapPage(KERNEL_CR3,(uint32_t)task->tss,task->tss,0x7);
+            pagingMapPage(KERNEL_CR3,(uint32_t)task->tss | KERNEL_PAGED_BASE_ADDRESS,task->tss,(uint16_t)0x7);
+            pagingMapPage(KERNEL_CR3,(uint32_t)task->tss,task->tss,(uint16_t)0x7);
             (task-1)->next=task;
             task->prev=(task-1);
             printd(DEBUG_TASK,"getAvailableTask: Using task %u @ 0x%08x, set TSS to 0x%08x\n",slot, task,task->tss);
@@ -145,7 +146,7 @@ void mmMapKernelIntoTask(task_t* task, bool kernelTSS)
     pagingMapPageCount(task->tss->CR3,0xB0000,0xB0000,4,0x7);
 */
     printd(DEBUG_TASK,"Mapping sysEnter_Vector page (0x%08x) to process, r/o\n",&sysEnter_Vector);
-    pagingMapPage(task->tss->CR3,&sysEnter_Vector,&sysEnter_Vector,0x5);
+    pagingMapPage(task->tss->CR3,&sysEnter_Vector,&sysEnter_Vector,(uint16_t)0x5);
     pagingMapPageCount(task->tss->CR3, schedStack, schedStack, 0x16000/PAGE_SIZE, 0x7, true);
     kDebugLevel=oldDebugLevel;
     
@@ -160,20 +161,22 @@ task_t* createTask(void* process, bool kernelTSS)
 {
     printd(DEBUG_TASK,"createTask: calling getTaskSlot\n");
     task_t* task;
+    process_t* theProcess = process;
     task=getAvailableTask();     //create task in the kTaskTable, also a tss in the same slot# in kTSSTable
     
     task->process=process;
+    theProcess->task = task;
     task->tss->CR3=(uint32_t)pagingAllocatePagingTablePage();
     //Configure the task registers
     printd(DEBUG_TASK,"createTask: Set task CR3 to 1k page directory @ 0x%08x\n",task->tss->CR3);
     
     //Map the CR3 into our memory space for before the iRet
-    pagingMapPage(KERNEL_CR3,task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,task->tss->CR3,0x3);
+    pagingMapPage(KERNEL_CR3,task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,task->tss->CR3,(uint16_t)0x3);
     task->pageDir=(uint32_t*)task->tss->CR3;
 
     //TODO: Fix this.  At the minimum, this will break when we start free()ing stuff.
     //Map TSS of task 0 since we are always using it
-    pagingMapPage(task->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,0x7);
+    pagingMapPage(task->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,(uint16_t)0x7);
     
     mmMapKernelIntoTask(task,kernelTSS);
     
@@ -194,9 +197,9 @@ task_t* createTask(void* process, bool kernelTSS)
     }
     else
     {
-        task->tss->SS=0x43;
+        task->tss->SS=0xa3;
         task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x33;
-        task->tss->CS=(0x3b);
+        task->tss->CS=(0x9b);
     }
     //Allocate space for the stack
     if (firstTaskESP0==0)
@@ -233,16 +236,47 @@ task_t* createTask(void* process, bool kernelTSS)
             kKernelTask->esp0Size/PAGE_SIZE);
     pagingMapPageCount(task->tss->CR3, kKernelTask->esp0Base| KERNEL_PAGED_BASE_ADDRESS, kKernelTask->esp0Base, kKernelTask->esp0Size/PAGE_SIZE, 0x7, true);
     
-    task->tss->ESP=(uint32_t)allocPages(0x16000);
-    ((process_t*)task->process)->stackStart=task->tss->ESP;
-    ((process_t*)task->process)->stackSize=0x16000;
-    printd(DEBUG_TASK,"createTask: ESP for task allocated at 0x%08x\n",task->tss->ESP);
-    pagingMapPageCount(task->tss->CR3, task->tss->ESP, task->tss->ESP, 0x16, 0x7, true);
-    pagingMapPageCount(task->tss->CR3, task->tss->ESP | KERNEL_PAGED_BASE_ADDRESS, task->tss->ESP, 0x16, 0x7, true);
-    //Map the stack process into our address space so that we can use it after the iRet
-    pagingMapPageCount(KERNEL_CR3, task->tss->ESP, task->tss->ESP, 0x16, 0x7, true);
-    //Set the pointer so that we don't go off the pages
-    task->tss->ESP+=0x15000;
+    if (kernelTSS)
+    {
+        task->tss->ESP=(uint32_t)allocPages(0x16000);
+        ((process_t*)task->process)->stackStart=task->tss->ESP;
+        ((process_t*)task->process)->stackSize=0x16000;
+        printd(DEBUG_TASK,"createTask: ESP for task allocated at 0x%08x\n",task->tss->ESP);
+        pagingMapPageCount(task->tss->CR3, task->tss->ESP, task->tss->ESP, 0x16, 0x7, true);
+        pagingMapPageCount(task->tss->CR3, task->tss->ESP | KERNEL_PAGED_BASE_ADDRESS, task->tss->ESP, 0x16, 0x7, true);
+        //Map the stack process into our address space so that we can use it after the iRet
+        pagingMapPageCount(KERNEL_CR3, task->tss->ESP, task->tss->ESP, 0x16, 0x7, true);
+        //Set the pointer so that we don't go off the pages
+        task->tss->ESP+=0x15000;
+    }
+    else
+    {
+        //first page has to be physically backed
+        task->tss->ESP=(uint32_t)allocPages(PAGE_SIZE);
+        pagingMapPageCount(task->tss->CR3, 0x9e023000, task->tss->ESP, 0x1, 0x7, true);
+        pagingMapPageCount(task->tss->CR3, 0x9e023000 | KERNEL_PAGED_BASE_ADDRESS, task->tss->ESP, 0x1, 0x7, true);
+        pagingMapPageCount(KERNEL_CR3, 0x9e023000, task->tss->ESP, 0x1, 0x7, true);
+        pagingMapPageCount(KERNEL_CR3, task->tss->ESP | KERNEL_PAGED_BASE_ADDRESS, task->tss->ESP, 0x1, 0x7, true);
+        printd(DEBUG_TASK, "createTask: First page of ESP allocated at 0x%08x and mapped to 0x9e023000\n", task->tss->ESP);
+        
+    //No longer physically allocating stack spage, instead we'll mmap it so that it is allocated on demand
+    ((process_t*)task->process)->stackStart=0x9e000000;  //TODO: make start address a #define?
+    ((process_t*)task->process)->stackSize=0x23000;     //TODO: make size a #define?
+    theProcess->pageDirPtr=task->tss->CR3;
+    if (sys_mmap(theProcess, 
+            (uintptr_t*)theProcess->stackStart, 
+            theProcess->stackSize, 
+            PROT_WRITE, MAP_FIXED | MAP_ANONYMOUS | MAP_STACK | MAP_PRIVATE, 
+            0, 
+            0))
+        panic("Sysmap error!");
+
+        task->tss->ESP=((process_t*)task->process)->stackStart;
+        ((process_t*)task->process)->stackStart=task->tss->ESP;
+        ((process_t*)task->process)->stackSize=0x24000;
+        printd(DEBUG_TASK,"createTask: ESP for task allocated at 0x%08x\n",task->tss->ESP);
+        task->tss->ESP+=0x23400;
+    }
     printd(DEBUG_TASK,"createTask: ESP set to 0x%08x\n", task->tss->ESP);
     //Mapping sysEnter (kKernelTask::ESP1) stack into process
     task->tss->ESP1=kMalloc(0x10*0x1000);
