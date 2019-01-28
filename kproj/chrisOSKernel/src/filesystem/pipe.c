@@ -135,7 +135,7 @@ size_t piperead(void *buffer, int size, int length, void *f)
                 break;
             //yield here
             //triggerScheduler();
-            __asm__("sti\nhlt\nhlt\nhlt"); //Wait for the scheduler
+            __asm__("sti\nhlt\n"); //Wait for the scheduler
         }
        
     } while (copySize < size * length);

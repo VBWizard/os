@@ -28,6 +28,7 @@ extern "C" {
 #include "time.h"
 #include "file.h"
 #include "pipe.h"
+#include "libcmmap.h"
 #include "../../../kproj/chrisOSKernel/include/syscalls.h"
     
 #include <bits/time.h>

@@ -168,7 +168,10 @@ uint32_t pagingGet4kPTEntryAddressCR3(uintptr_t pageDirAddress, uint32_t address
     uint32_t retVal=0;
     address&=0xFFFFF000;
     uintptr_t pDirPtr=pagingGet4kPDEntryValueCR3(pageDirAddress,address) & 0xFFFFF000;
+    if (pDirPtr!=0)
     retVal=((address & 0x3FF000) >> 12) << 2 | pDirPtr;
+    else
+        retVal = 0;
     printd(DEBUG_PAGING,"pagingGet4kPTEntryAddressCR3: returning 0x%08x for address 0x%08x (CR3=0x%08x)\n",retVal,address,pageDirAddress);
     return retVal;
 }
@@ -306,6 +309,18 @@ void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t
 /*        ptrT[(virtualAddress&0x003FFFFF/4096)]=physicalAddress | flags;
         printd(DEBUG_PAGING,"kMapPage: Mapped v=0x%08x via dir=0x%08x, page=0x%08x, to p=0x%08x\n", virtualAddress, &dirPtr[(virtualAddress>>22)], &pagePtr[(virtualAddress&0x003FFFFF/4096)],pagePtr[(virtualAddress&0x003FFFFF/4096)]);
 */
+    }
+    //CLR 1/28/2019: Noticed this while testing anonymous mmap.
+    //Need to update pdir flags if page to be mapped has more permissive perms
+    //There's probably more to do here to remove flags, but ... TODO
+    else 
+    {
+        if (flags & 0x1)
+            dirPtr[(virtualAddress>>22)] |= 1;
+        if (flags & 0x2)
+            dirPtr[(virtualAddress>>22)] |= 2;
+        if (flags & 0x4)
+            dirPtr[(virtualAddress>>22)] |= 4;
     }
     if (dirPtr[(virtualAddress>>22)]==0)
         dirPtr[virtualAddress>>22]=(pageDirAddress + ((virtualAddress&0x003FFFFF)/4096)) | flags;

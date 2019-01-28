@@ -268,7 +268,7 @@ task_t* createTask(void* process, bool kernelTSS)
             theProcess->stackSize, 
             PROT_WRITE, MAP_FIXED | MAP_ANONYMOUS | MAP_STACK | MAP_PRIVATE, 
             0, 
-            0))
+            0) < 0)
         panic("Sysmap error!");
 
         task->tss->ESP=((process_t*)task->process)->stackStart;

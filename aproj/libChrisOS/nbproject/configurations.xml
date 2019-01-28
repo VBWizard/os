@@ -9,6 +9,7 @@
       <itemPath>include/file.h</itemPath>
       <itemPath>include/input.h</itemPath>
       <itemPath>include/libChrisOS.h</itemPath>
+      <itemPath>include/libcmmap.h</itemPath>
       <itemPath>include/malloc.h</itemPath>
       <itemPath>include/memory.h</itemPath>
       <itemPath>include/pipe.h</itemPath>
@@ -50,10 +51,10 @@
       <itemPath>src/file.c</itemPath>
       <itemPath>src/input/input.c</itemPath>
       <itemPath>src/libChrisOS.c</itemPath>
+      <itemPath>src/libcmmap.c</itemPath>
       <itemPath>src/malloc.c</itemPath>
       <itemPath>src/memcpy.c</itemPath>
       <itemPath>src/memset.c</itemPath>
-      <itemPath>src/mmap.c</itemPath>
       <itemPath>src/pipe.c</itemPath>
       <itemPath>src/sprintf.c</itemPath>
       <itemPath>src/stdio.c</itemPath>
@@ -133,6 +134,8 @@
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/libcmmap.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/memory.h" ex="false" tool="3" flavor2="0">
@@ -159,13 +162,13 @@
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/libcmmap.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/pipe.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -264,6 +267,8 @@
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/libcmmap.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/memory.h" ex="false" tool="3" flavor2="0">
@@ -290,13 +295,13 @@
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/libcmmap.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/pipe.c" ex="false" tool="0" flavor2="0">
       </item>

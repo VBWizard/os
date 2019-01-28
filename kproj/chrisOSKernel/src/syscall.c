@@ -14,6 +14,7 @@
 #include "schedule.h"
 #include "filesystem/pipe.h"
 #include "kutility.h"
+#include "mmap.h"
 
 //#include "fs.h" - CLR 04/23/2018: Commented out
 
@@ -46,6 +47,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     bool taskExited = false;
     bool useExisting = false;
     uintptr_t *genericFileHandle;
+    syscall_mmap_t mmap_params;
     
     __asm__("mov eax,esi\n": "=a" (param4));
     __asm__("mov eax,cr3\n": "=a" (processCR3));
@@ -65,7 +67,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08x with return value %u\n",param1,param2);
              markTaskEnded(param1, param2);
              panic("_syscall: exit call, continued after halt!");
-             __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
+             __asm__("mov eax,0xbadbadba;mov ebx,0xbadbadba;mov ecx,0xbadbadba; mov edx,0xbadbadba\n\cli\nhlt\n");               //We should never get here
             break;
         case SYSCALL_FORK:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
@@ -122,6 +124,14 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             retVal = fs_pipe(process, (int*)param1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
+
+        case SYSCALL_MMAP:
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
+            retVal = syscall_mmap(process, (syscall_mmap_t*)param1);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
+            
         case SYSCALL_GETDENTS:
             process=getCurrentProcess();
             retVal = getDirEntries(process, (char*)param1, (void*)param2, param3);

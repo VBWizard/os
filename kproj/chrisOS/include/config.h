@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 //The minimum TPS I've gotten to work is 50.  Not possible to do > 1000 because of MS_PER_TICK.  Seems like 1000 may cause AHCI issues
-#define TICKS_PER_SECOND 100 
+#define TICKS_PER_SECOND 100
 //How many ticks expire between scheduler runs (@100hz - 5=20 ticks per run, 10=10  ticks per run)
 #define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 10
 //How many ticks expire between signal checks

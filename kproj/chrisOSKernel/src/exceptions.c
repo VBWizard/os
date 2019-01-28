@@ -152,7 +152,6 @@ void setupPagingHandler()
     idt_set_gate (&idtTable[0xe], 0xB8, 0, ACS_TASK | ACS_DPL_0); //paging exception
 }
 
-
 void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
 {
     uint32_t lPDEValue=0;

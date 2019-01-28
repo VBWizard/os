@@ -176,12 +176,12 @@ void kbd_handler_generic()
     }
 
 timeToReturn:
-    LOAD_CR3(cr3);
     lKeyControlVal = inb(KEYB_CTRL_PORT);
     lKeyControlVal |= 0x82;
     outb(KEYB_CTRL_PORT, lKeyControlVal);
     lKeyControlVal &= 0x7f;
     outb(KEYB_CTRL_PORT, lKeyControlVal);
+    LOAD_CR3(cr3);
     return;
 }
 

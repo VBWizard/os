@@ -106,7 +106,7 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             __asm__("cli\n");
             triggerScheduler();
             __asm__("mov cr3,eax\nsti\n"::"a" (callerCR3));
-            __asm__("sti\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\nhlt\n");      //Halt until the next tick when another task will take its place
+            __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
             break;
         case SIGSTOP:
             printd(DEBUG_SIGNALS,"Signalling STOP for task 0x%04X, old sigind=0x%08x, ",p->task->taskNum,p->signals.sigind);

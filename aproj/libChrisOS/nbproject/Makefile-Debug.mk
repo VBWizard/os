@@ -43,10 +43,10 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/file.o \
 	${OBJECTDIR}/src/input/input.o \
 	${OBJECTDIR}/src/libChrisOS.o \
+	${OBJECTDIR}/src/libcmmap.o \
 	${OBJECTDIR}/src/malloc.o \
 	${OBJECTDIR}/src/memcpy.o \
 	${OBJECTDIR}/src/memset.o \
-	${OBJECTDIR}/src/mmap.o \
 	${OBJECTDIR}/src/pipe.o \
 	${OBJECTDIR}/src/sprintf.o \
 	${OBJECTDIR}/src/stdio.o \
@@ -129,6 +129,11 @@ ${OBJECTDIR}/src/libChrisOS.o: src/libChrisOS.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libChrisOS.o src/libChrisOS.c
 
+${OBJECTDIR}/src/libcmmap.o: src/libcmmap.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libcmmap.o src/libcmmap.c
+
 ${OBJECTDIR}/src/malloc.o: src/malloc.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -143,11 +148,6 @@ ${OBJECTDIR}/src/memset.o: src/memset.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/memset.o src/memset.c
-
-${OBJECTDIR}/src/mmap.o: src/mmap.c
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mmap.o src/mmap.c
 
 ${OBJECTDIR}/src/pipe.o: src/pipe.c
 	${MKDIR} -p ${OBJECTDIR}/src

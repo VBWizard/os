@@ -144,13 +144,16 @@ void mmInit()
 uintptr_t mmGetFreeVirtAddress(uintptr_t cr3, uintptr_t startVirt, int size)
 {
     uintptr_t ptValue=0xFFFFFFFF;
-    int pagesNeeded=ALIGN_TO_PAGE_SIZE(size);
+    int pagesNeeded=size/PAGE_SIZE;
     int pagesFound=0;
     int firstVirt=0;
     
+    if (size%PAGE_SIZE)
+        pagesNeeded++;
+    
     while (pagesFound<pagesNeeded && startVirt<0xEFFFFFFF)
     {
-        ptValue=pagingGet4kPTEntryValueCR3(cr3,startVirt);
+        ptValue=pagingGet4kPTEntryAddressCR3(cr3,startVirt);
         if (ptValue==0)
         {
             if (firstVirt==0)

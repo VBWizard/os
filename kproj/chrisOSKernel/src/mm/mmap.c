@@ -10,6 +10,7 @@
 #include "errors.h"
 #include "paging.h"
 #include "kmalloc.h"
+#include "syscalls.h"
 
 #define ERROR_EXIT(a) {p->errno=a;goto mmap_exit;}
 
@@ -72,17 +73,18 @@ void* sys_mmap (process_t* p, void *addr,size_t len,int prot,int flags,int fd,of
             ERROR_EXIT(ERROR_MMAP_ADDRESS_IN_USE);
         }
     }
-    if (!(flags&MAP_FIXED))
-    {
-        //mm needs to suggest a virtual address to map to, starting at MMAP_VIRT_START 0xA0000000
-        virtStartAddress=mmGetFreeVirtAddress(p->pageDirPtr,MMAP_VIRT_START,(prot&PROT_WRITE)==PROT_WRITE);
-    }
 
     //Page align the length of the mapping
     if (len%PAGE_SIZE)
-        len+=(PAGE_SIZE-len);
+        len+=(PAGE_SIZE-(len%PAGE_SIZE));
 
-    
+    if (!(flags&MAP_FIXED))
+    {
+        //mm needs to suggest a virtual address to map to, starting at MMAP_VIRT_START 0xA0000000
+        virtStartAddress=mmGetFreeVirtAddress(p->pageDirPtr,MMAP_VIRT_START,len);
+    }
+
+   
     //At this point we are sure we want to create the mapping so allocate memory for the map struct
     map=kMalloc(sizeof(memmap_t));
     map->process=p;
@@ -125,26 +127,30 @@ void* sys_mmap (process_t* p, void *addr,size_t len,int prot,int flags,int fd,of
 mmap_exit:
     if (p->errno)
         return (void*)MAP_FAILED;
-    return 0;
+    return virtStartAddress;
 }
 
 bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExceptionCR2, uint32_t pteValue, int errorCode)
 {
     dllist_t* mmaps=victimProcess->mmaps;
-    memmap_t* mmap=NULL;
+    memmap_t* mmap=0x10101010;
     uint32_t pagePhysAddr=pteValue&0xFFFFF000;
     uint32_t pageFlags=pteValue&0x00000FFF;
     uint32_t pageVirtAddress = pagingExceptionCR2;
-
+    bool timeToExit = false;
+    
     if (mmaps!=NULL)
     {
-        do
+        while (!timeToExit)
         {
+            if (mmaps->next==mmaps)
+                timeToExit = true;
             mmap=mmaps->payload;
-            if (mmap->startAddress<pagingExceptionCR2 && mmap->startAddress+mmap->len>pagingExceptionCR2)
+            if (mmap->startAddress<=pagingExceptionCR2 && mmap->startAddress+mmap->len>=pagingExceptionCR2)
                 break;
             mmaps=mmaps->next;
-        } while (mmaps->next!=mmaps);
+            mmap = NULL;
+        } 
             
         if (mmap==NULL)
             panic("handleMMapPagingException: Could not find mmap for address 0x%08x\n",pagingExceptionCR2);
@@ -159,13 +165,16 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
                 if (mmap->flags & MAP_STACK)
                 {
                     //Verify we're really in the process' stack space. Requested address has to be a virt address within stackStart and stackSize
-                    if (pageVirtAddress < victimProcess->stackSize || pageVirtAddress > victimProcess->stackStart + victimProcess->stackSize)
+                    if (pageVirtAddress < victimProcess->stackStart || pageVirtAddress > victimProcess->stackStart + victimProcess->stackSize)
                         panic("handleMMapPagingException: mmap is marked MAP_STACK but page exception was outside the process' stack space");
                 }
                 printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: Found private, anonymous mmap.  Will allocate, map this page and add to mmap->mmappedPages\n");
                 pagePhysAddr=(uint32_t)allocPages(PAGE_SIZE);
 
                 pagingMapPage(victimProcess->pageDirPtr,pageVirtAddress,pagePhysAddr,(uint16_t)
+                    ((mmap->protection&PROT_WRITE)==PROT_WRITE?(1<<1):0)  //Pass PTE writable flag if mmap page is PROT_WRITE, otherwise page will only be readable (and by default executable)
+                    | (victimProcess->kernelProcess?0:1 << 2) | 1);     //Pass PTE user/admin 
+                pagingMapPage(KERNEL_CR3,pageVirtAddress,pagePhysAddr,(uint16_t)
                     ((mmap->protection&PROT_WRITE)==PROT_WRITE?(1<<1):0)  //Pass PTE writable flag if mmap page is PROT_WRITE, otherwise page will only be readable (and by default executable)
                     | (victimProcess->kernelProcess?0:1 << 2) | 1);     //Pass PTE user/admin 
                 mmappedPage_t* mappedPage=kMalloc(sizeof(mmappedPage_t));
@@ -184,4 +193,19 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
         printd(DEBUG_EXCEPTIONS,"\t\tProcess has no mmaps, skipping mmap check\n");
         return false;
     }
+}
+
+void* syscall_mmap (process_t *p, syscall_mmap_t *callParams)
+{
+    
+    syscall_mmap_t sm;
+    
+    copyToKernel(p, &sm, callParams, sizeof(syscall_mmap_t));
+    
+    return sys_mmap (p, sm.addr, 
+            sm.len, 
+            sm.prot, 
+            sm.flags, 
+            sm.fd, 
+            sm.offset);
 }

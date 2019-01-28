@@ -581,7 +581,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         process->execDontSaveRegisters = true;
         enableScheduler();
         triggerScheduler();
-        __asm__("sti\nhlt\nhlt\nhlt\nhlt\nhlt\n");
+        __asm__("sti\nhlt\n");
     }
     else
     {
@@ -685,7 +685,7 @@ uint32_t process_fork(process_t* currProcess)
     returnCount = 0;
     retVal = newTask->taskNum;      //parent gets this
     triggerScheduler();
-    __asm__("sti\nhlt\nhlt\nhlt\n\n");
+    __asm__("sti\nhlt\n");
     if (returnCount++ > 0)
         return retVal;
     else

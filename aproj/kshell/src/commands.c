@@ -232,6 +232,7 @@ void cmdSleep(char *cmdline)
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
 
+    //TODO: Remove this later ... leaving it here for a while to test mmap'd stack
     int size = 100000/4; //147400;
     int test[size];
     

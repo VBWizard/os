@@ -15,6 +15,7 @@
  * 
  */
 #include "libChrisOS.h"
+#include "types.h"
 
 int main(int argc, char** argv) {
 
@@ -22,13 +23,26 @@ int main(int argc, char** argv) {
     char* buffer;
     
     int readSize;
-    int pipes[2];
-    pipe(pipes);
-    close(pipes[0]);
-    close(pipes[1]);
     
     if (argc<2)
         return -1;
+
+    //Exercise the stack so that stack exceptions don't get in the way of testing mmap
+    int size = 10000/4; //147400;
+    int test[size];
+    
+    for (int cnt=0;cnt<size;cnt++)
+        test[cnt]=cnt;
+    
+    for (int cnt=0;cnt<size;cnt++)
+        if (test[cnt]!=cnt)
+            printf("uh oh!");
+
+    
+    int *a = mmap(0, 1025*sizeof(int), PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0);
+    
+    for (int cnt=0;cnt<1025;cnt++)
+        a[cnt]=cnt;
     
     file = open(argv[1],"r");
     if (file)
