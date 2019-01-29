@@ -27,6 +27,7 @@ int main(int argc, char** argv) {
     if (argc<2)
         return -1;
 
+/*    printf("Stack CoW test commencing ...\n");
     //Exercise the stack so that stack exceptions don't get in the way of testing mmap
     int size = 10000/4; //147400;
     int test[size];
@@ -38,13 +39,29 @@ int main(int argc, char** argv) {
         if (test[cnt]!=cnt)
             printf("uh oh!");
 
-    
+   printf("Anonymous mmap test commencing ...\n"); 
     int *a = mmap(0, 1025*sizeof(int), PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0);
     
     for (int cnt=0;cnt<1025;cnt++)
         a[cnt]=cnt;
+
+    return 0;
+    
+*/    printf("File mmap test commencing ...\n");
     
     file = open(argv[1],"r");
+    if (file)
+    {
+        char *a = mmap(0, 90749, PROT_WRITE, MAP_PRIVATE, (int)file, 0);
+        
+        printf("%s",a);
+    }
+    else
+        printf("Error opening file %s\n",argv[1]);
+    
+    close(file);
+    return 0;
+/*    file = open(argv[1],"r");
     if (file)
     {
 
@@ -63,6 +80,6 @@ int main(int argc, char** argv) {
         free(buffer);
         return 0;
     }
-    return -2;
+ */
 }
 

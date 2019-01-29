@@ -54,7 +54,7 @@ uint32_t tds=0;
 unsigned volatile char kKeyStatus[11];
 extern struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf);
 extern void kpagingUpdatePresentFlagA(uint32_t address, bool present);
-void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t cr3);
+void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *process);
 
 
 void defaultISRHandler()
@@ -182,7 +182,6 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     }
     //TODO: COMPLETE hack because on sysexit when target stack is COW, when handler is called, CR3 is still kernel's
 
-    
     //Don't forget to map the victim process to VADDR!
     pagingMapPage(victimProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)victimProcess & 0xFFFFF000, (uint16_t)0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
    __asm__("clts\n"); //TODO: Didn't save fpu registers
@@ -268,6 +267,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             pagingMapPage(pagingExceptionCR3,pagingExceptionCR2 & 0xFFFFF000,newPhys,(uint16_t)0x7);
             printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08x (0x%08x) with writable page 0x%08x (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
         }
+        printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: returning\n");
         __asm__("xor ebx,ebx\nmov cr2,ebx\n");
         return;
     }
@@ -285,7 +285,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08x\n",pagingExceptionCR3);
     printk("segfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
-    sys_sigaction2(SIGSEGV,0,0xe,pagingExceptionCR3);
+    sys_sigaction2(SIGSEGV,0,0xe, victimProcess);
 
     //Set the return address from the exception to a loop where the process can ... wait for death
     victimTask->tss->EIP = (uint32_t)&waitForDeath;

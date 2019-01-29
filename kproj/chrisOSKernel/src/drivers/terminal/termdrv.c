@@ -217,7 +217,8 @@ void updateTerms()
             if (kTermLock==0)
                 while (__sync_lock_test_and_set(&kTermLock, 1));
         //while (__sync_lock_test_and_set(&kTermLock, 1));
-            pipeReadSize = piperead(pipeContents, PIPE_FILE_SIZE,1, ttyDevices[cnt].stdOutReadPipe);
+            //CLR 1/28/2019: Basic monitor mode is 80x25, which is 4k bytes.  We'll process double that per call to updateTerms
+            pipeReadSize = piperead(pipeContents, 8000,1, ttyDevices[cnt].stdOutReadPipe);
             //pipeReadSize = fs_read(NULL, ttyDevices[cnt].piper, pipeContents, PIPE_FILE_SIZE, 1);
             if (pipeReadSize > 0)
             {

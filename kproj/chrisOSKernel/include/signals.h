@@ -35,8 +35,8 @@ extern "C" {
         
     } signal_t;
 
-    void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t callerCR3);
-    void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData);
+    void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *process);
+    void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData, void *process);
     void sys_masksig(signals signal, bool mask);
 
 #ifdef __cplusplus

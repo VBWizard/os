@@ -38,6 +38,7 @@ extern uint32_t kNextSignalCheckTicks;
 extern void keyboardInit();
 extern void initTerm();
 extern int initTTY();
+extern void globalMMapInit();
 
 filesystem_t *rootFs, *pipeFs;
 terminfo_t *sysConsole;
@@ -95,6 +96,7 @@ int main(int argc, char** argv)  {
     rootFs = kRegisterFileSystem("/",&fops);
     pipeFs = initpipefs();
     
+    globalMMapInit();
     initTerm();
     initTTY();
     sysConsole = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 0, 80, 50, "Main system console 0");
@@ -129,7 +131,7 @@ int main(int argc, char** argv)  {
     printk("KSHELL LOADED!!!");
 //    waitTicks(3);
     schedulerEnabled=true;
-    sys_sigaction(SIGUSLEEP,0,0x21);
+    sys_sigaction(SIGUSLEEP,0,0x21, kKernelProcess);
 /*#define pcount 3
     char* param1[pcount][10];
     char* param2[pcount][10];

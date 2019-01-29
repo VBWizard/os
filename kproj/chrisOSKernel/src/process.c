@@ -146,6 +146,8 @@ void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned l
         destPagedAddress=(destPagedAddress&0xFFFFF000) | (workingDestAddr&0x00000FFF);
         srcPagedAddress=(srcPagedAddress&0xFFFFF000) | (workingSrcAddr&0x00000FFF);
         
+        pagingMapPage(KERNEL_CR3, destPagedAddress, destPagedAddress, 0x7);
+        
         if ((workingDestAddr%PAGE_SIZE!=0) || (bytesLeft < PAGE_SIZE))  //If not page aligned write or bytes left < an entire page
         {
             if (bytesLeft>PAGE_SIZE-(workingDestAddr%PAGE_SIZE))        //If bytes left greater than 
@@ -163,6 +165,7 @@ void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned l
         workingDestAddr+=loopBytesLeft;
         workingSrcAddr+=loopBytesLeft;
     }
+    //TODO: Unmap?
     return dest;
 }
 

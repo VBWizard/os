@@ -18,6 +18,8 @@ extern filesystem_t* pipeFs;
 
 uint32_t pipeFileHandle = 0xFFFFFFFF;
 char* lBuffer;
+volatile int kFileWriteLock;
+volatile int kFileReadLock;
 
 filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
 {
@@ -44,6 +46,8 @@ filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
     fs->fops = kMalloc(sizeof(fileops_t));
     memcpy(fs->fops, fops, sizeof(fileops_t));
     lBuffer = NULL;
+    kFileWriteLock = 0;
+    kFileReadLock = 0;
     return fs;
 }
 
@@ -163,8 +167,10 @@ void* fs_open(char* path, const char* mode)
 int fs_read(process_t* process, void* file, void * buffer, int size, int length)
 {
     file_t* theFile = file;
-    int retVal = 0;
+    int retVal = 0, bytesRead;
     
+    printd(DEBUG_FILESYS, "fs_read: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
+
     if (size * length == 0)
         return 0;
     
@@ -172,13 +178,25 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
         panic("fs_read: Referenced a file that is not a file");
     
     if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
-        return theFile->fops->read(buffer, size, length, theFile->handle);
+    {
+        while (__sync_lock_test_and_set(&kFileReadLock, 1));
+        bytesRead = theFile->fops->read(buffer, size, length, theFile->handle);
+        __sync_lock_release(&kFileReadLock);   
+        
+        return bytesRead;
+    }
     
     if (lBuffer==NULL)
         lBuffer = allocPagesAndMap(size*length);
+    while (__sync_lock_test_and_set(&kFileReadLock, 1));
     retVal = theFile->fops->read(lBuffer, size, length, theFile->handle);
+    __sync_lock_release(&kFileReadLock);   
+
     if (retVal > 0)
+    {
+        printd(DEBUG_FILESYS, "\tfs_read: Read %u bytes, copying from kernel address 0x%08x to process address 0x%08x\n", retVal, lBuffer, buffer);
         copyFromKernel(process, buffer, lBuffer, retVal);
+    }
     else
         retVal = 0; //Regardless of what our disk driver returns for EOF, we return 0
     return retVal;
@@ -190,8 +208,10 @@ int fs_write(process_t* process, void* file, void * buffer, int size, int length
     int retVal = 0;
     char* lBuffer;
     
+    printd(DEBUG_FILESYS, "fs_write: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
+
     if (theFile->verification!=0xBABAABAB)
-        panic("fs_read: Referenced a file that is not a file");
+        panic("fs_write: Referenced a file that is not a file");
 
     if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
         return theFile->fops->write(buffer, size, length, theFile->handle);
@@ -207,6 +227,8 @@ int fs_seek(void* file, long offset, int whence)
 {
     file_t* theFile = file;
     
+    printd(DEBUG_FILESYS, "fs_seek: called for file %s (handle=0x%08X), offset %u, whence %u\n", theFile->f_path, theFile->handle, offset, whence);
+
     if (theFile->verification!=0xBABAABAB)
         panic("fs_seek: Referenced a file that is not a file",file);
     
@@ -228,14 +250,16 @@ void close(eListType listType, void* entry)
     if (((file_t*)foundEntry->payload)->handle!=entry && foundEntry==foundEntry)
         panic("fs_close: handle not found in fs->files/fs->dirs");
 */
-    file_t* file = entry;
+    file_t* theFile = entry;
     directory_t *dir = entry;
-    if (file->verification!=0xBABAABAB)
+
+    printd(DEBUG_FILESYS, "fs_close: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
+    if (theFile->verification!=0xBABAABAB)
         panic("close: Referenced a file that is not a file!");
     if (listType == LIST_DIRECTORY)
         dir->dops->close(dir->handle);
     else
-        file->fops->close(file->handle);
+        theFile->fops->close(theFile->handle);
     
 //    rootFs->files = listRemove(rootFs->files,foundEntry); //NOTE: listRemove will effectively de-init the list if it becomes empty
 //    kFree(foundEntry);
@@ -290,7 +314,7 @@ int fs_readdir(void* file, dirent_t *dirEntry)
     directory_t* foundFile = getFileFromList(rootFs, LIST_DIRECTORY, file);
     
     if (foundFile==NULL)
-        panic("fs_read: file handle not found in fs->files");
+        panic("fs_readdir: file handle not found in fs->files");
     return foundFile->dops->read(foundFile->handle, dirEntry);
 }
 

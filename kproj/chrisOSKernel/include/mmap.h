@@ -26,6 +26,8 @@ extern "C" {
 #include "printf.h"
 #include "mm.h"
 #include "syscalls.h"
+
+#define MMAP_BUFFER_SIZE PAGE_SIZE
     
 #define MAP_FAILED -1;
     typedef enum epageprotection
@@ -57,6 +59,7 @@ extern "C" {
         process_t* process;
         uintptr_t startAddress;     //Does this need to be page aligned?
         uint32_t startFileOffset;   //Does this need to be page aligned?
+        uint32_t currentFileOffset;
         size_t len;                 //We will round to interval of PAGE_SIZE
         int protection;             
         int flags;
@@ -67,6 +70,7 @@ extern "C" {
 
     typedef struct smemorymapping memmap_t;
 
+    void globalMMapInit();
     void * sys_mmap (process_t* p, void *addr,size_t len,int prot,int flags,int fd,off_t offset);
     bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExceptionCR2, uint32_t pteValue, int errorCode);
     void* syscall_mmap (process_t *p, syscall_mmap_t *params);

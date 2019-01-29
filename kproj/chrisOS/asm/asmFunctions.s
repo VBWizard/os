@@ -28,6 +28,8 @@ dumpregs:
         mov exceptionBP, eax
         mov eax, cr0
 
+
+
         mov exceptionCR0, eax
         mov eax, cr3
         mov exceptionCR3, eax

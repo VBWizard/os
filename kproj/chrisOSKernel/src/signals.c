@@ -64,24 +64,11 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
 
 
 //Process a sigaction against a process, called by sys_sigaction or the kernel
-void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_t callerCR3)
+void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *process)
 {
-    uint32_t currentTask = 0;
-    process_t *p;
     
-    __asm__("str eax\nshr eax,3\n":"=a" (currentTask));
-    printd(DEBUG_PROCESS, "current task = 0x%04X\n",currentTask);
-    if (!currentTask)
-        panic("Could not find task with CR3 of 0x%08x for signal 0x%08x, sigAction 0x%08x\n",callerCR3,signal,sigAction);
-    if (currentTask!=0x17)
-    {
-        p = getCurrentProcess();
-        callerCR3=p->pageDirPtr;
-    }
-    else
-    {
-        p = getCurrentProcess();
-    }
+    process_t *p = process;
+    uintptr_t callerCR3=p->pageDirPtr;
     
     printd(DEBUG_SIGNALS, "sys_sigAction2(0x%08x, 0x%08x, 0x%08x, 0x%08x)\n"
             ,signal, sigAction, sigData,callerCR3);
@@ -94,10 +81,8 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, uint32_
             printd(DEBUG_SIGNALS,"Signalling USLEEP for cr3=0x%08x, sigData=0x%08x, sigind=0x%08x\n",callerCR3,sigData,p->signals.sigind);
             triggerScheduler();
             __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
-__asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
             //Since SIGUSLEEP can be used to wait for a child task, we'll return the exit code from the child task
             return (void*)getExitCode(sigData);
-__asm__("mov cr3,eax\n"::"a" (callerCR3));
             break;
         case SIGSLEEP:
             p->signals.sigind|=SIGSLEEP;
@@ -105,7 +90,6 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             printd(DEBUG_SIGNALS,"Signalling SLEEP for task 0x%04X, wakeTicks=0x%08x\n",p->task->taskNum,sigData);
             __asm__("cli\n");
             triggerScheduler();
-            __asm__("mov cr3,eax\nsti\n"::"a" (callerCR3));
             __asm__("sti\nhlt\n");      //Halt until the next tick when another task will take its place
             break;
         case SIGSTOP:
@@ -123,6 +107,7 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
             printd(DEBUG_EXCEPTIONS,"Signaling SEGV for cr3=0x%08x, signald before=0x%08x processing signal\n",callerCR3,p->signals.sigind);
             //No CLI necessary as the exception 0xe handler has already done that
             p->signals.sigind|=SIGSEGV;
+            printd(DEBUG_EXCEPTIONS,"SEGV signaled for cr3=0x%08x, signald after=0x%08x processing signal\n",callerCR3,p->signals.sigind);
             printd(DEBUG_EXCEPTIONS,"Searching for children to SEGV\n");
             for (int cnt=0;cnt<1000;cnt++)
             {
@@ -136,9 +121,8 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
                     }
                 }
             }
-            printd(DEBUG_EXCEPTIONS,"SEGV signaled for cr3=0x%08x, signald after=0x%08x processing signal\n",callerCR3,p->signals.sigind);
             //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
-            return;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
+            return NULL;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         case SIGINT:
             //If signal is not blocked then set it
@@ -157,17 +141,11 @@ __asm__("mov cr3,eax\n"::"a" (callerCR3));
 }
 
 //Process a sigaction, called by running program which wants the signal
-void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
+void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData, void *process)
 {
-    uint32_t oldCR3;
     
-    __asm__("mov eax,cr3\n":"=a" (oldCR3));
-    __asm__("cli\n");
-    __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-
-    printd(DEBUG_PROCESS,"sys_sigaction(0x%08x,0x%08x,0x%08x,0x%08x)\n",signal,sigAction,sigData,oldCR3);
-    void* retVal=sys_sigaction2(signal, sigAction, sigData, oldCR3);
-    __asm__("mov cr3,eax\n"::"a" (oldCR3));
+    printd(DEBUG_PROCESS,"sys_sigaction(0x%08x,0x%08x,0x%08x,0x%08x)\n",signal,sigAction,sigData,process);
+    void* retVal=sys_sigaction2(signal, sigAction, sigData, process);
     return retVal;
 }
 

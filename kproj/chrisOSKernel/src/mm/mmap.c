@@ -11,10 +11,19 @@
 #include "paging.h"
 #include "kmalloc.h"
 #include "syscalls.h"
+#include "fs.h"
 
 #define ERROR_EXIT(a) {p->errno=a;goto mmap_exit;}
 
+char *kMMAPBuffer = NULL;
+
 dllist_t* kMemoryMapsList=NULL;
+
+void globalMMapInit()
+{
+    if (kMMAPBuffer==NULL)
+        kMMAPBuffer = kMalloc(MMAP_BUFFER_SIZE);
+}
 
 void mmapAddToGlobalList(memmap_t* map)
 {
@@ -90,6 +99,7 @@ void* sys_mmap (process_t* p, void *addr,size_t len,int prot,int flags,int fd,of
     map->process=p;
     map->startAddress=(uintptr_t)virtStartAddress;
     map->startFileOffset=offset;
+    map->currentFileOffset=offset;
     map->protection=prot;
     map->flags=flags;
     map->fd=fd;
@@ -127,16 +137,34 @@ void* sys_mmap (process_t* p, void *addr,size_t len,int prot,int flags,int fd,of
 mmap_exit:
     if (p->errno)
         return (void*)MAP_FAILED;
-    return virtStartAddress;
+    return (void*)virtStartAddress;
+}
+
+uint32_t mmapAllocatePages(process_t *process, memmap_t* mmap, uint32_t pageVirtAddress, int pageCount)
+{
+    uint32_t pagePhysAddr=(uint32_t)allocPages(PAGE_SIZE * pageCount);
+
+    pagingMapPageCount(process->pageDirPtr, pageVirtAddress, pagePhysAddr, pageCount, 
+            ((mmap->protection&PROT_WRITE)==PROT_WRITE?(1<<1):0)  //Pass PTE writable flag if mmap page is PROT_WRITE, otherwise page will only be readable (and by default executable)
+        | (process->kernelProcess?0:1 << 2) | 1, true);
+    pagingMapPageCount(KERNEL_CR3, pagePhysAddr, pagePhysAddr, pageCount, 0x7, true);
+    mmappedPage_t* mappedPage=kMalloc(sizeof(mmappedPage_t));
+    mappedPage->address=pageVirtAddress & 0xFFFFF000;
+    mappedPage->loaded=true;
+    dllist_t* mapList=&mmap->mmappedPages->listItem;
+    listAdd(mapList,&mappedPage->listItem,mappedPage);
+    printd(DEBUG_MMAP, "\t\tmmapAllocatePage: Allocated %u pages at physical 0x%08x for virtual 0x%08x and mapped, cr3=0x%08x\n",pageCount, pagePhysAddr, pageVirtAddress, process->pageDirPtr);
+    return pagePhysAddr;
 }
 
 bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExceptionCR2, uint32_t pteValue, int errorCode)
 {
     dllist_t* mmaps=victimProcess->mmaps;
-    memmap_t* mmap=0x10101010;
+    memmap_t* mmap=(void*)0x10101010;
     uint32_t pagePhysAddr=pteValue&0xFFFFF000;
     uint32_t pageFlags=pteValue&0x00000FFF;
     uint32_t pageVirtAddress = pagingExceptionCR2;
+    int pagesToMap;
     bool timeToExit = false;
     
     if (mmaps!=NULL)
@@ -160,7 +188,7 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
 
         if (mmap->flags & MAP_PRIVATE)
         {
-            if (mmap->flags & MAP_ANONYMOUS)
+            if (mmap->flags & MAP_ANONYMOUS) //memory mapping
             {
                 if (mmap->flags & MAP_STACK)
                 {
@@ -168,21 +196,34 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
                     if (pageVirtAddress < victimProcess->stackStart || pageVirtAddress > victimProcess->stackStart + victimProcess->stackSize)
                         panic("handleMMapPagingException: mmap is marked MAP_STACK but page exception was outside the process' stack space");
                 }
-                printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: Found private, anonymous mmap.  Will allocate, map this page and add to mmap->mmappedPages\n");
-                pagePhysAddr=(uint32_t)allocPages(PAGE_SIZE);
+                printd(DEBUG_MMAP,"\t\thandleMMapPagingException: Found private, anonymous mmap.  Will allocate, map this page and add to mmap->mmappedPages\n");
+                mmapAllocatePages(victimProcess, mmap, pageVirtAddress, 1);
+                printd(DEBUG_MMAP,"\t\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x)\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr);
+            }
+            else if (mmap->fd) //file mapping
+            {
+                uint32_t targetFileOffset = pagingExceptionCR2 - mmap->startAddress;
+                if (targetFileOffset > mmap->startFileOffset + mmap->len)
+                {
+                    printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: ERROR!  Attempt to read past end of mmap'd file. (handle=0x%08x)  File length = %u, read offset = %u\n", mmap->fd, mmap->len, targetFileOffset);
+                    return false;
+                }
+                printd(DEBUG_MMAP,"\t\thandleMMapPagingException: Found private, mmap for handle 0x%08x, offset = %u, will fulfill\n", mmap->fd, targetFileOffset);
 
-                pagingMapPage(victimProcess->pageDirPtr,pageVirtAddress,pagePhysAddr,(uint16_t)
-                    ((mmap->protection&PROT_WRITE)==PROT_WRITE?(1<<1):0)  //Pass PTE writable flag if mmap page is PROT_WRITE, otherwise page will only be readable (and by default executable)
-                    | (victimProcess->kernelProcess?0:1 << 2) | 1);     //Pass PTE user/admin 
-                pagingMapPage(KERNEL_CR3,pageVirtAddress,pagePhysAddr,(uint16_t)
-                    ((mmap->protection&PROT_WRITE)==PROT_WRITE?(1<<1):0)  //Pass PTE writable flag if mmap page is PROT_WRITE, otherwise page will only be readable (and by default executable)
-                    | (victimProcess->kernelProcess?0:1 << 2) | 1);     //Pass PTE user/admin 
-                mmappedPage_t* mappedPage=kMalloc(sizeof(mmappedPage_t));
-                mappedPage->address=pageVirtAddress & 0xFFFFF000;
-                mappedPage->loaded=true;
-                dllist_t* mapList=&mmap->mmappedPages->listItem;
-                listAdd(mapList,&mappedPage->listItem,mappedPage);
-                printd(DEBUG_EXCEPTIONS,"\t\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x)\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr);
+                if (targetFileOffset + (4*PAGE_SIZE) < mmap->len)
+                    pagesToMap = 4;
+                else
+                    pagesToMap = 1;
+                
+                pagePhysAddr=mmapAllocatePages(victimProcess, mmap, pageVirtAddress, pagesToMap);
+                if (fs_seek((void*)mmap->fd, targetFileOffset, SEEK_SET))
+                    panic("\t\tthandleMMapPagingException: Seek error (SEEK_SET), fd=0x%08x, offset=%u.",mmap->fd, targetFileOffset);
+                int bytesRead = fs_read(victimProcess, (void*)mmap->fd, (void*)pageVirtAddress, PAGE_SIZE, pagesToMap);
+                if (bytesRead == 0)
+                    memset((uintptr_t*)pagePhysAddr,0,PAGE_SIZE * pagesToMap);
+                printd(DEBUG_MMAP,"\t\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x), read %u bytes.\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr, bytesRead);
+                return true;
+                
             }
         }
         //NOTE: Later we'll add loading from a file if one is defined in the mmap
@@ -190,7 +231,7 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
     }
     else
     {
-        printd(DEBUG_EXCEPTIONS,"\t\tProcess has no mmaps, skipping mmap check\n");
+        printd(DEBUG_MMAP | DEBUG_EXCEPTIONS,"\t\tProcess has no mmaps, skipping mmap check\n");
         return false;
     }
 }

@@ -119,7 +119,8 @@ void kbd_handler_generic()
             //printk("^");
             if (translatedKeypress=='c') //CLR 12/30/2018: ^C pressed
             {
-                sys_sigaction(SIGINT, NULL, 0);
+                //TODO: sigint broken till I can figure out how to pass the process struct for the correct struct
+                //sys_sigaction(SIGINT, NULL, 0, );
                 goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
             }
         }

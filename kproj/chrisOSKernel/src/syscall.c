@@ -175,8 +175,11 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             //Only wait for the PID if it hasn't already exited
             if (!taskExited)
             {
+                __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+                process=getCurrentProcess();
                 printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08x) on pid=0x%04X.  Good night!\n",processCR3,param1);
-                retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1);
+                retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1, process);
+                __asm__("mov cr3,eax\n"::"a" (processCR3));
             }
             break;
         case SYSCALL_SETPRIORITY:      //***Set process priority - param1=new priority, returns old priority
@@ -200,16 +203,24 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SLEEP:     //***sleep - sleep until kTicksSinceStart==param1
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
             printd(DEBUG_PROCESS,"_syscall: sleep(0x%08x) called (cr3=0x%08x)\n",param1,processCR3);
-            sys_sigaction(SIGSLEEP,0,param1);
+            sys_sigaction(SIGSLEEP,0,param1, process);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SETSIGACTION:     //***setsigaction
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_PROCESS,"_syscall: sys_setsigaction(0x%08x, 0x%08x, 0x%08x) called\n",param1,param2,param3);
             sys_setsigaction(param1,(uintptr_t*)param2,param3);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_STOP:     //******stop - put process in STOPPED queue
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
             printd(DEBUG_PROCESS,"_syscall: Stop() called.\n");
-            sys_sigaction(SIGSTOP,0,0);
+            sys_sigaction(SIGSTOP,0,0, process);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_REBOOT:     //***reboot
             sysReboot();

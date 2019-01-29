@@ -19,8 +19,7 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/exceptions.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/mm/mm.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/drivers/terminal/termdrv.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/mm/mmap.c</file>
         </group>
     </open-files>
