@@ -100,19 +100,10 @@ void cursor_update(terminfo_t* term)
 
 void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* term, char charToPrint)
 {
-    if (charToPrint==0x9)
-    {
-        int a = 0;
-        a += 1;
-        a -= 1;
-    }
-    term->screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-    term->screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
-    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
-    {
-        console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-        console[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
-    }
+    char * screenBuffer = term->screenBuffer;
+
+    screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
+    screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
     if (++term->cursorX >= term->width)
     {
         term->cursorX = 0;
@@ -121,12 +112,17 @@ void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* te
     if (term->cursorY >= term->height)
     {
         //Move up 1 line by copying from the 2nd line of the screen down, to the first line
-        memcpy(term->screenBuffer, term->screenBuffer + (term->width * 2), term->width * term->height * 2);
+        memcpy(screenBuffer, screenBuffer + (term->width * 2), term->width * term->height * 2);
         if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
         {
             memcpy(console, console + (term->width * 2), term->width * term->height * 2);
         }
         term->cursorY--;
+    }
+    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+    {
+        console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
+        console[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
     }
 }
 

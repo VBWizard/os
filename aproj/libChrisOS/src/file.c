@@ -26,6 +26,10 @@ VISIBLE int write(void* handle, void *buffer, int size, int length)
     return do_syscall4(SYSCALL_WRITE, (uint32_t)handle, (uint32_t)buffer, size, length);
 }
 
+VISIBLE int seek(void* handle, long position, int whence)
+{
+    return do_syscall3(SYSCALL_SEEK, (uint32_t)handle, position, whence);
+}
 
 VISIBLE int getdir(char* path, char *buffer, int bufferCount)
 {

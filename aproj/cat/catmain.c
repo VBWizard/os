@@ -52,14 +52,19 @@ int main(int argc, char** argv) {
     file = open(argv[1],"r");
     if (file)
     {
-        char *a = mmap(0, 90749, PROT_WRITE, MAP_PRIVATE, (int)file, 0);
+        seek(file, 0, 0);
+        char *a = mmap(NULL, 51, PROT_WRITE, MAP_PRIVATE, (int)file, 0);
+
+        char test[51];
+        strncpy(test,a,51);
         
-        printf("%s",a);
+        a[1] = 0;
+        write(1, a, 51, 1);
+        close(file);
     }
     else
         printf("Error opening file %s\n",argv[1]);
     
-    close(file);
     return 0;
 /*    file = open(argv[1],"r");
     if (file)

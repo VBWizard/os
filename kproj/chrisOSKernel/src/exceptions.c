@@ -158,7 +158,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     uint32_t lPTEValue=0;
     uint32_t lPDEAddress=0, lPTEAddress=0;
     uint32_t lOldDebugLevel=0;
-    bool isCow=false, isMMap=false;
+    bool isCow=false, isMMap=false, mmapSucceeded=false;
     uint32_t pageVirtAddress;
     tss_t* ourTSS = pagingExceptionTSS;
     uint32_t victimTaskNum = ourTSS->LINK;
@@ -201,8 +201,9 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     pageVirtAddress=lPTEValue&0xFFFFF000;
     if ( (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))
     {
+        isMMap = true;
         printd(DEBUG_EXCEPTIONS,"\t\tFound uninitialized mmap page\n",victimProcess->path,lPTEValue);
-        isMMap = handleMMapPagingException(victimProcess, pagingExceptionCR2, lPTEValue, ErrorCode);
+        mmapSucceeded = handleMMapPagingException(victimProcess, pagingExceptionCR2, lPTEValue, ErrorCode);
     }  
     else
         printd(DEBUG_EXCEPTIONS,"\t\tNot mmap page\n",victimProcess->path,lPTEValue);
@@ -255,7 +256,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
         }
     }
 
-    if (isCow || isMMap)
+    if (isCow || (isMMap & mmapSucceeded))
     {
         if (isCow) //if isMMap then the page was already fixed.  This is the "success" exit point, so skip fixing up the page, clear the CR2 and exit
         {

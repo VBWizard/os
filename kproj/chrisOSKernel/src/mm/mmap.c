@@ -15,14 +15,10 @@
 
 #define ERROR_EXIT(a) {p->errno=a;goto mmap_exit;}
 
-char *kMMAPBuffer = NULL;
-
 dllist_t* kMemoryMapsList=NULL;
 
 void globalMMapInit()
 {
-    if (kMMAPBuffer==NULL)
-        kMMAPBuffer = kMalloc(MMAP_BUFFER_SIZE);
 }
 
 void mmapAddToGlobalList(memmap_t* map)
@@ -148,6 +144,7 @@ uint32_t mmapAllocatePages(process_t *process, memmap_t* mmap, uint32_t pageVirt
             ((mmap->protection&PROT_WRITE)==PROT_WRITE?(1<<1):0)  //Pass PTE writable flag if mmap page is PROT_WRITE, otherwise page will only be readable (and by default executable)
         | (process->kernelProcess?0:1 << 2) | 1, true);
     pagingMapPageCount(KERNEL_CR3, pagePhysAddr, pagePhysAddr, pageCount, 0x7, true);
+    memset((void*)pagePhysAddr,0,pageCount*PAGE_SIZE);
     mmappedPage_t* mappedPage=kMalloc(sizeof(mmappedPage_t));
     mappedPage->address=pageVirtAddress & 0xFFFFF000;
     mappedPage->loaded=true;
@@ -208,7 +205,7 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
                     printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: ERROR!  Attempt to read past end of mmap'd file. (handle=0x%08x)  File length = %u, read offset = %u\n", mmap->fd, mmap->len, targetFileOffset);
                     return false;
                 }
-                printd(DEBUG_MMAP,"\t\thandleMMapPagingException: Found private, mmap for handle 0x%08x, offset = %u, will fulfill\n", mmap->fd, targetFileOffset);
+                printd(DEBUG_MMAP,"\t\tFound private, mmap for handle 0x%08x, offset = %u, will fulfill\n", mmap->fd, targetFileOffset);
 
                 if (targetFileOffset + (4*PAGE_SIZE) < mmap->len)
                     pagesToMap = 4;
@@ -216,11 +213,16 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
                     pagesToMap = 1;
                 
                 pagePhysAddr=mmapAllocatePages(victimProcess, mmap, pageVirtAddress, pagesToMap);
+                printd(DEBUG_MMAP, "\t\tSeeking to offset %u on handle 0x%08x\n", targetFileOffset, mmap->fd);
                 if (fs_seek((void*)mmap->fd, targetFileOffset, SEEK_SET))
-                    panic("\t\tthandleMMapPagingException: Seek error (SEEK_SET), fd=0x%08x, offset=%u.",mmap->fd, targetFileOffset);
-                int bytesRead = fs_read(victimProcess, (void*)mmap->fd, (void*)pageVirtAddress, PAGE_SIZE, pagesToMap);
-                if (bytesRead == 0)
-                    memset((uintptr_t*)pagePhysAddr,0,PAGE_SIZE * pagesToMap);
+                    panic("\t\tSeek error (SEEK_SET), fd=0x%08x, offset=%u.",mmap->fd, targetFileOffset);
+                //NOTE: To have process' virtual space written to set first parameter to victimProcess, address parameter set to pageVirtAddress
+                int bytesRead = fs_read(NULL, (void*)mmap->fd, (void*)pagePhysAddr, PAGE_SIZE * pagesToMap, 1);
+                if (bytesRead <= 0)
+                {
+                    printd(DEBUG_MMAP,"\t\tfs_read unexpectedly returned %i on handle 0x%08x, cannot fulfill request.\n",bytesRead, mmap->fd);
+                    return false;
+                }
                 printd(DEBUG_MMAP,"\t\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x), read %u bytes.\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr, bytesRead);
                 return true;
                 

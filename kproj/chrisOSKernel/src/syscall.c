@@ -132,6 +132,12 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
             
+            
+        case SYSCALL_SEEK:
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            retVal = fs_seek((void*)param1, param2, param3);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
         case SYSCALL_GETDENTS:
             process=getCurrentProcess();
             retVal = getDirEntries(process, (char*)param1, (void*)param2, param3);

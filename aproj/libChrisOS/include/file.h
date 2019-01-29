@@ -23,7 +23,7 @@ extern "C" {
     int read(void* handle, void *buffer, int size, int length);
     int write(void* handle, void *buffer, int size, int length);
     int getdir(char* path, char *buffer, int bufferCount);
-
+    int seek(void* handle, long position, int whence);
 #ifdef __cplusplus
 }
 #endif

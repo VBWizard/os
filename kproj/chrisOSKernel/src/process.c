@@ -347,7 +347,10 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     
     //If useExistingProcess then we'll not initialize a new one
     if (useExistingProcess)
+    {
         process = parentProcessPtr;
+        process->mmaps = NULL;
+    }
     else
         process = initializeProcess(isKernelProcess);
     

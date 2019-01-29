@@ -28,7 +28,8 @@ extern "C" {
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
-
+#define EOF (-1)
+    
 #define DENTRY_ROOT 0xFFFFFFFF    
 
     typedef enum

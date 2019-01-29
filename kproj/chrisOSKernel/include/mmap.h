@@ -27,8 +27,8 @@ extern "C" {
 #include "mm.h"
 #include "syscalls.h"
 
-#define MMAP_BUFFER_SIZE PAGE_SIZE
-    
+#define MMAP_MAX_READAHEAD 4    
+#define MMAP_BUFFER_SIZE PAGE_SIZE * MMAP_MAX_READAHEAD
 #define MAP_FAILED -1;
     typedef enum epageprotection
     {
