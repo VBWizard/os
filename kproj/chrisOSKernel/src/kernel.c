@@ -127,11 +127,11 @@ int main(int argc, char** argv)  {
     args[1]=params[1];
 
     
-    process_t* process = createProcess(program, 2, args, kKernelProcess, false, false);
+    process_t* initialShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
     printk("KSHELL LOADED!!!");
 //    waitTicks(3);
     schedulerEnabled=true;
-    sys_sigaction(SIGUSLEEP,0,0x21, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,initialShellProcess->task->taskNum, kKernelProcess);
 /*#define pcount 3
     char* param1[pcount][10];
     char* param2[pcount][10];

@@ -11,6 +11,8 @@
         </group>
         <group name="aproj"/>
         <group name="os"/>
-        <group/>
+        <group>
+            <file>file:/home/yogi/src/os/aproj/testMMap/mmapmain.c</file>
+        </group>
     </open-files>
 </project-private>

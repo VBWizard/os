@@ -159,11 +159,18 @@ void cmdRepeat(char * cmdline)
     int argc = 0;
     char **argv;
     int count = 0;
-    char *newCmdLine=cmdline+2;
+    char *newCmdLine=cmdline;
     argv = cmdlineToArgv(cmdline, &argc);
     
     count = atoi(argv[0]);
 
+    if (count >= 100)
+        newCmdLine+=3;
+    else if (count >= 10)
+        newCmdLine+=2;
+    else 
+        newCmdLine+=1;
+    
     for (int cnt=0;cnt<count;cnt++)
     {
         printf("\n*************** REPEAT EXECUTION #%u of %u ***************\n",cnt+1,count);

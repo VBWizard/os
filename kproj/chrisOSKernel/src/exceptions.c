@@ -159,7 +159,6 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     uint32_t lPDEAddress=0, lPTEAddress=0;
     uint32_t lOldDebugLevel=0;
     bool isCow=false, isMMap=false, mmapSucceeded=false;
-    uint32_t pageVirtAddress;
     tss_t* ourTSS = pagingExceptionTSS;
     uint32_t victimTaskNum = ourTSS->LINK;
     victimTaskNum >>= 3;
@@ -198,7 +197,6 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08x)\n\tChecking for uninitialized mmap page, pt entry=0x%08x\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
 
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
-    pageVirtAddress=lPTEValue&0xFFFFF000;
     if ( (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))
     {
         isMMap = true;

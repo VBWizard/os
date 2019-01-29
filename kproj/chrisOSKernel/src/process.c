@@ -775,7 +775,7 @@ void dupPageTables(process_t* newProcess, process_t* currProcess)
             //Now iterate the old page table creating entries on the new table where they exist on the old
             //Now dup the page table
             memcpy(newPT, (uint32_t)oldPT & 0xFFFFF000, PAGE_SIZE);
-            pagingMapPage(newProcess->pageDirPtr,newPT, newPT,(uint16_t)((uint16_t)oldPT & 0x00000FFF));
+            pagingMapPage(newProcess->pageDirPtr,newPT, newPT,(uint16_t)((uint16_t)oldPT & 0x00000FFF)); //**NOTE**: 3ff is because we don't want to copy PAGE_MMAP_FLAG
             printd(DEBUG_PROCESS,"\t\tDup'd PT from 0x%08x to 0x%08x\n",(uint32_t)oldPT & 0xFFFFF000, newPT);
         }
     }

@@ -221,6 +221,7 @@ void pagingMakePageCoW(uintptr_t* ptEntry, bool makeCoW)
     {
        *ptEntry|=PAGE_COW_FLAG; //Set CoW (bit 9) flag
        *ptEntry&=0xFFFFFFFD; //Unset Read/Write (bit 1) flag
+       *ptEntry&=(~PAGE_MMAP_FLAG); //Wipe out the MMAP flag when setting the COW flag
     }
     else
     {

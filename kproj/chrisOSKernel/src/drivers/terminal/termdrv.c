@@ -104,6 +104,11 @@ void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* te
 
     screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
     screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
+    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+    {
+        console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
+        console[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
+    }
     if (++term->cursorX >= term->width)
     {
         term->cursorX = 0;
@@ -118,11 +123,6 @@ void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* te
             memcpy(console, console + (term->width * 2), term->width * term->height * 2);
         }
         term->cursorY--;
-    }
-    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
-    {
-        console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-        console[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
     }
 }
 

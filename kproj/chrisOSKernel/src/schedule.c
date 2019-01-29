@@ -8,7 +8,7 @@
 #include "strings.h"
 
 #define SCHEDULER_DEBUG 1
-#define MAX_TASKS 50
+#define MAX_TASKS 1000
 
 extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t* kTicksSinceStart;
@@ -331,6 +331,7 @@ task_t* submitNewTask(task_t *task)
         addToQ(qRunnable,slot);
         if (slot->taskNum>1)
             ((process_t*)(slot->process))->signals.sigind=0;
+        task->totalRunningTicks = 0;
 	return slot;
 }
 
@@ -367,16 +368,13 @@ task_t* findTaskToRun()
             //This is where we increment all the runnable ticks, based on the process' priority
             if ( task!=kIdleTask || (task==kIdleTask) && task->prioritizedTicksInRunnable==0)
                 task->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-process->priority)+1;
-            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s-%u[%s]), priority=%u, old ticks=%u, new ticks=%u %s\n",
+            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s-%u[%s]), priority=%u, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
                     task->taskNum, process->exename,
                     process->childNumber,
                     process->parent->exename,
                     process->priority,
                     oldTicks,
-                    task->prioritizedTicksInRunnable, task==kIdleTask?"(idle task)":"");
-            if ( task==kIdleTask)
-                printd(DEBUG_PROCESS," (idle task)");
-            printd(DEBUG_PROCESS,"\n");
+                    task->prioritizedTicksInRunnable, process->totalRunTicks);
             if ( task->prioritizedTicksInRunnable >= mostIdleTicks)
             {
                 taskToRun=task;
