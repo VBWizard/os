@@ -20,7 +20,6 @@ extern "C" {
 #include <stdint.h>
 #include "task.h"
 #include "kernel.h"
-#include "thesignals.h"
 
     extern task_t* findTaskByCR3(uint32_t cr3);
     extern uint32_t NO_PREV;
@@ -37,7 +36,7 @@ extern "C" {
 
     void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *process);
     void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData, void *process);
-    void sys_masksig(signals signal, bool mask);
+    void sys_masksig(int signal, bool mask);
 
 #ifdef __cplusplus
 }

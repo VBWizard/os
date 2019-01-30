@@ -177,7 +177,8 @@ void cmdRepeat(char * cmdline)
         kexec(newCmdLine,false);
         if (bSigIntReceived)
         {
-            processSignal(SIGINT);
+            if (processSignal(SIGINT)==SIGINT)
+                cnt=count;
             break;
         }
     }

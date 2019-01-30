@@ -15,6 +15,7 @@
 #include "drivers/tty_driver.h"
 #include "alloc.h"
 #include "kutility.h"
+#include "thesignals.h"
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
@@ -36,6 +37,7 @@ extern void* kKeyboardHandlerRoutine;
 extern struct idt_entry* idtTable;
 extern void vector21();
 extern ttydevice_t *tty1;
+extern pipe_t *activeSTDIN;
         
 uint32_t kbdTop=KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE;
 
@@ -99,6 +101,7 @@ void kbd_handler_generic()
         if (tty1->stdInWritePipe)
         {
             pipewrite(&rawKey, 1, 1, tty1->stdInWritePipe);
+            sys_sigaction(SIGIO, NULL, (uintptr_t)activeSTDIN->owner, activeSTDIN->owner);
             printd(DEBUG_KEYBOARD, "kbd_handler_generic: Raw key '%u' delivered to stdin pipe 0x%08X\n",rawKey, tty1->stdInWritePipe);
         }
         else
@@ -120,7 +123,9 @@ void kbd_handler_generic()
             if (translatedKeypress=='c') //CLR 12/30/2018: ^C pressed
             {
                 //TODO: sigint broken till I can figure out how to pass the process struct for the correct struct
-                //sys_sigaction(SIGINT, NULL, 0, );
+                sys_sigaction(SIGINT, NULL, 0, activeSTDIN->owner);
+                if (tty1->stdInWritePipe)
+                    pipewrite("^C\n", 2, 1, tty1->stdInWritePipe);
                 goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
             }
         }
@@ -132,6 +137,7 @@ void kbd_handler_generic()
         {
             //CLR 01/10/2017: Increment the buffer pointer first
             pipewrite(&translatedKeypress, 1, 1, tty1->stdInWritePipe);
+            sys_sigaction(SIGIO, NULL, (uintptr_t)activeSTDIN->owner, activeSTDIN->owner);
             printd(DEBUG_KEYBOARD, "kbd_handler_generic: Translated key '%c' delivered to stdin pipe 0x%08X (CR3=0x%08X)\n",translatedKeypress, tty1->stdInWritePipe, CURRENT_CR3);
         }
         else

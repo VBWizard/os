@@ -10,11 +10,14 @@
 #include "utility.h"
 #include "errors.h"
 #include "printf.h"
+#include "thesignals.h"
 
 extern filesystem_t* pipeFs;
-
+extern volatile int kTicksPerMS;
+extern volatile int *kTicksSinceStart;
 volatile int kPipeWriteLock;
 volatile int kPipeReadLock;
+volatile int kTicksPerSecond;
 
 filesystem_t *initpipefs()
 {
@@ -134,7 +137,7 @@ size_t piperead(void *buffer, int size, int length, void *f)
             if (pipe->flags & PIPENOBLOCK) //Pipe doesn't block so oh well if the copy size is less than the caller wants
                 break;
             //yield here
-            //triggerScheduler();
+            sys_sigaction2(SIGSLEEP, 0, *kTicksSinceStart+kTicksPerSecond, getCurrentProcess());
             __asm__("sti\nhlt\n"); //Wait for the scheduler
         }
        

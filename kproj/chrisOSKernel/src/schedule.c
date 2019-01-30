@@ -6,6 +6,8 @@
 
 #include "schedule.h"
 #include "strings.h"
+#include "filesystem/pipe.h"
+#include "thesignals.h"
 
 #define SCHEDULER_DEBUG 1
 #define MAX_TASKS 1000
@@ -39,7 +41,7 @@ uintptr_t* schedStack; //Loaded by scheduler when it is called
 uint32_t nextScheduleTicks;
 uint32_t kPagingExceptionCount;
 
-file_t *activeSTDOUT, *activeSTDIN, *activeSTDERR;
+pipe_t *activeSTDOUT, *activeSTDIN, *activeSTDERR;
 
 const char* TASK_STATE_NAMES[] = {"Zombie","Running","Runnable","Stopped","Uninterruptable Sleep","Interruptable Sleep","Exited","None"};
 
@@ -565,6 +567,11 @@ void runAnotherTask(bool schedulerRequested)
                     taskToStopNewQueue=TASK_RUNNABLE;
                 }
         }
+        else if ((pToStop->signals.sigind & SIGIO) == SIGIO)
+        {
+            taskToStopNewQueue=TASK_RUNNABLE;
+            printd(DEBUG_PROCESS,"*Task 0x%04X: SIGIO received, no default handler  Executing default action (nothing).\n",taskToStop->taskNum);
+        }
         else
         {
             panic("scheduler: Unhandled signal");
@@ -600,13 +607,20 @@ void runAnotherTask(bool schedulerRequested)
 
     if (taskToRun!=NULL && taskToRun->taskNum!=taskToStop->taskNum)
     {
+        process_t *process = taskToRun->process;
         printd(DEBUG_PROCESS,"*Found task 0x%04X move to CPU\n",taskToRun->taskNum);
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
-        activeSTDOUT = ((process_t *)taskToRun->process)->stdout;
-        activeSTDIN = ((process_t *)taskToRun->process)->stdin;
+        if (!(strcmp(process->path,"/sbin/idle")==0))
+        {
+            activeSTDOUT = ((process_t *)taskToRun->process)->stdout;
+            activeSTDIN = ((process_t *)taskToRun->process)->stdin;
+            activeSTDIN->owner = taskToRun->process;
+            activeSTDOUT->owner = taskToRun->process;
+            activeSTDERR = ((process_t *)taskToRun->process)->stderr;
+            activeSTDERR->owner = taskToRun->process;
+        }
         printd(DEBUG_PROCESS,"Active STDIN = 0x%08X\n",activeSTDIN);
-        activeSTDERR = ((process_t *)taskToRun->process)->stderr;
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08x\n",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);

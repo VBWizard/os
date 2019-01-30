@@ -313,15 +313,17 @@ int handleSignals(int signal)
     }
 }
 
-void processSignal(int signal)
+int processSignal(int signal)
 {
     switch (signal)
     {
         case SIGINT:
-            printf("^C\n");
+            //printf("^C\n");
             bSigIntReceived = false;
+            return SIGINT;
             break;
     }
+    return 0;
 }
 
 int kShell(int argc, char** argv, char** envp)
@@ -342,7 +344,7 @@ int kShell(int argc, char** argv, char** envp)
     strcpy(sExecutingProgram,sKShellProgramName);
     //puts("\nWelcome to kShell ... hang a while!\n");
 
-    modifySignal(SIGINT, handleSignals, SIGINT);
+    modifySignal(SIGINT, handleSignals, 0);
     
     while (!timeToExit)
     {
@@ -362,10 +364,13 @@ getAKey:
 //            gets(&lCurrKey,1,1);
             if (bSigIntReceived)
             {
-                processSignal(SIGINT);
-                lCommand[0] = 0x0;
-                lCurrKeyCount = 0;
-                prompt();
+                if (processSignal(SIGINT)==SIGINT)
+                {
+                    lCommand[0] = 0x0;
+                    lCurrKeyCount = 0;
+                    printf("\n");
+                    prompt();
+                }
             }
         }
         //print("key='%08X'",lCurrKey);

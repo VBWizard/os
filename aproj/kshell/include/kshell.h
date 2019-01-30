@@ -40,7 +40,7 @@ typedef struct
     char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char** pptr);
     void freeArgV(int pcount, char **params);
     int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size);
-    void processSignal(int signal);
+    int processSignal(int signal);
     
     char sExecutingProgram[512];
     char* sKShellProgramName;

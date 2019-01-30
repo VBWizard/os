@@ -692,6 +692,7 @@ uint32_t process_fork(process_t* currProcess)
     retVal = newTask->taskNum;      //parent gets this
     triggerScheduler();
     __asm__("sti\nhlt\n");
+    printd(DEBUG_PROCESS, "fork: lastChildCR3 = 0x%08x\n",getCurrentProcess()->lastChildCR3);
     if (returnCount++ > 0)
         return retVal;
     else

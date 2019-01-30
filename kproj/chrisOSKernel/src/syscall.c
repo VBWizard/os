@@ -15,6 +15,7 @@
 #include "filesystem/pipe.h"
 #include "kutility.h"
 #include "mmap.h"
+#include "thesignals.h"
 
 //#include "fs.h" - CLR 04/23/2018: Commented out
 

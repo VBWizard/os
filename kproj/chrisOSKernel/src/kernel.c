@@ -28,6 +28,7 @@
 #include "filesystem/pipe.h"
 #include "drivers/termdrv.h"
 #include "drivers/tty_driver.h"
+#include "thesignals.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -103,6 +104,7 @@ int main(int argc, char** argv)  {
     tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 0);
     kKernelProcess->stdout = tty1->stdOutWritePipe;
     kKernelProcess->stdin = tty1->stdInReadPipe;
+    kKernelProcess->stderr = tty1->stdErrWritePipe;
     
     printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
             tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);

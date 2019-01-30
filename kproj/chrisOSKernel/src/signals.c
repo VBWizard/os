@@ -6,6 +6,7 @@
 
 #include "signals.h"
 #include "process.h"
+#include "thesignals.h"
 
 //TODO: ******************** Tie signals into scheduler ********************************
 extern void sigSleepReturn();
@@ -75,6 +76,11 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *p
     printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08x, task 0x%04X for cr3 of 0x%08x\n",p,p->task->taskNum,callerCR3);
     switch (signal)
     {
+        case SIGIO:
+            p->signals.sigind|=SIGIO;
+            p->signals.sigdata[SIGIO]=sigData;
+            printd(DEBUG_SIGNALS,"Signalling SIGIO for task 0x%04X, IO source = 0x%08X\n",p->task->taskNum,sigData);
+            break;
         case SIGUSLEEP:    //Put task to sleep until a situation occurs.  For now its only when another task ends
             p->signals.sigind|=SIGUSLEEP;
             p->signals.sigdata[SIGUSLEEP]=sigData;
@@ -109,7 +115,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *p
             p->signals.sigind|=SIGSEGV;
             printd(DEBUG_EXCEPTIONS,"SEGV signaled for cr3=0x%08x, signald after=0x%08x processing signal\n",callerCR3,p->signals.sigind);
             printd(DEBUG_EXCEPTIONS,"Searching for children to SEGV\n");
-            for (int cnt=0;cnt<1000;cnt++)
+/*            for (int cnt=0;cnt<1000;cnt++)
             {
                 if (kTaskList[cnt].taskNum != 0)
                 {
@@ -121,7 +127,7 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *p
                     }
                 }
             }
-            //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
+*/            //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
             return NULL;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         case SIGINT:
@@ -158,7 +164,7 @@ void sys_sigactionC(int signal, uintptr_t* sigAction, uint32_t sigData)
 }
 
 //NOTE: true will mask/block the signal, false will unmask/unblock it
-void sys_masksig(signals signal, bool mask)
+void sys_masksig(int signal, bool mask)
 {
     uint32_t oldCR3;
     
@@ -220,12 +226,16 @@ scanSleep:
         if (*sleep!=0)
         {
             task_t* task=(task_t*)*sleep;
-            if (((process_t*)(task->process))->signals.sigdata[SIGSLEEP]<*kTicksSinceStart)
+            process_t *process = task->process;
+            
+            if (process->signals.sigdata[SIGSLEEP]<*kTicksSinceStart || 
+                    process->signals.sigind & SIGIO)
             {
                 printd(DEBUG_SIGNALS,"\tWaking task 0x%04X as wakeTicks (0x%08x) < kTicksSinceStart (0x%08x)\n",task->taskNum,((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
                 changeTaskQueue(task,TASK_RUNNABLE);
-                ((process_t*)(task->process))->signals.sigdata[SIGSLEEP]=0;
-                ((process_t*)(task->process))->signals.sigind&=~SIGSLEEP;
+                process->signals.sigdata[SIGSLEEP]=0;
+                process->signals.sigind&=~SIGSLEEP;
+                process->signals.sigind&=~SIGIO;
                 //CLR 01/17/2019: Don't make sure the task is chosen next!
                 //task->prioritizedTicksInRunnable=1000000;  //Make this the next chosen task
                 //awoken=true;
@@ -233,6 +243,8 @@ scanSleep:
         }
         sleep++;
     }
+
+
     __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (priorCR3));
     if (awoken) 
     {

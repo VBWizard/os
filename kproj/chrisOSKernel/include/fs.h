@@ -108,6 +108,7 @@ extern "C" {
         void* handle;
         void *pipe, *buffer, **bufferPtr;
         uint32_t verification;
+        void *owner;
     };
 
     struct file_operations

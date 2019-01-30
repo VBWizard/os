@@ -22,9 +22,15 @@
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernel.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/schedule.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/exceptions.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/paging.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/signals.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/task.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/drivers/drv_genKeyboard.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kIRQHandlers.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/task.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/vfs.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/signals.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/pipe.c</file>
         </group>
     </open-files>
 </project-private>
