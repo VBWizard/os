@@ -271,17 +271,30 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
 {
     char** argv;
     char cmd[1024];
-    char *spacePtr=cmd, *lastSpacePtr=cmd;
+    char *spacePtr=cmd, *lastSpacePtr=cmd, *quotePtr=cmd;
+    char dblquote[2] = {'"',0};
     *argc = 0;
     
     strncpyI(cmd,cmdline,1024);
     strtrimI(cmd);
     do
     {
+        quotePtr = strnstrI(spacePtr,dblquote,4000);        //Need to honor double quotes
         spacePtr=strstrI(spacePtr," ");
+        if (quotePtr <= spacePtr)                            //If a double quote shows up before a space ...
+        {
+            char *temp = spacePtr;
+            spacePtr = strnstrI(quotePtr+1,dblquote,4000);  //Look for the closing double quote
+            if (spacePtr>=quotePtr+4000)
+                spacePtr = temp;                            //Didn't find it so resume normal processing (space bound)
+            else
+                spacePtr += 1;                              //Skip the closing quote
+        }
         *argc+=1;
+        if (*spacePtr)
+            spacePtr++;
     
-    } while (spacePtr++);
+    } while (*spacePtr);
     
     argv=mallocI((*argc*MAXPARAMLEN)+(*argc*sizeof(int)));
     int argvPtr=4* *argc;
@@ -289,12 +302,27 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
     for (int cnt=0;cnt<*argc; cnt++)
     {
         argv[cnt]=(char*)argv+argvPtr;
-        spacePtr=strstrI(spacePtr," ");
-        if (spacePtr)
-            strncpyI(argv[cnt],lastSpacePtr,spacePtr-lastSpacePtr);
+        quotePtr = strnstrI(spacePtr,dblquote,4000);                    //Need to honor double quotes
+        if (quotePtr <= spacePtr)                                       //If a double quote shows up before a space ...
+        {
+            char *temp = spacePtr;
+            spacePtr = strnstrI(quotePtr+1,dblquote,4000);              //Look for the closing double quote
+            if (spacePtr>=quotePtr+4000)
+                spacePtr = temp;                                        //Didn't find it so resume normal processing (space bound)
+            else
+            {
+                strncpyI(argv[cnt],quotePtr+1,spacePtr-lastSpacePtr-2); //parameter value becomes the entire quoted string minus the 2 quotes
+            }
+        }
         else
-            strncpyI(argv[cnt],lastSpacePtr,strlenI(lastSpacePtr));
-        strtrimI(argv[cnt]);
+        {
+            spacePtr=strstrI(spacePtr," ");
+            if (spacePtr)
+                strncpyI(argv[cnt],lastSpacePtr,spacePtr-lastSpacePtr);
+            else
+                strncpyI(argv[cnt],lastSpacePtr,strlenI(lastSpacePtr));
+            strtrimI(argv[cnt]);
+        }
         lastSpacePtr=spacePtr++;
         argvPtr+=MAXPARAMLEN;
     }

@@ -48,6 +48,42 @@ static char rcsid[] = "$Header: /user6/ouster/tcl/compat/RCS/strstr.c,v 1.2 93/0
 
 #include "strings.h"
 
+char* strnstrI(char* string, char* substring, int length)
+{
+    register char *a, *b;
+
+    /* First scan quickly through the two strings looking for a
+     * single-character match.  When it's found, then compare the
+     * rest of the substring.
+     */
+    int len=length;
+    
+    b = substring;
+    if (*b == 0) {
+	return string;
+    }
+    for ( ; *string != 0; string += 1) {
+	if (*string != *b) {
+            if (len--<=0)
+                return string;
+	    continue;
+	}
+	a = string;
+	while (1) {
+	    if (*b == 0) {
+		return string;
+	    }
+            if (len--<=0)
+                return string;
+	    if (*a++ != *b++) {
+		break;
+	    }
+	}
+	b = substring;
+    }
+    return (char *) 0;
+}
+
 char* strstrI(char* string, char* substring)
 {
     register char *a, *b;
