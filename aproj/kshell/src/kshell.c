@@ -18,12 +18,12 @@ int commandHistoryPtr=0;
 int commandHistoryMax=0;
 char lCommand[256];
 
-void execInternalCommand(char lCommand[256]);
 int findCommand(char* command);
 char **buildargv (const char *input);
 
 void execInternalCommand(char lCommand[256])
 {
+    strtrim(lCommand);
     int i = findCommand(lCommand);
 
     if(i>0)

@@ -75,7 +75,7 @@ int kexec2(char* path, int argc, char** argv, bool background)
 
 }
 
-int kexec(char* cmdline, bool timeIt)
+int kexec(char* cmdline)
 {
     bool background=false;
     int forkPid=0;
@@ -86,8 +86,6 @@ int kexec(char* cmdline, bool timeIt)
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     int execParamCount=0;
     int pcount=1;
-    struct tm *startTime, *endTime;
-    uint32_t startTicks, endTicks;
     
     if (paramCount==0)
         return -3;
@@ -105,9 +103,6 @@ int kexec(char* cmdline, bool timeIt)
     
     if (*argv[argc-1]=='&')
         background=true;
-
-    
-    startTicks=getticks();
     
     forkPid = fork();
     
@@ -132,12 +127,7 @@ int kexec(char* cmdline, bool timeIt)
         {
             lastExecExitCode = waitpid(forkPid);
             if (lastExecExitCode == 0xBADBADBA)
-                print("execTime: Cannot execute %s\n",argv[0]);
-        }
-        if (timeIt)
-        {
-            endTicks=getticks();
-            print("\n%u ticks\n",endTicks-startTicks);
+                print("exec: Cannot execute %s\n",argv[0]);
         }
         char ret[10];
         itoa(lastExecExitCode,ret);
@@ -151,7 +141,13 @@ int kexec(char* cmdline, bool timeIt)
 
 void cmdTime(char* cmdline)
 {
-    kexec(cmdline,true);
+    uint32_t startTicks, endTicks;
+    
+    startTicks=getticks();
+    execInternalCommand(cmdline);
+    endTicks=getticks();
+    print("\n%u ticks\n",endTicks-startTicks);
+    
 }
 
 void cmdRepeat(char * cmdline)
@@ -174,7 +170,7 @@ void cmdRepeat(char * cmdline)
     for (int cnt=0;cnt<count;cnt++)
     {
         printf("\n*************** REPEAT EXECUTION #%u of %u ***************\n",cnt+1,count);
-        kexec(newCmdLine,false);
+        execInternalCommand(newCmdLine);
         if (bSigIntReceived)
         {
             if (processSignal(SIGINT)==SIGINT)
@@ -187,7 +183,7 @@ void cmdRepeat(char * cmdline)
 
 void cmdExecp(char* cmdline)
 {
-    kexec(cmdline,false);
+    kexec(cmdline);
 }
 
 void cmdExit(char *cmdline)

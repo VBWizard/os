@@ -10,6 +10,7 @@
 /*Parts from: http://wiki.osdev.org/Creating_A_Shell*/
 #include "libChrisOS.h"
 #include "../../../kproj/chrisOSKernel/include/signals.h"
+#include "../../../kproj/chrisOSKernel/include/thesignals.h"
 
 #define INITIAL_MAXARGC 20
 #define EOS '\0'
@@ -41,7 +42,8 @@ typedef struct
     void freeArgV(int pcount, char **params);
     int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size);
     int processSignal(int signal);
-    
+    void execInternalCommand(char lCommand[256]);
+
     char sExecutingProgram[512];
     char* sKShellProgramName;
     char** environmentLoc;

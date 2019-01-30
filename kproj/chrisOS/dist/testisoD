@@ -27,7 +27,6 @@ qemu-system-i386 							\
 	-d int,cpu_reset,pcall,guest_errors                        		\
 	-hda ~/qemu-test-disk2.img                                     \
 	-usb -device usb-host,hostbus=2,hostaddr=3 			\
-	-no-shutdown
 	$@ 
 #	--enable-kvm
 

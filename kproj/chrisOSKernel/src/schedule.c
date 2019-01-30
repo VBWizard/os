@@ -359,18 +359,20 @@ task_t* findTaskToRun()
     process_t* process;
     uintptr_t* queue=qRunnable;
     
+    processSignals();
     while (*queue!=NO_NEXT)
     {
+        int queEntryNum = 0;
         if (*queue!=0)
         {
             task = (task_t*)*queue;
             process = task->process;
-            
             oldTicks=task->prioritizedTicksInRunnable;
             //This is where we increment all the runnable ticks, based on the process' priority
             if ( task!=kIdleTask || (task==kIdleTask) && task->prioritizedTicksInRunnable==0)
                 task->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-process->priority)+1;
-            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s-%u[%s]), priority=%u, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
+            printd(DEBUG_PROCESS,"*\t(%u) Task 0x%04X (%s-%u[%s]), priority=%u, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
+                    queEntryNum,
                     task->taskNum, process->exename,
                     process->childNumber,
                     process->parent->exename,
@@ -383,6 +385,7 @@ task_t* findTaskToRun()
                 mostIdleTicks=task->prioritizedTicksInRunnable;
             }
         }
+        queEntryNum++;
         queue++;
     }
     

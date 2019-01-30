@@ -138,7 +138,8 @@ size_t piperead(void *buffer, int size, int length, void *f)
                 break;
             //yield here
             sys_sigaction2(SIGSLEEP, 0, *kTicksSinceStart+kTicksPerSecond, getCurrentProcess());
-            __asm__("sti\nhlt\n"); //Wait for the scheduler
+            triggerScheduler();
+            __asm__("sti\nhlt\n");
         }
        
     } while (copySize < size * length);
