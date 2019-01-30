@@ -5,6 +5,7 @@
  */
 
 #include "libChrisOS.h"
+#include "file.h"
 
 VISIBLE void* open(char* path, const char* mode)
 {
@@ -21,9 +22,14 @@ VISIBLE int read(void* handle, void *buffer, int size, int length)
     return do_syscall4(SYSCALL_READ, (uint32_t)handle, (uint32_t)buffer, size, length);
 }
 
-VISIBLE int write(void* handle, void *buffer, int size, int length)
+int writeI(void* handle, void *buffer, int size, int length)
 {
     return do_syscall4(SYSCALL_WRITE, (uint32_t)handle, (uint32_t)buffer, size, length);
+}
+
+VISIBLE int write(void* handle, void *buffer, int size, int length)
+{
+    return writeI(handle, buffer, size, length);
 }
 
 VISIBLE int seek(void* handle, long position, int whence)

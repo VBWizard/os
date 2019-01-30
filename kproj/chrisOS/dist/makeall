@@ -22,8 +22,8 @@ pathMid=dist/${buildType^}/GNU-Linux #GNU-Linux
 
 declare -a kernProgArray=("chrisOS" "chrisOSKernel")
 declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")
-declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat" "echo")
-declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat" "echo/$pathMid/echo")
+declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat" "echo" "clock")
+declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat" "echo/$pathMid/echo" "clock/$pathMid/clock")
 basePath=/home/yogi/src/os/kproj/
 tabs 5,36,50,70
 echo "Build environment: ${buildType^}"

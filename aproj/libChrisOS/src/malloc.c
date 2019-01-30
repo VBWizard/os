@@ -6,6 +6,7 @@
 
 #include "malloc.h"
 #include "libChrisOS.h"
+#include "config.h"
 
 #define HEAP_GET_NEXT(s,t) {t=(uint8_t*)s+s->len+sizeof(heaprec_t);}
 #define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
@@ -104,7 +105,7 @@ __attribute__((visibility("default"))) void*  malloc(size_t size)
     return mallocI(size);
 }
 
-void* reallocI(void *foldptr, int newlen)
+void* reallocI(void *foldptr, uint32_t newlen)
 {
     
     //Allocate space of newlen
@@ -123,7 +124,7 @@ void* reallocI(void *foldptr, int newlen)
     return fnewptr;
 }
 
-VISIBLE void* realloc(void *foldptr, int newlen)
+VISIBLE void* realloc(void *foldptr, uint32_t newlen)
 {
     return reallocI(foldptr, newlen);
 }

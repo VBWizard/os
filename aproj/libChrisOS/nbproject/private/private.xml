@@ -18,6 +18,10 @@
             <file>file:/home/yogi/src/os/aproj/libChrisOS/src/strings/strcpy.c</file>
         </group>
         <group>
+            <file>file:/home/yogi/src/os/aproj/libChrisOS/src/console.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/syscalls.h</file>
+            <file>file:/home/yogi/src/os/aproj/libChrisOS/src/strings/strlen.c</file>
+            <file>file:/home/yogi/src/os/aproj/libChrisOS/src/time.c</file>
             <file>file:/home/yogi/src/os/aproj/libChrisOS/src/libChrisOS.c</file>
         </group>
     </open-files>

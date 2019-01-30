@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>include/ascii.h</itemPath>
+      <itemPath>include/console.h</itemPath>
       <itemPath>include/environment.h</itemPath>
       <itemPath>include/file.h</itemPath>
       <itemPath>include/input.h</itemPath>
@@ -48,6 +49,7 @@
         <itemPath>src/strings/strtrim.c</itemPath>
       </logicalFolder>
       <itemPath>src/ascii.c</itemPath>
+      <itemPath>src/console.c</itemPath>
       <itemPath>src/environment.c</itemPath>
       <itemPath>src/file.c</itemPath>
       <itemPath>src/input/input.c</itemPath>
@@ -127,6 +129,8 @@
       </item>
       <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/console.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/environment.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/file.h" ex="false" tool="3" flavor2="0">
@@ -154,6 +158,8 @@
       <item path="include/types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/ascii.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/console.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/environment.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -262,6 +268,8 @@
       </item>
       <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/console.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/environment.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/file.h" ex="false" tool="3" flavor2="0">
@@ -289,6 +297,8 @@
       <item path="include/types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/ascii.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/console.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/environment.c" ex="false" tool="0" flavor2="0">
       </item>

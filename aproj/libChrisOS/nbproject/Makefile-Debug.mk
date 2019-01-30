@@ -39,6 +39,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/4459a81c/strcspn.o \
 	${OBJECTDIR}/_ext/4459a81c/strtok.o \
 	${OBJECTDIR}/src/ascii.o \
+	${OBJECTDIR}/src/console.o \
 	${OBJECTDIR}/src/environment.o \
 	${OBJECTDIR}/src/file.o \
 	${OBJECTDIR}/src/input/input.o \
@@ -109,6 +110,11 @@ ${OBJECTDIR}/src/ascii.o: src/ascii.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ascii.o src/ascii.c
+
+${OBJECTDIR}/src/console.o: src/console.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/console.o src/console.c
 
 ${OBJECTDIR}/src/environment.o: src/environment.c
 	${MKDIR} -p ${OBJECTDIR}/src

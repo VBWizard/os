@@ -24,6 +24,9 @@ extern "C" {
     int write(void* handle, void *buffer, int size, int length);
     int getdir(char* path, char *buffer, int bufferCount);
     int seek(void* handle, long position, int whence);
+    
+    int writeI(void* handle, void *buffer, int size, int length);
+    
 #ifdef __cplusplus
 }
 #endif

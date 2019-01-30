@@ -24,12 +24,12 @@ extern "C" {
 #include "strings.h"
 #include "environment.h"
 #include "input.h"
-#include "config.h"
 #include "time.h"
 #include "file.h"
 #include "pipe.h"
 #include "libcmmap.h"
 #include "../../../kproj/chrisOSKernel/include/syscalls.h"
+#include "console.h"
     
 #include <bits/time.h>
 #ifndef NULL
@@ -58,6 +58,7 @@ extern "C" {
     char** cmdlineToArgv(char* cmdline, int *argc);
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printf(const char *format, ...);
+    int printfI(const char *format, ...);
     int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
     unsigned int VISIBLE sleep (unsigned int __seconds);
