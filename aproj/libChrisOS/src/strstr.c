@@ -84,7 +84,7 @@ char* strnstrI(char* string, char* substring, int length)
     return (char *) 0;
 }
 
-char* strstrI(char* string, char* substring)
+char* strstrI(const char* string, const char* substring)
 {
     register char *a, *b;
 
@@ -115,7 +115,7 @@ char* strstrI(char* string, char* substring)
     return (char *) 0;
 }
 
-VISIBLE char* strstr(char* string, char* substring)
+VISIBLE char* strstr(const char* string, const char* substring)
 {
     return strstrI(string, substring);
 }

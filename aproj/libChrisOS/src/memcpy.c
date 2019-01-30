@@ -7,7 +7,8 @@
 //clr 05/26/2016: Modified to copy by 4 or 2 bytes if applicable
 //This is needed for many memory mapped registers which cannot be
 //copied a byte at a time
-VISIBLE void * memcpy(void *dest, const void *src, size_t n)
+
+void *memcpyI(void *dest, const void *src, size_t n)
 {
     bool dw,dd;
     
@@ -62,3 +63,7 @@ VISIBLE void * memcpy(void *dest, const void *src, size_t n)
     }
 }
 
+VISIBLE void * memcpy(void *dest, const void *src, size_t n)
+{
+    return memcpyI(dest, src, n);
+}

@@ -18,6 +18,8 @@
         </group>
         <group name="os"/>
         <group name="aproj"/>
-        <group/>
+        <group>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/drivers/terminal/termdrv.c</file>
+        </group>
     </open-files>
 </project-private>

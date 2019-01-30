@@ -55,8 +55,7 @@ void freeI(void* fpointer)
     if (mp->marker!=ALLOC_MARKER_VALUE)
     {
         //print("malloc: marker not found error!!!\n");
-gotoHere:
-        goto gotoHere;
+        return; //Return silently ... for now
     }
     mp->inUse=false;
 }
@@ -103,6 +102,30 @@ void*  mallocI(size_t size)
 __attribute__((visibility("default"))) void*  malloc(size_t size)
 {
     return mallocI(size);
+}
+
+void* reallocI(void *foldptr, int newlen)
+{
+    
+    //Allocate space of newlen
+    uintptr_t *fnewptr = mallocI(newlen);
+   
+    //Get old heap pointer
+    heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
+    HEAP_CURR(foldptr,mp);
+    
+    //Copy from old pointer to new memory using the old pointer's length
+    memsetI(fnewptr+mp->len,0,newlen);
+    memcpyI(fnewptr, foldptr, mp->len>newlen?newlen:mp->len);
+    
+   //free old pointer
+    freeI(foldptr);
+    return fnewptr;
+}
+
+VISIBLE void* realloc(void *foldptr, int newlen)
+{
+    return reallocI(foldptr, newlen);
 }
 
 __attribute__((visibility("default"))) void free(void* fpointer)

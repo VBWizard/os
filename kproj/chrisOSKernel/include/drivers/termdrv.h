@@ -32,6 +32,7 @@ extern "C" {
         char *screenBuffer;
         bool refresh;
         void (*updateTerminal)(void);
+        int savedCursorX, savedCursorY;
     } __attribute__((packed)) terminfo_t;
     
     terminfo_t *terminfos;

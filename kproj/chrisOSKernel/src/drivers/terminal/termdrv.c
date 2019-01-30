@@ -144,8 +144,9 @@ void updateTermBuffer(ttydevice_t *device)
 {
     //NOTE: pipeContents contains the data to be written to the buffer
     terminfo_t* term = getTermInfo(device->termDeviceMajor, device->termDeviceMinor);
-
+    bool sequenceFound = false;
     term->refresh = true;
+    int lSavedX, lSavedY;
     
     if (term == NULL)
         panic("updateTermBuffer: Couldn't find the terminal to be updated (major=0x%04X, minor=0x%04X)\n", device->termDeviceMajor, device->termDeviceMinor);
@@ -168,31 +169,128 @@ void updateTermBuffer(ttydevice_t *device)
             case 0x1b:                                                  //ANSI escape sequence
                 if (pipeContents[cnt+1] == '[')
                 {
-                    switch (pipeContents[cnt+3])
+                    char contentP2 = pipeContents[cnt+2];
+                    char contentP3 = pipeContents[cnt+3];
+                    char contentP4 = pipeContents[cnt+4];
+                    char contentP5 = pipeContents[cnt+5];
+                    char contentP6 = pipeContents[cnt+6];
+                    char contentP7 = pipeContents[cnt+7];
+                    char contentP8 = pipeContents[cnt+8];
+                    
+                    if ( (contentP2==';' || contentP3==';' ||contentP4==';')
+                      && (contentP3=='H' || contentP4=='H' || contentP5=='H' || contentP6=='H' || contentP7=='H')
+                            )
                     {
-                        case 'J':
-                            if (pipeContents[cnt+2]=='2')               //Clear screen
+                        int lCursorX=-1, lCursorY=-1;
+                        char num[3] = {0, 0, 0};
+                        int numPtr = 0;
+                        for (int idx=cnt+2;idx<cnt+8;cnt++)
+                        {
+                            if (lCursorX==-1)
+                                if (pipeContents[idx]==';')
+                                {
+                                    lCursorX=0;
+                                    idx++; //jump over the ;
+                                }
+                                else
+                                {
+                                    numPtr=0;
+                                    while (pipeContents[idx+numPtr]!=';')
+                                    {
+                                        num[numPtr]=pipeContents[idx+numPtr];
+                                        numPtr++;
+                                    }
+                                    num[numPtr]=0;
+                                    lCursorX=atoi(num);
+                                    idx+=numPtr;
+                                    idx++; //jump over the ;
+                                }
+                            else if (lCursorY==-1)
                             {
-                                clearScreen(term, term->screenBuffer);
-                                if (device->stdOutWritePipe == activeSTDOUT)
-                                    clearScreen(term, console);
-                                cnt+=3;
-                                curr = 0;
+                                if (pipeContents[idx]=='H')
+                                    lCursorY=0;
+                                else
+                                {
+                                    numPtr=0;
+                                    while (pipeContents[idx+numPtr]!='H')
+                                    {
+                                        num[numPtr]=pipeContents[idx+numPtr];
+                                        numPtr++;
+                                    }
+                                    num[numPtr]=0;
+                                    lCursorY=atoi(num);
+                                    idx+=numPtr;
+                                }
                             }
+                            else if (pipeContents[idx]!='H')
+                                panic("updateTermBuffer: Error parsing ANSI CUP sequence\n");
+                            else
+                            {
+                                cnt=idx;
+                                break;
+                            }
+                        }
+                        term->cursorX = lCursorX;
+                        term->cursorY = lCursorY;
+                        cursor_update(term);
+                        sequenceFound = true;
+                        curr=0;
+                        break;
+                    }
+                    switch (contentP2)
+                    {
+                        case 's':
+                            term->savedCursorX = term->cursorX;
+                            term->savedCursorY = term->cursorY;
+                            cnt+=2;
+                            sequenceFound = true;
+                            curr=0;
                             break;
-                        case 'D':
-                            term->cursorX-=pipeContents[cnt+2]-48;
-                            cnt+=3;
-                            curr = 0;
+                        case 'u':
+                            term->cursorX = term->savedCursorX;
+                            term->cursorY = term->savedCursorY;
+                            cnt+=2;
+                            sequenceFound = true;
+                            curr=0;
                             break;
-                        case 'C':
-                            term->cursorX+=pipeContents[cnt+2]-48;
-                            cnt+=3;
-                            curr = 0;
-                            break;
-                        default:
+                        case 'K':
+                            lSavedX = term->cursorX;
+                            lSavedY = term->cursorY;
+                            for (int cnt=term->cursorX;cnt<term->width;cnt++)
+                                processCharacter(device, term, ' ');
+                            term->cursorX = lSavedX;
+                            term->cursorY = lSavedY;
+                            cnt+=2;
+                            sequenceFound = true;
+                            curr=0;
                             break;
                     }
+                    if (!sequenceFound)
+                        switch (contentP3)
+                        {
+                            case 'J':
+                                if (contentP2=='2')               //Clear screen
+                                {
+                                    clearScreen(term, term->screenBuffer);
+                                    if (device->stdOutWritePipe == activeSTDOUT)
+                                        clearScreen(term, console);
+                                    cnt+=3;
+                                    curr = 0;
+                                }
+                                break;
+                            case 'D':
+                                term->cursorX-=contentP2-48;
+                                cnt+=3;
+                                curr = 0;
+                                break;
+                            case 'C':
+                                term->cursorX+=contentP2-48;
+                                cnt+=3;
+                                curr = 0;
+                                break;
+                            default:
+                                break;
+                        }
                 }
         }
         if (curr != 0)

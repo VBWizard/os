@@ -55,10 +55,11 @@ size_t strlen(const char* str);
     char * strtok(char* s, /*const*/ char* delim);
     char *strchr(const char *s, int c);
     int strcspn(char* string, char* chars);
-    char* strstr(char* string, char* substring);
-    char* strstrI(char* string, char* substring);
+    char* strstr(const char* string, const char* substring);
+    char* strstrI(const char* string, const char* substring);
     char* strnstrI(char* string, char* substring, int length);
     int sprintf(char *buf, const char *fmt, ...);
     int vsprintf(char *buf, const char *fmt, va_list args);
+    char *strreplace(const char *in, const char *pattern, const char *by);
 #endif	/* STRINGS_H */
 

@@ -281,7 +281,7 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
     {
         quotePtr = strnstrI(spacePtr,dblquote,4000);        //Need to honor double quotes
         spacePtr=strstrI(spacePtr," ");
-        if (quotePtr <= spacePtr)                            //If a double quote shows up before a space ...
+        if (quotePtr!=0 && (quotePtr <= spacePtr))                            //If a double quote shows up before a space ...
         {
             char *temp = spacePtr;
             spacePtr = strnstrI(quotePtr+1,dblquote,4000);  //Look for the closing double quote
@@ -291,10 +291,10 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
                 spacePtr += 1;                              //Skip the closing quote
         }
         *argc+=1;
-        if (*spacePtr)
+        if (spacePtr!=0 && *spacePtr)
             spacePtr++;
     
-    } while (*spacePtr);
+    } while (spacePtr!=0 && *spacePtr);
     
     argv=mallocI((*argc*MAXPARAMLEN)+(*argc*sizeof(int)));
     int argvPtr=4* *argc;
@@ -303,7 +303,7 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
     {
         argv[cnt]=(char*)argv+argvPtr;
         quotePtr = strnstrI(spacePtr,dblquote,4000);                    //Need to honor double quotes
-        if (quotePtr <= spacePtr)                                       //If a double quote shows up before a space ...
+        if (quotePtr && quotePtr <= spacePtr)                                       //If a double quote shows up before a space ...
         {
             char *temp = spacePtr;
             spacePtr = strnstrI(quotePtr+1,dblquote,4000);              //Look for the closing double quote
@@ -331,8 +331,6 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
 
 VISIBLE char** cmdlineToArgv(char* cmdline, int *argc)
 {
-    do_syscall0(0);
-
     return cmdlineToArgvI(cmdline, argc);
 }
 

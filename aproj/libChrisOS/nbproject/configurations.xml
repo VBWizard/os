@@ -41,6 +41,7 @@
         <itemPath>src/strings/strncpy.c</itemPath>
         <itemPath>src/strings/stroul.c</itemPath>
         <itemPath>src/strings/strparts.c</itemPath>
+        <itemPath>src/strreplace.c</itemPath>
         <itemPath>src/strstr.c</itemPath>
         <itemPath>../../kproj/chrisOS/src/strings/strtok.c</itemPath>
         <itemPath>src/strings/strtol.c</itemPath>
@@ -198,6 +199,8 @@
       </item>
       <item path="src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/strreplace.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/strstr.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/time.c" ex="false" tool="0" flavor2="0">
@@ -332,6 +335,8 @@
       <item path="src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strreplace.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strstr.c" ex="false" tool="0" flavor2="0">
       </item>

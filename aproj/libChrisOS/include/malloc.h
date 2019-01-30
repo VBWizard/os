@@ -58,6 +58,7 @@ void initmalloc();
 void* malloc(size_t size);
 void*  mallocI(size_t size);
 void malloc_cleanup();
+void* reallocI(void *foldptr, int newlen);
 void free(void* fpointer);
 void freeI(void* fpointer);
 #ifdef __cplusplus
