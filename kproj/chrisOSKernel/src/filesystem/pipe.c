@@ -30,7 +30,7 @@ filesystem_t *initpipefs()
     fops->write=&pipewrite;
     fops->close=&pipeclose;
     fops->seek=NULL;
-    fs = kRegisterFileSystem("/pipe/",fops);
+    fs = kRegisterFileSystem("/pipe/", fops, NULL);
     fs->files = kMalloc(sizeof(dllist_t));
     memset(openPipes,0,sizeof(pipes_t)*1000);
     kPipeWriteLock = 0;

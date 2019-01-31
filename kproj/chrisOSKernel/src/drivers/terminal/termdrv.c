@@ -162,7 +162,7 @@ void updateTermBuffer(ttydevice_t *device)
                 curr = 0;
                 break;
             case '\t':
-                for (int cnt=0;cnt<5;cnt++)
+                for (int cnt=0;cnt<(term->cursorX%5==0?5:term->cursorX%5);cnt++)
                     processCharacter(device, term, ' ');
                     curr = 0;
                 break;

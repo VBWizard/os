@@ -78,6 +78,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/fat/fat_write.o \
 	${OBJECTDIR}/src/fat/taskSwitch.o \
 	${OBJECTDIR}/src/filesystem/pipe.o \
+	${OBJECTDIR}/src/filesystem/procfs.o \
 	${OBJECTDIR}/src/kIRQHandlers.o \
 	${OBJECTDIR}/src/kInit.o \
 	${OBJECTDIR}/src/kernel.o \
@@ -335,6 +336,11 @@ ${OBJECTDIR}/src/filesystem/pipe.o: src/filesystem/pipe.c nbproject/Makefile-${C
 	${MKDIR} -p ${OBJECTDIR}/src/filesystem
 	${RM} "$@.d"
 	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/filesystem/pipe.o src/filesystem/pipe.c
+
+${OBJECTDIR}/src/filesystem/procfs.o: src/filesystem/procfs.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/filesystem
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/filesystem/procfs.o src/filesystem/procfs.c
 
 ${OBJECTDIR}/src/kIRQHandlers.o: src/kIRQHandlers.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src

@@ -140,8 +140,10 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_GETDENTS:
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             retVal = getDirEntries(process, (char*)param1, (void*)param2, param3);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_GETCWD:    //param1=buffer *, param2=size of buffer
             retVal=(uint32_t)processGetCWD((char*)param1,param2);

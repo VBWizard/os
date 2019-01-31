@@ -125,6 +125,7 @@
       <itemPath>../chrisOS/src/printf.c</itemPath>
       <itemPath>src/printfNew.c</itemPath>
       <itemPath>src/process.c</itemPath>
+      <itemPath>src/filesystem/procfs.c</itemPath>
       <itemPath>src/schedule.c</itemPath>
       <itemPath>src/schedule_old.c</itemPath>
       <itemPath>src/signals.c</itemPath>
@@ -409,6 +410,8 @@
       <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/filesystem/procfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -708,6 +711,8 @@
       <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/filesystem/procfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
       </item>

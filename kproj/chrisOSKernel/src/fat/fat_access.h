@@ -108,7 +108,7 @@ struct fs_dir_ent
     uint16                  create_date;
     uint16                  create_time;
 #endif
-};
+} __attribute__((packed));
 
 //-----------------------------------------------------------------------------
 // Prototypes

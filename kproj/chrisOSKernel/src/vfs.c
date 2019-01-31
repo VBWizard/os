@@ -16,12 +16,20 @@
 extern filesystem_t* rootFs;
 extern filesystem_t* pipeFs;
 
+struct fs_dir_list_status
+{
+    uint32_t                  sector;
+    uint32_t                  cluster;
+    uint8_t                   offset;
+};
+
+typedef struct fs_dir_list_status    FL_DIR;
 uint32_t pipeFileHandle = 0xFFFFFFFF;
 char* lBuffer;
 volatile int kFileWriteLock;
 volatile int kFileReadLock;
 
-filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
+filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const dirops_t * dops)
 {
     filesystem_t *fs;
     vfs_mount_t *vfs;
@@ -44,7 +52,9 @@ filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops)
         panic("Mounting filesystem as non-root ... this is not yet supported");
     
     fs->fops = kMalloc(sizeof(fileops_t));
+    fs->dops = kMalloc(sizeof(dirops_t));
     memcpy(fs->fops, fops, sizeof(fileops_t));
+    memcpy(fs->dops, dops, sizeof(dirops_t));
     lBuffer = NULL;
     kFileWriteLock = 0;
     kFileReadLock = 0;
@@ -67,7 +77,7 @@ dllist_t* getListEntry(filesystem_t *fs, eListType listType, void* entryToFind)
             if (((file_t*)list->payload)->handle==entryToFind)
                 return list;
         }
-        else if (((directory_t*)list->payload)->handle==entryToFind)
+        else if (((directory_t*)list->payload)==entryToFind)
                 return list;
         if (list->next==list)
             break;
@@ -278,12 +288,13 @@ void fs_close(void* file)
 
 void* fs_opendir(char* path)
 {
-    void* handle;
+    void *handle;
     dllist_t* list;
     directory_t *dir;
-    
+
     //call the fs's open method
-    handle = rootFs->dops->open(path);
+    handle = kMalloc(sizeof(FL_DIR));
+    handle = rootFs->dops->open(path, handle);
     if (handle)
     {
         list = kMalloc(sizeof(dllist_t));
@@ -303,7 +314,7 @@ void* fs_opendir(char* path)
         }
         else
             listAdd(rootFs->dirs,list,dir);
-        return handle;
+        return dir;
     }
     return NULL;
 }
@@ -315,7 +326,8 @@ int fs_readdir(void* file, dirent_t *dirEntry)
     
     if (foundFile==NULL)
         panic("fs_readdir: file handle not found in fs->files");
-    return foundFile->dops->read(foundFile->handle, dirEntry);
+    int retVal = foundFile->dops->read(foundFile->handle, dirEntry);
+    return retVal;
 }
 
 void fs_closedir(void* dir)
@@ -324,20 +336,24 @@ void fs_closedir(void* dir)
 }
 
 /*SYSCALL_GETDENTS:*/
-int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount)
+int getDirEntries(void *process, char* path, dirent_t *buffer, int buflen)
 {
     void* dirp = fs_opendir(path);
-    dirent_t dirEntry;
-    dirent_t* lBuffer;
+    directory_t* dir;
+    dirent_t *dirEntry = kMalloc(sizeof(dirent_t));
     process_t *proc = process;
     int dirCount=0;
     
-    if (dirp)
+    dir = (directory_t*)dirp;
+    
+    if (dir->handle)
     {
-        while (fs_readdir(dirp,&dirEntry)!=-1 && dirCount < bufferCount)
+        while (fs_readdir(dirp,dirEntry)>=0 && dirCount*sizeof(dirent_t) < buflen)
         {
-            copyFromKernel(proc, lBuffer++, &dirEntry, sizeof(dirent_t));
+            copyFromKernel(proc, buffer, dirEntry, sizeof(dirent_t));
             dirCount++;
+            int a = sizeof(dirent_t);
+            buffer++;
         }
         
         return dirCount;

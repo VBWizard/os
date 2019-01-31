@@ -18,6 +18,16 @@
         </group>
         <group name="os"/>
         <group name="aproj"/>
-        <group/>
+        <group>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernel.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/fat/fat_access.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/drivers/terminal/termdrv.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/fat/fat_filelib.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/dllist.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/x86.s</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/fat/fat_access.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/vfs.c</file>
+        </group>
     </open-files>
 </project-private>

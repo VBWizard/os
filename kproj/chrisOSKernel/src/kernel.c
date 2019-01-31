@@ -94,7 +94,7 @@ int main(int argc, char** argv)  {
     dops.close = &fl_closedir;
     dops.read = &fl_readdir;
     
-    rootFs = kRegisterFileSystem("/",&fops);
+    rootFs = kRegisterFileSystem("/", &fops, &dops);
     pipeFs = initpipefs();
     
     globalMMapInit();
