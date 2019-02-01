@@ -30,6 +30,8 @@ extern "C" {
 #define SEEK_END 2
 #define EOF (-1)
     
+#define FS_BUFFERSIZE 1048576
+    
 #define DENTRY_ROOT 0xFFFFFFFF    
 
     typedef enum

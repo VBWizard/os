@@ -368,9 +368,9 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     else
         strcpy(process->path,path);
     
-    char *slash=path, *slash2=path;
+    char *slash=process->path, *slash2=process->path;
     
-    while (slash)
+    while (slash!=NULL)
     {
         slash = strstr(slash2+1, "/");
         if (slash)
@@ -378,7 +378,6 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         else
             slash2+=1;
     }
-
     strcpy(process->exename, slash2);
     
     printd(DEBUG_PROCESS,"process->path (0x%08x)=%s\n",process->path,process->path);

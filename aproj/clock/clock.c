@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 
         saveCursorPosition();
         moveToXY(70,0);
-        printf("%i:%i:%i",timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+        printf("%02i:%02i:%02i",timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
         restoreCursorPosition();
         sleep(1);
     }

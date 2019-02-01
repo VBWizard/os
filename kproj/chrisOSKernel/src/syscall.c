@@ -114,7 +114,6 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 genericFileHandle = process->stdout;
             retVal=fs_write(process, genericFileHandle, (void*)param2, param3, 1);
             printd(DEBUG_FILESYS, "_sysCall: write() wrote %u bytes to %s from %s\n",retVal, ((file_t*)genericFileHandle)->f_path, process->exename);
-            printd(DEBUG_PROCESS,"syscall (write): Returning CR3 to 0x%08X\n",processCR3);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             if (*((char*)param2) == '\n')
                 retVal = 22;

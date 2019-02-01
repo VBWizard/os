@@ -360,9 +360,9 @@ task_t* findTaskToRun()
     uintptr_t* queue=qRunnable;
     
     processSignals();
+    int queEntryNum = 0;
     while (*queue!=NO_NEXT)
     {
-        int queEntryNum = 0;
         if (*queue!=0)
         {
             task = (task_t*)*queue;

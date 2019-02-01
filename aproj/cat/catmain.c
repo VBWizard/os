@@ -49,17 +49,50 @@ int main(int argc, char** argv) {
     
 */    printf("File mmap test commencing ...\n");
     
+    direntry_t *dirbuff = malloc(16384);
+    
+    char *ptr=argv[1], *ptr2=argv[1];
+    char *path, *filename;
+    int filesize = -1;
+    
+    path=malloc(0x512);
+    filename=malloc(0x512);
+    
+    while (ptr=(strstr(ptr,"/")))
+    {
+        ptr++;
+        ptr2=ptr;
+    }
+    
+    strncpy(path, argv[1], (uint32_t)ptr2-(uint32_t)argv[1]);
+    strcpy(filename, ptr2);
+    int entryCount = getdir(path, (void*)dirbuff, 16384);
+    
+    for (int cnt=0;cnt<entryCount;cnt++)
+        if (strcmp(filename,dirbuff[cnt].filename)==0)
+        {
+            filesize = dirbuff[cnt].size;
+            break;
+        }
+    
+    if (filesize == -1)
+    {
+        printf("Error, can't stat file %s",filename);
+        return -2;
+    }
+    
     file = open(argv[1],"r");
     if (file)
     {
         seek(file, 0, 0);
-        char *a = mmap(NULL, 51, PROT_WRITE, MAP_PRIVATE, (int)file, 0);
+        char *a = mmap(NULL, filesize, PROT_WRITE, MAP_PRIVATE, (int)file, 0);
 
-        char test[51];
-        strncpy(test,a,51);
+        char test[filesize];
+        strncpy(test,a,filesize);
         
         a[1] = 0;
-        write(1, a, 51, 1);
+        write(1, a, filesize, 1);
+        printf("\n");
         close(file);
     }
     else

@@ -101,8 +101,9 @@ void kbd_handler_generic()
         if (tty1->stdInWritePipe)
         {
             pipewrite(&rawKey, 1, 1, tty1->stdInWritePipe);
-            sys_sigaction(SIGIO, NULL, (uintptr_t)activeSTDIN->owner, activeSTDIN->owner);
             printd(DEBUG_KEYBOARD, "kbd_handler_generic: Raw key '%u' delivered to stdin pipe 0x%08X\n",rawKey, tty1->stdInWritePipe);
+	    //NOTE: We are passing data but no process.  sigaction2 knows to not expect a process for SIGIO
+            sys_sigaction2(SIGIO, NULL, (uintptr_t)activeSTDIN, NULL);
         }
         else
             panic("kbd_handler_generic: STDIN pipe is null! (1)\n");
@@ -123,7 +124,7 @@ void kbd_handler_generic()
             if (translatedKeypress=='c') //CLR 12/30/2018: ^C pressed
             {
                 //TODO: sigint broken till I can figure out how to pass the process struct for the correct struct
-                sys_sigaction(SIGINT, NULL, 0, activeSTDIN->owner);
+                sys_sigaction2(SIGINT, NULL, 0, activeSTDIN->owner);
                 if (tty1->stdInWritePipe)
                     pipewrite("^C\n", 2, 1, tty1->stdInWritePipe);
                 goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
@@ -137,8 +138,9 @@ void kbd_handler_generic()
         {
             //CLR 01/10/2017: Increment the buffer pointer first
             pipewrite(&translatedKeypress, 1, 1, tty1->stdInWritePipe);
-            sys_sigaction(SIGIO, NULL, (uintptr_t)activeSTDIN->owner, activeSTDIN->owner);
             printd(DEBUG_KEYBOARD, "kbd_handler_generic: Translated key '%c' delivered to stdin pipe 0x%08X (CR3=0x%08X)\n",translatedKeypress, tty1->stdInWritePipe, CURRENT_CR3);
+	    //NOTE: We are passing data but no process.  sigaction2 knows to not expect a process for SIGIO
+            sys_sigaction2(SIGIO, NULL, (uintptr_t)activeSTDIN, NULL);
         }
         else
             panic("kbd_handler_generic: STDIN pipe is null! (2)\n");

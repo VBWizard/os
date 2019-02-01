@@ -53,7 +53,10 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
             p->signals.sighandler[SIGINT]=sigAction;
             p->signals.sigdata[SIGINT]=sigData;
             break;
-        //case SIGIO:
+        case SIGIO:
+            p->signals.sighandler[SIGINT]=sigAction;
+            p->signals.sigdata[SIGINT]=sigData;
+            break;
         default:
             panic("sys_setsigaction: Unhandled signal 0x%08x, sigAction 0x%08x\n",signal,sigAction);
             break;
@@ -66,21 +69,43 @@ void sys_setsigaction(int signal, uintptr_t* sigAction, uint32_t sigData)
 
 
 //Process a sigaction against a process, called by sys_sigaction or the kernel
+//NOTE: Some code will call this without a process which means the signal should go to 
+//all processes wanting the signal
 void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *process)
 {
     
-    process_t *p = process;
-    uintptr_t callerCR3=p->pageDirPtr;
+    process_t *p;
+    uintptr_t callerCR3;
+    uintptr_t*sleepQ = qISleep;
+    
+    if (process)
+    {
+        p = process;
+        callerCR3 = p->pageDirPtr;
+        printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08x, task 0x%04X for cr3 of 0x%08x\n",p,p->task->taskNum,callerCR3);
+    }
     
     printd(DEBUG_SIGNALS, "sys_sigAction2(0x%08x, 0x%08x, 0x%08x, 0x%08x)\n"
             ,signal, sigAction, sigData,callerCR3);
-    printd(DEBUG_SIGNALS, "sys_sigaction2: Found process 0x%08x, task 0x%04X for cr3 of 0x%08x\n",p,p->task->taskNum,callerCR3);
     switch (signal)
     {
-        case SIGIO:
-            p->signals.sigind|=SIGIO;
-            p->signals.sigdata[SIGIO]=sigData;
-            printd(DEBUG_SIGNALS,"Signalling SIGIO for task 0x%04X, IO source = 0x%08X\n",p->task->taskNum,sigData);
+        case SIGIO: //NOTE: SIGIO goes to all processes on the pipe (sigData) in question
+            while (*sleepQ!=NO_NEXT)
+            {
+                if (*sleepQ!=0)
+                {
+                    task_t* task=(task_t*)*sleepQ;
+                    process_t *sigproc = task->process;
+                    if (sigproc->stdin==(void*)sigData)
+                    {
+                        int a = SIGIO;
+                        sigproc->signals.sigind|=SIGIO;
+                        sigproc->signals.sigdata[SIGIO]=sigData;
+                    }
+                    printd(DEBUG_SIGNALS,"Signalling SIGIO for task 0x%04X, IO source = 0x%08X, sigind=0x%08X\n",task->taskNum,sigData,p->signals.sigind);
+                }
+                sleepQ++;
+            }       
             break;
         case SIGUSLEEP:    //Put task to sleep until a situation occurs.  For now its only when another task ends
             p->signals.sigind|=SIGUSLEEP;
@@ -233,7 +258,10 @@ scanSleep:
                     process->signals.sigind & SIGIO)
             {
                 while (__sync_lock_test_and_set(&kSigCheckLock, 1));
-                printd(DEBUG_SIGNALS,"\tWaking task 0x%04X as wakeTicks (0x%08x) < kTicksSinceStart (0x%08x)\n",task->taskNum,((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
+                if (process->signals.sigdata[SIGSLEEP]<=*kTicksSinceStart)
+                    printd(DEBUG_SIGNALS,"\tWaking task 0x%04X as wakeTicks (0x%08x) < kTicksSinceStart (0x%08x)\n",task->taskNum,((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
+                else
+                    printd(DEBUG_SIGNALS,"\tWaking task 0x%04X for SIGIO\n",task->taskNum);
                 changeTaskQueue(task,TASK_RUNNABLE);
                 process->signals.sigdata[SIGSLEEP]=0;
                 process->signals.sigind&=~SIGSLEEP;
@@ -241,7 +269,7 @@ scanSleep:
                 __sync_lock_release(&kSigCheckLock);   
                 //CLR 01/17/2019: Don't make sure the task is chosen next!
                 //task->prioritizedTicksInRunnable=1000000;  //Make this the next chosen task
-                //awoken=true;
+                awoken=true;
             }
         }
         sleep++;

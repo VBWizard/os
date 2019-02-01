@@ -16,10 +16,11 @@
 int main(int argc, char** argv) 
 {
 
+    //char *garbage = malloc(1000*1024*1024);
+
     direntry_t *buffer = malloc(16384);
     
-    int entryCount = getdir("/", (void*)buffer, 16384);
-    
+    int entryCount = getdir(argv[1], (direntry_t*)buffer, 16384);
     for (int cnt=0;cnt<entryCount;cnt++)
     {
         //printf("%s\t\t\t\t%u\t%s\n",buffer[cnt].filename, buffer[cnt].size, buffer[cnt].is_dir?"drw":"rwx");

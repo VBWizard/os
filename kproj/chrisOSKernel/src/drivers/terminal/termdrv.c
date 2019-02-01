@@ -29,7 +29,6 @@
 extern file_t *activeSTDOUT;
 
 char *pipeContents;
-int pipeReadSize;
 volatile int kTermLock;
 char *console;
 
@@ -38,7 +37,6 @@ void initTerm()
     terminfos = (terminfo_t*)kMalloc(sizeof(terminfo_t) * TERM_MAX_TERMINALS);
     termsRegistered = 0;
     pipeContents = kMalloc(PIPE_FILE_SIZE);
-    pipeReadSize = 0;
     kTermLock = 0;
     console = (char*)0xB8000;
 }
@@ -98,22 +96,10 @@ void cursor_update(terminfo_t* term)
     //Move the cursor in the bios data area
  }
 
-void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* term, char charToPrint)
+void processCharacter(ttydevice_t *device, terminfo_t* term, char charToPrint)
 {
     char * screenBuffer = term->screenBuffer;
 
-    screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-    screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
-    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
-    {
-        console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-        console[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
-    }
-    if (++term->cursorX >= term->width)
-    {
-        term->cursorX = 0;
-        term->cursorY += 1;
-    }
     if (term->cursorY >= term->height)
     {
         //Move up 1 line by copying from the 2nd line of the screen down, to the first line
@@ -123,6 +109,18 @@ void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* te
             memcpy(console, console + (term->width * 2), term->width * term->height * 2);
         }
         term->cursorY--;
+    }
+    screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
+    screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) + 1] = 0x07;
+    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+    {
+        console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
+        console[((term->cursorX + (term->cursorY*term->width)) * 2) + 1] = 0x07;
+    }
+    if (++term->cursorX >= term->width)
+    {
+        term->cursorX = 0;
+        term->cursorY += 1;
     }
 }
 
@@ -140,7 +138,7 @@ void clearScreen(terminfo_t* term, char* buffer)
     term->cursorY = 0;
 }
 
-void updateTermBuffer(ttydevice_t *device)
+void updateTermBuffer(ttydevice_t *device, int bytesToUpdate)
 {
     //NOTE: pipeContents contains the data to be written to the buffer
     terminfo_t* term = getTermInfo(device->termDeviceMajor, device->termDeviceMinor);
@@ -151,7 +149,7 @@ void updateTermBuffer(ttydevice_t *device)
     if (term == NULL)
         panic("updateTermBuffer: Couldn't find the terminal to be updated (major=0x%04X, minor=0x%04X)\n", device->termDeviceMajor, device->termDeviceMinor);
 
-    for (int cnt=0;cnt<pipeReadSize;cnt++)
+    for (int cnt=0;cnt<bytesToUpdate;cnt++)
     {
         char curr = pipeContents[cnt];
         switch (curr)
@@ -304,7 +302,8 @@ void updateTermBuffer(ttydevice_t *device)
 
 void updateTerms()
 {
-    for (int cnt=0;cnt<ttysRegistered;cnt++)
+    int pipeReadSize;
+   for (int cnt=0;cnt<ttysRegistered;cnt++)
     {
         if (ttyDevices[cnt].termDeviceMajor == TERMINAL_CONSOLE_MAJOR_NUMBER)
         {
@@ -312,13 +311,18 @@ void updateTerms()
                 while (__sync_lock_test_and_set(&kTermLock, 1));
         //while (__sync_lock_test_and_set(&kTermLock, 1));
             //CLR 1/28/2019: Basic monitor mode is 80x25, which is 4k bytes.  We'll process double that per call to updateTerms
-            pipeReadSize = piperead(pipeContents, 8000,1, ttyDevices[cnt].stdOutReadPipe);
+	    //CLR 2/1/2019: Found out we can process 64k in less than a tick so we'll do that!
+            pipeReadSize = piperead(pipeContents, 65535,1, ttyDevices[cnt].stdOutReadPipe);
             //pipeReadSize = fs_read(NULL, ttyDevices[cnt].piper, pipeContents, PIPE_FILE_SIZE, 1);
             if (pipeReadSize > 0)
             {
-                updateTermBuffer(&ttyDevices[cnt]);
+               printd(DEBUG_TERM,"Starting terminal update\n");
+               updateTermBuffer(&ttyDevices[cnt], pipeReadSize);
+               printd(DEBUG_TERM,"Done terminal update\n");
             }
-           __sync_lock_release(&kTermLock);    
+            else
+               printd(DEBUG_TERM,"No terminal update necessary\n");
+           __sync_lock_release(&kTermLock);
         }
     }
 }

@@ -81,6 +81,7 @@ int kexec(char* cmdline)
     int forkPid=0;
     char* tok;
     char* pgm=NULL;
+        char fileToExec[256] = "/\0";
 
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
@@ -109,7 +110,9 @@ int kexec(char* cmdline)
     if (forkPid == 0)
     {
         int retVal;
-        int childPid = exec(argv[0], argc, argv);
+        
+        strcat(fileToExec,argv[0]);
+        int childPid = exec(fileToExec, argc, argv);
         
         if (childPid > 0)
         {
