@@ -32,8 +32,12 @@ int doChild(int childNum)
 
 int main(int argc, char** argv) {
 
-    int pid=0, pid2=0;
-    const int pidsToSpawn = 5;
+    int pid=0, pid2=0, pidsToSpawn;
+    if (argc == 1)
+        pidsToSpawn = 5;
+    else
+        pidsToSpawn = atoi(argv[1]);
+        
     int pids[pidsToSpawn];
     int rets[pidsToSpawn];
     int pidsP = 0;

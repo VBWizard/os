@@ -42,7 +42,7 @@ typedef struct s_task
     uint32_t buffer;
     void* process;
     uint32_t buffer2;
-    uint32_t lastRunStartTicks, lastRunEndTicks;
+    uint32_t lastRunStartTicks, lastRunEndTicks, totalRunningTicks;
     uint32_t esp0Base, esp0Size;
 } task_t;
 

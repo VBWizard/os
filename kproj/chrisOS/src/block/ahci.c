@@ -69,16 +69,15 @@ int AhciIssueCmd(volatile HBA_PORT *port,int cmdslot)
 
     //wait cmd
     for (i = 0; i < 100; i++) {
-        wait(1); //CLR 01/09/2018: changed from 50 to 1 ... this sped the system up immensely!
-        if (!port->tfd.BSY)
-            break;
+        //(1); //CLR 01/09/2018: changed from 50 to 1 ... this sped the system up immensely!
+        while (port->tfd.BSY){__asm__("hlt\n");}
     }
 
     if (port->tfd.BSY)
         printd(DEBUG_AHCI, "AhciIssueCmd: WARNING - port busy after waiting\n");
     
     // Wait for completion
-    delay = 5000;
+    delay = 10000000;
     while (delay > 0) {
 
         if ((port->ci & (1 << cmdslot)) == 0)
@@ -90,7 +89,7 @@ int AhciIssueCmd(volatile HBA_PORT *port,int cmdslot)
             printd(DEBUG_AHCI, "AHCI: Read disk error\n");
             return -1;
         }
-        wait(10); //CLR 01/12/2019: Changed from (I think) 50 to 10 ... and WOW.  Can't change to less than 10 because 1 ms is 10 ticks and we can't get smaller than that
+        //wait(10); //CLR 01/12/2019: Changed from (I think) 50 to 10 ... and WOW.  Can't change to less than 10 because 1 ms is 10 ticks and we can't get smaller than that
         delay -= 1;
     }
 

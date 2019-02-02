@@ -354,10 +354,10 @@ bool putDataOnPages(uintptr_t CR3, uintptr_t virtAddr, void* file, bool writeFro
         else
         {
             startPhysAddr=(uintptr_t)allocPages(countToWrite) | (startVirtAddr & 0x00000FFF);
-            pagingMapPage(CR3,startVirtAddr,startPhysAddr,0x7);
+            pagingMapPage(CR3,startVirtAddr,startPhysAddr,(uint16_t)0x7);
             printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08x not mapped, mapped to P=0x%08x (CR3=0x%08x)\n",startVirtAddr,startPhysAddr,CR3);
-            pagingMapPage(previousCR3,startVirtAddr,startPhysAddr,0x7);
-            pagingMapPage(previousCR3,startPhysAddr,startPhysAddr,0x7);
+            pagingMapPage(previousCR3,startVirtAddr,startPhysAddr,(uint16_t)0x7);
+            pagingMapPage(previousCR3,startPhysAddr,startPhysAddr,(uint16_t)0x7);
             printd(DEBUG_ELF_LOADER,"putDataOnPages: V=0x%08x also mapped to KP=0x%08x (CR3=0x%08x)\n",startVirtAddr,startPhysAddr,previousCR3);
             addElfLoadInfo(elf, startVirtAddr & 0xFFFFF000, startPhysAddr & 0xFFFFF000, countToWrite/PAGE_SIZE);
         }
@@ -774,16 +774,17 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     {
         if (elfInfo->secHdrTable[cnt].sh_type==SHT_STRTAB)
         {
-            fs_seek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
-            elfInfo->dynamicInfo.strTableAddress[cnt]=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
-            printd(DEBUG_ELF_LOADER,"Mapping string table @ 0x%08x (0x%08x) for 0x%08x bytes into kernel\n",
-                    elfInfo->dynamicInfo.strTableAddress[cnt], 
-                    (uint32_t)(elfInfo->dynamicInfo.strTableAddress[cnt]) | KERNEL_PAGED_BASE_ADDRESS,
-                    elfInfo->secHdrTable[cnt].sh_size/0x1000+0x1000);
+            if (elfInfo->secHdrTable[cnt].sh_addr==0)
+            {
+                fs_seek(fPtr,elfInfo->secHdrTable[cnt].sh_offset,SEEK_SET);
+                elfInfo->dynamicInfo.strTableAddress[cnt]=kMalloc(elfInfo->secHdrTable[cnt].sh_size+0x1000);
+                uint32_t lResult=fs_read(NULL, fPtr, (char*)elfInfo->dynamicInfo.strTableAddress[cnt], elfInfo->secHdrTable[cnt].sh_size, 1);
+                printd(DEBUG_ELF_LOADER,"Reading string table to 0x%08x, 0x%08x bytes, result=0x%08x\n",elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,lResult);
+            }
+            else
+                elfInfo->dynamicInfo.strTableAddress[cnt] = (uintptr_t*)elfInfo->secHdrTable[cnt].sh_addr;
             elfInfo->dynamicInfo.strTableName[cnt]=elfInfo->secHdrTable[cnt].sh_name;
             //uint32_t lResult=fl_fread((char*)elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,1,fPtr);
-            uint32_t lResult=fs_read(NULL, fPtr, (char*)elfInfo->dynamicInfo.strTableAddress[cnt], elfInfo->secHdrTable[cnt].sh_size, 1);
-            printd(DEBUG_ELF_LOADER,"Reading string table to 0x%08x, 0x%08x bytes, result=0x%08x\n",elfInfo->dynamicInfo.strTableAddress[cnt],elfInfo->secHdrTable[cnt].sh_size,lResult);
             elfInfo->dynamicInfo.strTableFilePtr[cnt]=elfInfo->secHdrTable[cnt].sh_offset;
             elfInfo->dynamicInfo.strTableSize[cnt]=elfInfo->secHdrTable[cnt].sh_size;
             tabCount++;

@@ -14,6 +14,8 @@
 #include "schedule.h"
 #include "filesystem/pipe.h"
 #include "kutility.h"
+#include "mmap.h"
+#include "thesignals.h"
 
 //#include "fs.h" - CLR 04/23/2018: Commented out
 
@@ -46,14 +48,17 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     bool taskExited = false;
     bool useExisting = false;
     uintptr_t *genericFileHandle;
+    syscall_mmap_t mmap_params;
     
     __asm__("mov eax,esi\n": "=a" (param4));
     __asm__("mov eax,cr3\n": "=a" (processCR3));
     __asm__("cli\n");
+    printd(DEBUG_PROCESS, "_syscall: call for 0x%04x, CR3=0x%08x\n",callNum, processCR3);
     switch (callNum)
     {
         case 0x0:       //***Invalid call #
             printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08x, invalid call number. (cr3=0x%08x)\n",callNum,processCR3);
+            retVal = processCR3;
             break;
         case SYSCALL_ENDPROCESS:       //***exit
             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
@@ -63,13 +68,12 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              printd(DEBUG_PROCESS,"syscall: Ending process with CR3=0x%08x with return value %u\n",param1,param2);
              markTaskEnded(param1, param2);
              panic("_syscall: exit call, continued after halt!");
-             __asm__("mov eax,0xbad;mov ebx,0xbad;mov ecx,0xbad; mov edx,0xbad\nhlt\n");               //We should never get here
+             __asm__("mov eax,0xbadbadba;mov ebx,0xbadbadba;mov ecx,0xbadbadba; mov edx,0xbadbadba\n\cli\nhlt\n");               //We should never get here
             break;
         case SYSCALL_FORK:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_PROCESS,"syscall: Fork called by %s-%u\n", process->path, process->childNumber);
-            //process=(process_t*)(findTaskByCR3(processCR3))->process;
             retVal=process_fork(process);
             if (process->lastChildCR3 > 0)
             {
@@ -111,6 +115,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             retVal=fs_write(process, genericFileHandle, (void*)param2, param3, 1);
             printd(DEBUG_FILESYS, "_sysCall: write() wrote %u bytes to %s from %s\n",retVal, ((file_t*)genericFileHandle)->f_path, process->exename);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
+            if (*((char*)param2) == '\n')
+                retVal = 22;
             break;
         case SYSCALL_PIPE:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
@@ -118,9 +124,25 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             retVal = fs_pipe(process, (int*)param1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
+
+        case SYSCALL_MMAP:
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
+            retVal = syscall_mmap(process, (syscall_mmap_t*)param1);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
+            
+            
+        case SYSCALL_SEEK:
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            retVal = fs_seek((void*)param1, param2, param3);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
         case SYSCALL_GETDENTS:
-            process=(process_t*)(findTaskByCR3(processCR3))->process;
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
             retVal = getDirEntries(process, (char*)param1, (void*)param2, param3);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_GETCWD:    //param1=buffer *, param2=size of buffer
             retVal=(uint32_t)processGetCWD((char*)param1,param2);
@@ -161,16 +183,19 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             //Only wait for the PID if it hasn't already exited
             if (!taskExited)
             {
+                __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+                process=getCurrentProcess();
                 printd(DEBUG_PROCESS,"_syscall: waitForPID signalling SIG_USLEEP for current task (cr3=0x%08x) on pid=0x%04X.  Good night!\n",processCR3,param1);
-                retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1);
+                retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1, process);
+                __asm__("mov cr3,eax\n"::"a" (processCR3));
             }
             break;
         case SYSCALL_SETPRIORITY:      //***Set process priority - param1=new priority, returns old priority
-            retVal=sys_setpriority(findTaskByCR3(processCR3)->process,param1);
+            retVal=sys_setpriority(getCurrentProcess(),param1);
             break;
         case SYSCALL_REGEXITHANDLER:     //***Register exit handler
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            processRegExit(findTaskByCR3(processCR3)->process,(void*)param1);
+            processRegExit(getCurrentProcess(),(void*)param1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_FREE:     //***free - free system mory
@@ -186,16 +211,24 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SLEEP:     //***sleep - sleep until kTicksSinceStart==param1
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
             printd(DEBUG_PROCESS,"_syscall: sleep(0x%08x) called (cr3=0x%08x)\n",param1,processCR3);
-            sys_sigaction(SIGSLEEP,0,param1);
+            sys_sigaction(SIGSLEEP,0,param1, process);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SETSIGACTION:     //***setsigaction
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_PROCESS,"_syscall: sys_setsigaction(0x%08x, 0x%08x, 0x%08x) called\n",param1,param2,param3);
             sys_setsigaction(param1,(uintptr_t*)param2,param3);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_STOP:     //******stop - put process in STOPPED queue
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
             printd(DEBUG_PROCESS,"_syscall: Stop() called.\n");
-            sys_sigaction(SIGSTOP,0,0);
+            sys_sigaction(SIGSTOP,0,0, process);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_REBOOT:     //***reboot
             sysReboot();
@@ -232,7 +265,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             panic("_syscall: Invalid call number 0x%04X\n",callNum);
     }
     //__asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
-    __asm__("sti\n\nmov esp,ebp;add esp,4;ret"::"a" (retVal)); /* BLACK MAGIC! */
+    if (CURRENT_CR3==KERNEL_CR3)
+        panic("_syscall: CR3 set to kernel CR3 on exit\n");
+    __asm__("sti\nmov esp,ebp\nadd esp,4\nret\n"::"a" (retVal)); /* BLACK MAGIC! */
 
 }
 

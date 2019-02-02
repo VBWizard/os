@@ -10,11 +10,14 @@
 #include "utility.h"
 #include "errors.h"
 #include "printf.h"
+#include "thesignals.h"
 
 extern filesystem_t* pipeFs;
-
+extern volatile int kTicksPerMS;
+extern volatile int *kTicksSinceStart;
 volatile int kPipeWriteLock;
 volatile int kPipeReadLock;
+volatile int kTicksPerSecond;
 
 filesystem_t *initpipefs()
 {
@@ -27,7 +30,7 @@ filesystem_t *initpipefs()
     fops->write=&pipewrite;
     fops->close=&pipeclose;
     fops->seek=NULL;
-    fs = kRegisterFileSystem("/pipe/",fops);
+    fs = kRegisterFileSystem("/pipe/", fops, NULL);
     fs->files = kMalloc(sizeof(dllist_t));
     memset(openPipes,0,sizeof(pipes_t)*1000);
     kPipeWriteLock = 0;
@@ -134,8 +137,10 @@ size_t piperead(void *buffer, int size, int length, void *f)
             if (pipe->flags & PIPENOBLOCK) //Pipe doesn't block so oh well if the copy size is less than the caller wants
                 break;
             //yield here
-            //triggerScheduler();
-            __asm__("sti\nhlt\nhlt\nhlt"); //Wait for the scheduler
+            printd(DEBUG_FILESYS, "piperead: Need %u bytes, not available, sleeping until they are\n",size*length);
+            sys_sigaction2(SIGSLEEP, 0, *kTicksSinceStart+kTicksPerSecond, getCurrentProcess());
+            triggerScheduler();
+            __asm__("sti\nhlt\n");
         }
        
     } while (copySize < size * length);
@@ -149,8 +154,11 @@ size_t piperead(void *buffer, int size, int length, void *f)
         memcpy(file->buffer, file->buffer+copySize, *file->bufferPtr-file->buffer-copySize);
         *file->bufferPtr-=copySize; 
         __sync_lock_release(&kPipeReadLock);   
-        printd(DEBUG_FILESYS, "piperead: Returning %u bytes from pipe %s (0x%08X), %u bytes available\n",copySize, pipe->file[0]->f_path, pipe->file,
-            pipe->file, (uint32_t)*file->bufferPtr - (uint32_t)file->buffer);
+        printd(DEBUG_FILESYS, "piperead: Returning %u bytes from pipe %s (0x%08X), %u bytes left\n",
+                copySize, 
+                pipe->file[0]->f_path, 
+                pipe->file,
+                (uint32_t)*file->bufferPtr - (uint32_t)file->buffer);
 
     }
     return copySize;
@@ -162,6 +170,7 @@ size_t pipewrite(const void *data, int size, int count, void *f)
     pipe_t *pipe = file->pipe;
     
     int copySize = size*count;
+    int written = 0;
 
     if (pipe==NULL)
         panic("pipewrite: NULL pipe detected on write\n");
@@ -169,22 +178,39 @@ size_t pipewrite(const void *data, int size, int count, void *f)
     if ((pipe->flags & PIPEWRITE)==0)
         return ERROR_FS_FILE_INVALID_OPERATION;
 
-    while (__sync_lock_test_and_set(&kPipeWriteLock, 1));
-    //If there isn't as much data as the caller wanted, give them what we have
-    int available = (uintptr_t)file->buffer + PIPE_FILE_SIZE - (uintptr_t)*file->bufferPtr;
-    if (copySize > available)
-        copySize = available;
-//***TODO: OTHERWISE BLOCK UNTIL ENOUGH DATA IS AVAILABLE UNLESS 'n'
+    while (written < size*count)
+    {
+        while (__sync_lock_test_and_set(&kPipeWriteLock, 1));
+        //If there isn't as much data as the caller wanted, give them what we have
+        int available = (uintptr_t)file->buffer + PIPE_FILE_SIZE - (uintptr_t)*file->bufferPtr;
+        if (copySize > available)
+            copySize = available;
+        if (copySize>0)
+        {
+            memcpy(*file->bufferPtr, data+written, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
+            *file->bufferPtr+=copySize;    
+        }
+        __sync_lock_release(&kPipeWriteLock);   
+        printd(DEBUG_FILESYS, "pipewrite: wrote %u bytes to pipe %s (0x%08x)\n", copySize);
+        written += copySize;
+        if (written < size*count)
+        {
+            copySize=(size*count)-written;
+            //TODO: Fix this effectively polling solution to allos SIGSLEEP to wake on "data available in pipe"
+            printd(DEBUG_FILESYS, "pipewrite: Not enough room to complete write (need=%u, available=%u)\n\tsleeping till more space is available in the pipe\n", copySize, PIPE_FILE_SIZE-((uint32_t)*file->bufferPtr - (uint32_t)file->buffer));
+            sys_sigaction2(SIGSLEEP, 0, *kTicksSinceStart+(kTicksPerSecond/5), getCurrentProcess());
+            triggerScheduler();
+            __asm__("sti\nhlt\n");
+        }
+            
+    }
     
+    printd(DEBUG_FILESYS, "pipewrite: Done writing to pipe %s (0x%08x).  Wrote %u (total) bytes\n",
+            pipe->file[1]->f_path, 
+            pipe->file, 
+            written);
 
-    memcpy(*file->bufferPtr, data, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
-    *file->bufferPtr+=copySize;    
-    __sync_lock_release(&kPipeWriteLock);   
-    
-    printd(DEBUG_FILESYS, "pipewrite: Wrote %u bytes to pipe %s (0x%08X), %u bytes available\n",copySize, pipe->file[1]->f_path, 
-            pipe->file, (uint32_t)*file->bufferPtr - (uint32_t)file->buffer);
-
-    return copySize;
+    return written;
 }
 
 pipe_t *pipedup(void* path, const char *mode, file_t* file)

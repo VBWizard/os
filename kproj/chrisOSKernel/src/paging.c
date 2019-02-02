@@ -51,8 +51,8 @@ uint32_t pagingFindAvailableAddressToMapTo(uintptr_t pageDirAddress,int pagesToF
         {
             dir=(uint32_t*)pageDirAddress;
             *dir=(uint32_t)allocPages(PAGE_SIZE);
-            pagingMapPage(pageDirAddress,*dir,*dir,0x07);
-            pagingMapPage(KERNEL_CR3,*dir | KERNEL_PAGED_BASE_ADDRESS,*dir,0x03);
+            pagingMapPage(pageDirAddress,*dir,*dir,(uint16_t)0x07);
+            pagingMapPage(KERNEL_CR3,*dir | KERNEL_PAGED_BASE_ADDRESS,*dir,(uint16_t)0x03);
             *dir &= 0xFFFFF000;
             *dir |= 0x7;
             dirEntryNumber=0;
@@ -168,7 +168,10 @@ uint32_t pagingGet4kPTEntryAddressCR3(uintptr_t pageDirAddress, uint32_t address
     uint32_t retVal=0;
     address&=0xFFFFF000;
     uintptr_t pDirPtr=pagingGet4kPDEntryValueCR3(pageDirAddress,address) & 0xFFFFF000;
+    if (pDirPtr!=0)
     retVal=((address & 0x3FF000) >> 12) << 2 | pDirPtr;
+    else
+        retVal = 0;
     printd(DEBUG_PAGING,"pagingGet4kPTEntryAddressCR3: returning 0x%08x for address 0x%08x (CR3=0x%08x)\n",retVal,address,pageDirAddress);
     return retVal;
 }
@@ -216,12 +219,13 @@ void pagingMakePageCoW(uintptr_t* ptEntry, bool makeCoW)
     printd(DEBUG_COW,"\tpagingSetCowFlag: CoW 0x%08x? %c: (after: ",*ptEntry, (makeCoW?'Y':'N'), *ptEntry);
     if (makeCoW)
     {
-       *ptEntry|=COW_PAGE; //Set CoW (bit 9) flag
+       *ptEntry|=PAGE_COW_FLAG; //Set CoW (bit 9) flag
        *ptEntry&=0xFFFFFFFD; //Unset Read/Write (bit 1) flag
+       *ptEntry&=(~PAGE_MMAP_FLAG); //Wipe out the MMAP flag when setting the COW flag
     }
     else
     {
-       *ptEntry&=(~COW_PAGE); //Unset CoW (bit 9) flag
+       *ptEntry&=(~PAGE_COW_FLAG); //Unset CoW (bit 9) flag
        *ptEntry|=0x2;       //Set Read/Write (bit 1) flag
     }   
     printd(DEBUG_COW,"0x%08x)\n", *ptEntry);    
@@ -280,7 +284,7 @@ void pagingUpdatePresentFlagV(uintptr_t pageDirAddress,uint32_t address, bool pr
 }
 
 ///Map a page to a new address
-void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, uint8_t flags)
+void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, uint16_t flags)
 {
     uint32_t *dirPtr;
     uint32_t dirPtrVal;
@@ -307,6 +311,18 @@ void pagingMapPage(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t
         printd(DEBUG_PAGING,"kMapPage: Mapped v=0x%08x via dir=0x%08x, page=0x%08x, to p=0x%08x\n", virtualAddress, &dirPtr[(virtualAddress>>22)], &pagePtr[(virtualAddress&0x003FFFFF/4096)],pagePtr[(virtualAddress&0x003FFFFF/4096)]);
 */
     }
+    //CLR 1/28/2019: Noticed this while testing anonymous mmap.
+    //Need to update pdir flags if page to be mapped has more permissive perms
+    //There's probably more to do here to remove flags, but ... TODO
+    else 
+    {
+        if (flags & 0x1)
+            dirPtr[(virtualAddress>>22)] |= 1;
+        if (flags & 0x2)
+            dirPtr[(virtualAddress>>22)] |= 2;
+        if (flags & 0x4)
+            dirPtr[(virtualAddress>>22)] |= 4;
+    }
     if (dirPtr[(virtualAddress>>22)]==0)
         dirPtr[virtualAddress>>22]=(pageDirAddress + ((virtualAddress&0x003FFFFF)/4096)) | flags;
     dirPtrVal=dirPtr[virtualAddress>>22];
@@ -324,17 +340,18 @@ void pagingMapPageRange(uintptr_t pageDirAddress, uintptr_t startVirtualAddress,
         pagingMapPage(pageDirAddress,
                 startVirtualAddress+=0x1000,
                 startPhysicalAddress+=0x1000,
-                flags);
+                (uint16_t)flags);
 }
 
-//CLR 01/20/2019: Added incrementPhysical parameter so that when we are un-mapping (setting all phys to 0), phys doesn't increment!
-void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, int pageCount, uint8_t flags, bool incrementPhysical)
+//CLR 01/20/2019: Added incrementPhysical parameter so that when we are mmapping (where we don't set the physical address when page mapping,
+//or un-mapping (setting all phys to 0), phys doesn't increment!
+void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uintptr_t physicalAddress, int pageCount, uint16_t flags, bool incrementPhysical)
 {
     for (int cnt=0;cnt<pageCount;cnt++)
     {
         //Doing this check first makes (especially) un-mapping pages much quicker. (didn't really work)
         //if (pagingGet4kPTEntryValueCR3(pageDirAddress, virtualAddress+(0x1000*cnt)) != physicalAddress+(incrementPhysical?0x1000:0))
-            pagingMapPage(pageDirAddress,virtualAddress+(0x1000*cnt),physicalAddress+((incrementPhysical?0x1000:0)*cnt),flags);
+            pagingMapPage(pageDirAddress,virtualAddress+(0x1000*cnt),physicalAddress+((incrementPhysical?0x1000:0)*cnt),(uint16_t)flags);
     }
 }
 
@@ -342,7 +359,7 @@ void pagingMapPageCount(uintptr_t pageDirAddress, uintptr_t virtualAddress, uint
 bool pagingMapProcessPageIntoKernel(uintptr_t processCR3, uintptr_t virtualAddress, uint8_t flags)
 {
     
-    pagingMapPage(KERNEL_CR3, virtualAddress, pagingGet4kPTEntryValueCR3(processCR3,virtualAddress), flags);
+    pagingMapPage(KERNEL_CR3, virtualAddress, pagingGet4kPTEntryValueCR3(processCR3,virtualAddress), (uint16_t)flags);
 }
 
 bool isPageMapped(uintptr_t pageDirAddress, uintptr_t Address)
@@ -410,4 +427,15 @@ void pagingSetPageRangeInUseFlag(uintptr_t pageDirAddress, uintptr_t startAddres
 {
     for (uintptr_t cnt=startAddress;cnt<endAddress;cnt+=pageSize)
         pagingSetPageInUseFlag(pageDirAddress,cnt,inUse);
+}
+
+void *cowPages(uintptr_t pdt, void *addr, size_t len)
+{
+    for (uint32_t addressToCow=(uint32_t)addr;addressToCow<(uint32_t)addr+len;addressToCow+=PAGE_SIZE)
+    {
+        uintptr_t currPageEntry = pagingGet4kPTEntryValueCR3(pdt, addressToCow);
+        if ( currPageEntry != 0 && (currPageEntry & PAGE_COW_FLAG)!= PAGE_COW_FLAG)
+            pagingMakePageCoW((uintptr_t*)pagingGet4kPTEntryAddressCR3((uint32_t)pdt,addressToCow),true);
+    }
+    return addr;
 }

@@ -7,6 +7,7 @@
 #include "libChrisOS.h"
 #include "time.h"
 #include "strings.h"
+#include "config.h"
 
 extern void sysEnter_Vector();
 bool libcInitialized = false;
@@ -87,9 +88,16 @@ VISIBLE int printf(const char *format, ...)
     va_start( args, format );
     
     int size = vsprintf(printBuffer, format, args);
-    do_syscall3(SYSCALL_WRITE, 1, (uint32_t)printBuffer, size);
-    //do_syscall2(SYSCALL_PRINT,(uint32_t)format,(uint32_t)args);
-    return 0;
+    return do_syscall3(SYSCALL_WRITE, 1, (uint32_t)printBuffer, size);
+}
+
+int printfI(const char *format, ...)
+{
+    va_list args;
+    va_start( args, format );
+    
+    int size = vsprintf(printBuffer, format, args);
+    return do_syscall3(SYSCALL_WRITE, 1, (uint32_t)printBuffer, size);
 }
 
 int printI(const char *format, ...)
@@ -271,17 +279,30 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
 {
     char** argv;
     char cmd[1024];
-    char *spacePtr=cmd, *lastSpacePtr=cmd;
+    char *spacePtr=cmd, *lastSpacePtr=cmd, *quotePtr=cmd;
+    char dblquote[2] = {'"',0};
     *argc = 0;
     
     strncpyI(cmd,cmdline,1024);
     strtrimI(cmd);
     do
     {
+        quotePtr = strnstrI(spacePtr,dblquote,4000);        //Need to honor double quotes
         spacePtr=strstrI(spacePtr," ");
+        if (quotePtr!=0 && (quotePtr <= spacePtr))                            //If a double quote shows up before a space ...
+        {
+            char *temp = spacePtr;
+            spacePtr = strnstrI(quotePtr+1,dblquote,4000);  //Look for the closing double quote
+            if (spacePtr>=quotePtr+4000)
+                spacePtr = temp;                            //Didn't find it so resume normal processing (space bound)
+            else
+                spacePtr += 1;                              //Skip the closing quote
+        }
         *argc+=1;
+        if (spacePtr!=0 && *spacePtr)
+            spacePtr++;
     
-    } while (spacePtr++);
+    } while (spacePtr!=0 && *spacePtr);
     
     argv=mallocI((*argc*MAXPARAMLEN)+(*argc*sizeof(int)));
     int argvPtr=4* *argc;
@@ -289,12 +310,27 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
     for (int cnt=0;cnt<*argc; cnt++)
     {
         argv[cnt]=(char*)argv+argvPtr;
-        spacePtr=strstrI(spacePtr," ");
-        if (spacePtr)
-            strncpyI(argv[cnt],lastSpacePtr,spacePtr-lastSpacePtr);
+        quotePtr = strnstrI(spacePtr,dblquote,4000);                    //Need to honor double quotes
+        if (quotePtr && quotePtr <= spacePtr)                                       //If a double quote shows up before a space ...
+        {
+            char *temp = spacePtr;
+            spacePtr = strnstrI(quotePtr+1,dblquote,4000);              //Look for the closing double quote
+            if (spacePtr>=quotePtr+4000)
+                spacePtr = temp;                                        //Didn't find it so resume normal processing (space bound)
+            else
+            {
+                strncpyI(argv[cnt],quotePtr+1,spacePtr-lastSpacePtr-2); //parameter value becomes the entire quoted string minus the 2 quotes
+            }
+        }
         else
-            strncpyI(argv[cnt],lastSpacePtr,strlenI(lastSpacePtr));
-        strtrimI(argv[cnt]);
+        {
+            spacePtr=strstrI(spacePtr," ");
+            if (spacePtr)
+                strncpyI(argv[cnt],lastSpacePtr,spacePtr-lastSpacePtr);
+            else
+                strncpyI(argv[cnt],lastSpacePtr,strlenI(lastSpacePtr));
+            strtrimI(argv[cnt]);
+        }
         lastSpacePtr=spacePtr++;
         argvPtr+=MAXPARAMLEN;
     }
@@ -304,4 +340,9 @@ char** cmdlineToArgvI(const char* cmdline, int *argc)
 VISIBLE char** cmdlineToArgv(char* cmdline, int *argc)
 {
     return cmdlineToArgvI(cmdline, argc);
+}
+
+VISIBLE int test()
+{
+    return do_syscall0(0);
 }

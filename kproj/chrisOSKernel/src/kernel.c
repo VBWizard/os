@@ -28,6 +28,7 @@
 #include "filesystem/pipe.h"
 #include "drivers/termdrv.h"
 #include "drivers/tty_driver.h"
+#include "thesignals.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -38,6 +39,7 @@ extern uint32_t kNextSignalCheckTicks;
 extern void keyboardInit();
 extern void initTerm();
 extern int initTTY();
+extern void globalMMapInit();
 
 filesystem_t *rootFs, *pipeFs;
 terminfo_t *sysConsole;
@@ -92,17 +94,19 @@ int main(int argc, char** argv)  {
     dops.close = &fl_closedir;
     dops.read = &fl_readdir;
     
-    rootFs = kRegisterFileSystem("/",&fops);
+    rootFs = kRegisterFileSystem("/", &fops, &dops);
     pipeFs = initpipefs();
     
+    globalMMapInit();
     initTerm();
     initTTY();
     sysConsole = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 0, 80, 50, "Main system console 0");
     tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 0);
     kKernelProcess->stdout = tty1->stdOutWritePipe;
     kKernelProcess->stdin = tty1->stdInReadPipe;
+    kKernelProcess->stderr = tty1->stdErrWritePipe;
     
-    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X", 
+    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
             tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);
     
     keyboardInit();
@@ -125,11 +129,11 @@ int main(int argc, char** argv)  {
     args[1]=params[1];
 
     
-    process_t* process = createProcess(program, 2, args, kKernelProcess, false, false);
+    process_t* initialShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
     printk("KSHELL LOADED!!!");
 //    waitTicks(3);
     schedulerEnabled=true;
-    sys_sigaction(SIGUSLEEP,0,0x21);
+    sys_sigaction(SIGUSLEEP,0,initialShellProcess->task->taskNum, kKernelProcess);
 /*#define pcount 3
     char* param1[pcount][10];
     char* param2[pcount][10];

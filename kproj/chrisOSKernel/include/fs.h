@@ -28,7 +28,10 @@ extern "C" {
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
-
+#define EOF (-1)
+    
+#define FS_BUFFERSIZE 1048576
+    
 #define DENTRY_ROOT 0xFFFFFFFF    
 
     typedef enum
@@ -107,6 +110,7 @@ extern "C" {
         void* handle;
         void *pipe, *buffer, **bufferPtr;
         uint32_t verification;
+        void *owner;
     };
 
     struct file_operations
@@ -126,7 +130,7 @@ extern "C" {
 
     struct dir_operations
     {
-        void* (*open) (const char* path);
+        void* (*open) (const char* path, void* dir);
         int (*read) (void *dir, dirent_t *entry);
         int (*close) (void *dir);
     };
@@ -141,16 +145,16 @@ extern "C" {
     
     struct direntry
     {
-    char                      filename[256];
-    uint8_t                   is_dir;
-    uint32_t                  cluster;
-    uint32_t                  size;
-    uint16_t                  access_date;
-    uint16_t                  write_time;
-    uint16_t                  write_date;
-    uint16_t                  create_date;
-    uint16_t                  create_time;
-    };
+        char                      filename[260];
+        uint8_t                   is_dir;
+        uint32_t                  cluster;
+        uint32_t                  size;
+        uint16_t                  access_date;
+        uint16_t                  write_time;
+        uint16_t                  write_date;
+        uint16_t                  create_date;
+        uint16_t                  create_time;
+    } __attribute((packed));
 
     struct file_system
     {
@@ -164,7 +168,7 @@ extern "C" {
     };
     
     
-    filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops);
+    filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const dirops_t * dops);
     void* fs_open(char* path, const char* mode);
     int fs_read(process_t* process, void* file, void * buffer, int size, int length);
     int fs_write(process_t* process, void* file, void * buffer, int size, int length);

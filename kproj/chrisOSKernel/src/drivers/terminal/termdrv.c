@@ -29,7 +29,6 @@
 extern file_t *activeSTDOUT;
 
 char *pipeContents;
-int pipeReadSize;
 volatile int kTermLock;
 char *console;
 
@@ -38,7 +37,6 @@ void initTerm()
     terminfos = (terminfo_t*)kMalloc(sizeof(terminfo_t) * TERM_MAX_TERMINALS);
     termsRegistered = 0;
     pipeContents = kMalloc(PIPE_FILE_SIZE);
-    pipeReadSize = 0;
     kTermLock = 0;
     console = (char*)0xB8000;
 }
@@ -98,35 +96,31 @@ void cursor_update(terminfo_t* term)
     //Move the cursor in the bios data area
  }
 
-void __attribute__((inline))processCharacter(ttydevice_t *device, terminfo_t* term, char charToPrint)
+void processCharacter(ttydevice_t *device, terminfo_t* term, char charToPrint)
 {
-    if (charToPrint==0x9)
-    {
-        int a = 0;
-        a += 1;
-        a -= 1;
-    }
-    term->screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-    term->screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
-    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
-    {
-        console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-        console[((term->cursorX + (term->cursorY*term->width)) * 2) - 1] = 0x07;
-    }
-    if (++term->cursorX >= term->width)
-    {
-        term->cursorX = 0;
-        term->cursorY += 1;
-    }
+    char * screenBuffer = term->screenBuffer;
+
     if (term->cursorY >= term->height)
     {
         //Move up 1 line by copying from the 2nd line of the screen down, to the first line
-        memcpy(term->screenBuffer, term->screenBuffer + (term->width * 2), term->width * term->height * 2);
+        memcpy(screenBuffer, screenBuffer + (term->width * 2), term->width * term->height * 2);
         if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
         {
             memcpy(console, console + (term->width * 2), term->width * term->height * 2);
         }
         term->cursorY--;
+    }
+    screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
+    screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) + 1] = 0x07;
+    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+    {
+        console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
+        console[((term->cursorX + (term->cursorY*term->width)) * 2) + 1] = 0x07;
+    }
+    if (++term->cursorX >= term->width)
+    {
+        term->cursorX = 0;
+        term->cursorY += 1;
     }
 }
 
@@ -144,17 +138,18 @@ void clearScreen(terminfo_t* term, char* buffer)
     term->cursorY = 0;
 }
 
-void updateTermBuffer(ttydevice_t *device)
+void updateTermBuffer(ttydevice_t *device, int bytesToUpdate)
 {
     //NOTE: pipeContents contains the data to be written to the buffer
     terminfo_t* term = getTermInfo(device->termDeviceMajor, device->termDeviceMinor);
-
+    bool sequenceFound = false;
     term->refresh = true;
+    int lSavedX, lSavedY;
     
     if (term == NULL)
         panic("updateTermBuffer: Couldn't find the terminal to be updated (major=0x%04X, minor=0x%04X)\n", device->termDeviceMajor, device->termDeviceMinor);
 
-    for (int cnt=0;cnt<pipeReadSize;cnt++)
+    for (int cnt=0;cnt<bytesToUpdate;cnt++)
     {
         char curr = pipeContents[cnt];
         switch (curr)
@@ -165,38 +160,135 @@ void updateTermBuffer(ttydevice_t *device)
                 curr = 0;
                 break;
             case '\t':
-                for (int cnt=0;cnt<5;cnt++)
+                for (int cnt=0;cnt<(term->cursorX%5==0?5:term->cursorX%5);cnt++)
                     processCharacter(device, term, ' ');
                     curr = 0;
                 break;
             case 0x1b:                                                  //ANSI escape sequence
                 if (pipeContents[cnt+1] == '[')
                 {
-                    switch (pipeContents[cnt+3])
+                    char contentP2 = pipeContents[cnt+2];
+                    char contentP3 = pipeContents[cnt+3];
+                    char contentP4 = pipeContents[cnt+4];
+                    char contentP5 = pipeContents[cnt+5];
+                    char contentP6 = pipeContents[cnt+6];
+                    char contentP7 = pipeContents[cnt+7];
+                    char contentP8 = pipeContents[cnt+8];
+                    
+                    if ( (contentP2==';' || contentP3==';' ||contentP4==';')
+                      && (contentP3=='H' || contentP4=='H' || contentP5=='H' || contentP6=='H' || contentP7=='H')
+                            )
                     {
-                        case 'J':
-                            if (pipeContents[cnt+2]=='2')               //Clear screen
+                        int lCursorX=-1, lCursorY=-1;
+                        char num[3] = {0, 0, 0};
+                        int numPtr = 0;
+                        for (int idx=cnt+2;idx<cnt+8;cnt++)
+                        {
+                            if (lCursorX==-1)
+                                if (pipeContents[idx]==';')
+                                {
+                                    lCursorX=0;
+                                    idx++; //jump over the ;
+                                }
+                                else
+                                {
+                                    numPtr=0;
+                                    while (pipeContents[idx+numPtr]!=';')
+                                    {
+                                        num[numPtr]=pipeContents[idx+numPtr];
+                                        numPtr++;
+                                    }
+                                    num[numPtr]=0;
+                                    lCursorX=atoi(num);
+                                    idx+=numPtr;
+                                    idx++; //jump over the ;
+                                }
+                            else if (lCursorY==-1)
                             {
-                                clearScreen(term, term->screenBuffer);
-                                if (device->stdOutWritePipe == activeSTDOUT)
-                                    clearScreen(term, console);
-                                cnt+=3;
-                                curr = 0;
+                                if (pipeContents[idx]=='H')
+                                    lCursorY=0;
+                                else
+                                {
+                                    numPtr=0;
+                                    while (pipeContents[idx+numPtr]!='H')
+                                    {
+                                        num[numPtr]=pipeContents[idx+numPtr];
+                                        numPtr++;
+                                    }
+                                    num[numPtr]=0;
+                                    lCursorY=atoi(num);
+                                    idx+=numPtr;
+                                }
                             }
+                            else if (pipeContents[idx]!='H')
+                                panic("updateTermBuffer: Error parsing ANSI CUP sequence\n");
+                            else
+                            {
+                                cnt=idx;
+                                break;
+                            }
+                        }
+                        term->cursorX = lCursorX;
+                        term->cursorY = lCursorY;
+                        cursor_update(term);
+                        sequenceFound = true;
+                        curr=0;
+                        break;
+                    }
+                    switch (contentP2)
+                    {
+                        case 's':
+                            term->savedCursorX = term->cursorX;
+                            term->savedCursorY = term->cursorY;
+                            cnt+=2;
+                            sequenceFound = true;
+                            curr=0;
                             break;
-                        case 'D':
-                            term->cursorX-=pipeContents[cnt+2]-48;
-                            cnt+=3;
-                            curr = 0;
+                        case 'u':
+                            term->cursorX = term->savedCursorX;
+                            term->cursorY = term->savedCursorY;
+                            cnt+=2;
+                            sequenceFound = true;
+                            curr=0;
                             break;
-                        case 'C':
-                            term->cursorX+=pipeContents[cnt+2]-48;
-                            cnt+=3;
-                            curr = 0;
-                            break;
-                        default:
+                        case 'K':
+                            lSavedX = term->cursorX;
+                            lSavedY = term->cursorY;
+                            for (int cnt=term->cursorX;cnt<term->width;cnt++)
+                                processCharacter(device, term, ' ');
+                            term->cursorX = lSavedX;
+                            term->cursorY = lSavedY;
+                            cnt+=2;
+                            sequenceFound = true;
+                            curr=0;
                             break;
                     }
+                    if (!sequenceFound)
+                        switch (contentP3)
+                        {
+                            case 'J':
+                                if (contentP2=='2')               //Clear screen
+                                {
+                                    clearScreen(term, term->screenBuffer);
+                                    if (device->stdOutWritePipe == activeSTDOUT)
+                                        clearScreen(term, console);
+                                    cnt+=3;
+                                    curr = 0;
+                                }
+                                break;
+                            case 'D':
+                                term->cursorX-=contentP2-48;
+                                cnt+=3;
+                                curr = 0;
+                                break;
+                            case 'C':
+                                term->cursorX+=contentP2-48;
+                                cnt+=3;
+                                curr = 0;
+                                break;
+                            default:
+                                break;
+                        }
                 }
         }
         if (curr != 0)
@@ -210,20 +302,27 @@ void updateTermBuffer(ttydevice_t *device)
 
 void updateTerms()
 {
-    for (int cnt=0;cnt<ttysRegistered;cnt++)
+    int pipeReadSize;
+   for (int cnt=0;cnt<ttysRegistered;cnt++)
     {
         if (ttyDevices[cnt].termDeviceMajor == TERMINAL_CONSOLE_MAJOR_NUMBER)
         {
             if (kTermLock==0)
                 while (__sync_lock_test_and_set(&kTermLock, 1));
         //while (__sync_lock_test_and_set(&kTermLock, 1));
-            pipeReadSize = piperead(pipeContents, PIPE_FILE_SIZE,1, ttyDevices[cnt].stdOutReadPipe);
+            //CLR 1/28/2019: Basic monitor mode is 80x25, which is 4k bytes.  We'll process double that per call to updateTerms
+	    //CLR 2/1/2019: Found out we can process 64k in less than a tick so we'll do that!
+            pipeReadSize = piperead(pipeContents, 65535,1, ttyDevices[cnt].stdOutReadPipe);
             //pipeReadSize = fs_read(NULL, ttyDevices[cnt].piper, pipeContents, PIPE_FILE_SIZE, 1);
             if (pipeReadSize > 0)
             {
-                updateTermBuffer(&ttyDevices[cnt]);
+               printd(DEBUG_TERM,"Starting terminal update\n");
+               updateTermBuffer(&ttyDevices[cnt], pipeReadSize);
+               printd(DEBUG_TERM,"Done terminal update\n");
             }
-           __sync_lock_release(&kTermLock);    
+            else
+               printd(DEBUG_TERM,"No terminal update necessary\n");
+           __sync_lock_release(&kTermLock);
         }
     }
 }

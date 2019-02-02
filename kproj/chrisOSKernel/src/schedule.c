@@ -6,9 +6,11 @@
 
 #include "schedule.h"
 #include "strings.h"
+#include "filesystem/pipe.h"
+#include "thesignals.h"
 
 #define SCHEDULER_DEBUG 1
-#define MAX_TASKS 50
+#define MAX_TASKS 1000
 
 extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t* kTicksSinceStart;
@@ -39,7 +41,7 @@ uintptr_t* schedStack; //Loaded by scheduler when it is called
 uint32_t nextScheduleTicks;
 uint32_t kPagingExceptionCount;
 
-file_t *activeSTDOUT, *activeSTDIN, *activeSTDERR;
+pipe_t *activeSTDOUT, *activeSTDIN, *activeSTDERR;
 
 const char* TASK_STATE_NAMES[] = {"Zombie","Running","Runnable","Stopped","Uninterruptable Sleep","Interruptable Sleep","Exited","None"};
 
@@ -245,9 +247,9 @@ void loadISRSavedRegs(task_t* task)
         isrSavedES = parentTSS->ES;
         isrSavedFS = parentTSS->FS;
         isrSavedGS = parentTSS->GS;
-        //We need to load the CR3 because whatever CR3 the parent was using, that's what the child should use.
+        //We need to load the CR3 because whatever CR3 the parent was using, that's what the child should use for the FIRST return from syscall.
         isrSavedCR3 = parentTSS->CR3; 
-        memcpy((uintptr_t*)((process_t*)task->process)->stackStart, (uintptr_t*)parent->stackStart, ((process_t*)task->process)->stackSize);
+//        memcpy((uintptr_t*)((process_t*)task->process)->stackStart, (uintptr_t*)parent->stackStart, ((process_t*)task->process)->stackSize);
         memcpy((uintptr_t*)((process_t*)task->process)->stack1Start, (uintptr_t*)parent->stack1Start, ((process_t*)task->process)->stack1Size);
     }
 #ifdef SCHEDULER_DEBUG
@@ -331,6 +333,7 @@ task_t* submitNewTask(task_t *task)
         addToQ(qRunnable,slot);
         if (slot->taskNum>1)
             ((process_t*)(slot->process))->signals.sigind=0;
+        task->totalRunningTicks = 0;
 	return slot;
 }
 
@@ -356,33 +359,33 @@ task_t* findTaskToRun()
     process_t* process;
     uintptr_t* queue=qRunnable;
     
+    processSignals();
+    int queEntryNum = 0;
     while (*queue!=NO_NEXT)
     {
         if (*queue!=0)
         {
             task = (task_t*)*queue;
             process = task->process;
-            
             oldTicks=task->prioritizedTicksInRunnable;
             //This is where we increment all the runnable ticks, based on the process' priority
             if ( task!=kIdleTask || (task==kIdleTask) && task->prioritizedTicksInRunnable==0)
                 task->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-process->priority)+1;
-            printd(DEBUG_PROCESS,"*\tTask 0x%04X (%s-%u[%s]), priority=%u, old ticks=%u, new ticks=%u %s\n",
+            printd(DEBUG_PROCESS,"*\t(%u) Task 0x%04X (%s-%u[%s]), priority=%u, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
+                    queEntryNum,
                     task->taskNum, process->exename,
                     process->childNumber,
                     process->parent->exename,
                     process->priority,
                     oldTicks,
-                    task->prioritizedTicksInRunnable, task==kIdleTask?"(idle task)":"");
-            if ( task==kIdleTask)
-                printd(DEBUG_PROCESS," (idle task)");
-            printd(DEBUG_PROCESS,"\n");
+                    task->prioritizedTicksInRunnable, process->totalRunTicks);
             if ( task->prioritizedTicksInRunnable >= mostIdleTicks)
             {
                 taskToRun=task;
                 mostIdleTicks=task->prioritizedTicksInRunnable;
             }
         }
+        queEntryNum++;
         queue++;
     }
     
@@ -567,6 +570,11 @@ void runAnotherTask(bool schedulerRequested)
                     taskToStopNewQueue=TASK_RUNNABLE;
                 }
         }
+        else if ((pToStop->signals.sigind & SIGIO) == SIGIO)
+        {
+            taskToStopNewQueue=TASK_RUNNABLE;
+            printd(DEBUG_PROCESS,"*Task 0x%04X: SIGIO received, no default handler  Executing default action (nothing).\n",taskToStop->taskNum);
+        }
         else
         {
             panic("scheduler: Unhandled signal");
@@ -602,13 +610,20 @@ void runAnotherTask(bool schedulerRequested)
 
     if (taskToRun!=NULL && taskToRun->taskNum!=taskToStop->taskNum)
     {
+        process_t *process = taskToRun->process;
         printd(DEBUG_PROCESS,"*Found task 0x%04X move to CPU\n",taskToRun->taskNum);
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
-        activeSTDOUT = ((process_t *)taskToRun->process)->stdout;
-        activeSTDIN = ((process_t *)taskToRun->process)->stdin;
+        if (!(strcmp(process->path,"/sbin/idle")==0))
+        {
+            activeSTDOUT = ((process_t *)taskToRun->process)->stdout;
+            activeSTDIN = ((process_t *)taskToRun->process)->stdin;
+            activeSTDIN->owner = taskToRun->process;
+            activeSTDOUT->owner = taskToRun->process;
+            activeSTDERR = ((process_t *)taskToRun->process)->stderr;
+            activeSTDERR->owner = taskToRun->process;
+        }
         printd(DEBUG_PROCESS,"Active STDIN = 0x%08X\n",activeSTDIN);
-        activeSTDERR = ((process_t *)taskToRun->process)->stderr;
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08x\n",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);

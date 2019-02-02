@@ -375,7 +375,7 @@ static FL_FILE* _open_file(const char *path)
             file->file_data_address = 0xFFFFFFFF;
             file->file_data_dirty = 0;
             file->filelength_changed = 0;
-
+            printd(1<<27, "fl_fopen: Opened file %s, length = %i, bytenum = %i\n",sfEntry.Name, file->filelength, file->bytenum);
             // Quick lookup for next link in the chain
             file->last_fat_lookup.ClusterIdx = 0xFFFFFFFF;
             file->last_fat_lookup.CurrentCluster = 0xFFFFFFFF;
@@ -961,6 +961,7 @@ void fl_fclose(void *f)
         file->filelength_changed = 0;
 
         // Free file handle
+        printd(1<<12,"fl_fclose: freeing handle 0x%08x\n",file);
         _free_file(file);
 
         fatfs_fat_purge(&_fs);
@@ -1044,7 +1045,10 @@ int fl_fread(void * buffer, int size, int length, void *f )
 
     // Check if read starts past end of file
     if (file->bytenum >= file->filelength)
+    {
+        printd(1<<27, "fl_fread: Error: bytenum (%i) > length (%i)\n",file->bytenum, file->filelength);
         return -1;
+    }
 
     // Limit to file size
     if ( (file->bytenum + count) > file->filelength )
@@ -1146,6 +1150,8 @@ int fl_fseek( void *f, long offset, int origin )
 
         if (file->bytenum > file->filelength)
             file->bytenum = file->filelength;
+            
+        printd(1<<27, "fl_fseek: Bytenum set to %i\n",file->bytenum);
 
         res = 0;
     }

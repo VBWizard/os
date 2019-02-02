@@ -38,7 +38,7 @@ loadTaskRegisters:
     mov gs, bx
     mov ebp,isrSavedEBP
     mov eax, isrSavedFlags
-    or eax, 0x3000
+    or eax, 0x3000              #Unconditionally set the IOPL bits of flags (TODO: Fix this)
     mov isrSavedFlags, eax
     mov ecx, isrSavedECX
     mov edx, isrSavedEDX

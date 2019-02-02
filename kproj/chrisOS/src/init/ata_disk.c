@@ -48,9 +48,8 @@ uint8_t ataWaitForIdle(struct ataDeviceInfo_t* devInfo)
     lValue=inb(devInfo->ioPort+ATA_PORT_STATUS);
     if ((lValue & ATA_STATUS_DRQ) == ATA_STATUS_DRQ && ticks)
         inw(devInfo->ioPort+ATA_PORT_DATA);
-    while (ticks++<=ATA_STANDARD_WAIT_MS*kTicksPerMS)
+    while (1==1)
     {
-        __asm__("sti\nhlt\n");
         lValue=inb(devInfo->ioPort+ATA_PORT_STATUS);
             //If both BUSY and DRQ are zero, then, the command is probably complete. 
         if ((lValue & (ATA_STATUS_DRQ | ATA_STATUS_BUSY)) == 0 )

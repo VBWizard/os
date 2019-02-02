@@ -26,7 +26,7 @@
 .globl pagingExceptionHandler
 .type pagingExceptionHandler, @function
 pagingExceptionHandler:
-    cli
+    cli #NOTE: don't need to STI later as jumping back to the tss that caused the exception will set/clear the if
     mov ebp, esp
     #Increment the paging exception count
     mov eax,kPagingExceptionCount
@@ -43,7 +43,6 @@ pagingExceptionHandler:
     #For non-fatals, the IRET will jump back into the task that triggered the exception
     #either way we don't need to do anything before IRETing except reset the stack and enable interrupts
     mov esp, ebp
-    sti
     iret
     jmp pagingExceptionHandler #Next paging exception the handler will start here so jump back to the beginning of the handler
 
@@ -117,6 +116,7 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
+jmp overSaveTheStack
     mov eax,isrNumber
     cmp eax,0x20                
     jge overSaveTheStack        #CLR 03/26/2017: Changed (je to jge) to skip stack capture for 0x20 (IRQ0) & 0x21 (KBD) (not sure what else)

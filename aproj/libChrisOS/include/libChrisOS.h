@@ -24,11 +24,12 @@ extern "C" {
 #include "strings.h"
 #include "environment.h"
 #include "input.h"
-#include "config.h"
 #include "time.h"
 #include "file.h"
 #include "pipe.h"
+#include "libcmmap.h"
 #include "../../../kproj/chrisOSKernel/include/syscalls.h"
+#include "console.h"
     
 #include <bits/time.h>
 #ifndef NULL
@@ -57,6 +58,7 @@ extern "C" {
     char** cmdlineToArgv(char* cmdline, int *argc);
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printf(const char *format, ...);
+    int printfI(const char *format, ...);
     int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
     unsigned int VISIBLE sleep (unsigned int __seconds);
@@ -70,6 +72,7 @@ extern "C" {
     void *memset(void *d1, int val, size_t len);
     void *memsetI(void *d1, int val, size_t len);
     void * memcpy(void *dest, const void *src, size_t n);
+    void *memcpyI(void *dest, const void *src, size_t n);
     struct tm* gettime(struct tm *time, bool localTime);
     char* getcwd(char* buf, size_t size);
     bool strisnum(char* str);
@@ -77,6 +80,7 @@ extern "C" {
     size_t split(char *buffer, char *argv[], size_t argv_size);
     void exit (int status);
     char** processEnvp;
+    int test();
     
 #ifdef __cplusplus
 }

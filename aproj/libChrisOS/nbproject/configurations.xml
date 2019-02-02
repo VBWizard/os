@@ -5,10 +5,12 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>include/ascii.h</itemPath>
+      <itemPath>include/console.h</itemPath>
       <itemPath>include/environment.h</itemPath>
       <itemPath>include/file.h</itemPath>
       <itemPath>include/input.h</itemPath>
       <itemPath>include/libChrisOS.h</itemPath>
+      <itemPath>include/libcmmap.h</itemPath>
       <itemPath>include/malloc.h</itemPath>
       <itemPath>include/memory.h</itemPath>
       <itemPath>include/pipe.h</itemPath>
@@ -40,20 +42,22 @@
         <itemPath>src/strings/strncpy.c</itemPath>
         <itemPath>src/strings/stroul.c</itemPath>
         <itemPath>src/strings/strparts.c</itemPath>
+        <itemPath>src/strreplace.c</itemPath>
         <itemPath>src/strstr.c</itemPath>
         <itemPath>../../kproj/chrisOS/src/strings/strtok.c</itemPath>
         <itemPath>src/strings/strtol.c</itemPath>
         <itemPath>src/strings/strtrim.c</itemPath>
       </logicalFolder>
       <itemPath>src/ascii.c</itemPath>
+      <itemPath>src/console.c</itemPath>
       <itemPath>src/environment.c</itemPath>
       <itemPath>src/file.c</itemPath>
       <itemPath>src/input/input.c</itemPath>
       <itemPath>src/libChrisOS.c</itemPath>
+      <itemPath>src/libcmmap.c</itemPath>
       <itemPath>src/malloc.c</itemPath>
       <itemPath>src/memcpy.c</itemPath>
       <itemPath>src/memset.c</itemPath>
-      <itemPath>src/mmap.c</itemPath>
       <itemPath>src/pipe.c</itemPath>
       <itemPath>src/sprintf.c</itemPath>
       <itemPath>src/stdio.c</itemPath>
@@ -125,6 +129,8 @@
       </item>
       <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/console.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/environment.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/file.h" ex="false" tool="3" flavor2="0">
@@ -132,6 +138,8 @@
       <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/libcmmap.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -151,6 +159,8 @@
       </item>
       <item path="src/ascii.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/console.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/environment.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/file.c" ex="false" tool="0" flavor2="0">
@@ -159,13 +169,13 @@
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/libcmmap.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/pipe.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -194,6 +204,8 @@
       <item path="src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strreplace.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strstr.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -256,6 +268,8 @@
       </item>
       <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/console.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/environment.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/file.h" ex="false" tool="3" flavor2="0">
@@ -263,6 +277,8 @@
       <item path="include/input.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/libChrisOS.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/libcmmap.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/malloc.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -282,6 +298,8 @@
       </item>
       <item path="src/ascii.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/console.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/environment.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/file.c" ex="false" tool="0" flavor2="0">
@@ -290,13 +308,13 @@
       </item>
       <item path="src/libChrisOS.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/libcmmap.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/malloc.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/mmap.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/pipe.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -327,6 +345,8 @@
       <item path="src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strreplace.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strstr.c" ex="false" tool="0" flavor2="0">
       </item>

@@ -75,19 +75,18 @@ int kexec2(char* path, int argc, char** argv, bool background)
 
 }
 
-int kexec(char* cmdline, bool timeIt)
+int kexec(char* cmdline)
 {
     bool background=false;
     int forkPid=0;
     char* tok;
     char* pgm=NULL;
+        char fileToExec[256] = "/\0";
 
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     int execParamCount=0;
     int pcount=1;
-    struct tm *startTime, *endTime;
-    uint32_t startTicks, endTicks;
     
     if (paramCount==0)
         return -3;
@@ -105,16 +104,15 @@ int kexec(char* cmdline, bool timeIt)
     
     if (*argv[argc-1]=='&')
         background=true;
-
-    
-    startTicks=getticks();
     
     forkPid = fork();
     
     if (forkPid == 0)
     {
         int retVal;
-        int childPid = exec(argv[0], argc, argv);
+        
+        strcat(fileToExec,argv[0]);
+        int childPid = exec(fileToExec, argc, argv);
         
         if (childPid > 0)
         {
@@ -132,12 +130,7 @@ int kexec(char* cmdline, bool timeIt)
         {
             lastExecExitCode = waitpid(forkPid);
             if (lastExecExitCode == 0xBADBADBA)
-                print("execTime: Cannot execute %s\n",argv[0]);
-        }
-        if (timeIt)
-        {
-            endTicks=getticks();
-            print("\n%u ticks\n",endTicks-startTicks);
+                print("exec: Cannot execute %s\n",argv[0]);
         }
         char ret[10];
         itoa(lastExecExitCode,ret);
@@ -151,7 +144,13 @@ int kexec(char* cmdline, bool timeIt)
 
 void cmdTime(char* cmdline)
 {
-    kexec(cmdline,true);
+    uint32_t startTicks, endTicks;
+    
+    startTicks=getticks();
+    execInternalCommand(cmdline);
+    endTicks=getticks();
+    print("\n%u ticks\n",endTicks-startTicks);
+    
 }
 
 void cmdRepeat(char * cmdline)
@@ -159,18 +158,26 @@ void cmdRepeat(char * cmdline)
     int argc = 0;
     char **argv;
     int count = 0;
-    char *newCmdLine=cmdline+2;
+    char *newCmdLine=cmdline;
     argv = cmdlineToArgv(cmdline, &argc);
     
     count = atoi(argv[0]);
 
+    if (count >= 100)
+        newCmdLine+=3;
+    else if (count >= 10)
+        newCmdLine+=2;
+    else 
+        newCmdLine+=1;
+    
     for (int cnt=0;cnt<count;cnt++)
     {
         printf("\n*************** REPEAT EXECUTION #%u of %u ***************\n",cnt+1,count);
-        kexec(newCmdLine,false);
+        execInternalCommand(newCmdLine);
         if (bSigIntReceived)
         {
-            processSignal(SIGINT);
+            if (processSignal(SIGINT)==SIGINT)
+                cnt=count;
             break;
         }
     }
@@ -179,7 +186,7 @@ void cmdRepeat(char * cmdline)
 
 void cmdExecp(char* cmdline)
 {
-    kexec(cmdline,false);
+    kexec(cmdline);
 }
 
 void cmdExit(char *cmdline)
@@ -232,6 +239,17 @@ void cmdSleep(char *cmdline)
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
 
+    //TODO: Remove this later ... leaving it here for a while to test mmap'd stack
+    int size = 100000/4; //147400;
+    int test[size];
+    
+    for (int cnt=0;cnt<size;cnt++)
+        test[cnt]=cnt;
+    
+    for (int cnt=0;cnt<size;cnt++)
+        if (test[cnt]!=cnt)
+            printf("uh oh!");
+    
     if (params[0][0]==0)
     {
         print("Requires 1 parameter which is the number of seconds to sleep\n");
