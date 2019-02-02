@@ -18,8 +18,9 @@ void deviceRegister(device_t* dev)
         listAdd(kDevList,&dev->listItem,dev);
 }
 
+//NOTE: Have to fix list functionality .... its broken!
 //NOTE: Caller should free the dev when they are done with it
-void deviceUnregister(device_t* dev)
+/*void deviceUnregister(device_t* dev)
 {
     while (kDevList->next!=kDevList)
     {
@@ -31,3 +32,4 @@ void deviceUnregister(device_t* dev)
         
     }
 }
+*/

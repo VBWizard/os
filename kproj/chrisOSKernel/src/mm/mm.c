@@ -144,13 +144,16 @@ void mmInit()
 uintptr_t mmGetFreeVirtAddress(uintptr_t cr3, uintptr_t startVirt, int size)
 {
     uintptr_t ptValue=0xFFFFFFFF;
-    int pagesNeeded=ALIGN_TO_PAGE_SIZE(size);
+    int pagesNeeded=size/PAGE_SIZE;
     int pagesFound=0;
     int firstVirt=0;
     
+    if (size%PAGE_SIZE)
+        pagesNeeded++;
+    
     while (pagesFound<pagesNeeded && startVirt<0xEFFFFFFF)
     {
-        ptValue=pagingGet4kPTEntryValueCR3(cr3,startVirt);
+        ptValue=pagingGet4kPTEntryAddressCR3(cr3,startVirt);
         if (ptValue==0)
         {
             if (firstVirt==0)
@@ -170,12 +173,12 @@ uintptr_t mmGetFreeVirtAddress(uintptr_t cr3, uintptr_t startVirt, int size)
         return firstVirt;
 }
 
-bool mmInitMMapPages(uintptr_t cr3, uintptr_t startVirt, int count, bool writable)
+bool mmInitMMapPages(uintptr_t cr3, uintptr_t startVirt, int count, int flags)
 {
     //Set up not present mapping for each virtual page in the mmap
-    //Set the user and write flags, but omit the present flag
-    //We'll temporarily fill the physical address with the virtual address
-    //Later the paging exception code will fill in the physical address
-    pagingMapPageCount(cr3,startVirt,startVirt,count,0x4 | writable<<1);
+    //Set whatever flags are passed, but also set the MMAP_FLAG flag
+    //so that the paging handler knows to use mmap data when a paging exception
+    //is triggered for one of the pages.
+    pagingMapPageCount(cr3, startVirt, 0, count, flags | PAGE_MMAP_FLAG, false);
     return true;
 }

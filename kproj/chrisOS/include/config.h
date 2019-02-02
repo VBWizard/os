@@ -18,12 +18,12 @@
 extern "C" {
 #endif
 
-//The minimum TPS I've gotten to work is 50.  Not possible to do > 1000 because of MS_PER_TICK
+//The minimum TPS I've gotten to work is 50.  Not possible to do > 1000 because of MS_PER_TICK.  Seems like 1000 may cause AHCI issues
 #define TICKS_PER_SECOND 100
-//How many ticks expire between scheduler runs (5=20 ticks per run, 10=10  ticks per run)
-#define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 5
+//How many ticks expire between scheduler runs (@100hz - 5=20 ticks per run, 10=10  ticks per run)
+#define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 10
 //How many ticks expire between signal checks
-#define TICKS_PER_SIGNAL_CHECK 5 
+#define TICKS_PER_SIGNAL_CHECK 1
     //TICKS_PER_SECOND / 5 
     //old=/50
 //MS=Milliseconds or thousands of a second
@@ -35,6 +35,8 @@ extern "C" {
 
 #define MAX_PARAM_COUNT 10
 #define MAX_PARAM_WIDTH 128
+
+#define FS_LAZY_LOAD
     
 /* ***NOTE: If DEBUG_NONE is defined then there will be no debugging*** */
 //#define DEBUG_NONE 0
@@ -55,7 +57,7 @@ extern "C" {
 #define DEBUG_TASK 1<<14
 #define DEBUG_KERNEL_PAGING 1<<15
 #define DEBUG_MEMORY_MANAGEMENT 1<<16
-#define DEBUG_LOADER 1<<17
+#define DEBUG_TERM 1<<17
 #define DEBUG_PROCESS 1<<18
 #define DEBUG_KMALLOC 1<<19
 #define DEBUG_KEYBOARD_DRIVER 1<<20
@@ -68,8 +70,9 @@ extern "C" {
 #define DEBUG_FILESYS 1<<27
 #define DEBUG_COW 1<<28
 #define DEBUG_MAX 0XFFFFFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_COW | DEBUG_EXCEPTIONS | DEBUG_PRINT_TO_PORT | DEBUG_PROCESS | DEBUG_DETAILED | DEBUG_LIBC | DEBUG_MALLOC | DEBUG_EXCEPTIONS 
-    //| DEBUG_ELF_LOADER
+    //NOTE: Turning off detailed and/or process causes everything to crash
+#define KDEBUGLEVEL  DEBUG_EXCEPTIONS |DEBUG_PRINT_TO_PORT | DEBUG_PROCESS | DEBUG_TASK | DEBUG_FILESYS | DEBUG_MMAP | DEBUG_MALLOC | DEBUG_TERM | DEBUG_SIGNALS | DEBUG_KEYBOARD
+//DEBUG_ELF_LOADER | DEBUG_DETAILED | DEBUG_KMALLOC
 #ifdef __cplusplus
 }
 #endif

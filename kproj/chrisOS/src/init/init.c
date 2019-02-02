@@ -62,6 +62,8 @@ struct gdt_ptr lGDT;
 //NOTE: This is a temporary idt pointer ... only used during init
 struct idt_ptr kInitialIDTReg;
 
+bool dupPrintKtoPrintD;
+
 //CLR 04/27/2016: Even though we are working on our cross compiler env, somehow __linus is set
 //so unset it
 #undef __linux__
@@ -69,7 +71,7 @@ struct idt_ptr kInitialIDTReg;
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
 #endif
-#define __i386__
+//#define __i386__
 /* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
 #error "This operating system needs to be compiled with a ix86-elf compiler"
@@ -106,7 +108,7 @@ void HIGH_CODE_SECTION gdt_init()
     gdtEntryApplication(0x10, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - ring 0 starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
 
-    gdtEntryApplication(0x11, 0xC0000000, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE, //88 ring 0 starting at 0x0 - code used by sysEnter
+    gdtEntryApplication(0x11, 0x00000000, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE, //88 ring 0 starting at 0x0 - code used by sysEnter
           GDT_GRANULAR | GDT_32BIT,true);
     gdtEntryApplication(0x12, 0x0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //90 - ring 0 starting at 0x0 data used by sysEnter
               GDT_GRANULAR | GDT_32BIT,true);
@@ -236,9 +238,10 @@ void HIGH_CODE_SECTION testWPBit()
 }
 
 void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/) {
-    
 char currTime[150];
 struct tm theDateTime;
+
+    dupPrintKtoPrintD = true;
     //Zero out all of the memory we will be using as rebooting a computer doesn't necessarily clear memory
     memset((void*)KERNEL_OBJECT_BASE_ADDRESS,0,0x2000000);
     kBootCmd[0]=0x0;
@@ -276,7 +279,7 @@ gdt_init();
     PIC_remap(0x00+PIC_REMAP_OFFSET, 0x8+PIC_REMAP_OFFSET);
     IRQ_clear_mask(0);
     IRQ_clear_mask(1);
-    __asm__("sti\n");
+__asm__("sti\n");
 
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
@@ -414,6 +417,7 @@ overStuff:
         execInternalCommand("exec /kernel");
         }*/
 MAINLOOPv:
+        dupPrintKtoPrintD = false;
         bootShell();
     goto MAINLOOPv;
     __asm__("cli\nhlt\n");

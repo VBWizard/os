@@ -28,7 +28,7 @@ extern "C" {
 
     dllist_t* listInit(dllist_t* firstItem, void* payload);
     void* listAdd(dllist_t* list, dllist_t* item, void* payload);
-    void listRemove(dllist_t* item);
+    dllist_t* listRemove(dllist_t* listHead, dllist_t* item);
     void* listPrev(dllist_t* list);
     void* listNext(dllist_t* list);
     void* listHead(dllist_t* list);

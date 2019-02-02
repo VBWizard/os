@@ -41,7 +41,8 @@ extern "C" {
     task_t* findTaskByCR3(uint32_t cr3);
     task_t* findTaskByTaskNum(uint32_t taskNum);
     uint32_t NO_PREV, NO_NEXT;
-
+    void enableScheduler();
+    void disableScheduler();
 #ifdef __cplusplus
 }
 #endif

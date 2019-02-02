@@ -25,7 +25,10 @@ extern "C" {
 #include "process.h"
 #include "printf.h"
 #include "mm.h"
-    
+#include "syscalls.h"
+
+#define MMAP_MAX_READAHEAD 4    
+#define MMAP_BUFFER_SIZE PAGE_SIZE * MMAP_MAX_READAHEAD
 #define MAP_FAILED -1;
     typedef enum epageprotection
     {
@@ -36,10 +39,11 @@ extern "C" {
     
     typedef enum emapflags
     {
-        MAP_PRIVATE = 1,
-        MAP_SHARED = 2,
-        MAP_ANONYMOUS = 3,
-        MAP_FIXED = 4 //MAP_FIXED has to be the largest value
+        MAP_PRIVATE = 1<<1,
+        MAP_SHARED = 1<<2,
+        MAP_ANONYMOUS = 1<<3,
+        MAP_STACK = 1<<4,
+        MAP_FIXED = 1<<10 //MAP_FIXED has to be the largest value
     } eMapFlags;
 
     typedef struct smmappedpage
@@ -55,6 +59,7 @@ extern "C" {
         process_t* process;
         uintptr_t startAddress;     //Does this need to be page aligned?
         uint32_t startFileOffset;   //Does this need to be page aligned?
+        uint32_t currentFileOffset;
         size_t len;                 //We will round to interval of PAGE_SIZE
         int protection;             
         int flags;
@@ -65,7 +70,10 @@ extern "C" {
 
     typedef struct smemorymapping memmap_t;
 
-    void * sys_mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset);
+    void globalMMapInit();
+    void * sys_mmap (process_t* p, void *addr,size_t len,int prot,int flags,int fd,off_t offset);
+    bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExceptionCR2, uint32_t pteValue, int errorCode);
+    void* syscall_mmap (process_t *p, syscall_mmap_t *params);
     
 #ifdef __cplusplus
 }

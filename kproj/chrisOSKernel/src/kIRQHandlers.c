@@ -6,13 +6,18 @@
 
 #include "kIRQHandlers.h"
 #include "printf.h"
+#include "kInit.h"
+#include "../../chrisOS/include/io.h"
+#include "drivers/termdrv.h"
+#include "kutility.h"
 
-bool schedulerEnabled=false;
 extern uint32_t nextScheduleTicks;
 extern void processSignals();
 uint32_t kNextSignalCheckTicks=0;
 bool schedulerTriggered=false;
 bool signalCheckTriggered=false;
+extern bool schedulerEnabled;
+extern terminfo_t *sysConsole;
 
 void kIRQ0_handler()
 {
@@ -24,7 +29,7 @@ static struct tm theDateTime;
         kSystemCurrentTime++;
     if (schedulerEnabled)
     {
-        if(*kTicksSinceStart>nextScheduleTicks)
+        if(*kTicksSinceStart>=nextScheduleTicks && schedulerEnabled)
         {
             printd(DEBUG_PROCESS,"kIRQ0_Handler: triggering scheduler\n");
             schedulerTriggered=true;
@@ -35,7 +40,16 @@ static struct tm theDateTime;
             //signalCheckTriggered=true;
             processSignals();
             kNextSignalCheckTicks=*kTicksSinceStart+TICKS_PER_SIGNAL_CHECK;
-        }
+/*            uint32_t currCR3;
+            SAVE_CURRENT_CR3(currCR3);
+            LOAD_KERNEL_CR3
+            __asm__("CLI\n");
+            printd(DEBUG_PROCESS,"Starting term update @ 0x%08x\n",sysConsole->updateTerminal);
+            sysConsole->updateTerminal();
+            printd(DEBUG_PROCESS,"Term update done @ 0x%08x\n",sysConsole->updateTerminal);
+            __asm__("STI\n");
+            LOAD_CR3(currCR3);
+*/        }
     }
 #ifndef DEBUG_EXPANDED_TICK
         if ((kDebugLevel & DEBUG_EXPANDED_TICK) == DEBUG_EXPANDED_TICK)
@@ -55,7 +69,7 @@ static struct tm theDateTime;
         {
             cursorSavePosition();
             cursorMoveTo(55,SYS_VGA_HEIGHT-1);
-            //printf("0x%04X:0x%08X 0x%08X",exceptionCS, exceptionEIP, exceptionFlags);
+            //printf("0x%04X:0x%08x 0x%08x",exceptionCS, exceptionEIP, exceptionFlags);
             //kTermMoveTo(65,0);
             printk("%u",*kTicksSinceStart);
             printk("-%c-%04X:%08X",(isrSavedFlags & 0x200)==0x200?'I':'i',isrSavedCS, isrSavedEIP);
@@ -66,4 +80,23 @@ static struct tm theDateTime;
             cursorRestorePosition();
         }
 #endif
+}
+
+void kIRQ8_handler()
+{
+    printd(DEBUG_EXCEPTIONS,"In kernel irq8 handler\n");
+}
+
+void IRQ_clear_mask(unsigned char IRQline) {
+    uint16_t port;
+    uint8_t value;
+ 
+    if(IRQline < 8) {
+        port = PIC1_DATA;
+    } else {
+        port = PIC2_DATA;
+        IRQline -= 8;
+    }
+    value = inb(port) & ~(1 << IRQline);
+    outb(port, value);        
 }

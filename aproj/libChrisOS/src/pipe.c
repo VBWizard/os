@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-#include "libChrisOS.h"
-#include "types.h"
 
-VISIBLE void* mmap (void *addr,size_t len,int prot,int flags,int fd,off_t offset) //memory map pages either to a file or anonymously
+#include "libChrisOS.h"
+#include "pipe.h"
+
+VISIBLE int pipe(int pipefd[2])
 {
-    return NULL;
+    return do_syscall1(SYSCALL_PIPE, (uintptr_t)pipefd);
 }

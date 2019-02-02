@@ -69,13 +69,15 @@ int AhciIssueCmd(volatile HBA_PORT *port,int cmdslot)
 
     //wait cmd
     for (i = 0; i < 100; i++) {
-        wait(1); //CLR 01/09/2018: changed from 50 to 1 ... this sped the system up immensely!
-        if (!port->tfd.BSY)
-            break;
+        //(1); //CLR 01/09/2018: changed from 50 to 1 ... this sped the system up immensely!
+        while (port->tfd.BSY){__asm__("hlt\n");}
     }
 
+    if (port->tfd.BSY)
+        printd(DEBUG_AHCI, "AhciIssueCmd: WARNING - port busy after waiting\n");
+    
     // Wait for completion
-    delay = 5000;
+    delay = 10000000;
     while (delay > 0) {
 
         if ((port->ci & (1 << cmdslot)) == 0)
@@ -87,13 +89,17 @@ int AhciIssueCmd(volatile HBA_PORT *port,int cmdslot)
             printd(DEBUG_AHCI, "AHCI: Read disk error\n");
             return -1;
         }
-        wait(20);
+        //wait(10); //CLR 01/12/2019: Changed from (I think) 50 to 10 ... and WOW.  Can't change to less than 10 because 1 ms is 10 ticks and we can't get smaller than that
         delay -= 1;
     }
 
     if (port->tfd.ERR || delay == 0)
         Status = -2;
 
+    if (Status != true)
+        panic("AhciIssueCmd: Status is non-zero");
+        //printd(DEBUG_AHCI, "AhciIssueCmd: WARNING - port busy after waiting\n");
+    
     return Status;
 }
 
@@ -395,7 +401,7 @@ void start_cmd(volatile HBA_PORT *port) {
 
 void waitForPortIdle(volatile HBA_PORT *port) {
     while (port->cmd.ST | port->cmd.CR | port->cmd.FRE | port->cmd.FR) {
-        waitTicks(20);
+        waitTicks(10);
     }
 }
 
@@ -410,7 +416,7 @@ void stop_cmd(volatile volatile HBA_PORT *port) {
             break;
         if (!(port->cmd.CR))
             break;
-        waitTicks(20);
+        waitTicks(10);
     }
 
     // Clear FRE (bit4)
@@ -794,7 +800,8 @@ Pos1:
         wait(20); /* wait for BSY to show up */
         while (1) {
                 uint8_t sts = p->tfd.AsUchar;
-                if (sts & 1) {
+                if (sts & 1) 
+                {
                         /* something went wrong! */
                         if (sts == 0x7f) /* no device */
                                 break;

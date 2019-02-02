@@ -12,5 +12,5 @@
 #include "task.h"
 
 int sysExec(process_t* process,int argc,char** argv);
-elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3, bool alreadyLoaded);
+elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3);
 #endif	/* SYSLOADER_H */

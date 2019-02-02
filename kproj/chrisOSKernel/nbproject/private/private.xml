@@ -18,13 +18,6 @@
         </group>
         <group name="os"/>
         <group name="aproj"/>
-        <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kInit.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/process.h</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/x86.s</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/signals.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/mm/mmap.c</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

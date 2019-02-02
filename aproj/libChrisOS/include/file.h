@@ -18,11 +18,32 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+    
+    struct direntry
+    {
+    char                      filename[260];
+    uint8_t                   is_dir;
+    uint32_t                  cluster;
+    uint32_t                  size;
+    uint16_t                  access_date;
+    uint16_t                  write_time;
+    uint16_t                  write_date;
+    uint16_t                  create_date;
+    uint16_t                  create_time;
+    } __attribute((packed));
+    
+    typedef struct direntry direntry_t;
+    
     void* open(char* path, const char* mode);
     void close(void* handle);
     int read(void* handle, void *buffer, int size, int length);
+    int write(void* handle, void *buffer, int size, int length);
     int getdir(char* path, char *buffer, int bufferCount);
-
+    int seek(void* handle, long position, int whence);
+    
+    int writeI(void* handle, void *buffer, int size, int length);
+    
 #ifdef __cplusplus
 }
 #endif

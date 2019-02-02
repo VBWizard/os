@@ -39,14 +39,17 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/4459a81c/strcspn.o \
 	${OBJECTDIR}/_ext/4459a81c/strtok.o \
 	${OBJECTDIR}/src/ascii.o \
+	${OBJECTDIR}/src/console.o \
 	${OBJECTDIR}/src/environment.o \
 	${OBJECTDIR}/src/file.o \
 	${OBJECTDIR}/src/input/input.o \
 	${OBJECTDIR}/src/libChrisOS.o \
+	${OBJECTDIR}/src/libcmmap.o \
 	${OBJECTDIR}/src/malloc.o \
 	${OBJECTDIR}/src/memcpy.o \
 	${OBJECTDIR}/src/memset.o \
-	${OBJECTDIR}/src/mmap.o \
+	${OBJECTDIR}/src/pipe.o \
+	${OBJECTDIR}/src/sprintf.o \
 	${OBJECTDIR}/src/stdio.o \
 	${OBJECTDIR}/src/strings/strcat.o \
 	${OBJECTDIR}/src/strings/strcmp.o \
@@ -59,6 +62,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/strings/strparts.o \
 	${OBJECTDIR}/src/strings/strtol.o \
 	${OBJECTDIR}/src/strings/strtrim.o \
+	${OBJECTDIR}/src/strreplace.o \
 	${OBJECTDIR}/src/strstr.o \
 	${OBJECTDIR}/src/time.o
 
@@ -107,6 +111,11 @@ ${OBJECTDIR}/src/ascii.o: src/ascii.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ascii.o src/ascii.c
 
+${OBJECTDIR}/src/console.o: src/console.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/console.o src/console.c
+
 ${OBJECTDIR}/src/environment.o: src/environment.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -127,6 +136,11 @@ ${OBJECTDIR}/src/libChrisOS.o: src/libChrisOS.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libChrisOS.o src/libChrisOS.c
 
+${OBJECTDIR}/src/libcmmap.o: src/libcmmap.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/libcmmap.o src/libcmmap.c
+
 ${OBJECTDIR}/src/malloc.o: src/malloc.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -142,10 +156,15 @@ ${OBJECTDIR}/src/memset.o: src/memset.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/memset.o src/memset.c
 
-${OBJECTDIR}/src/mmap.o: src/mmap.c
+${OBJECTDIR}/src/pipe.o: src/pipe.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mmap.o src/mmap.c
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pipe.o src/pipe.c
+
+${OBJECTDIR}/src/sprintf.o: src/sprintf.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/sprintf.o src/sprintf.c
 
 ${OBJECTDIR}/src/stdio.o: src/stdio.c
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -206,6 +225,11 @@ ${OBJECTDIR}/src/strings/strtrim.o: src/strings/strtrim.c
 	${MKDIR} -p ${OBJECTDIR}/src/strings
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strtrim.o src/strings/strtrim.c
+
+${OBJECTDIR}/src/strreplace.o: src/strreplace.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strreplace.o src/strreplace.c
 
 ${OBJECTDIR}/src/strstr.o: src/strstr.c
 	${MKDIR} -p ${OBJECTDIR}/src

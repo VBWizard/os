@@ -31,7 +31,6 @@
 // SUCH DAMAGE.
 // 
 
-#include <string.h>
 #include <time.h>
 #include "printf.h"
 #include "chrisos.h"

@@ -42,7 +42,8 @@ int main(int argc, char** argv) {
         return -2;
     }
     sec = atoi(argv[1]);
-    retVal = sec;
+    //retVal = sec;
+    retVal = 0;
     SLEEP_SECONDS(sec);
     return (retVal);
 }

@@ -12,6 +12,9 @@
 #include "tss.h"
 
 #define RESERVED_TASKS 32
+#define CURRENT_TASKNUM ({uint32_t taskNum; \
+                      __asm__("str eax\nshr eax,3\n":"=a" (taskNum));\
+                      taskNum;})
 
 typedef enum etaskstate
 {
@@ -39,12 +42,14 @@ typedef struct s_task
     uint32_t buffer;
     void* process;
     uint32_t buffer2;
-    uint32_t lastRunStartTicks, lastRunEndTicks;
+    uint32_t lastRunStartTicks, lastRunEndTicks, totalRunningTicks;
     uint32_t esp0Base, esp0Size;
 } task_t;
 
-task_t* createTask(void* process, bool kernelTSS);
-task_t* getAvailableTask();
+task_t *createTask(void* process, bool kernelTSS);
+task_t *getAvailableTask();
+void freeTask(uint32_t taskNum);
+task_t *getCurrentTask();
 
 #endif	/* TASK_H */
 

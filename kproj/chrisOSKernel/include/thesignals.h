@@ -26,6 +26,7 @@ extern "C" {
         SIGINT = 1 << 3,
         SIGSEGV = 1 << 4,
         SIGSTOP = 1 << 5,
+        SIGIO = 1 << 6
     } signals;
     
 

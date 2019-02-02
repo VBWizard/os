@@ -12,7 +12,7 @@
 #include "strings.h"
 #include "charDev.h"
 #include "i386/kPaging.h"
-
+#include "../../../chrisOSKernel/include/paging.h"
 extern int kTimeZone;
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
@@ -190,26 +190,54 @@ char * strtoupper(char* pointerToString)
 #define LOAD_KERNEL_BASED_DS __asm__("mov eax,0x10\nmov ds,eax":::"eax");
 
 //Called by exception 0xd & 0xe (possibly more)
-void printPagingExceptionRegs(uint32_t esp)
+void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bool toLog)
 {
-    volatile unsigned short *lCSIPPtr=(volatile unsigned short *)exceptionCS;
+    tss_t* tss = task->tss;
+    uint32_t esp = tss->ESP;
+    
+#ifdef KERNEL_LOADED
+    uint32_t *espP = (pagingGet4kPTEntryValueCR3(task->tss->CR3,tss->ESP) & 0xFFFFF000) | (esp & 0x00000FFF);
+#else
+    uint32_t *espP = (uint32_t*)tss->ESP;
+#endif    
+    char content[5000];
+    memset(content, 0, 5000);
+    char *contentP=content;
+    volatile unsigned short *lCSIPPtr=(volatile unsigned short *)tss->CS;
 LOAD_ZERO_BASED_DS    
-    printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
-    printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
-    printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
-    printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
-    printk("GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
-    printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
+    sprintf(content, "EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", tss->EAX, tss->EBX, tss->ECX, tss->EDX,tss->EFLAGS);
+    contentP=content+strlen(content);
+    sprintf(contentP, "EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", tss->EBP, tss->ESI, tss->EDI, tss->ESP);
+    contentP=content+strlen(content);
+    sprintf(contentP, "CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", 0, cr2, task->tss->CR3, 0);
+    contentP=content+strlen(content);
+    sprintf(contentP, " DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", tss->DS, tss->ES, tss->FS, tss->GS);
+    contentP=content+strlen(content);
+    sprintf(contentP, "GDT=%08X\t TR=0x%08X\tTRL=0x%08X\n",kernelGDT.base,task->taskNum, tss->LINK);
+    contentP=content+strlen(content);
+    sprintf(contentP, "CS:EIP = %04X:%08X, error code=%08X\n", tss->CS, tss->EIP, errorCode);
 //          printk("Bytes at CS:EIP: ");
 //          for (int cnt=0;cnt<19;cnt++)
 //              printk("%02X ", lCSIPPtr[cnt]);
 //          printk("\n");
-          printk ("Stack (ss:ebp) @ 0x%08x:0x%08X:\n",exceptionSS, esp);
-          for (int cnt=0;cnt<20;cnt++)
-          {
-              printk("\t0x%08X: 0x%08X\n",esp, exceptionSavedStack[cnt]);
-              esp+=4;
-          }
+    contentP=content+strlen(content);
+    sprintf(contentP, "Stack (ss:ebp) @ 0x%08x:0x%08X:\n",tss->SS, esp);
+    for (int cnt=0;cnt<20;cnt++)
+    {
+#ifdef KERNEL_LOADED
+        int pte=pagingGet4kPTEntryValueCR3(task->tss->CR3,espP);
+        if (!(pte & 0x1))
+            break;
+#endif
+        sprintf(contentP, "\t0x%08X: 0x%08X\n",esp, *espP);
+        espP++;
+        esp++;
+        contentP=content+strlen(content);
+    }
+    if (toLog)
+        printd(DEBUG_EXCEPTIONS, "%s", content);
+    else
+        printk("%s", content);
 LOAD_KERNEL_BASED_DS
 }
 

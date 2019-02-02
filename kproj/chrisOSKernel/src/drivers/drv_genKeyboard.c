@@ -11,6 +11,11 @@
 #include "charDev.h"
 #include "kbd.h"
 #include "signals.h"
+#include "filesystem/pipe.h"
+#include "drivers/tty_driver.h"
+#include "alloc.h"
+#include "kutility.h"
+#include "thesignals.h"
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
@@ -18,7 +23,7 @@
 unsigned volatile char kKeyChar=0;
 unsigned volatile char kKeyStatus[11];
 extern volatile char* kKbdBuffCurrTop;
-extern volatile uint32_t kDebugLevel;
+extern uint32_t kDebugLevel;
 extern volatile uint32_t exceptionErrorCode;
 extern volatile uint16_t exceptionNumber;
 extern volatile uint32_t exceptionCS;
@@ -31,6 +36,9 @@ extern volatile uint32_t* kTicksSinceStart;
 extern void* kKeyboardHandlerRoutine;
 extern struct idt_entry* idtTable;
 extern void vector21();
+extern ttydevice_t *tty1;
+extern pipe_t *activeSTDIN;
+        
 uint32_t kbdTop=KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE;
 
 void kbd_handler_generic()
@@ -38,48 +46,51 @@ void kbd_handler_generic()
     unsigned char lKeyControlVal=0;
     unsigned char rawKey=0;
     unsigned char translatedKeypress=0;
-
+    uintptr_t cr3;
+    
+    SAVE_CURRENT_CR3(cr3);
+    LOAD_KERNEL_CR3;
     rawKey = inb(KEYB_DATA_PORT);
     kKeyChar = rawKey;//& 0x80;
-    printd(DEBUG_KEYBOARD,"got a key: %c (0x%04X)\n",kKeyChar,kKeyChar);
+    //printd(DEBUG_KEYBOARD,"got a key: %c (0x%04X)\n",kKeyChar,kKeyChar);
     switch(rawKey)
     {
     case KEY_SHIFT_DN:
         kKeyStatus[INDEX_SHIFT]=1;
-        printd(DEBUG_KEYBOARD,"Shift down\n");
-        return;
+        //printd(DEBUG_KEYBOARD,"Shift down\n");
+        goto timeToReturn;
     case KEY_SHIFT_UP:
         kKeyStatus[INDEX_SHIFT]=0;
-        printd(DEBUG_KEYBOARD,"Shift up\n");
-        return;
+        //printd(DEBUG_KEYBOARD,"Shift up\n");
+        goto timeToReturn;
     case KEY_CTRL_DN:
                 cursorSavePosition();
                 cursorMoveTo(74,0);
                 printk("%c",'c');
                 cursorRestorePosition();
         kKeyStatus[INDEX_CTRL]=1;
-        printd(DEBUG_KEYBOARD,"Ctrl down\n");
-        return;
+        //printd(DEBUG_KEYBOARD,"Ctrl down\n");
+        goto timeToReturn;
     case KEY_CTRL_UP:
                 cursorSavePosition();
                 cursorMoveTo(74,0);
                 printk("%c",' ');
                 cursorRestorePosition();
         kKeyStatus[INDEX_CTRL]=0;
-        printd(DEBUG_KEYBOARD,"Ctrl up\n");
-        return;
+        //printd(DEBUG_KEYBOARD,"Ctrl up\n");
+        goto timeToReturn;
     case KEY_ALT_DN:
         kKeyStatus[INDEX_ALT]=1;
-        printd(DEBUG_KEYBOARD,"Alt down\n");
-        return;
+        //printd(DEBUG_KEYBOARD,"Alt down\n");
+        goto timeToReturn;
     case KEY_ALT_UP:
         kKeyStatus[INDEX_ALT]=0;
-        printd(DEBUG_KEYBOARD,"Alt up\n");
-        return;
+        //printd(DEBUG_KEYBOARD,"Alt up\n");
+        goto timeToReturn;
     case KEY_CAPSLOCK_UP:
         kKeyStatus[INDEX_CAPSLOCK]=!kKeyStatus[INDEX_CAPSLOCK];
-        printd(DEBUG_KEYBOARD,"Capslock\n");
-        return;
+        //printd(DEBUG_KEYBOARD,"Capslock\n");
+        goto timeToReturn;
 //        case MAKE_RIGHT: kKeyStatus[INDEX_RIGHT]=0;break;
 //        case MAKE_LEFT: kKeyStatus[INDEX_LEFT]=0;break;
 //        case MAKE_UP: kKeyStatus[INDEX_UP]=0;break;
@@ -87,12 +98,16 @@ void kbd_handler_generic()
     }
     //changed from if rawkey & 0x80, so that keydown triggers the key being input
     if (rawKey==BREAK_RIGHT || rawKey==BREAK_LEFT || rawKey==BREAK_UP || rawKey==BREAK_DOWN)
-        if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
-            //CLR 01/10/2017: Increment the buffer pointer first
+        if (tty1->stdInWritePipe)
         {
-            kKbdBuffCurrTop++;
-            *kKbdBuffCurrTop=rawKey;
+            pipewrite(&rawKey, 1, 1, tty1->stdInWritePipe);
+            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Raw key '%u' delivered to stdin pipe 0x%08X\n",rawKey, tty1->stdInWritePipe);
+	    //NOTE: We are passing data but no process.  sigaction2 knows to not expect a process for SIGIO
+            sys_sigaction2(SIGIO, NULL, (uintptr_t)activeSTDIN, NULL);
         }
+        else
+            panic("kbd_handler_generic: STDIN pipe is null! (1)\n");
+            
     if (!(rawKey & 0x80))
     {
         //rawKey &= 0x7f;
@@ -103,53 +118,32 @@ void kbd_handler_generic()
         }
         else
             translatedKeypress=keyboard_map[rawKey];
-#ifndef DEBUG_NONE
-//                 if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-//                 {
-//                      printf("%u, %u, %c\n",kKeyChar, rawKey, translatedKeypress);
-//                 }
-#endif
         if (kKeyStatus[INDEX_CTRL])
         {
             //printk("^");
             if (translatedKeypress=='c') //CLR 12/30/2018: ^C pressed
             {
-                sys_sigaction(SIGINT, NULL, 0);
+                //TODO: sigint broken till I can figure out how to pass the process struct for the correct struct
+                sys_sigaction2(SIGINT, NULL, 0, activeSTDIN->owner);
+                if (tty1->stdInWritePipe)
+                    pipewrite("^C\n", 2, 1, tty1->stdInWritePipe);
+                goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
             }
         }
 
         if (translatedKeypress==124)
             translatedKeypress=34;
-        if (kKbdBuffCurrTop<(char*)KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE && !kKeyStatus[INDEX_ALT])
+        //CLR 01/24/2019: Added stdin check because we don't care how full the keyboard buffer is if we're going to write the results to the STDIN pipe
+        if (tty1->stdInWritePipe)
         {
             //CLR 01/10/2017: Increment the buffer pointer first
-            {
-                kKbdBuffCurrTop++;
-                *kKbdBuffCurrTop=translatedKeypress;
-            }
-#ifndef DEBUG_NONE
-            if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-            {
-                cursorSavePosition();
-                cursorMoveTo(78,0);
-                printk("%c",'k');
-                cursorRestorePosition();
-            }
-#endif
+            pipewrite(&translatedKeypress, 1, 1, tty1->stdInWritePipe);
+            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Translated key '%c' delivered to stdin pipe 0x%08X (CR3=0x%08X)\n",translatedKeypress, tty1->stdInWritePipe, CURRENT_CR3);
+	    //NOTE: We are passing data but no process.  sigaction2 knows to not expect a process for SIGIO
+            sys_sigaction2(SIGIO, NULL, (uintptr_t)activeSTDIN, NULL);
         }
         else
-        {
-#ifndef DEBUG_NONE
-            if ((kDebugLevel & DEBUG_KEYBOARD) == DEBUG_KEYBOARD)
-            {
-                printk("noRoomForKey: Top=0x%08X Max=0x%08X\n",kKbdBuffCurrTop,KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE);
-                cursorSavePosition();
-                cursorMoveTo(78,0);
-                printk("%c",'K');
-                cursorRestorePosition();
-            }
-#endif
-        }
+            panic("kbd_handler_generic: STDIN pipe is null! (2)\n");
         //Debug
         if (kKeyStatus[INDEX_ALT] && translatedKeypress==0x6A)
         {
@@ -190,11 +184,13 @@ void kbd_handler_generic()
         }
     }
 
+timeToReturn:
     lKeyControlVal = inb(KEYB_CTRL_PORT);
     lKeyControlVal |= 0x82;
     outb(KEYB_CTRL_PORT, lKeyControlVal);
     lKeyControlVal &= 0x7f;
     outb(KEYB_CTRL_PORT, lKeyControlVal);
+    LOAD_CR3(cr3);
     return;
 }
 

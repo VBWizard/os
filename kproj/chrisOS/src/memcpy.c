@@ -12,6 +12,9 @@ void * memcpy(void *dest, const void *src, size_t n)
 {
     bool dw,dd;
     
+    //CLR 02/01/2019: Bail immediately if the size passed is zero!  No reason to hang around.
+    if (n==0)
+        return;
     dd=n%4==0;
     dw=n%2==0;
     if (dd)

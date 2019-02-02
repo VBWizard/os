@@ -20,6 +20,21 @@ extern "C" {
 
     typedef long int off_t;
 
+        typedef enum epageprotection
+    {
+        PROT_READ = 1,
+        PROT_WRITE = 2,
+        PROT_EXEC = 3
+    } ePageProtection;
+    
+    typedef enum emapflags
+    {
+        MAP_PRIVATE = 1<<1,
+        MAP_SHARED = 1<<2,
+        MAP_ANONYMOUS = 1<<3,
+        MAP_STACK = 1<<4,
+        MAP_FIXED = 1<<10 //MAP_FIXED has to be the largest value
+    } eMapFlags;
 
 #ifdef __cplusplus
 }

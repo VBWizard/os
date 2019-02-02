@@ -40,8 +40,9 @@ extern "C" {
     typedef struct sprocess
     {
         uint32_t processSyscallESP;         //NOTE: this must be the first item in the struct, as it is mapped into the process later
-        struct sprocess* this;                     //NOTE: This must remain the second item in the struct at offset +4
         uint32_t pageDirPtr;
+        char exename[128];
+        struct sprocess* this;                     //NOTE: This must remain the second item in the struct at offset +4
         task_t* task;
         sGDT* gdtEntry;
         elfInfo_t* elf;
@@ -51,7 +52,7 @@ extern "C" {
         uint32_t heapStart, heapEnd, stackStart, stackSize, stack1Start, stack1Size, stack0Start, stack0Size;
         short priority;           //-20=highest, 20=lowest
         void* exitHandler[PROCESS_MAX_EXIT_HANDLERS];
-        void* parent;
+        struct sprocess* parent;
         bool kernelProcess;
         struct tm startTime, endTime;
         uint32_t totalRunTicks;
@@ -70,16 +71,23 @@ extern "C" {
         char* mappedEnv;
         char* realEnv;
         bool justForked;
+        uint32_t lastChildCR3;
+        uint32_t childNumber;
+        uint32_t lastChildNumber;
+        bool execDontSaveRegisters;
+        bool foreground;
     } process_t;
 
 
-    process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess);
+    process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess, bool useExistingProcess);
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);
     char* processGetCWD(char* buf, unsigned long size);
     void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size); //Copy memory from kernel to user space (assumes dest is user page)
     void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size); //Copy memory from user space to kernel (assumes dest is kernel page)
+    process_t *getCurrentProcess ();
+
 #define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus
 }

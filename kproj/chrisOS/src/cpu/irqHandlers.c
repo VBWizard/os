@@ -80,6 +80,11 @@ static struct tm theDateTime;
 #endif
 }
 
+void irq8_handler()
+{
+    printd(0,"In irq8 handler\n");
+}
+
 void kbd_handler()
 {
     unsigned char lKeyControlVal=0;

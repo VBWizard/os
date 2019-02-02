@@ -29,7 +29,8 @@ extern uint32_t isrSavedAX, isrSavedBX, isrSavedCX, isrSavedDX, isrSavedSI, isrS
 extern uint32_t isrSavedCS;
 extern uint32_t isrSavedEIP;
 extern uint32_t isrSavedFlags;
-
+void kIRQ8_handler();
+void IRQ_clear_mask(unsigned char IRQline);
 
 #ifdef __cpluplus
 }

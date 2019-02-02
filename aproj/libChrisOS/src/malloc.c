@@ -6,6 +6,7 @@
 
 #include "malloc.h"
 #include "libChrisOS.h"
+#include "config.h"
 
 #define HEAP_GET_NEXT(s,t) {t=(uint8_t*)s+s->len+sizeof(heaprec_t);}
 #define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
@@ -55,8 +56,7 @@ void freeI(void* fpointer)
     if (mp->marker!=ALLOC_MARKER_VALUE)
     {
         //print("malloc: marker not found error!!!\n");
-gotoHere:
-        goto gotoHere;
+        return; //Return silently ... for now
     }
     mp->inUse=false;
 }
@@ -103,6 +103,30 @@ void*  mallocI(size_t size)
 __attribute__((visibility("default"))) void*  malloc(size_t size)
 {
     return mallocI(size);
+}
+
+void* reallocI(void *foldptr, uint32_t newlen)
+{
+    
+    //Allocate space of newlen
+    uintptr_t *fnewptr = mallocI(newlen);
+   
+    //Get old heap pointer
+    heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
+    HEAP_CURR(foldptr,mp);
+    
+    //Copy from old pointer to new memory using the old pointer's length
+    memsetI(fnewptr+mp->len,0,newlen);
+    memcpyI(fnewptr, foldptr, mp->len>newlen?newlen:mp->len);
+    
+   //free old pointer
+    freeI(foldptr);
+    return fnewptr;
+}
+
+VISIBLE void* realloc(void *foldptr, uint32_t newlen)
+{
+    return reallocI(foldptr, newlen);
 }
 
 __attribute__((visibility("default"))) void free(void* fpointer)

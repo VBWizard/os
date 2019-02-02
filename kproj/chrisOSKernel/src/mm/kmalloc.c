@@ -113,7 +113,7 @@ void* kMalloc(size_t size)
     uint32_t cs=getCS()>>3;
     bool isKernel=(bootGdt[cs].access & 0x60)==0x0;
     
-    heapPtr* ptr;
+    heapPtr* ptr=NULL;
     //First find a page to place the memory pointer on
     ptr=findFreeMallocPointer();
     //Next get a memory address to point to and map the memory into the process
@@ -141,10 +141,10 @@ void* mallocI(uint32_t cr3, size_t size)
     printd(DEBUG_KMALLOC,"mallocI: Found process 0x%04X\n",p->task->taskNum);
     uint32_t phys=(uint32_t)allocPages(newSize);
     printd(DEBUG_KMALLOC,"mallocI: Allocated 0x%08X bytes @ 0x%08X\n",newSize,phys);
-    pagingMapPageCount(cr3,p->heapEnd,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    pagingMapPageCount(cr3, p->heapEnd, phys, newSize/PAGE_SIZE, 0x7, true); //CLR 02/25/2017 - changed map page to map page count
     //Map into kernel, both phys to phys, and virtual to phys
-    pagingMapPageCount(KERNEL_CR3,phys,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
-    pagingMapPageCount(KERNEL_CR3,p->heapEnd,phys,newSize/PAGE_SIZE,0x7); //CLR 02/25/2017 - changed map page to map page count
+    pagingMapPageCount(KERNEL_CR3, phys, phys, newSize/PAGE_SIZE, 0x7, true); //CLR 02/25/2017 - changed map page to map page count
+    pagingMapPageCount(KERNEL_CR3, p->heapEnd, phys, newSize/PAGE_SIZE, 0x7, true); //CLR 02/25/2017 - changed map page to map page count
     retVal=p->heapEnd;
     p->heapEnd+=newSize;
     printd(DEBUG_KMALLOC,"mallocI: returning 0x%08X\n",retVal);

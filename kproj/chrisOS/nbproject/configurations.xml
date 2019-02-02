@@ -122,6 +122,7 @@
       <itemPath>src/strings/strncpy.c</itemPath>
       <itemPath>src/strings/stroul.c</itemPath>
       <itemPath>src/strings/strparts.c</itemPath>
+      <itemPath>src/strings/strstr.c</itemPath>
       <itemPath>src/strings/strtol.c</itemPath>
       <itemPath>src/strings/strtrim.c</itemPath>
       <itemPath>src/time.c</itemPath>
@@ -415,6 +416,8 @@
       <item path="src/strings/stroul.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strparts.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strstr.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -720,6 +723,8 @@
       </item>
       <item path="src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/strings/strstr.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
@@ -1024,6 +1029,8 @@
       <item path="src/strings/stroul.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strparts.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strings/strstr.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>

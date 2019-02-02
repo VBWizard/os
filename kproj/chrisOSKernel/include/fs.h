@@ -28,7 +28,10 @@ extern "C" {
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
-
+#define EOF (-1)
+    
+#define FS_BUFFERSIZE 1048576
+    
 #define DENTRY_ROOT 0xFFFFFFFF    
 
     typedef enum
@@ -36,6 +39,12 @@ extern "C" {
         LIST_DIRECTORY,
         LIST_FILE
     } eListType;
+    
+    typedef enum
+    {
+        FILETYPE_FILE,
+        FILETYPE_PIPE
+    } eFileType;
     
     typedef struct file file_t;
     typedef struct directory directory_t;
@@ -47,7 +56,7 @@ extern "C" {
     typedef struct file_operations file_operations_t;
     typedef struct vfsmount vfs_mount_t;
     typedef struct inode_operations inode_operations_t;
-    typedef struct file_system file_system_t;
+    typedef struct file_system filesystem_t;
     typedef struct inode inode_t;
     
     struct super_block
@@ -94,17 +103,21 @@ extern "C" {
     
     struct file
     {
+        eFileType filetype;
         char* f_path;
         inode_t* f_inode;
         fileops_t* fops;
         void* handle;
+        void *pipe, *buffer, **bufferPtr;
+        uint32_t verification;
+        void *owner;
     };
 
     struct file_operations
     {
         
         //file_t* (*open) (char *filename, const char *mode);
-        void* (*open) (char *filename, const char *mode); //using this temporarily for fat fs
+        void* (*open) (void *file, const char *mode); //using this temporarily for fat fs
         //int (*close) (file_t *);
         void (*close) (void *); //using this temporarily for fat fs
         //int (*seek) (file_t *, long offset, int whence);
@@ -117,7 +130,7 @@ extern "C" {
 
     struct dir_operations
     {
-        void* (*open) (const char* path);
+        void* (*open) (const char* path, void* dir);
         int (*read) (void *dir, dirent_t *entry);
         int (*close) (void *dir);
     };
@@ -132,16 +145,16 @@ extern "C" {
     
     struct direntry
     {
-    char                      filename[256];
-    uint8_t                   is_dir;
-    uint32_t                  cluster;
-    uint32_t                  size;
-    uint16_t                  access_date;
-    uint16_t                  write_time;
-    uint16_t                  write_date;
-    uint16_t                  create_date;
-    uint16_t                  create_time;
-    };
+        char                      filename[260];
+        uint8_t                   is_dir;
+        uint32_t                  cluster;
+        uint32_t                  size;
+        uint16_t                  access_date;
+        uint16_t                  write_time;
+        uint16_t                  write_date;
+        uint16_t                  create_date;
+        uint16_t                  create_time;
+    } __attribute((packed));
 
     struct file_system
     {
@@ -155,9 +168,10 @@ extern "C" {
     };
     
     
-    file_system_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops);
+    filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const dirops_t * dops);
     void* fs_open(char* path, const char* mode);
     int fs_read(process_t* process, void* file, void * buffer, int size, int length);
+    int fs_write(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);
     void fs_close(void* file);
     int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);

@@ -6,6 +6,7 @@
 .extern isrSavedCS, isrSavedEIP, isrSavedErrorCode, isrSavedEAX, isrSavedEBX, isrSavedECX, isrSavedEDX, isrSavedESI, isrSavedEDI, isrSavedEBP, isrSavedCR0, isrSavedCR1, isrSavedCR4, isrSavedDS, isrSavedES, isrSavedFS, isrSavedGS, isrSavedSS, isrSavedNumber, isrSavedCR2, isrSavedESP, isrSavedFlags, isrSavedStack
 .extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, isrSavedTR
 .extern kIRQ0_handler
+.extern kIRQ8_handler
 .extern _sysCall
 .extern _schedule
 .extern schedulerTaskSwitched
@@ -16,7 +17,6 @@
 .extern kKernelCR3
 .extern kKeyboardHandlerRoutine
 .extern call defaultISRHandler
-.extern forkReturn
 .extern schedStack
 .extern _schedule
 .extern schedulerTriggered
@@ -26,7 +26,7 @@
 .globl pagingExceptionHandler
 .type pagingExceptionHandler, @function
 pagingExceptionHandler:
-    cli
+    cli #NOTE: don't need to STI later as jumping back to the tss that caused the exception will set/clear the if
     mov ebp, esp
     #Increment the paging exception count
     mov eax,kPagingExceptionCount
@@ -39,14 +39,17 @@ pagingExceptionHandler:
     mov eax,cr2
     push eax
     call kPagingExceptionHandlerNew
+    #For fatals the paging handler will have set the victimTask's return address already for the IRET
+    #For non-fatals, the IRET will jump back into the task that triggered the exception
+    #either way we don't need to do anything before IRETing except reset the stack and enable interrupts
     mov esp, ebp
-    sti
     iret
-    jmp pagingExceptionHandler #Next paging exception the handler will start here if last one was not a SEGV
+    jmp pagingExceptionHandler #Next paging exception the handler will start here so jump back to the beginning of the handler
 
 .globl alltraps
 .type alltraps, @function
 alltraps:
+cli
     #NOTE: CLI not necessary, Interrupt Gate
     push eax
     push ebx
@@ -113,6 +116,7 @@ getExceptionDetailsWithError:
      movzx ebx,bx
      mov isrSavedErrorCode, bx
 saveTheStack:
+jmp overSaveTheStack
     mov eax,isrNumber
     cmp eax,0x20                
     jge overSaveTheStack        #CLR 03/26/2017: Changed (je to jge) to skip stack capture for 0x20 (IRQ0) & 0x21 (KBD) (not sure what else)
@@ -209,20 +213,35 @@ notSysCallHandler:
     cmp eax,0
     je  kbdError
     call eax
-    mov al,0x20
-    out 0x20,al
-    jmp noIRQResponseRequired
+    jmp ckeckForIRQResponse
 kbdError:
     jmp kbdError
 notKbdHandler:
+    cmp eax,0x28
+    jne notRTCHandler
+    #IRQ 8 RTC interrupt detected
+    call kIRQ8_handler
+    #Have to retrieve register C from the CMOS every time we service an IRQ8 RTC interrupt
+    mov al,0x0c
+    out 0x70,al
+    in al, 0x71
+    mov al,0x20
+    out 0xa0, al
+    out 0x20, al
+    jmp ckeckForIRQResponse
+notRTCHandler:
     call defaultISRHandler
 ckeckForIRQResponse:
     mov eax,isrNumber
     cmp eax,0x20                    #If this is the IRQ0 exception, respond to the PIC
+    je irqResponseRequired
+    cmp eax, 21
     jne noIRQResponseRequired
+irqResponseRequired:
     mov al,0x20
     out 0x20,al
 noIRQResponseRequired:
+cli
     popad                           # restoring the regs - only EBX and ESP modified after this point
     #dont' need to release vector parameters because we did when we saved the ESP
     #add esp,8                   #release the vector parameters from the stack

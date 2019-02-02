@@ -12,6 +12,7 @@
             <sourceRootList>
                 <sourceRootElem>../chrisOS/src/fat</sourceRootElem>
                 <sourceRootElem>../chrisOS/src/strings</sourceRootElem>
+                <sourceRootElem>src/fat</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

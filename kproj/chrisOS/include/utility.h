@@ -32,7 +32,7 @@ struct cpuinfo_t
 };
 typedef struct sizeof_type
 {
-    word shortSize, intSize, longSize, longLongSize, longLongIntSize;
+    uint16_t shortSize, intSize, longSize, longLongSize, longLongIntSize;
 } sizeof_t;
 
 void reverse(char s[]);

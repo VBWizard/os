@@ -13,6 +13,7 @@ int _daylight=1;                  // Non-zero if daylight savings time is used
 long _dstbias=0;                  // Offset for Daylight Saving Time
 char *_tzname[2] = {"GMT", "GMT"};  // Standard/daylight savings time zone names
 int ticksToWait;
+struct tm tmbuf;
 
 const int _ytab[2][12] = {
   {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
@@ -63,9 +64,8 @@ VISIBLE struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf)
 
 VISIBLE struct tm *localtime(const time_t *timer) {
   time_t t;
-  struct tm tmbuf;
-  
-  t = *timer - libcTZ;
+ 
+  t = *timer + (libcTZ*60*60);
   return gmtime_r(&t, &tmbuf);
 }
 
@@ -197,4 +197,11 @@ VISIBLE struct tm* gettime(struct tm *time, bool localTime)
         return localtime_rI(&ticks,time);
     else
         return gmtime_rI((time_t*)&ticks,time);
+}
+
+VISIBLE time_t time (time_t *result)
+{
+    uint32_t ticks = do_syscall0(SYSCALL_GETTIME);
+    memcpyI(result, &ticks, 4);
+    return ticks;
 }

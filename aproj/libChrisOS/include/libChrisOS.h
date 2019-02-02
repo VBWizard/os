@@ -24,16 +24,22 @@ extern "C" {
 #include "strings.h"
 #include "environment.h"
 #include "input.h"
-#include "config.h"
 #include "time.h"
 #include "file.h"
+#include "pipe.h"
+#include "libcmmap.h"
 #include "../../../kproj/chrisOSKernel/include/syscalls.h"
+#include "console.h"
     
 #include <bits/time.h>
 #ifndef NULL
 #define NULL ((void *) 0)
 #endif
 
+#define STDIN 0
+#define STDOUT 1
+#define STDERR 2
+#define MAXPARAMLEN 255
 #define VISIBLE __attribute__((visibility("default")))
 #define SYSCALL0(a,b) {asm("call sysEnter_Vector\n":"=a" (b):"a" (a), "b" (0), "c" (0), "d" (0), "S" (0));}
 #define SYSCALL1(a,b,c) {asm("call sysEnter_Vector\n":"=a" (c):"a" (a), "b" (b), "c" (0), "d" (0), "S" (0));}
@@ -49,24 +55,32 @@ extern "C" {
     int do_syscall2(int callnum, uint32_t param1, uint32_t param2);
     int do_syscall3(int callnum, uint32_t param1, uint32_t param2, uint32_t param3);
     int do_syscall4(int callnum, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4);
+    char** cmdlineToArgv(char* cmdline, int *argc);
     int print(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
+    int printf(const char *format, ...);
+    int printfI(const char *format, ...);
     int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
     unsigned int VISIBLE sleep (unsigned int __seconds);
     void stop();
     void modifySignal(int signal, void* sigHandler, int sigData);
     void libc_cleanup(void);
-    int exec(char* path);
+    int exec(char* path, int argc, char** argv);
     int execa(char* path, int argc, char** argv);
+    int execb(char* path);
     int waitpid(uint32_t pid);
     void *memset(void *d1, int val, size_t len);
     void *memsetI(void *d1, int val, size_t len);
     void * memcpy(void *dest, const void *src, size_t n);
+    void *memcpyI(void *dest, const void *src, size_t n);
     struct tm* gettime(struct tm *time, bool localTime);
     char* getcwd(char* buf, size_t size);
     bool strisnum(char* str);
-
+    int fork();
+    size_t split(char *buffer, char *argv[], size_t argv_size);
+    void exit (int status);
     char** processEnvp;
+    int test();
     
 #ifdef __cplusplus
 }

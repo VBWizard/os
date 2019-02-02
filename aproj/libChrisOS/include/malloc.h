@@ -52,12 +52,13 @@ extern "C" {
 uint32_t heapBase;    
 uint32_t heapCurr;
 uint32_t heapEnd;
-uint32_t libcTZ;
+long libcTZ;
 
 void initmalloc();
 void* malloc(size_t size);
 void*  mallocI(size_t size);
 void malloc_cleanup();
+void* reallocI(void *foldptr, uint32_t newlen);
 void free(void* fpointer);
 void freeI(void* fpointer);
 #ifdef __cplusplus

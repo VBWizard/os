@@ -262,8 +262,10 @@ char *_strtime(char *s) {
 void __attribute__((noinline))waitTicks(int TicksToWait)
 {
     //printf("ttw=%u",ttw);
-    if (TicksToWait==0)
+    if (TicksToWait<=0)
         return;
+    if (ticksToWait>5000)
+        printd(DEBUG_EXCEPTIONS,"waitTicks: Excessive ticks value %u\n",TicksToWait);
     //printd(DEBUG_TIMER,"ttw=%08X", TicksToWait);
     do
     {

@@ -2,34 +2,34 @@
 <configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="fat" displayName="fat" projectFiles="true">
-      <itemPath>../chrisOS/src/fat/API.txt</itemPath>
-      <itemPath>../chrisOS/src/fat/COPYRIGHT.txt</itemPath>
-      <itemPath>../chrisOS/src/fat/Configuration.txt</itemPath>
-      <itemPath>../chrisOS/src/fat/History.txt</itemPath>
-      <itemPath>../chrisOS/src/fat/License.txt</itemPath>
-      <itemPath>../chrisOS/src/fat/Media Access API.txt</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_access.c</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_access.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_cache.c</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_cache.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_defs.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_filelib.c</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_filelib.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_format.c</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_format.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_list.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_misc.c</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_misc.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_opts.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_string.c</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_string.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_table.c</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_table.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_types.h</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_write.c</itemPath>
-      <itemPath>../chrisOS/src/fat/fat_write.h</itemPath>
-      <itemPath>../chrisOS/src/fat/taskSwitch.s</itemPath>
-      <itemPath>../chrisOS/src/fat/version.txt</itemPath>
+      <itemPath>src/fat/API.txt</itemPath>
+      <itemPath>src/fat/COPYRIGHT.txt</itemPath>
+      <itemPath>src/fat/Configuration.txt</itemPath>
+      <itemPath>src/fat/History.txt</itemPath>
+      <itemPath>src/fat/License.txt</itemPath>
+      <itemPath>src/fat/Media Access API.txt</itemPath>
+      <itemPath>src/fat/fat_access.c</itemPath>
+      <itemPath>src/fat/fat_access.h</itemPath>
+      <itemPath>src/fat/fat_cache.c</itemPath>
+      <itemPath>src/fat/fat_cache.h</itemPath>
+      <itemPath>src/fat/fat_defs.h</itemPath>
+      <itemPath>src/fat/fat_filelib.c</itemPath>
+      <itemPath>src/fat/fat_filelib.h</itemPath>
+      <itemPath>src/fat/fat_format.c</itemPath>
+      <itemPath>src/fat/fat_format.h</itemPath>
+      <itemPath>src/fat/fat_list.h</itemPath>
+      <itemPath>src/fat/fat_misc.c</itemPath>
+      <itemPath>src/fat/fat_misc.h</itemPath>
+      <itemPath>src/fat/fat_opts.h</itemPath>
+      <itemPath>src/fat/fat_string.c</itemPath>
+      <itemPath>src/fat/fat_string.h</itemPath>
+      <itemPath>src/fat/fat_table.c</itemPath>
+      <itemPath>src/fat/fat_table.h</itemPath>
+      <itemPath>src/fat/fat_types.h</itemPath>
+      <itemPath>src/fat/fat_write.c</itemPath>
+      <itemPath>src/fat/fat_write.h</itemPath>
+      <itemPath>src/fat/taskSwitch.s</itemPath>
+      <itemPath>src/fat/version.txt</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -57,6 +57,7 @@
       <itemPath>include/mmap.h</itemPath>
       <itemPath>include/paging.h</itemPath>
       <itemPath>../../chrisOS/include/pci/pci.h</itemPath>
+      <itemPath>include/filesystem/pipe.h</itemPath>
       <itemPath>include/process.h</itemPath>
       <itemPath>include/rusage.h</itemPath>
       <itemPath>include/schedule.h</itemPath>
@@ -65,9 +66,12 @@
       <itemPath>include/syscalls.h</itemPath>
       <itemPath>include/sysloader.h</itemPath>
       <itemPath>include/task.h</itemPath>
+      <itemPath>include/devices/termdrv.h</itemPath>
       <itemPath>include/thesignals.h</itemPath>
       <itemPath>../../chrisOS/include/time_os.h</itemPath>
       <itemPath>include/tss.h</itemPath>
+      <itemPath>include/tty_device.h</itemPath>
+      <itemPath>include/drivers/tty_driver.h</itemPath>
       <itemPath>/home/yogi/src/os/chrisOSKernel/include/x86idt.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -86,6 +90,7 @@
         <itemPath>../chrisOS/src/strings/strncpy.c</itemPath>
         <itemPath>../chrisOS/src/strings/stroul.c</itemPath>
         <itemPath>../chrisOS/src/strings/strparts.c</itemPath>
+        <itemPath>../chrisOS/src/strings/strstr.c</itemPath>
         <itemPath>../chrisOS/src/strings/strtol.c</itemPath>
         <itemPath>../chrisOS/src/strings/strtrim.c</itemPath>
       </logicalFolder>
@@ -100,7 +105,6 @@
       <itemPath>src/dllist.c</itemPath>
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
       <itemPath>src/exceptions.c</itemPath>
-      <itemPath>src/fs.c</itemPath>
       <itemPath>../chrisOS/src/cpu/gdt.c</itemPath>
       <itemPath>../chrisOS/src/iodugging.c</itemPath>
       <itemPath>src/kIRQHandlers.c</itemPath>
@@ -117,9 +121,11 @@
       <itemPath>src/paging.c</itemPath>
       <itemPath>../chrisOS/src/panic.c</itemPath>
       <itemPath>../chrisOS/src/block/pci.c</itemPath>
+      <itemPath>src/filesystem/pipe.c</itemPath>
       <itemPath>../chrisOS/src/printf.c</itemPath>
       <itemPath>src/printfNew.c</itemPath>
       <itemPath>src/process.c</itemPath>
+      <itemPath>src/filesystem/procfs.c</itemPath>
       <itemPath>src/schedule.c</itemPath>
       <itemPath>src/schedule_old.c</itemPath>
       <itemPath>src/signals.c</itemPath>
@@ -127,8 +133,11 @@
       <itemPath>src/syscall.c</itemPath>
       <itemPath>src/sysloader.c</itemPath>
       <itemPath>src/task.c</itemPath>
+      <itemPath>src/drivers/terminal/termdrv.c</itemPath>
       <itemPath>../chrisOS/src/time.c</itemPath>
+      <itemPath>src/drivers/terminal/tty_driver.c</itemPath>
       <itemPath>../chrisOS/src/init/utility.c</itemPath>
+      <itemPath>src/vfs.c</itemPath>
       <itemPath>src/x86.s</itemPath>
       <itemPath>src/x86idt.c</itemPath>
     </logicalFolder>
@@ -147,6 +156,7 @@
   <sourceRootList>
     <Elem>../chrisOS/src/fat</Elem>
     <Elem>../chrisOS/src/strings</Elem>
+    <Elem>src/fat</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -165,6 +175,9 @@
             <pElem>../chrisOS/include</pElem>
           </incDir>
           <commandLine>-ffreestanding -masm=intel</commandLine>
+          <preprocessorList>
+            <Elem>KERNEL_LOADED</Elem>
+          </preprocessorList>
         </cTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kernel</output>
@@ -172,7 +185,7 @@
             <pElem>/usr/local/lib</pElem>
             <pElem>/home/yogi/opt/cross/lib</pElem>
           </linkerAddLib>
-          <commandLine>-T linker.ld -ffreestanding -nostdlib -lgcc</commandLine>
+          <commandLine>-T linker.ld -ffreestanding -nostdlib</commandLine>
         </linkerTool>
       </compileType>
       <item path="../../chrisOS/include/ahci.h" ex="false" tool="3" flavor2="0">
@@ -224,68 +237,6 @@
       </item>
       <item path="../chrisOS/src/cpu/msr.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/fat/API.txt" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/COPYRIGHT.txt" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/Configuration.txt"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/History.txt" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/License.txt" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/Media Access API.txt"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_access.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_access.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_cache.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_cache.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_defs.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_filelib.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_filelib.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_format.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_format.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_list.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_misc.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_misc.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_opts.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_string.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_string.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_table.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_table.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_types.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_write.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_write.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/taskSwitch.s" ex="false" tool="4" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/version.txt" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="../chrisOS/src/init/ata_disk.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
@@ -314,6 +265,8 @@
       </item>
       <item path="../chrisOS/src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="../chrisOS/src/strings/strstr.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../chrisOS/src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
@@ -334,11 +287,17 @@
       </item>
       <item path="include/device.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/devices/termdrv.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/dllist.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/drivers/tty_driver.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/errors.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -376,6 +335,8 @@
       </item>
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/tty_device.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="kbd.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/_scheduler.s" ex="false" tool="4" flavor2="0">
@@ -386,9 +347,71 @@
       </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/drivers/terminal/termdrv.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/drivers/terminal/tty_driver.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/fs.c" ex="false" tool="0" flavor2="0">
+      <item path="src/fat/API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/COPYRIGHT.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/Configuration.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/History.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/License.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/Media Access API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_access.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_access.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_cache.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_cache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_defs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_filelib.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_filelib.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_format.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_format.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_list.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_misc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_opts.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_string.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_string.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_table.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_table.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_write.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_write.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/taskSwitch.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/filesystem/procfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -423,6 +446,8 @@
       <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/task.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/vfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/x86.s" ex="false" tool="4" flavor2="0">
       </item>
@@ -511,68 +536,6 @@
       </item>
       <item path="../chrisOS/src/cpu/msr.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/fat/API.txt" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/COPYRIGHT.txt" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/Configuration.txt"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/History.txt" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/License.txt" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/Media Access API.txt"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_access.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_access.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_cache.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_cache.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_defs.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_filelib.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_filelib.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_format.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_format.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_list.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_misc.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_misc.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_opts.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_string.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_string.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_table.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_table.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_types.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_write.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/fat_write.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/taskSwitch.s" ex="false" tool="4" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/fat/version.txt" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="../chrisOS/src/init/ata_disk.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
@@ -603,6 +566,8 @@
       </item>
       <item path="../chrisOS/src/strings/strparts.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="../chrisOS/src/strings/strstr.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../chrisOS/src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
@@ -623,11 +588,17 @@
       </item>
       <item path="include/device.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/devices/termdrv.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/dllist.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/drivers/tty_driver.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/drv_genKeyboard.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/errors.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -665,6 +636,8 @@
       </item>
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/tty_device.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="kbd.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/_scheduler.s" ex="false" tool="4" flavor2="0">
@@ -675,9 +648,71 @@
       </item>
       <item path="src/drivers/drv_genKeyboard.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/drivers/terminal/termdrv.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/drivers/terminal/tty_driver.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/exceptions.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/fs.c" ex="false" tool="0" flavor2="0">
+      <item path="src/fat/API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/COPYRIGHT.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/Configuration.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/History.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/License.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/Media Access API.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_access.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_access.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_cache.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_cache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_defs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_filelib.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_filelib.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_format.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_format.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_list.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_misc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_opts.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_string.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_string.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_table.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_table.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/fat_write.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/fat/fat_write.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fat/taskSwitch.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/filesystem/procfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/kIRQHandlers.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -712,6 +747,8 @@
       <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/task.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/vfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/x86.s" ex="false" tool="4" flavor2="0">
       </item>

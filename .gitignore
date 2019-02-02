@@ -64,3 +64,18 @@ gdb_history
 
 /aproj/sleep/build/
 /aproj/sleep/dist/
+/aproj/libChrisOS/build/
+/kproj/chrisOSKernel/build/
+/kproj/chrisOS/build/
+/aproj/kshell/build/
+/aproj/testMainProgramEntry/build/
+/aproj/testMMap/build/
+/aproj/time/build/
+/aproj/cat/build/
+/aproj/cat/dist/
+/aproj/echo/build/
+/aproj/echo/dist/
+/aproj/clock/build/
+/aproj/clock/dist/
+/aproj/ls/build/
+/aproj/ls/dist/
