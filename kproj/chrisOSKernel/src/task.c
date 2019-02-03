@@ -58,6 +58,7 @@ void freeTask(uint32_t taskNum)
     //TODO: Once we need more than MAXTASKS, we'll have to start resetting tasks once no longer used
     //already did this once, but when opening a 2nd kshell, exiting it and starting another, the 2nd one reused
     //task 0x0023, but some wierdness started happening in the CoW malloc page replacement
+    //TODO: 02/03/2019: Make this work!
     //bitsSet(ptr,(taskNum%32));
 }
 
@@ -272,8 +273,6 @@ task_t* createTask(void* process, bool kernelTSS)
         panic("Sysmap error!");
 
         task->tss->ESP=((process_t*)task->process)->stackStart;
-        ((process_t*)task->process)->stackStart=task->tss->ESP;
-        ((process_t*)task->process)->stackSize=0x24000;
         printd(DEBUG_TASK,"createTask: ESP for task allocated at 0x%08x\n",task->tss->ESP);
         task->tss->ESP+=0x23400;
     }

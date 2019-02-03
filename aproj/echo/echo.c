@@ -89,10 +89,10 @@ int main(int argc, char** argv, char** envp) {
         
     }
     strtrim(outString5);
-    printf("%s", outString5);
+    printf("%s\n", outString5);
     free(outString);
     free(outString);
-    if (processEscapes);
+    if (processEscapes)
     {
         free(outString2);
         free(outString3);

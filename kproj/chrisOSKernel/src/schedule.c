@@ -12,15 +12,19 @@
 #define SCHEDULER_DEBUG 1
 #define MAX_TASKS 1000
 
-extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t* kTicksSinceStart;
 extern bool schedulerTaskSwitched;
 extern task_t* kKernelTask;
 extern task_t* kIdleTask;
 extern sGDT* bootGdt;
+extern bool signalCheckEnabled;
+
+extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t kCPUCyclesPerSecond;
 extern uint32_t sigProcAddress, sigProcCR3; //_scheduler.s
 extern void _sigJumpPoint();
+
+void triggerScheduler();
 
 task_t *kTaskList;
 uintptr_t *qZombie;
@@ -468,7 +472,7 @@ void taskYield()
 void triggerScheduler()
 {
     printd(DEBUG_PROCESS,"triggerScheduler: triggering scheduler\n");
-     nextScheduleTicks=*kTicksSinceStart-1;
+     nextScheduleTicks=*kTicksSinceStart+1; //delay schedule by 1 tick to get the caller a chance to STI
 }
 
 void enableScheduler()
@@ -669,12 +673,11 @@ void runAnotherTask(bool schedulerRequested)
 void scheduler()
 {
     uint64_t ticksBefore=rdtsc();
-    
+    signalCheckEnabled = false;
     //NOTE: When this method is entered, it is time to reschedule.  The check for whether it is time is in kIRQ0_handler()
     runAnotherTask(true);
     kSchedulerCallCount++;
-    
-
+    signalCheckEnabled = true;
     uint64_t ticksAfter=rdtsc();
     
 #ifdef SCHEDULER_DEBUG
@@ -700,11 +703,12 @@ int32_t getExitCode(uint32_t taskNum)
         task=(task_t*)*q;
         if (task->taskNum!=0)
         {
-            printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04X\n", task->taskNum);
+            //printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04X\n", task->taskNum);
             if (task->taskNum == taskNum)
             {
+                uint32_t retVal = ((process_t*)task->process)->retVal;
                 freeTask(taskNum);
-                return ((process_t*)task->process)->retVal;
+                return retVal;
             }
         }
         q++;

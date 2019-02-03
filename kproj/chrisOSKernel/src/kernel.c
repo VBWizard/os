@@ -33,6 +33,7 @@
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
 extern bool schedulerEnabled;
+extern bool signalCheckEnabled;
 bool schedulerTaskSwitched=0;
 extern uint32_t* isrSavedStack; 
 extern uint32_t kNextSignalCheckTicks;
@@ -133,6 +134,7 @@ int main(int argc, char** argv)  {
     printk("KSHELL LOADED!!!");
 //    waitTicks(3);
     schedulerEnabled=true;
+    signalCheckEnabled=true;
     sys_sigaction(SIGUSLEEP,0,initialShellProcess->task->taskNum, kKernelProcess);
 /*#define pcount 3
     char* param1[pcount][10];

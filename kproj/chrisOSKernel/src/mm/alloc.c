@@ -47,22 +47,48 @@ sMemInfo* findBlockByMemoryAddress(uintptr_t* address)
 //Returns a block with enough memory to fulfill the request
 sMemInfo* findAvailableBlockBySize(uint32_t pSize)
 {
+    //The first sMemInfo is the one with all of the available space, but we want to first see if there is another block that was previously
+    //allocated, which has space to fulfill this request.
+    //So we will skip the first sMemInfo when others are available, and only come back to use it if no other is found
     sMemInfo* mInfo=heapMemoryInfo;
-    
-    do
+
+    //Skip the master block
+    if (mInfo->next)
     {
-        //Found an mInfo bigger than the required size, so return it
-        //a later call to allocateFromBlock will break off a piece of memory big enough to fulfill the request
-        //and make a new sMemInfo for the remaining memory
-        if (mInfo->size >= pSize)
+        mInfo=mInfo->next;
+        do
         {
-            printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Returning block address 0x%08X\n",mInfo);
-            return mInfo;
-        }
-        mInfo++;
-    } 
+            //Found an mInfo bigger than or equal to the required size, and it isn't in use, so return it
+            //a later call to allocateFromBlock will break off a piece of memory big enough to fulfill the request if necessary
+            //and make a new sMemInfo for the remaining memory
+            if (!mInfo->inUse)
+                if (mInfo->size >= pSize)
+                {
+                    if (mInfo->address==0x00000fa0)
+                    {
+                        dumpAllHeapPointers();
+                        int a = 0;
+                        a+=1-1;
+                    }
+                    printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Reusing previously allocated block at address 0x%08x, size =  0x%08x (zeroed)\n",mInfo->address, mInfo->size);
+                    pagingMapPageCount(KERNEL_CR3, 
+                            mInfo->address, 
+                            mInfo->address, 
+                            pSize%PAGE_SIZE==0?pSize/PAGE_SIZE: (pSize/PAGE_SIZE)+1, 0x7, true);
+                    memset((uintptr_t*)mInfo->address, 0, pSize);
+                    return mInfo;
+                }
+            mInfo++;
+        } 
     while (mInfo->next);
-    panic("findAvailableBlockBySize: Iterated all of the memory blocks and couldn't find one with enough space to use!\n");
+    }
+    //Instead of panicking like we used to do we'll first check to see if the first (big) sMemInfo has space to fulfill the requests
+    if (heapMemoryInfo->size > pSize)
+    {
+        printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Returning the address of the master block at address 0x%08X\n",heapMemoryInfo);
+        return heapMemoryInfo;
+    }
+    panic("findAvailableBlockBySize: Memory appears to be exhausted.  Iterated all of the memory blocks and couldn't find one with enough space to use!\n");
 }
 
 //Create a new block with the requested amount of memory, and adjust the old block's size and pointer appropriately
@@ -98,12 +124,22 @@ void* allocPages(uint32_t size)
         printd(DEBUG_MEMORY_MANAGEMENT,"allocPages: Size adjusted from %u to %u\n",size,newSize);
     }
     uintptr_t* lRetVal;
+    //CLR 2/2/2019: TODO: Remove me.  Temporary code to find other code requesting 0 bytes of memory
+    if (size==0)
+    {
+        printd(DEBUG_EXCEPTIONS, "allocPages: Request for 0 bytes of memory, nothing to see here, move on\n");
+        return NULL;
+    }
+    printd(DEBUG_MEMORY_MANAGEMENT, "allocPages: Request for %u bytes of memory (adjusted to %u).  Finding an available sMemInfo block\n", size, newSize);
     sMemInfo* block=findAvailableBlockBySize(newSize);
-    block->inUse=true;
+    //CLR 02/02/2019: Removed block->inUse=true ... was setting the base block to inuse
     if ( block->size > newSize)
        lRetVal=allocateBlockFrom(block,newSize);
     else
+    {
         lRetVal=block->address;
+        block->inUse=true;
+    }
     return lRetVal;
 }
 
@@ -147,14 +183,22 @@ void* allocPagesAndMap(uint32_t size)
     return allocPagesAndMapI(CURRENT_CR3, size);
 }
 
-void freeA(void* address)
+void freeI(void* address)
 {
     sMemInfo* mInfo = findBlockByMemoryAddress(address);
     if (mInfo!=NULL)
-    {
-        mInfo->inUse=false;
-        printd(DEBUG_MEMORY_MANAGEMENT,"Freed block 0x%08x for memory address 0x%08x\n",mInfo,address);
-    }
+        if (mInfo->inUse)
+        {
+            //Clear everything except address and size because this is still a valid sMemInfo, and we can't give the memory
+            //back to the master block (although we might merge free blocks back into master later
+            mInfo->inUse=false;
+            mInfo->cr3 = 0;
+            mInfo->pid = 0;
+            printd(DEBUG_MEMORY_MANAGEMENT,"Freed block 0x%08x for memory address 0x%08x\n",mInfo,address);
+        }
+        else
+            printd(DEBUG_MEMORY_MANAGEMENT,"Block 0x%08x for memory address 0x%08 already freed, doing nothing\n",mInfo,address);
+            
     else
         printd(DEBUG_MEMORY_MANAGEMENT,"free: Could not find memory block for 0x%08X to free, doing nothing\n",address);
 }

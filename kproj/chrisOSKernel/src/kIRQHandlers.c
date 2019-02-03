@@ -13,11 +13,12 @@
 
 extern uint32_t nextScheduleTicks;
 extern void processSignals();
+extern bool schedulerEnabled;
+extern terminfo_t *sysConsole;
 uint32_t kNextSignalCheckTicks=0;
 bool schedulerTriggered=false;
 bool signalCheckTriggered=false;
-extern bool schedulerEnabled;
-extern terminfo_t *sysConsole;
+bool signalCheckEnabled=false;
 
 void kIRQ0_handler()
 {
@@ -34,7 +35,7 @@ static struct tm theDateTime;
             printd(DEBUG_PROCESS,"kIRQ0_Handler: triggering scheduler\n");
             schedulerTriggered=true;
         }
-        if (*kTicksSinceStart>kNextSignalCheckTicks)
+        if (*kTicksSinceStart>kNextSignalCheckTicks && signalCheckEnabled)
         {
             printd(DEBUG_SIGNALS,"\nProcessing signals\n");
             //signalCheckTriggered=true;

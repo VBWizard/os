@@ -47,8 +47,8 @@ int main(int argc, char** argv) {
 
     return 0;
     
-*/    printf("File mmap test commencing ...\n");
-    
+    printf("File mmap test commencing ...\n");
+*/    
     direntry_t *dirbuff = malloc(16384);
     
     char *ptr=argv[1], *ptr2=argv[1];
@@ -90,7 +90,6 @@ int main(int argc, char** argv) {
         char test[filesize];
         strncpy(test,a,filesize);
         
-        a[1] = 0;
         write(1, a, filesize, 1);
         printf("\n");
         close(file);

@@ -144,6 +144,8 @@ notIRQ0Handler:
     hlt
 notGPF:
     cmp eax,0xe
+    je pagingHandler
+    cmp eax,0xd
     jne notPagingHandler
 
 pagingHandler:

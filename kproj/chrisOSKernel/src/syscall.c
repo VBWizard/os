@@ -41,8 +41,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     void* parentProcess;
     process_t* process;
     task_t* task;
-    char test[2][50];
-    char* testp[2];
+    char path[255];
     uint32_t param4;
     uint32_t processCR3;  //NOTE: Moved from module level to here because this needs to be a stack variable for fork()
     bool taskExited = false;
@@ -53,11 +52,11 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     __asm__("mov eax,esi\n": "=a" (param4));
     __asm__("mov eax,cr3\n": "=a" (processCR3));
     __asm__("cli\n");
-    printd(DEBUG_PROCESS, "_syscall: call for 0x%04x, CR3=0x%08x\n",callNum, processCR3);
+    printd(DEBUG_SYSCALL, "_syscall: call for 0x%04x, CR3=0x%08x\n",callNum, processCR3);
     switch (callNum)
     {
         case 0x0:       //***Invalid call #
-            printd(DEBUG_PROCESS,"_syscall: Called with CallNum=0x%08x, invalid call number. (cr3=0x%08x)\n",callNum,processCR3);
+            printd(DEBUG_SYSCALL,"_syscall: Called with CallNum=0x%08x, invalid call number. (cr3=0x%08x)\n",callNum,processCR3);
             retVal = processCR3;
             break;
         case SYSCALL_ENDPROCESS:       //***exit
@@ -149,14 +148,15 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_EXEC:
         case SYSCALL_EXECNEW:      //***exec: param1=program path
+            strcpy(path, param1);
             if (callNum == SYSCALL_EXEC)
                 useExisting = true;
             else
                 useExisting = false;
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             parentProcess=getCurrentProcess();
-            printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08x,0x%08x,0x%08x,%u)\n",param1,param2,param3,parentProcess, useExisting);
-            process = createProcess((char*)param1, param2, (char**)param3, parentProcess, false, useExisting);
+            printd(DEBUG_PROCESS,"_sysCall: createProcess(%s,0x%08x,0x%08x,0x%08x,%u)\n",path,param2,param3,parentProcess, useExisting);
+            process = createProcess((char*)param1, param2, param3, parentProcess, false, useExisting);
             if (process!=NULL)
             {
                 retVal=process->task->taskNum;
@@ -198,35 +198,43 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             processRegExit(getCurrentProcess(),(void*)param1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_FREE:     //***free - free system mory
-            //__asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            printd(DEBUG_PROCESS,"_syscall: free(0x%08x) called, NOT IMPLEMENTED (cr3=0x%08x)\n",param1,processCR3);
-            //__asm__("mov cr3,eax\n"::"a" (processCR3));
+        case SYSCALL_FREE:     //***free - free heap memory
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
+            //Need to get the physical memory address from the process' page mapping
+            uintptr_t physAddr = pagingGet4kPTEntryValueCR3(process->pageDirPtr, param1) & 0xFFFFF000;
+            if (!physAddr)
+                printd(DEBUG_SYSCALL,"_syscall: free(0x%08x): Couldn't find physical memory mapping in process %s (cr3=0x%08x)\n",param1, process->exename, processCR3);
+            else
+            {
+                freeI(physAddr);
+                printd(DEBUG_SYSCALL,"_syscall: free(0x%08x): Freed physical memory at 0x%08X for process %s (cr3=0x%08x)\n",param1, physAddr, process->exename, processCR3);
+            }
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_ALLOC:     //***mallocI - allocate system memory
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             retVal=(uint32_t)mallocI(processCR3,param1);
-            printd(DEBUG_PROCESS,"_syscall: malloc(0x%08x) returned 0x%08x (cr3=0x%08x)\n",param1,retVal,processCR3);
-            //printd(DEBUG_PROCESS,"_syscall: malloc returning 0x%08x\n",retVal);
+            printd(DEBUG_SYSCALL,"_syscall: malloc(0x%08x) returned 0x%08x (cr3=0x%08x)\n",param1,retVal,processCR3);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SLEEP:     //***sleep - sleep until kTicksSinceStart==param1
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
-            printd(DEBUG_PROCESS,"_syscall: sleep(0x%08x) called (cr3=0x%08x)\n",param1,processCR3);
+            printd(DEBUG_SYSCALL | DEBUG_PROCESS,"_syscall: sleep(0x%08x) called (cr3=0x%08x)\n",param1,processCR3);
             sys_sigaction(SIGSLEEP,0,param1, process);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SETSIGACTION:     //***setsigaction
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            printd(DEBUG_PROCESS,"_syscall: sys_setsigaction(0x%08x, 0x%08x, 0x%08x) called\n",param1,param2,param3);
+            printd(DEBUG_SYSCALL | DEBUG_SIGNALS,"_syscall: sys_setsigaction(0x%08x, 0x%08x, 0x%08x) called\n",param1,param2,param3);
             sys_setsigaction(param1,(uintptr_t*)param2,param3);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_STOP:     //******stop - put process in STOPPED queue
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
-            printd(DEBUG_PROCESS,"_syscall: Stop() called.\n");
+            printd(DEBUG_SYSCALL | DEBUG_PROCESS,"_syscall: Stop() called.\n");
             sys_sigaction(SIGSTOP,0,0, process);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;

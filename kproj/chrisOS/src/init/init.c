@@ -126,7 +126,7 @@ void HIGH_CODE_SECTION gdt_init()
     gdtEntryRM(3, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_WRITABLE,
               GDT_GRANULAR | GDT_32BIT);
 
-    kernelGDT.limit = 0x7ff; // (sizeof(sGDT) * GDT_ENTRIES) - 1;
+    kernelGDT.limit = 0xfff; // (sizeof(sGDT) * GDT_ENTRIES) - 1;
     kernelGDT.base = (unsigned int)INIT_GDT_TABLE_ADDRESS;
     rmGdtp.limit = (unsigned short)(sizeof(sGDT) * (GDT_TABLE_SIZE*8) - 1);
     rmGdtp.base = (unsigned int)rmGdt;
@@ -141,51 +141,54 @@ void HIGH_CODE_SECTION quietHardware()
 
 void doHDSetup()
 {
-    printk("ATA: Scanning for hard drives on primary bus ...\n");
-    ataScanForHarddrives();
     char* p1[512];
     memset(p1,0,512);
-    
-    *p1=kATADeviceInfo[0].ATADeviceModel;
-    printk("ATA: \tMaster: %s", kATADeviceInfo[0].ATADeviceAvailable==1?strtrim(p1):"none\n");
-    if (kATADeviceInfo[0].ATADeviceAvailable)
-    {
-        printk("\t%uMB (%ubps%s%s%s)\n", (kATADeviceInfo[0].totalSectorCount*kATADeviceInfo[0].sectorSize) / (1024*1024),
-                kATADeviceInfo[0].sectorSize,
-                kATADeviceInfo[0].lbaSupported?",LBA":"",
-                kATADeviceInfo[0].lba48Supported?",LBA48":"",
-                kATADeviceInfo[0].dmaSupported?",DMA":"");
-    }
-    *p1=kATADeviceInfo[1].ATADeviceModel;
-    printk("ATA: \tSlave:  %s", kATADeviceInfo[1].ATADeviceAvailable==1?strtrim(p1):"none\n");
-    if (kATADeviceInfo[1].ATADeviceAvailable)
-    {
-        printk("\t%uMB (%ubps %s%s%s)\n", (kATADeviceInfo[1].totalSectorCount*kATADeviceInfo[1].sectorSize) / (1024*1024),
-                kATADeviceInfo[1].sectorSize,
-                kATADeviceInfo[1].lbaSupported?",LBA":"",
-                kATADeviceInfo[1].lba48Supported?",LBA48":"",
-                kATADeviceInfo[1].dmaSupported?",DMA":"");
-    }
-    printk("ATA: Scanning for hard drives on secondary bus ...\n");
-    *p1=kATADeviceInfo[2].ATADeviceModel;
-    printk("ATA: \tMaster: %s", kATADeviceInfo[2].ATADeviceAvailable==1?strtrim(p1):"none\n");
-    if (kATADeviceInfo[2].ATADeviceAvailable)
-    {
-        printk("\t%uMB (%ubps%s%s%s)\n", (kATADeviceInfo[2].totalSectorCount*kATADeviceInfo[2].sectorSize) / (1024*1024),
-                kATADeviceInfo[2].sectorSize,
-                kATADeviceInfo[2].lbaSupported?",LBA":"",
-                kATADeviceInfo[2].lba48Supported?",LBA48":"",
-                kATADeviceInfo[2].dmaSupported?",DMA":"");
-    }
-    *p1=kATADeviceInfo[3].ATADeviceModel;
-    printk("ATA: \tSlave:  %s", kATADeviceInfo[3].ATADeviceAvailable==1?strtrim(p1):"none\n");
-    if (kATADeviceInfo[3].ATADeviceAvailable)
-    {
-        printk("\t%uMB (%ubps %s%s%s)\n", (kATADeviceInfo[3].totalSectorCount*kATADeviceInfo[3].sectorSize) / (1024*1024),
-                kATADeviceInfo[3].sectorSize,
-                kATADeviceInfo[3].lbaSupported?",LBA":"",
-                kATADeviceInfo[3].lba48Supported?",LBA48":"",
-                kATADeviceInfo[3].dmaSupported?",DMA":"");
+    if (ParamExists(kBootParams,"ata",kBootParamCount))
+   {
+	    printk("ATA: Scanning for hard drives on primary bus ...\n");
+	    ataScanForHarddrives();
+	    
+	    *p1=kATADeviceInfo[0].ATADeviceModel;
+	    printk("ATA: \tMaster: %s", kATADeviceInfo[0].ATADeviceAvailable==1?strtrim(p1):"none\n");
+	    if (kATADeviceInfo[0].ATADeviceAvailable)
+	    {
+		printk("\t%uMB (%ubps%s%s%s)\n", (kATADeviceInfo[0].totalSectorCount*kATADeviceInfo[0].sectorSize) / (1024*1024),
+		        kATADeviceInfo[0].sectorSize,
+		        kATADeviceInfo[0].lbaSupported?",LBA":"",
+		        kATADeviceInfo[0].lba48Supported?",LBA48":"",
+		        kATADeviceInfo[0].dmaSupported?",DMA":"");
+	    }
+	    *p1=kATADeviceInfo[1].ATADeviceModel;
+	    printk("ATA: \tSlave:  %s", kATADeviceInfo[1].ATADeviceAvailable==1?strtrim(p1):"none\n");
+	    if (kATADeviceInfo[1].ATADeviceAvailable)
+	    {
+		printk("\t%uMB (%ubps %s%s%s)\n", (kATADeviceInfo[1].totalSectorCount*kATADeviceInfo[1].sectorSize) / (1024*1024),
+		        kATADeviceInfo[1].sectorSize,
+		        kATADeviceInfo[1].lbaSupported?",LBA":"",
+		        kATADeviceInfo[1].lba48Supported?",LBA48":"",
+		        kATADeviceInfo[1].dmaSupported?",DMA":"");
+	    }
+	    printk("ATA: Scanning for hard drives on secondary bus ...\n");
+	    *p1=kATADeviceInfo[2].ATADeviceModel;
+	    printk("ATA: \tMaster: %s", kATADeviceInfo[2].ATADeviceAvailable==1?strtrim(p1):"none\n");
+	    if (kATADeviceInfo[2].ATADeviceAvailable)
+	    {
+		printk("\t%uMB (%ubps%s%s%s)\n", (kATADeviceInfo[2].totalSectorCount*kATADeviceInfo[2].sectorSize) / (1024*1024),
+		        kATADeviceInfo[2].sectorSize,
+		        kATADeviceInfo[2].lbaSupported?",LBA":"",
+		        kATADeviceInfo[2].lba48Supported?",LBA48":"",
+		        kATADeviceInfo[2].dmaSupported?",DMA":"");
+	    }
+	    *p1=kATADeviceInfo[3].ATADeviceModel;
+	    printk("ATA: \tSlave:  %s", kATADeviceInfo[3].ATADeviceAvailable==1?strtrim(p1):"none\n");
+	    if (kATADeviceInfo[3].ATADeviceAvailable)
+	    {
+		printk("\t%uMB (%ubps %s%s%s)\n", (kATADeviceInfo[3].totalSectorCount*kATADeviceInfo[3].sectorSize) / (1024*1024),
+		        kATADeviceInfo[3].sectorSize,
+		        kATADeviceInfo[3].lbaSupported?",LBA":"",
+		        kATADeviceInfo[3].lba48Supported?",LBA48":"",
+		        kATADeviceInfo[3].dmaSupported?",DMA":"");
+	    }
     }
     if (ParamExists(kBootParams,"noahci",kBootParamCount))
         printk("AHCI: No scanning per parameter 'noahci'\n");

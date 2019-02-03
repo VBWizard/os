@@ -230,7 +230,16 @@ void processExit()
         }
     //Can't save endTime here because we had to change VADDR to be read-only for ring 3
     //gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
-    
+    //TODO: Clean up list items before clearing the list
+/*    dllist_t *maplist = process->mmaps;
+    do
+    {
+        if (maplist->next==maplist)
+            maplist=NULL;
+        else
+            maplist=maplist->next;
+    } while (maplist!=NULL);
+  */  
      __asm__("call sysEnter_Vector\n"::"a" (SYSCALL_ENDPROCESS), "b" (process->pageDirPtr), "c" (lRetVal));
     //Free memory allocated to the process
      
@@ -343,8 +352,6 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     //TODO: If useExistingProcess, we should remove the text, data, tdata and bss mappings from the CR3 
     //since we're replacing those segments
     
-    printd(DEBUG_PROCESS,"Creating %s process for %s\n",isKernelProcess?"kernel":"user",path);
-    
     //If useExistingProcess then we'll not initialize a new one
     if (useExistingProcess)
     {
@@ -368,6 +375,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     else
         strcpy(process->path,path);
     
+    printd(DEBUG_PROCESS,"Creating %s process for %s\n",isKernelProcess?"kernel":"user",process->path);
+
     char *slash=process->path, *slash2=process->path;
     
     while (slash!=NULL)
@@ -424,7 +433,10 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         if (process->parent!=kKernelProcess)
             pagingMapProcessPageIntoKernel(((process_t*)process->parent)->pageDirPtr,argv,0x7);
         //Create and populate a page with the parameters, replacing old pointers with new ones which are virtualized to our address space
-        process->argv=(uintptr_t)allocPages(50*argc+(4*argc));
+        if (argc>0)
+            process->argv=(uintptr_t)allocPages(50*argc+(4*argc));
+        else 
+            process->argv=(uintptr_t)allocPages(54); //Don't want a NULL pointer floating around
         pagingMapPageCount(KERNEL_CR3, process->argv, process->argv, ((50*argc+(4*argc))/PAGE_SIZE)+1,0x7,true);
         printd(DEBUG_PROCESS,"Retrieving argv parameter values from parent process\n");
         //processCopyArgV((char**)process->argv,(char**)argv,argvVirt,argc);
@@ -737,6 +749,8 @@ void CoWProcess(process_t* process)
 void dupPageTables(process_t* newProcess, process_t* currProcess)
 {
     newProcess->pageDirPtr = (uint32_t)pagingAllocatePagingTablePage();
+    newProcess->task->pageDir = newProcess->pageDirPtr;
+    newProcess->task->tss->CR3 = newProcess->pageDirPtr;
     memset(newProcess->pageDirPtr, 0, PAGE_SIZE);
     newProcess->task->tss->CR3 = newProcess->pageDirPtr;
     printd(DEBUG_PROCESS, "\tdupPageTables: Duping page tables from 0x%08x to 0x%08x\n",currProcess->pageDirPtr, newProcess->pageDirPtr);

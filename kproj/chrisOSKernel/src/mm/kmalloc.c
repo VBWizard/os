@@ -105,7 +105,7 @@ void allocateMemoryToProcess(heapPtr* ptr, size_t size, bool isKernel)
 
 void kFree(void* address)
 {
-    freeA(address);
+    freeI(address);
 }
 
 void* kMalloc(size_t size)

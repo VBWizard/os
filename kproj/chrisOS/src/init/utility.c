@@ -13,6 +13,10 @@
 #include "charDev.h"
 #include "i386/kPaging.h"
 #include "../../../chrisOSKernel/include/paging.h"
+#ifdef KERNEL_LOADED
+#include "../../../chrisOSKernel/include/alloc.h"
+#endif
+
 extern int kTimeZone;
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
@@ -24,6 +28,10 @@ extern uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, d
 extern uint32_t  *debugSavedStack;
 extern struct gdt_ptr kernelGDT;
 extern sGDT* bootGdt;
+#ifdef KERNEL_LOADED
+extern sMemInfo* heapMemoryInfo;
+#endif
+
 extern void doNonPagingJump();
 extern void doPagingJump();
 
@@ -188,6 +196,31 @@ char * strtoupper(char* pointerToString)
 
 #define LOAD_ZERO_BASED_DS     __asm__("mov eax,0x90\nmov ds,eax":::"eax");
 #define LOAD_KERNEL_BASED_DS __asm__("mov eax,0x10\nmov ds,eax":::"eax");
+
+void __attribute__((noinline)) dumpAllHeapPointers()
+{
+#ifdef KERNEL_LOADED
+
+    sMemInfo *mInfo = heapMemoryInfo;
+    
+    printd(DEBUG_EXCEPTIONS,"\nSystem Heap Memory list:\n");
+    printd(DEBUG_EXCEPTIONS,"\tAddress   \tSize      \tInUse\tThis      \tPrev      \tNext      \n");
+     while (mInfo!=NULL)
+    {
+         if ((pagingGet4kPTEntryValue(mInfo) & 7) != 7)
+             break;
+        printd(DEBUG_EXCEPTIONS, "\t0x%08x\t0x%08X\t%c    \t0x%08x\t0x%08x\t0x%08x\n",
+                mInfo->address, 
+                mInfo->size,
+                mInfo->inUse?'Y':'N',
+                mInfo, 
+                mInfo->prev, 
+                mInfo->next==NULL?0:mInfo->next);
+        mInfo = mInfo->next;
+    };
+        
+#endif
+}
 
 //Called by exception 0xd & 0xe (possibly more)
 void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bool toLog)

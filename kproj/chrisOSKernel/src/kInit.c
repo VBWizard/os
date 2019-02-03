@@ -142,7 +142,8 @@ __asm__("cli\n");
     idt_set_gate (&idtTable[0x80], 0x8, (int)&vector128, ACS_INT | ACS_DPL_3);
     //See setupPagingHandler
     //idt_set_gate (&idtTable[0xe], 0x8, (int)&vector14, ACS_INT);   //paging exception
-    //idt_set_gate (&idtTable[0xd], 0x8, (int)&vector13, ACS_INT); //Move this out of the way of the exception handlers
+    
+    idt_set_gate (&idtTable[0xd], 0x8, (int)&vector13, ACS_INT);
 
     //Configure SysEnter/SysExit
     if (!kCPUFeatures.cpuid_feature_bits.sep)

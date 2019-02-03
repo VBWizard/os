@@ -217,7 +217,6 @@ void processSignals()
     uintptr_t*sleep;
     bool awoken=false;
     //Process running
-
     uint32_t priorCR3;
 
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
@@ -274,15 +273,14 @@ scanSleep:
         }
         sleep++;
     }
-
-
-    __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (priorCR3));
     if (awoken) 
     {
         printd(DEBUG_SIGNALS,"Trigger the scheduler to process ... the awoken\n");
         triggerScheduler();
     }
     printd(DEBUG_SIGNALS,"Done processing signals\n");
+    __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (priorCR3));
+    return;
 }
 
 void executeSigHandler()

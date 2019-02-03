@@ -1,13 +1,10 @@
 #!/bin/bash
-rm ./myos.iso
 ./makeall
 if [ $? -ne 0 ] 
 then
 exit -1
 fi
 #strip --strip-debug --strip-unneeded Debug/GNU-Linux/chrisos
-cp Debug/GNU-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
-grub-mkrescue -o myos.iso ~/src/os/build_dir/isodir > /dev/null
 qemu-system-i386 							\
 	-m 1536								\
 	-smp 4    							\
