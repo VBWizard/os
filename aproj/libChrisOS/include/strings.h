@@ -61,5 +61,6 @@ size_t strlen(const char* str);
     int sprintf(char *buf, const char *fmt, ...);
     int vsprintf(char *buf, const char *fmt, va_list args);
     char *strreplace(const char *in, const char *pattern, const char *by);
+    size_t strnlen(const char* str, int maxlen);
 #endif	/* STRINGS_H */
 

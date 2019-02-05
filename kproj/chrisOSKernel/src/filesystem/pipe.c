@@ -137,7 +137,7 @@ size_t piperead(void *buffer, int size, int length, void *f)
             if (pipe->flags & PIPENOBLOCK) //Pipe doesn't block so oh well if the copy size is less than the caller wants
                 break;
             //yield here
-            printd(DEBUG_FILESYS, "piperead: Need %u bytes, not available, sleeping until they are\n",size*length);
+            printd(DEBUG_FILESYS, "\tpiperead: Need %u bytes, not available, sleeping until they are\n",size*length);
             sys_sigaction2(SIGSLEEP, 0, *kTicksSinceStart+kTicksPerSecond, getCurrentProcess());
             triggerScheduler();
             __asm__("sti\nhlt\n");
@@ -154,7 +154,7 @@ size_t piperead(void *buffer, int size, int length, void *f)
         memcpy(file->buffer, file->buffer+copySize, *file->bufferPtr-file->buffer-copySize);
         *file->bufferPtr-=copySize; 
         __sync_lock_release(&kPipeReadLock);   
-        printd(DEBUG_FILESYS, "piperead: Returning %u bytes from pipe %s (0x%08X), %u bytes left\n",
+        printd(DEBUG_FILESYS, "\t\tpiperead: Returning %u bytes from pipe %s (0x%08X), %u bytes left\n",
                 copySize, 
                 pipe->file[0]->f_path, 
                 pipe->file,
@@ -191,13 +191,13 @@ size_t pipewrite(const void *data, int size, int count, void *f)
             *file->bufferPtr+=copySize;    
         }
         __sync_lock_release(&kPipeWriteLock);   
-        printd(DEBUG_FILESYS, "pipewrite: wrote %u bytes to pipe %s (0x%08x)\n", copySize);
+        printd(DEBUG_FILESYS, "\t\tpipewrite: wrote %u bytes to pipe %s (0x%08x)\n", copySize, file->f_path);
         written += copySize;
         if (written < size*count)
         {
             copySize=(size*count)-written;
             //TODO: Fix this effectively polling solution to allos SIGSLEEP to wake on "data available in pipe"
-            printd(DEBUG_FILESYS, "pipewrite: Not enough room to complete write (need=%u, available=%u)\n\tsleeping till more space is available in the pipe\n", copySize, PIPE_FILE_SIZE-((uint32_t)*file->bufferPtr - (uint32_t)file->buffer));
+            printd(DEBUG_FILESYS, "\t\tpipewrite: Not enough room to complete write (need=%u, available=%u)\n\tsleeping till more space is available in the pipe\n", copySize, PIPE_FILE_SIZE-((uint32_t)*file->bufferPtr - (uint32_t)file->buffer));
             sys_sigaction2(SIGSLEEP, 0, *kTicksSinceStart+(kTicksPerSecond/5), getCurrentProcess());
             triggerScheduler();
             __asm__("sti\nhlt\n");
@@ -205,7 +205,7 @@ size_t pipewrite(const void *data, int size, int count, void *f)
             
     }
     
-    printd(DEBUG_FILESYS, "pipewrite: Done writing to pipe %s (0x%08x).  Wrote %u (total) bytes\n",
+    printd(DEBUG_FILESYS, "\t\tpipewrite: Done writing to pipe %s (0x%08x).  Wrote %u (total) bytes\n",
             pipe->file[1]->f_path, 
             pipe->file, 
             written);
@@ -292,7 +292,7 @@ int fs_pipeA(process_t *process, int pipefd[2], int flags)
     pipe.file[1] = filew;
     
     pipe.owner = process;
-    printd(DEBUG_FILESYS, "Created pipe pair %s/%s (0x%08X/0x%08X) for %s\n", 
+    printd(DEBUG_FILESYS, "\tCreated pipe pair %s/%s (0x%08X/0x%08X) for %s\n", 
             pipe.file[0]->f_path, 
             pipe.file[1]->f_path, 
             pipe.file[0], 

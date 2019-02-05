@@ -16,6 +16,11 @@
 #define EOS '\0'
 #define NUMBER_OF_COMMANDS sizeof(cmds)/sizeof(command_table_t)
 #define KEY_BACKSPACE "\033[1D \033[1D"
+//Max cmds that can be parsed at once
+#define PARSE_CMD_COUNT 100
+#define CMDLINE_MAX_SIZE 512
+#define CMDLINE_BUFFER_SIZE CMDLINE_MAX_SIZE*PARSE_CMD_COUNT
+
 
 typedef struct
 {

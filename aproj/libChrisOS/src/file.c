@@ -41,3 +41,8 @@ VISIBLE int seek(void* handle, long position, int whence)
 {
     return do_syscall3(SYSCALL_SEEK, (uint32_t)handle, position, whence);
 }
+
+VISIBLE char *fgets(char *str, int n, void *stream)
+{
+    
+}

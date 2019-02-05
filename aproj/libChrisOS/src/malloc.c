@@ -48,6 +48,9 @@ void freeI(void* fpointer)
 {
     heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
     
+    if (fpointer < heapBase || fpointer > heapCurr)
+        return;
+    
     if (fpointer==NULL)
         return;             //CLR 04/20/2017: If pointer to be freed is NULL, don't do anything
     HEAP_CURR(fpointer,mp);

@@ -17,9 +17,51 @@ char commandHistory[500][MAX_PARAM_WIDTH];
 int commandHistoryPtr=0;
 int commandHistoryMax=0;
 char lCommand[256];
-
+char **kCmdline;
 int findCommand(char* command);
 char **buildargv (const char *input);
+
+
+void preprocessCmd(char *command)
+{
+    
+}
+
+void execCmds(char **cmds)
+{
+    char **lcmds = cmds;
+    
+    while (*lcmds)
+    {
+        execInternalCommand(*lcmds);
+        lcmds++;
+    }
+}
+
+//Parse individual commandline (especially for pipes)
+char** parseCmds(char *command)
+{
+    char delims[3] = ";";
+    char **cmds;
+    char *lcommand=malloc(1024);
+    char *cmd;
+    int cmdptr=0;
+    
+    //Get a local copy of the command for strtok which will modify the string
+    strncpy(lcommand,command,1024);
+    
+    memset(kCmdline,0,CMDLINE_BUFFER_SIZE);
+    cmd = strtok(lcommand, delims);
+    while( cmd != NULL )
+    {
+        kCmdline[cmdptr]=kCmdline+(PARSE_CMD_COUNT*4) + (cmdptr*CMDLINE_MAX_SIZE);
+        strcpy(kCmdline[cmdptr],cmd);
+        cmd = strtok(NULL, delims);
+        if (cmd!=NULL)
+            cmdptr++;
+    };
+    return kCmdline;
+}
 
 void execInternalCommand(char lCommand[256])
 {
@@ -333,6 +375,7 @@ int kShell(int argc, char** argv, char** envp)
     int commandWasFromThisBufferPtr=0;
     char ansiSeq[20];
 
+    kCmdline = malloc(CMDLINE_BUFFER_SIZE);  //Possibility of 25 chained commands
     bSigIntReceived = false;
     exitCode = 0;
     timeToExit = false;
@@ -461,8 +504,10 @@ doneGettingKeys:
         if (commandWasFromThisBufferPtr == -1)
             saveCommand(lCommand);
         int i = findCommand(lCommand);
-        execInternalCommand(lCommand);
+        execCmds(parseCmds(lCommand));
     }
     free(sKShellProgramName);
+    if (kCmdline)
+        free(kCmdline);
     return exitCode;
 }

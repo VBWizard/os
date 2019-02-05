@@ -124,7 +124,7 @@ task_t* findTaskByCR3(uint32_t cr3)
 task_t* findTaskByTaskNum(uint32_t taskNum)
 {
     task_t* taskList;
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByNum: Finding task 0x%04X\n",taskNum);
+    printd(DEBUG_TASK | DEBUG_DETAILED,"\tfindTaskByNum: Finding task 0x%04X\n",taskNum);
     taskList=kTaskList;
     do
     {
@@ -135,11 +135,11 @@ task_t* findTaskByTaskNum(uint32_t taskNum)
 
     if (taskList->taskNum==0x0)
     {
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByTaskNum: Could not find task with TaskNum=0x%08x\n",taskNum);
+        printd(DEBUG_TASK | DEBUG_DETAILED,"\tfindTaskByTaskNum: Could not find task with TaskNum=0x%08x\n",taskNum);
         return NULL;
     }
 
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByNum: Found task @ 0x%08x\n",taskList);
+    printd(DEBUG_TASK | DEBUG_DETAILED,"\tfindTaskByNum: Found task @ 0x%08x\n",taskList);
     return taskList;
 }
 

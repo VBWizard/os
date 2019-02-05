@@ -109,7 +109,7 @@ void* fs_open(char* path, const char* mode)
     file_t *file;
     bool isPipeFile = false;
     
-    printd(DEBUG_FILESYS, "fs_open: called with path=%s, mode=%s\n", path, mode);
+    printd(DEBUG_FILESYS, "\t\tfs_open: called with path=%s, mode=%s\n", path, mode);
     file = kMalloc(sizeof(file_t));
     memset(file,0,sizeof(file_t));
     
@@ -166,10 +166,10 @@ void* fs_open(char* path, const char* mode)
             listAdd(rootFs->files,list,file);
 */
         file->verification=0xBABAABAB;
-        printd(DEBUG_FILESYS, "\tfs_open: returning handle 0x%08x\n",handle);
+        printd(DEBUG_FILESYS, "\t\tfs_open: returning handle 0x%08x\n",handle);
         return file;
     }
-    printd(DEBUG_FILESYS, "\tfs_open: returning NULL\n",handle);
+    printd(DEBUG_FILESYS, "\t\tfs_open: returning NULL\n",handle);
     return NULL;
 }
 
@@ -181,7 +181,7 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     file_t* theFile = file;
     int retVal = 0, bytesRead;
     
-    printd(DEBUG_FILESYS, "fs_read: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
+    printd(DEBUG_FILESYS, "\t\tfs_read: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
 
     if (size * length == 0)
         return 0;
@@ -206,7 +206,7 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
 
     if (retVal > 0)
     {
-        printd(DEBUG_FILESYS, "\tfs_read: Read %u bytes, copying from kernel address 0x%08x to process address 0x%08x\n", retVal, vfs_readBuffer, buffer);
+        printd(DEBUG_FILESYS, "\t\tfs_read: Read %u bytes, copying from kernel address 0x%08x to process address 0x%08x\n", retVal, vfs_readBuffer, buffer);
         copyFromKernel(process, buffer, vfs_readBuffer, retVal);
     }
     else
@@ -219,7 +219,7 @@ int fs_write(process_t* process, void* file, void * buffer, int size, int length
     file_t* theFile = file;
     int retVal = 0;
 
-    printd(DEBUG_FILESYS, "fs_write: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
+    printd(DEBUG_FILESYS, "\t\tfs_write: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
 
     if (theFile->verification!=0xBABAABAB)
         panic("fs_write: Referenced a file that is not a file");
@@ -238,7 +238,7 @@ int fs_seek(void* file, long offset, int whence)
 {
     file_t* theFile = file;
     
-    printd(DEBUG_FILESYS, "fs_seek: called for file %s (handle=0x%08X), offset %u, whence %u\n", theFile->f_path, theFile->handle, offset, whence);
+    printd(DEBUG_FILESYS, "\t\tfs_seek: called for file %s (handle=0x%08X), offset %u, whence %u\n", theFile->f_path, theFile->handle, offset, whence);
 
     if (theFile->verification!=0xBABAABAB)
         panic("fs_seek: Referenced a file that is not a file",file);
@@ -264,7 +264,7 @@ void close(eListType listType, void* entry)
     file_t* theFile = entry;
     directory_t *dir = entry;
 
-    printd(DEBUG_FILESYS, "fs_close: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
+    printd(DEBUG_FILESYS, "\t\tfs_close: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
     if (theFile->verification!=0xBABAABAB)
         panic("close: Referenced a file that is not a file!");
     if (listType == LIST_DIRECTORY)

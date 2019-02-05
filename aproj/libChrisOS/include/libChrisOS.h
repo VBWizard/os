@@ -30,6 +30,7 @@ extern "C" {
 #include "libcmmap.h"
 #include "../../../kproj/chrisOSKernel/include/syscalls.h"
 #include "console.h"
+#include "stdio.h"
     
 #include <bits/time.h>
 #ifndef NULL
