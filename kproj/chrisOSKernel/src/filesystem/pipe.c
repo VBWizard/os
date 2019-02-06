@@ -258,11 +258,11 @@ int fs_pipe(process_t *process, int pipefd[2])
 {
 
     int flags = PIPENOBLOCK;
-    fs_pipeA(process, pipefd, flags);
+    fs_pipeI(process, pipefd, flags);
     return 0;
 }
 
-int fs_pipeA(process_t *process, int pipefd[2], int flags)
+int fs_pipeI(process_t *process, int pipefd[2], int flags)
 {
     file_t *filer, *filew;
     char mode[10];

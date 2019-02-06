@@ -34,7 +34,7 @@ typedef struct s_task
     tss_t* tss;
     uint32_t* pageDir;
     uint32_t* kernelPageDirPtr; //Kernel's paged pointer to pageDir
-    uint32_t next, prev;
+    struct s_task *next, *prev;
     bool kernel;
     eTaskState taskState;
     uint32_t ticksSinceLastInterrupted, prioritizedTicksInRunnable;

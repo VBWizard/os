@@ -7,6 +7,8 @@
 
 #include "kshell.h"
 
+int execPipes[2];
+
 void cmdClearScreen()
 {
     printf("\033[2J");
@@ -75,7 +77,7 @@ int kexec2(char* path, int argc, char** argv, bool background)
 
 }
 
-int kexec(char* cmdline)
+int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
 {
     bool background=false;
     int forkPid=0;
@@ -87,12 +89,32 @@ int kexec(char* cmdline)
     int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
     int execParamCount=0;
     int pcount=1;
+    char *stdinRedir, *stdoutRedir;
+    char *stdinfile=NULL, *stdoutfile=NULL, *stderrfile=NULL;
     
     if (paramCount==0)
         return -3;
 
     int argc = 0;
     char **argv;
+    
+    //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
+    stdinRedir = strstr(cmdline,"<");
+    if (stdinRedir)
+    {
+        stdinfile = malloc(256);
+        char *start = strstr(stdinRedir," ")+1;
+        if (!start)
+            start=stdinRedir;
+        char *end = strstr(start," ");
+        if (!end)
+            end = strstr(start,"\n");
+        if (end)
+            strncpy(stdinfile,start,end-start);
+        else
+            strcpy(stdinfile, start);
+        stdinRedir='\0';
+    }
     
     argv = cmdlineToArgv(cmdline, &argc);
 
@@ -112,6 +134,18 @@ int kexec(char* cmdline)
         int retVal;
         
         strcat(fileToExec,argv[0]);
+        
+        //CLR 02/05/2019: Redirect standard input/output/err from/to a file (i.e. < and >)
+        if (stdinfile!=NULL)
+            if (freopen(stdinfile, "r",(void*)STDIN_FILE)==(void*)-1)
+            {
+                printf("Redirect of input failed, cannot continue\n");
+                return -3;
+            }
+        if (stdoutfile!=NULL)
+            freopen(stdoutfile,"w",(void*)STDOUT_FILE);
+        if (stderrfile!=NULL)
+            freopen(stderrfile,"w",(void*)STDERR_FILE);
         int childPid = exec(fileToExec, argc, argv);
         
         if (childPid > 0)
@@ -139,6 +173,12 @@ int kexec(char* cmdline)
     //Its ok to free arguments now because they are copied by the kernel to pgm's memory
     free(argv);
     free(pgm);
+    if (stdinfile)
+        free(stdinfile);
+    if (stdoutfile)
+        free(stdoutfile);
+    if (stderrfile)
+        free(stderrfile);
     
 }
 
@@ -186,7 +226,7 @@ void cmdRepeat(char * cmdline)
 
 void cmdExecp(char* cmdline)
 {
-    kexec(cmdline);
+    kexec(cmdline, STDIN_FILE, STDOUT_FILE, STDERR_FILE);
 }
 
 void cmdExit(char *cmdline)

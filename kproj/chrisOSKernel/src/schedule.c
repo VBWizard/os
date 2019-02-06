@@ -491,7 +491,7 @@ void checkUSleepTasks(task_t* taskToStop, uint32_t retVal)
     task_t* task;
     process_t* process;
     printd(DEBUG_PROCESS,"checkUSleepTasks: Looking through USLEEP queue for tasks to wake up\n");
-    while (*q!=NO_NEXT)
+    while (*q!=NULL)
     {
         task=(task_t*)*q;
         if (task->taskNum!=0)
@@ -698,7 +698,7 @@ int32_t getExitCode(uint32_t taskNum)
     
     printd(DEBUG_PROCESS,"getExitCode: Looking through EXITED queue for exit code for task 0x%04X\n", taskNum);
 
-    while (*q!=NO_NEXT)
+    while (*q!=NULL)
     {
         task=(task_t*)*q;
         if (task->taskNum!=0)

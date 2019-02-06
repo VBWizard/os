@@ -75,7 +75,7 @@ extern "C" {
         uint32_t childNumber;
         uint32_t lastChildNumber;
         bool execDontSaveRegisters;
-        bool foreground;
+        bool foreground, stdinRedirected, stdoutRedirected, stderrRedirected;
     } process_t;
 
 

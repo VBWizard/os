@@ -49,7 +49,7 @@ extern "C" {
     size_t pipewrite(const void *buffer, int size, int count, void *f);
     pipe_t *pipedup(void* path, const char *mode, file_t* file);
     int fs_pipe(process_t *process, int pipefd[2]);
-    int fs_pipeA(process_t *process, int pipefd[2], int flags);
+    int fs_pipeI(process_t *process, int pipefd[2], int flags);
     
     typedef struct
     {

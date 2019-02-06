@@ -66,7 +66,7 @@ VISIBLE struct tm *localtime(const time_t *timer) {
   time_t t;
  
   t = *timer + (libcTZ*60*60);
-  return gmtime_r(&t, &tmbuf);
+  return gmtime_rI(&t, &tmbuf);
 }
 
 struct tm *localtime_rI(const time_t *timer, struct tm *tmbuf) 

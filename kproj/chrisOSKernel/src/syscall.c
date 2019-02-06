@@ -85,15 +85,33 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 __asm__("mov cr3,eax\n"::"a" (temp));
             }
             else
-                //__asm__("mov cr3, eax\n"::"a" (process->pageDirPtr));
                 __asm__("mov cr3,eax\n"::"a" (processCR3));
-            //__asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_OPEN: //param1=path, param2=mode
+        case SYSCALL_OPEN: //param1=path, param2=mode, param3=used by freopen, stream
             strcpy(path, (void*)param1);
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: open(%s,%s)\n",path, param2);
             retVal=(uint32_t)fs_open((char*)path, (char*)param2);
+            //NOTE: freopen only works with STDIN/STDOUT/STDERR
+            switch (param3)
+            {
+                case STDIN_FILE:
+                    printd(DEBUG_PROCESS, "Redirecting stdin from 0x%08x to %s (0x%08)x\n",process->stdin,path,retVal);
+                    process->stdin=(void*)retVal;
+                    process->stdinRedirected=true;
+                    break;
+                case STDOUT_FILE:
+                    printd(DEBUG_PROCESS, "Redirecting stdout from 0x%08x to %s (0x%08x)\n",process->stdout,path,retVal);
+                    process->stdout=(void*)retVal;
+                    process->stdoutRedirected=true;
+                    break;
+                case STDERR_FILE:
+                    printd(DEBUG_PROCESS, "Redirecting stderr from 0x%08x to %s (0x%08)x\n",process->stderr,path,retVal);
+                    process->stderr=(void*)retVal;
+                    process->stderrRedirected=true;
+                    break;
+            }
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_CLOSE: //param1=handle
@@ -111,7 +129,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 genericFileHandle = process->stdin;
             retVal=fs_read(process, genericFileHandle, (void*)param2, param3, 1);
             printd(DEBUG_FILESYS, "\t_sysCall: read() returning %u bytes to %s from %s\n",retVal, process->exename, ((file_t*)genericFileHandle)->f_path);
-                __asm__("mov cr3,eax\n"::"a" (processCR3));
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_WRITE:       //***write to descriptor, param1 = descriptor #, param2 = string to write
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
@@ -123,8 +141,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             retVal=fs_write(process, genericFileHandle, (void*)param2, param3, 1);
             printd(DEBUG_FILESYS, "\t_sysCall: write() wrote %u bytes to %s from %s\n",retVal, ((file_t*)genericFileHandle)->f_path, process->exename);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
-            if (*((char*)param2) == '\n')
-                retVal = 22;
+//            if (*((char*)param2) == '\n')
+//                retVal = 22;
             break;
         case SYSCALL_PIPE:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
@@ -171,7 +189,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             printd(DEBUG_SYSCALL,"\tsyscall: exec%s(%s,0x%08x,0x%08x)\n",callNum==SYSCALL_EXEC?"":"New",path,param2,param3);
             parentProcess=getCurrentProcess();
             printd(DEBUG_PROCESS,"\t_sysCall: createProcess(%s,0x%08x,0x%08x,0x%08x,%u)\n",path,param2,param3,parentProcess, useExisting);
-            process = createProcess((char*)param1, param2, param3, parentProcess, false, useExisting);
+            process=createProcess((char*)param1, param2, param3, parentProcess, false, useExisting);
             if (process!=NULL)
             {
                 retVal=process->task->taskNum;
@@ -195,16 +213,14 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             }
             else //Otherwise
                 taskExited = false;
-            LOAD_CR3(processCR3);
             //Only wait for the PID if it hasn't already exited
             if (!taskExited)
             {
-                __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
                 process=getCurrentProcess();
                 printd(DEBUG_PROCESS,"\tsyscall: signalling SIG_USLEEP for current task (cr3=0x%08x) on pid=0x%04X.  Good night!\n",processCR3,param1);
                 retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1, process);
-                __asm__("mov cr3,eax\n"::"a" (processCR3));
             }
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SETPRIORITY:      //***Set process priority - param1=new priority, returns old priority
             printd(DEBUG_SYSCALL,"\tsyscall: setPriority(0x%08x)\n",param1);

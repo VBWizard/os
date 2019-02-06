@@ -38,7 +38,7 @@ void execCmds(char **cmds)
     }
 }
 
-//Parse individual commandline (especially for pipes)
+//Parse individual commandline (look for pipes)
 char** parseCmds(char *command)
 {
     char delims[3] = ";";
@@ -403,7 +403,7 @@ getAKey:
         lCurrKey=0;
         while(lCurrKey==0)
         {
-            read(STDIN, &lCurrKey, 1, 1); //Reading from STDIN blocks until a key is available
+            read(STDIN_FILE, &lCurrKey, 1, 1); //Reading from STDIN blocks until a key is available
 //            gets(&lCurrKey,1,1);
             if (bSigIntReceived)
             {

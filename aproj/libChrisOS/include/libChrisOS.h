@@ -37,9 +37,9 @@ extern "C" {
 #define NULL ((void *) 0)
 #endif
 
-#define STDIN 0
-#define STDOUT 1
-#define STDERR 2
+#define STDIN_FILE 0
+#define STDOUT_FILE 1
+#define STDERR_FILE 2
 #define MAXPARAMLEN 255
 #define VISIBLE __attribute__((visibility("default")))
 #define SYSCALL0(a,b) {asm("call sysEnter_Vector\n":"=a" (b):"a" (a), "b" (0), "c" (0), "d" (0), "S" (0));}

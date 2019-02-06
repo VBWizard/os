@@ -20,6 +20,7 @@
 #include "task.h"
 #include "schedule.h" 
 #include "thesignals.h"
+#include "filesystem/pipe.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
@@ -47,7 +48,7 @@ extern task_t* kKernelTask;
 extern struct idt_entry* idtTable;
 extern uint16_t isrNumber;
 extern void waitForDeath();
-
+extern pipe_t *activeSTDOUT;
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
 
@@ -189,7 +190,8 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     task_t* victimTask = findTaskByTaskNum(victimTaskNum);
     process_t* victimProcess = victimTask->process;
     uint32_t pagingExceptionCR3 = victimTask->tss->CR3;
-
+    bool nullPointer = false;
+    
     if (pagingExceptionCR3 == KERNEL_CR3)
     {
         printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception was in kernel CR3 (0x%08x), victim CR3=0x%08x (Process 0x%04x).\n",pagingExceptionCR3, victimProcess->pageDirPtr, victimTaskNum);
@@ -209,6 +211,8 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     lPDEAddress=kPagingGet4kPDEntryAddressCR3(pagingExceptionCR3,pagingExceptionCR2);
     lPDEValue=kPagingGet4kPDEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
     lPTEValue=kPagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
+    nullPointer=lPDEValue==0;
+    
     uint32_t pagePhysAddr=lPTEValue&0xFFFFF000;
     uint32_t pageFlags=lPTEValue&0x00000FFF;
     elfInfo_t* elf=victimProcess->elf;
@@ -229,12 +233,11 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     pagingMapPage(victimProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)victimProcess & 0xFFFFF000, (uint16_t)0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
    __asm__("clts\n"); //TODO: Didn't save fpu registers
     //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08x (CR3=0x%08x)\n",exceptionCR2,exceptionCR3);
-    printk(0,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
     printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
     printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08x)\n\tChecking for uninitialized mmap page, pt entry=0x%08x\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
 
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
-    if ( (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))
+    if ( !nullPointer && (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))
     {
         isMMap = true;
         printd(DEBUG_EXCEPTIONS,"\t\tFound uninitialized mmap page\n",victimProcess->path,lPTEValue);
@@ -243,7 +246,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     else
         printd(DEBUG_EXCEPTIONS,"\t\tNot mmap page\n",victimProcess->path,lPTEValue);
 
-    if (!isMMap)
+    if (!nullPointer && !isMMap)
     {
         //Check for page tagged as COW (bit 9)
         printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bits\n");
@@ -259,7 +262,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             printd(DEBUG_EXCEPTIONS,"\t\tAddress is not CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
         }
     }
-    if (!isMMap && !isCow)
+    if (!nullPointer && !isMMap && !isCow)
     {
         //Check for CoW pages in libraries
         printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bss/data in libraries\n",victimProcess->path);
@@ -293,7 +296,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             printd(DEBUG_EXCEPTIONS,"\t\tNot library CoW page\n");
     }
 
-    if (isCow || (isMMap & mmapSucceeded))
+    if (!nullPointer && (isCow || (isMMap & mmapSucceeded)))
     {
         if (isCow) //if isMMap then the page was already fixed.  This is the "success" exit point, so skip fixing up the page, clear the CR2 and exit
         {
@@ -313,18 +316,27 @@ kPagingExceptionHandlerNewReturn:
     }
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
-          printk("\nPaging handler: Exception for virtual address 0x%02X\n",pagingExceptionCR2);
-          printk("PDE@0x%08x=0x%08x, PTE@0x%08x=0x%08x\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
-          printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, false);
+          //printk("\nPaging handler: Exception for virtual address 0x%02X\n",pagingExceptionCR2);
+          //printk("PDE@0x%08x=0x%08x, PTE@0x%08x=0x%08x\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
+          //printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, false);
           printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, true);
           //dumpAllHeapPointers();
-          printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
-          printk("Finding symbol for 0x%08x ...\n",pagingExceptionCR2);
+          //printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
+          //printk("Finding symbol for 0x%08x ...\n",pagingExceptionCR2);
     }
     
     kPagingExceptionsSinceStart++;
     printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08x\n",pagingExceptionCR3);
-    printk("segfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
+    
+    //Print to pipe instead of printk if available
+    if (activeSTDOUT)
+    {
+        char err[256];
+        sprintf(err, "\nsegfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
+        fs_write(NULL, activeSTDOUT, err,strlen(err),1);
+    }
+    else
+        printk("\nsegfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
     sys_sigaction2(SIGSEGV,0,0xe, victimProcess);
 

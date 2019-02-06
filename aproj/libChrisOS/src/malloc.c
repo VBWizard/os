@@ -48,7 +48,7 @@ void freeI(void* fpointer)
 {
     heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
     
-    if (fpointer < heapBase || fpointer > heapCurr)
+    if ((uint32_t)fpointer < heapBase || (uint32_t)fpointer > heapCurr)
         return;
     
     if (fpointer==NULL)

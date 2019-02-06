@@ -35,15 +35,18 @@ extern "C" {
     
     typedef struct direntry direntry_t;
     
+    uintptr_t *filesToClose;
+    uint32_t filesToCloseCount;
+
     void* open(char* path, const char* mode);
     void close(void* handle);
     int read(void* handle, void *buffer, int size, int length);
     int write(void* handle, void *buffer, int size, int length);
     int getdir(char* path, char *buffer, int bufferCount);
     int seek(void* handle, long position, int whence);
-    
+    void* freopen(char* path, const char* mode, void *stream);
     int writeI(void* handle, void *buffer, int size, int length);
-    
+    void file_cleanup();
 #ifdef __cplusplus
 }
 #endif

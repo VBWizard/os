@@ -55,6 +55,8 @@ VISIBLE void __attribute__((constructor)) libc_init()
     if (!libcInitialized)
     {
         initmalloc();
+        filesToCloseCount=0;
+//        printfI("libc_init: filesToCloseCount=%u\n",filesToCloseCount);
         //processEnvp = envp;
         __asm__("mov %0,[ebp+52]\n":"=a" (processEnvp));
         do_syscall0(SYSCALL_INVALID);
@@ -70,6 +72,7 @@ VISIBLE void __attribute__((constructor)) libc_init()
 void __attribute__((destructor)) libc_cleanup(void)
 {
     malloc_cleanup();
+    file_cleanup();
 }
 
 VISIBLE int print(const char *format, ...)

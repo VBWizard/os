@@ -39,13 +39,13 @@ ttydevice_t *registerTTY(int deviceMajor, int deviceMinor)
     int stdErrPipes[2];
     device->termDeviceMajor = deviceMajor;
     device->termDeviceMinor= deviceMinor;
-    fs_pipeA(NULL, stdOutPipes,PIPENOBLOCK); //n for no blocking
+    fs_pipeI(NULL, stdOutPipes,PIPENOBLOCK); //n for no blocking
     device->stdOutReadPipe = (file_t*)stdOutPipes[0];
     device->stdOutWritePipe = (file_t*)stdOutPipes[1];
-    fs_pipeA(NULL, stdInPipes, 0); //we want this one to block!
+    fs_pipeI(NULL, stdInPipes, 0); //we want this one to block!
     device->stdInReadPipe = (file_t*)stdInPipes[0];
     device->stdInWritePipe = (file_t*)stdInPipes[1];
-    fs_pipeA(NULL, stdErrPipes, 0); //we want this one to block!
+    fs_pipeI(NULL, stdErrPipes, 0); //we want this one to block!
     device->stdErrReadPipe = (file_t*)stdErrPipes[0];
     device->stdErrWritePipe = (file_t*)stdErrPipes[1];
     

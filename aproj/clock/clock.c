@@ -22,7 +22,9 @@ int main(int argc, char** argv) {
     while (1==1)
     {
         time_t theTime = time(&theTime);
-        struct tm *timeinfo = localtime(&theTime);
+        struct tm *timeinfo = malloc(sizeof(struct tm));
+        
+        timeinfo = localtime(&theTime);
 
         saveCursorPosition();
         moveToXY(70,0);

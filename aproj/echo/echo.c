@@ -90,8 +90,8 @@ int main(int argc, char** argv, char** envp) {
     }
     strtrim(outString5);
     printf("%s\n", outString5);
-    free(outString);
-    free(outString);
+    if (outString)
+        free(outString);
     if (processEscapes)
     {
         free(outString2);

@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     }
     
     if (useStdIn)
-        handle=STDIN;
+        handle=STDIN_FILE;
     else
         handle=open(haystack, "r");
     
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
         }
     }
     
-    if (handle!=STDIN)
+    if (handle!=STDIN_FILE)
         close(handle);
     free(buffer);
     if (printbuffer)

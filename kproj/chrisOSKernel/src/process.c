@@ -228,6 +228,12 @@ void processExit()
             printd(DEBUG_PROCESS,"processExit: Executing exitHandler %u @ 0x%08x\n",lCounter,process->exitHandler[lCounter]);
             x();
         }
+/*    if (process->stdinRedirected)
+        fs_close(process->stdin);
+    if (process->stdout!=STDOUT_FILE)
+        fs_close(process->stdout);
+    if (process->stderr!=STDERR_FILE)
+        fs_close(process->stderr);*/
     //Can't save endTime here because we had to change VADDR to be read-only for ring 3
     //gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
     //TODO: Clean up list items before clearing the list
@@ -291,7 +297,7 @@ void processIdleLoop()
 /*        if (++kIdleTicks % 10 == 0)
             printd(DEBUG_PROCESS,"IDLE TASK: Idle ticks = %u\n",kIdleTicks);*/
         __asm__("sti;hlt;");
-    }   
+     }   
 }
 
 process_t *initializeProcess(bool isKernelProcess)
@@ -306,8 +312,6 @@ process_t *initializeProcess(bool isKernelProcess)
     memset(process,0,sizeof(process_t));
     process->task=createTask(process, isKernelProcess);
     process->pageDirPtr=process->task->tss->CR3;
-    process->heapStart=PROCESS_HEAP_START;
-    process->heapEnd=PROCESS_HEAP_START;
     process->path=(char*)kMalloc(0x1000); 
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08x for process->path\n",process->path);
     process->cwd=allocPagesAndMap(PAGE_SIZE);
@@ -337,11 +341,11 @@ process_t *initializeProcess(bool isKernelProcess)
     return process;
 }
 
-//NOTE: if initialize parameter is passed as false, parentProcessPtr is the pointer to the process to use
-//NOT to its parent. In this case:
+//NOTE: if initialize parameter is passed as false, parentProcessPtr is the pointer to the process which is currently running, NOT its parent
+//In this case:
 //      1) If the process' real parent is NULL then we will free some resources
 //      2) We will leave the environment alone (i.e. not pass argc and argv)
-//      3) 
+//      3) We won't touch stdin/stdout/stderr
 process_t* createProcess(char* path, int argc, char** argv, process_t* parentProcessPtr, bool isKernelProcess, bool useExistingProcess)
 {
     process_t* process;
@@ -399,13 +403,17 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     memset(process->cwd,0,PAGE_SIZE);
     strcpy(process->cwd,"/");
     
+    process->heapStart=PROCESS_HEAP_START;
+    process->heapEnd=PROCESS_HEAP_START;
+    
     if (useExistingProcess)
     {
        process->parent=parentProcessPtr->parent;
        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
-       process->stdin=((process_t*)parentProcessPtr)->stdin;
+       //CLR 02/05/2019: If we forked we don't want to mess with the pipes established 
+       /*process->stdin=((process_t*)parentProcessPtr)->stdin;
        process->stdout=((process_t*)parentProcessPtr)->stdout;
-       process->stderr=((process_t*)parentProcessPtr)->stderr;
+       process->stderr=((process_t*)parentProcessPtr)->stderr;*/
     }
     else if (parentProcessPtr != NULL)
     {
@@ -662,25 +670,6 @@ uint32_t process_fork(process_t* currProcess)
     newProcess->task->tss->IOPB = sizeof(tss_t)-200;
     gdtEntryOS(newProcess->task->taskNum,(uintptr_t)newProcess->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
     pagingMapPage(newProcess->task->tss->CR3,(uintptr_t)newProcess->task->tss,(uintptr_t)newProcess->task->tss,(uint16_t)0x7);
-
-
-    //Clone the parent's ESP Stack
-/*
-    newProcess->stackSize = currProcess->stackSize;
-    newProcess->stack1Size = currProcess->stack1Size;
-    ((process_t*)newTask->process)->stackStart=kMalloc(newProcess->stackSize);
-    //Make the physical addresses of the original ESP stack into virtual addresses in the child's task space
-    //So that we can use the cloned stack
-    pagingMapPageCount(newTask->tss->CR3,newProcess->stackStart, newProcess->stackStart,currProcess->stackSize/PAGE_SIZE,0x7);  
-    //Also map the parent's stack addresses into our space as virtual
-    //NOTE: YOu can not both virtually map and CoW an address :-)
-    //pagingMapPageCount(newTask->tss->CR3,currProcess->stackStart, newProcess->stackStart,currProcess->stackSize/PAGE_SIZE,0x7);  
-    pagingMapPageCount(newTask->tss->CR3,newTask->tss->ESP | KERNEL_PAGED_BASE_ADDRESS,newTask->tss->ESP,0x16,0x7);
-    pagingMapPageCount(KERNEL_CR3,newTask->tss->ESP,newTask->tss->ESP,0x16,0x7);
-    printd(DEBUG_PROCESS,"process_fork: Allocated task ESP at 0x%08x (0x%08x bytes)\n",newProcess->stackStart,newProcess->stackSize);
-    printd(DEBUG_PROCESS,"process_fork: Mapped parent's physical stack addresses to virtual in our address space. (0x%08x-0x%08x)\n",currProcess->stackStart, currProcess->stackStart + currProcess->stackSize);
-    memcpy(newProcess->stackStart, currProcess->stackStart, currProcess->stackSize);
-*/
     
     //Clone the parent's ESP1 Stack
     ((process_t*)newTask->process)->stack1Start=kMalloc(newProcess->stack1Size);
@@ -740,7 +729,7 @@ void CoWProcess(process_t* process)
     if (process->heapEnd - process->heapStart > 0)
     {
         cowPages(process->pageDirPtr, (uintptr_t*)(process->heapStart & 0xFFFFF000), process->heapEnd - process->heapStart);
-        printd(DEBUG_PROCESS, "\tCoW'd the .heap at 0x%08x for 0x%08x bytes\n",process->heapStart, process->heapEnd - process->heapStart);
+        printd(DEBUG_PROCESS, "\tCoW'd the heap at 0x%08x for 0x%08x bytes\n",process->heapStart, process->heapEnd - process->heapStart);
     }
     cowPages(process->pageDirPtr, (uintptr_t*)(process->stackStart & 0xFFFFF000), process->stackSize);
     printd(DEBUG_PROCESS, "\tCoW'd the stack at 0x%08x for 0x%08x bytes\n",process->stackStart, process->stackSize);
@@ -810,6 +799,7 @@ void removeProgramSegmentMappings(process_t *currProcess, process_t *newProcess)
         pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->tdataAddress, 0, currProcess->elf->tdataSize/PAGE_SIZE+1, 0, false);
     if (currProcess->elf->bssAddress>0)
         pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->bssAddress, 0, currProcess->elf->bssSize/PAGE_SIZE+1, 0, false);
+    pagingMapPageCount(newProcess->pageDirPtr, currProcess->heapStart, 0, (currProcess->heapEnd - currProcess->heapStart)/PAGE_SIZE+1, 0, false);
 
  
 /*    uint32_t* newCR3 = (uint32_t*)newProcess->pageDirPtr;
