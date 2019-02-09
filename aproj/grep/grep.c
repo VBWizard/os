@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     else
         handle=open(haystack, "r");
     
-    if (handle==NULL)
+    if (!useStdIn && handle==NULL)
     {
         printf("Unable to open file %s\n", haystack);
         return -3;
@@ -106,7 +106,7 @@ int main(int argc, char** argv)
                 if (++fCount==needleLength)
                 {
                     doFound(buffer, readSize, &buffer[hstack], needle);
-                    hstack+=(uint32_t)(bufptr-buffer)+needleLength;
+                    hstack+=needleLength-1;
                     break;
                 }
                     

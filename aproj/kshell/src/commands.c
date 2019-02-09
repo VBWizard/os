@@ -5,9 +5,9 @@
  */
 
 
-#include "kshell.h"
+#include <stdio.h>
 
-int execPipes[2];
+#include "kshell.h"
 
 void cmdClearScreen()
 {
@@ -164,6 +164,8 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     char **argv;
     int retVal=-1;
     char *temp=NULL;
+    bool freeCmdline=false;
+    int yourSTDIN=0, yourSTDOUT=0;
     
     //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
     stdinRedir=strstr(cmdline,"<");
@@ -171,7 +173,9 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     
     if (stdoutPipe)
     {
-        
+        pipe(execPipes);
+        cmdline=strreplace(cmdline,"|","");
+        freeCmdline=true;
     }
     
     if (stdinRedir)
@@ -222,6 +226,17 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
 
         forkPid = fork();
 
+        if (execPipes[STDOUT_FILE]!=0)
+        {
+            yourSTDOUT=execPipes[STDOUT_FILE];
+            execPipes[STDOUT_FILE]=0;
+        }
+        else if (execPipes[STDIN_FILE]!=0)
+        {
+            yourSTDIN=execPipes[STDIN_FILE];
+            execPipes[STDIN_FILE]=0;
+        }
+        
         if (forkPid == 0)
         {
             int retVal;
@@ -236,6 +251,10 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
                 }
             if (stdoutfile!=NULL)
                 freopen(stdoutfile,"w",(void*)STDOUT_FILE);
+            else if (yourSTDOUT!=0)
+                setSTD(STDOUT_FILE, yourSTDOUT);
+            else if (yourSTDIN!=0)
+                setSTD(STDIN_FILE, yourSTDIN);
             if (stderrfile!=NULL)
                 freopen(stderrfile,"w",(void*)STDERR_FILE);
             int childPid = exec(fileToExec, argc, argv);
@@ -265,6 +284,8 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     }
 kexecReturn:
     //Its ok to free arguments now because they are copied by the kernel to pgm's memory
+    if (freeCmdline)
+        free(cmdline);
     free(argv);
     free(pgm);
     if (stdinfile)

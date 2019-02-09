@@ -349,7 +349,7 @@ VISIBLE char** cmdlineToArgv(char* cmdline, int *argc)
     return cmdlineToArgvI(cmdline, argc);
 }
 
-VISIBLE int test()
+VISIBLE int setSTD(int std, uint32_t filed)
 {
-    return do_syscall0(0);
+    return do_syscall2(SYSCALL_SETSTD, std, filed);
 }

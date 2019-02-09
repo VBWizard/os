@@ -50,7 +50,8 @@ extern "C" {
         SYSCALL_HLT			= 0x302,
         SYSCALL_MASKSIG                 = 0x303,
         SYSCALL_GETDENTS                = 0x304,
-        SYSCALL_EXECNEW			= 0x305
+        SYSCALL_EXECNEW			= 0x305,
+        SYSCALL_SETSTD                 = 0x306
     } E_SYSCALLS;
 
     typedef struct sMMapSyscall

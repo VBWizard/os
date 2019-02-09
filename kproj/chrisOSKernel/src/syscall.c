@@ -327,6 +327,28 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_GETTIME:
             retVal = kSystemCurrentTime;
             break;
+        case SYSCALL_SETSTD:
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
+            printd(DEBUG_SYSCALL,"\tsyscall: setSTD(%u,0x%08x)\n",param1,param2);
+            retVal=-1;
+            switch (param1)
+            {
+                case STDIN_FILE:
+                    process->stdin=param2;
+                    retVal=0;
+                    break;
+                case STDOUT_FILE:
+                    process->stdout=param2;
+                    retVal=0;
+                    break;
+                case STDERR_FILE:
+                    process->stderr=param2;
+                    retVal=0;
+                    break;
+            }
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
         default:
             panic("syscall: Invalid call number 0x%04X\n",callNum);
     }

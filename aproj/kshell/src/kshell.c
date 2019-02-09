@@ -363,6 +363,8 @@ int kShell(int argc, char** argv, char** envp)
     int commandWasFromThisBufferPtr=0;
     char ansiSeq[20];
 
+    execPipes[0]=0;
+    execPipes[1]=0;
     kCmdline = malloc(CMDLINE_BUFFER_SIZE);  //Possibility of 25 chained commands
     bSigIntReceived = false;
     exitCode = 0;

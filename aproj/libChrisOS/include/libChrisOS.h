@@ -82,7 +82,7 @@ extern "C" {
     size_t split(char *buffer, char *argv[], size_t argv_size);
     void exit (int status);
     char** processEnvp;
-    int test();
+    int setSTD(int std, uint32_t filed);
     
 #ifdef __cplusplus
 }

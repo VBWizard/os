@@ -48,7 +48,6 @@ typedef struct
     int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size);
     int processSignal(int signal);
     void execInternalCommand(char lCommand[256]);
-
     char sExecutingProgram[512];
     char* sKShellProgramName;
     char** environmentLoc;
@@ -57,6 +56,7 @@ typedef struct
     bool timeToExit;
     char cwd[256];
     bool bSigIntReceived;
+    int execPipes[2];
 
 static command_table_t cmds[] = { 
         {"cd","Change directory",cmdChangeDirectory,1},
