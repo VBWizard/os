@@ -81,3 +81,5 @@ gdb_history
 /aproj/ls/dist/
 /aproj/grep/build/
 /aproj/grep/dist/
+
+/build_dir/*
