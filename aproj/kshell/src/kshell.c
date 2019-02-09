@@ -403,7 +403,13 @@ getAKey:
         lCurrKey=0;
         while(lCurrKey==0)
         {
-            read(STDIN_FILE, &lCurrKey, 1, 1); //Reading from STDIN blocks until a key is available
+            //Reading from STDIN blocks until a key is available.  It will only return 0 when STDIN is redirected to a file
+            int retVal=read(STDIN_FILE, &lCurrKey, 1, 1);
+            if (retVal==0)
+            {
+                timeToExit=true;
+                break;
+            }
 //            gets(&lCurrKey,1,1);
             if (bSigIntReceived)
             {
@@ -483,7 +489,7 @@ getAKey:
                 printf(KEY_BACKSPACE);
             }
         }
-        else if (lCurrKey==0xa) //Enter
+        else if (lCurrKey==0xa || lCurrKey==0x0) //Enter
         {
             print("\n");
             goto doneGettingKeys;
@@ -499,12 +505,13 @@ getAKey:
         goto getAKey;
 //        gets(lCommand,50);
 doneGettingKeys:
-        if (lCommand[0]==0x0)
-            goto getACommand;
-        if (commandWasFromThisBufferPtr == -1)
-            saveCommand(lCommand);
-        int i = findCommand(lCommand);
-        execCmds(parseCmds(lCommand));
+        if (lCommand[0]!=0x0)
+        {
+            if (commandWasFromThisBufferPtr == -1)
+                saveCommand(lCommand);
+            int i = findCommand(lCommand);
+            execCmds(parseCmds(lCommand));
+        }
     }
     free(sKShellProgramName);
     if (kCmdline)

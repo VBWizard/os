@@ -90,7 +90,8 @@ done
 basePath=/home/yogi/src/os/aproj
 for i in "${appOutputArray[@]}"
 do
-	sudo cp $basePath/$i /mnt/loop/
+	sudo cp $basePath/$i /mnt/loop/bin
+	sudo cp $basePath/libChrisOS/$pathMid/libc.so /mnt/loop/
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
 	echo -en "\t$i ... done\n"
 done

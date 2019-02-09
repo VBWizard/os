@@ -94,24 +94,25 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             printd(DEBUG_SYSCALL,"\tsyscall: open(%s,%s)\n",path, param2);
             retVal=(uint32_t)fs_open((char*)path, (char*)param2);
             //NOTE: freopen only works with STDIN/STDOUT/STDERR
-            switch (param3)
-            {
-                case STDIN_FILE:
-                    printd(DEBUG_PROCESS, "Redirecting stdin from 0x%08x to %s (0x%08)x\n",process->stdin,path,retVal);
-                    process->stdin=(void*)retVal;
-                    process->stdinRedirected=true;
-                    break;
-                case STDOUT_FILE:
-                    printd(DEBUG_PROCESS, "Redirecting stdout from 0x%08x to %s (0x%08x)\n",process->stdout,path,retVal);
-                    process->stdout=(void*)retVal;
-                    process->stdoutRedirected=true;
-                    break;
-                case STDERR_FILE:
-                    printd(DEBUG_PROCESS, "Redirecting stderr from 0x%08x to %s (0x%08)x\n",process->stderr,path,retVal);
-                    process->stderr=(void*)retVal;
-                    process->stderrRedirected=true;
-                    break;
-            }
+            if (retVal)
+                switch (param3)
+                {
+                    case STDIN_FILE:
+                        printd(DEBUG_PROCESS, "Redirecting stdin from 0x%08x to %s (0x%08)x\n",process->stdin,path,retVal);
+                        process->stdin=(void*)retVal;
+                        process->stdinRedirected=true;
+                        break;
+                    case STDOUT_FILE:
+                        printd(DEBUG_PROCESS, "Redirecting stdout from 0x%08x to %s (0x%08x)\n",process->stdout,path,retVal);
+                        process->stdout=(void*)retVal;
+                        process->stdoutRedirected=true;
+                        break;
+                    case STDERR_FILE:
+                        printd(DEBUG_PROCESS, "Redirecting stderr from 0x%08x to %s (0x%08)x\n",process->stderr,path,retVal);
+                        process->stderr=(void*)retVal;
+                        process->stderrRedirected=true;
+                        break;
+                }
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_CLOSE: //param1=handle
@@ -165,6 +166,13 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_SYSCALL,"\tsyscall: seek(0x%08x,0x%08x,%u)\n",param1,param2,param3);
             retVal = fs_seek((void*)param1, param2, param3);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
+        case SYSCALL_STAT:
+            strcpy(path, (void*)param1);
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            printd(DEBUG_SYSCALL,"\tsyscall: stat(%s,0x%08x)\n",path,param2);
+            retVal = fs_stat(param1, param2);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_GETDENTS:

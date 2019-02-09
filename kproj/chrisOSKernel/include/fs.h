@@ -167,6 +167,14 @@ extern "C" {
         dllist_t* dirs;
     };
     
+    struct sfstat
+    {
+        uint32_t     st_size;        /* Total size, in bytes */
+        uint32_t  st_lastmod;
+    };
+    
+    typedef struct sfstat fstat_t;
+
     
     filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const dirops_t * dops);
     void* fs_open(char* path, const char* mode);
@@ -174,6 +182,7 @@ extern "C" {
     int fs_write(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);
     void fs_close(void* file);
+    int fs_stat(void *path, fstat_t *buffer);
     int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);
 #ifdef __cplusplus
 }

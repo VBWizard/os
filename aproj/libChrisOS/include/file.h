@@ -33,7 +33,14 @@ extern "C" {
     uint16_t                  create_time;
     } __attribute((packed));
     
+    struct sfstat
+    {
+        uint32_t     st_size;        /* Total size, in bytes */
+        uint32_t  st_lastmod;
+    };
+    
     typedef struct direntry direntry_t;
+    typedef struct sfstat fstat_t;
     
     uintptr_t *filesToClose;
     uint32_t filesToCloseCount;
@@ -45,6 +52,8 @@ extern "C" {
     int getdir(char* path, char *buffer, int bufferCount);
     int seek(void* handle, long position, int whence);
     void* freopen(char* path, const char* mode, void *stream);
+    int stat(void *path, fstat_t *stat);
+    
     int writeI(void* handle, void *buffer, int size, int length);
     void file_cleanup();
 #ifdef __cplusplus

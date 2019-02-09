@@ -42,5 +42,7 @@ unsigned long strtoul(const char *nptr, char **endptr, register int base);
 char* strcat (char *dest, const char *src);
 char* strleft(char* val, int cnt);
 char* strstr(const char* string, char* substring);
+int strcmp (const char *p1, const char *p2);
+
 #endif	/* STRINGS_H */
 

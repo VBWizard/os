@@ -18,8 +18,6 @@
         </group>
         <group name="os"/>
         <group name="aproj"/>
-        <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/exceptions.c</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

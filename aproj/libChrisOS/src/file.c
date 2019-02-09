@@ -35,6 +35,7 @@ VISIBLE void* freopen(char* path, const char* mode, void *stream)
         filesToClose=mallocI(sizeof(uintptr_t)*25);
     }
     filesToClose[filesToCloseCount++]=(uintptr_t)retVal;
+    return retVal;
 }
 
 VISIBLE void close(void* handle)
@@ -60,4 +61,9 @@ VISIBLE int write(void* handle, void *buffer, int size, int length)
 VISIBLE int seek(void* handle, long position, int whence)
 {
     return do_syscall3(SYSCALL_SEEK, (uint32_t)handle, position, whence);
+}
+
+VISIBLE int stat(void *path, fstat_t *stat)
+{
+    return do_syscall2(SYSCALL_STAT, (uint32_t)path, (uint32_t)stat);
 }

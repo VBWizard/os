@@ -264,9 +264,16 @@ void close(eListType listType, void* entry)
     file_t* theFile = entry;
     directory_t *dir = entry;
 
-    printd(DEBUG_FILESYS, "\t\tfs_close: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
-    if (theFile->verification!=0xBABAABAB)
-        panic("close: Referenced a file that is not a file!");
+    if (listType==LIST_FILE)
+    {
+        printd(DEBUG_FILESYS, "\t\tfs_close: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
+        if (theFile->verification!=0xBABAABAB)
+            panic("close: Referenced a file that is not a file!");
+    }
+    else
+    {
+        printd(DEBUG_FILESYS, "\t\tfs_close: called for directory %s (handle=0x%08X)\n", dir->f_path, dir->handle);
+    }
     if (listType == LIST_DIRECTORY)
         dir->dops->close(dir->handle);
     else
@@ -331,6 +338,58 @@ int fs_readdir(void* file, dirent_t *dirEntry)
     return retVal;
 }
 
+int parsePath(const char *inPath, char *outPath, char *outFilename)
+{
+    char *lpath[512];
+    char *token, *lasttoken;
+    char tok[2] = "/";
+    
+    strcpy((char*)lpath,inPath);
+    token=strtok(lpath,tok);
+    strcpy(outPath,"/");
+    
+    while (token!=NULL)
+    {
+        lasttoken=token;
+        token=strtok(NULL,tok);
+        if (token!=NULL)
+        {
+            strcat(outPath,lasttoken);
+            strcat(outPath,"/");
+        }
+        else
+            strcpy(outFilename,lasttoken);
+    }
+}
+
+
+int fs_stat(void *path, fstat_t *buffer)
+{
+    
+    char lpath[512], lfile[512];
+    dirent_t *dir=kMalloc(16384);
+    int dircnt=0;
+    int retVal=-1;
+    
+    parsePath(path, lpath, lfile);
+    
+    dircnt=getDirEntries(NULL, lpath, dir, 16384);
+    
+    for (int cnt=0;cnt<dircnt;cnt++)
+        if (strcmp(dir[cnt].filename,lfile)==0)
+        {
+            buffer->st_size=dir[cnt].size;
+            buffer->st_lastmod=dir[cnt].write_date << 16 | dir[cnt].write_time;
+            retVal=0;
+            break;
+        }
+    
+    if (dir)
+        kFree(dir);
+    
+    return retVal;
+}
+
 void fs_closedir(void* dir)
 {
     close(LIST_DIRECTORY, dir);
@@ -343,7 +402,8 @@ int getDirEntries(void *process, char* path, dirent_t *buffer, int buflen)
     directory_t* dir;
     dirent_t *dirEntry = kMalloc(sizeof(dirent_t));
     process_t *proc = process;
-    int dirCount=0;
+    int dirCount=0, retVal=0;
+    dirent_t *bufptr=buffer;
     
     dir = (directory_t*)dirp;
     
@@ -351,13 +411,18 @@ int getDirEntries(void *process, char* path, dirent_t *buffer, int buflen)
     {
         while (fs_readdir(dirp,dirEntry)>=0 && dirCount*sizeof(dirent_t) < buflen)
         {
-            copyFromKernel(proc, buffer, dirEntry, sizeof(dirent_t));
+            if (proc)
+                copyFromKernel(proc, bufptr, dirEntry, sizeof(dirent_t));
+            else
+                memcpy(bufptr, dirEntry, sizeof(dirent_t));
             dirCount++;
             int a = sizeof(dirent_t);
-            buffer++;
+            bufptr++;
         }
         
-        return dirCount;
+        retVal=dirCount;
     }
-    return 0;
+    if (dirp)
+        fs_closedir(dirp);
+    return retVal;
 }

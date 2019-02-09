@@ -83,18 +83,11 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     int forkPid=0;
     char* tok;
     char* pgm=NULL;
-        char fileToExec[256] = "/\0";
+    char fileToExec[256] = "/\0";
 
-    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];
-    int paramCount=parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
-    int execParamCount=0;
-    int pcount=1;
+    char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];  //strangely, if I remove this variable I get a SEGV at 0x009B:0x7000e0bf for 0x00000023
     char *stdinRedir, *stdoutRedir;
     char *stdinfile=NULL, *stdoutfile=NULL, *stderrfile=NULL;
-    
-    if (paramCount==0)
-        return -3;
-
     int argc = 0;
     char **argv;
     
@@ -118,10 +111,26 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     
     argv = cmdlineToArgv(cmdline, &argc);
 
+    if (argc==0)
+        return -3;
+
     if (argc<1)
     {
         printf("kexec: Invalid command\n");
         return -5;
+    }
+
+
+    if (argv[0][0]=='/')
+        strcpy(fileToExec,argv[0]);
+    else
+        strcat(fileToExec,argv[0]);
+
+    fstat_t fstat;
+    if (stat(argv[0],&fstat)) //stat returns 0 if successful
+    {
+        printf("invalid path or filename%s\n",argv[0]);
+        return -4;
     }
     
     if (*argv[argc-1]=='&')
@@ -132,8 +141,6 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     if (forkPid == 0)
     {
         int retVal;
-        
-        strcat(fileToExec,argv[0]);
         
         //CLR 02/05/2019: Redirect standard input/output/err from/to a file (i.e. < and >)
         if (stdinfile!=NULL)

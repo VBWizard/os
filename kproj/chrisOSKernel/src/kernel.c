@@ -119,7 +119,7 @@ int main(int argc, char** argv)  {
     kIdleTask=kIdleProcess->task;
     //Need to let the idle task run once so that it initializes, so make sure it is the first task to run when the scheduler starts
     kIdleTask->prioritizedTicksInRunnable = 0xDFFFFFFF;
-    char program[40]="/kshell";
+    char program[40]="/bin/kshell";
     printk("Loading and executing %s\n",program);
     /*NOTE: This is how to create argv!!!*/
     char params[2][50];

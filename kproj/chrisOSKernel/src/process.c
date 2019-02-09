@@ -454,10 +454,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         {
             //argv[cnt] = address of argv + # of arguments * 8 (char**) + 
             process->argv[cnt]=(char*)process->argv+argcPtr;
-            if (useExistingProcess)
-                memcpy(process->argv[cnt],argv[cnt],50);
-            else
-                copyToKernel(parentProcessPtr,process->argv[cnt],argv[cnt],50);
+            copyToKernel(parentProcessPtr,process->argv[cnt],argv[cnt],50);
             process->argv[cnt]=(char*)argcPtr+argvVirt;
             argcPtr+=50;
         }
