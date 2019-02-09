@@ -42,7 +42,6 @@ typedef struct
     void cmdRepeat(char *cmdline);
     void (*command_function)(void);
     void (*command_function_p)(char*);
-    bool getEnvVariableValue(char* evName, char* value);
     char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char** pptr);
     void freeArgV(int pcount, char **params);
     int parseParamsShell(char* cmdLine, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], int size);

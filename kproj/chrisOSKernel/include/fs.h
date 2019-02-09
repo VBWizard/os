@@ -182,7 +182,7 @@ extern "C" {
     int fs_write(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);
     void fs_close(void* file);
-    int fs_stat(void *path, fstat_t *buffer);
+    int fs_stat(process_t *process, void *path, fstat_t *buffer);
     int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);
 #ifdef __cplusplus
 }

@@ -171,8 +171,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_STAT:
             strcpy(path, (void*)param1);
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: stat(%s,0x%08x)\n",path,param2);
-            retVal = fs_stat(param1, param2);
+            retVal = fs_stat(process, path, param2);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_GETDENTS:

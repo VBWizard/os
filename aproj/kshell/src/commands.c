@@ -77,19 +77,73 @@ int kexec2(char* path, int argc, char** argv, bool background)
 
 }
 
+int resolvePathToExecutable(const char *inPath, char *outPath)
+{
+    char delim[2]=":";
+    char *token;
+    char *envPath=NULL;
+    char *lInPath=NULL;
+    char *resPath=NULL;
+    int retVal=-1;
+    
+    //using the PATH variable, attempt to resolve the path to an executable when a path isn't given in the commandline
+    
+    //If there is a / character in the path, then don't attempt to resolve
+    if (strstr(inPath, "/"))
+    {
+        strcpy(outPath,inPath);
+        return 0;
+    }
+    
+    lInPath=malloc(1024);
+    strcpy(lInPath,inPath);
+    
+    envPath=malloc(1024);
+    getenv("PATH",envPath);
+    
+    resPath=malloc(1024);
+    
+    token=strtok(envPath,delim);
+    while (token!=NULL)
+    {
+        strcpy(resPath,token);
+        strcat(resPath,"/");
+        strcat(resPath,inPath);
+        fstat_t fstat;
+        int res=stat(resPath,&fstat);
+        if (res==0)
+        {
+            strcpy(outPath,resPath);
+            retVal=0;
+            break;
+        }
+        token=strtok(NULL,delim);
+    }
+
+    if (lInPath)
+        free(lInPath);
+    if (envPath)
+        free(envPath);
+    if (resPath)
+        free(resPath);
+    
+    return retVal;
+}
+
 int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
 {
     bool background=false;
     int forkPid=0;
     char* tok;
     char* pgm=NULL;
-    char fileToExec[256] = "/\0";
-
+    char fileToExec[256];
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];  //strangely, if I remove this variable I get a SEGV at 0x009B:0x7000e0bf for 0x00000023
     char *stdinRedir, *stdoutRedir;
     char *stdinfile=NULL, *stdoutfile=NULL, *stderrfile=NULL;
     int argc = 0;
     char **argv;
+    int retVal=-1;
+    char *temp=NULL;
     
     //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
     stdinRedir = strstr(cmdline,"<");
@@ -111,72 +165,78 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     
     argv = cmdlineToArgv(cmdline, &argc);
 
-    if (argc==0)
-        return -3;
-
     if (argc<1)
     {
         printf("kexec: Invalid command\n");
-        return -5;
+        retVal=-3;
     }
 
+    if (retVal==-1)
+    {
+        temp=malloc(1024);
+        fstat_t fstat;
 
-    if (argv[0][0]=='/')
+        if (resolvePathToExecutable(argv[0], temp)==0)
+            argv[0]=temp;
+        else if (stat(argv[0],&fstat)) //stat returns 0 if successful
+        {
+            printf("invalid path or filename '%s'\n",argv[0]);
+            retVal=-4;
+        }
+    }
+
+    //Everything is resolved and verified, lets execute the command!
+    if (retVal==-1)
+    {
         strcpy(fileToExec,argv[0]);
-    else
-        strcat(fileToExec,argv[0]);
 
-    fstat_t fstat;
-    if (stat(argv[0],&fstat)) //stat returns 0 if successful
-    {
-        printf("invalid path or filename%s\n",argv[0]);
-        return -4;
-    }
-    
-    if (*argv[argc-1]=='&')
-        background=true;
-    
-    forkPid = fork();
-    
-    if (forkPid == 0)
-    {
-        int retVal;
-        
-        //CLR 02/05/2019: Redirect standard input/output/err from/to a file (i.e. < and >)
-        if (stdinfile!=NULL)
-            if (freopen(stdinfile, "r",(void*)STDIN_FILE)==(void*)-1)
+        if (*argv[argc-1]=='&')
+            background=true;
+
+        forkPid = fork();
+
+        if (forkPid == 0)
+        {
+            int retVal;
+
+            //CLR 02/05/2019: Redirect standard input/output/err from/to a file (i.e. < and >)
+            if (stdinfile!=NULL)
+                if (freopen(stdinfile, "r",(void*)STDIN_FILE)==(void*)-1)
+                {
+                    printf("Redirect of input failed, cannot continue\n");
+                    retVal=-3;
+                    goto kexecReturn;
+                }
+            if (stdoutfile!=NULL)
+                freopen(stdoutfile,"w",(void*)STDOUT_FILE);
+            if (stderrfile!=NULL)
+                freopen(stderrfile,"w",(void*)STDERR_FILE);
+            int childPid = exec(fileToExec, argc, argv);
+
+            if (childPid > 0)
             {
-                printf("Redirect of input failed, cannot continue\n");
-                return -3;
+                retVal = waitpid(childPid);
             }
-        if (stdoutfile!=NULL)
-            freopen(stdoutfile,"w",(void*)STDOUT_FILE);
-        if (stderrfile!=NULL)
-            freopen(stderrfile,"w",(void*)STDERR_FILE);
-        int childPid = exec(fileToExec, argc, argv);
-        
-        if (childPid > 0)
-        {
-            retVal = waitpid(childPid);
+            else
+                retVal = 0xBADBADBA;
+            exit(retVal);
         }
+        else if (forkPid < 0)
+            print("Fork error %u", forkPid);
         else
-            retVal = 0xBADBADBA;
-        exit(retVal);
-    }
-    else if (forkPid < 0)
-        print("Fork error %u", forkPid);
-    else
-    {
-        if (!background)
         {
-            lastExecExitCode = waitpid(forkPid);
-            if (lastExecExitCode == 0xBADBADBA)
-                print("exec: Cannot execute %s\n",argv[0]);
+            if (!background)
+            {
+                lastExecExitCode = waitpid(forkPid);
+                if (lastExecExitCode == 0xBADBADBA)
+                    print("exec: Cannot execute %s\n",argv[0]);
+            }
+            char ret[10];
+            itoa(lastExecExitCode,ret);
+            setenv("LASTEXIT",ret);    
         }
-        char ret[10];
-        itoa(lastExecExitCode,ret);
-        setenv("LASTEXIT",ret);    
     }
+kexecReturn:
     //Its ok to free arguments now because they are copied by the kernel to pgm's memory
     free(argv);
     free(pgm);
@@ -186,6 +246,8 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
         free(stdoutfile);
     if (stderrfile)
         free(stderrfile);
+    if (temp)
+        free(temp);
     
 }
 

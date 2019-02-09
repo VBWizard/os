@@ -363,7 +363,7 @@ int parsePath(const char *inPath, char *outPath, char *outFilename)
 }
 
 
-int fs_stat(void *path, fstat_t *buffer)
+int fs_stat(process_t *process, void *path, fstat_t *buffer)
 {
     
     char lpath[512], lfile[512];
@@ -378,8 +378,17 @@ int fs_stat(void *path, fstat_t *buffer)
     for (int cnt=0;cnt<dircnt;cnt++)
         if (strcmp(dir[cnt].filename,lfile)==0)
         {
-            buffer->st_size=dir[cnt].size;
-            buffer->st_lastmod=dir[cnt].write_date << 16 | dir[cnt].write_time;
+            if (process)
+            {
+                uint32_t lastMod=dir[cnt].write_date << 16 | dir[cnt].write_time;
+                copyFromKernel(process,&buffer->st_size,&dir[cnt].size,sizeof(dir[cnt].size));
+                copyFromKernel(process,&buffer->st_lastmod,&lastMod,sizeof(uint32_t));
+            }
+            else
+            {
+                buffer->st_size=dir[cnt].size;
+                buffer->st_lastmod=dir[cnt].write_date << 16 | dir[cnt].write_time;
+            }
             retVal=0;
             break;
         }

@@ -296,29 +296,6 @@ void freeArgV(int pcount, char **params)
     free(params);
 }
 
-bool getEnvVariableValue(char* evName, char* value)
-{
-    
-    for (int cnt=0;cnt<50;cnt++)
-    {
-        if (environmentLoc[cnt]!=0)
-        {
-            char* idx = strstr((char*)environmentLoc[cnt],evName);
-            if (idx>0)
-            {
-                idx = strstr(idx,"=");
-                //++ because we don't want to include the = sign
-                strcpy(value, ++idx);
-                //print("getEnvVariableValue: value for '%s'='%s'\n",evName, value);
-                return true;
-            }
-        }
-    } 
-    return false;
-}
-
-
-
 /*void getDate()
 {
     struct tm theDate;
@@ -489,9 +466,14 @@ getAKey:
                 printf(KEY_BACKSPACE);
             }
         }
-        else if (lCurrKey==0xa || lCurrKey==0x0) //Enter
+        else if (lCurrKey==0xa) //Enter
         {
             print("\n");
+            goto doneGettingKeys;
+        }
+        else if (lCurrKey==0x0)
+        {
+            lCommand[0]=0x0;
             goto doneGettingKeys;
         }
         else
