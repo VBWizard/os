@@ -18,11 +18,13 @@
 #define BREAK_LEFT      203  //
 #define BREAK_UP        200  //
 #define BREAK_DOWN      208  //
-#define KEY_SHIFT_DN    42
+#define KEY_LEFT_SHIFT_DN    42
+#define KEY_RIGHT_SHIFT_DN   54
 #define KEY_CTRL_DN     29
 #define KEY_ALT_DN      56
 #define KEY_CAPSLOCK_DN 58
-#define KEY_SHIFT_UP    KEY_SHIFT_DN | 0x80
+#define KEY_LEFT_SHIFT_UP    KEY_LEFT_SHIFT_DN | 0x80
+#define KEY_RIGHT_SHIFT_UP   KEY_RIGHT_SHIFT_DN | 0x80
 #define KEY_CTRL_UP     KEY_CTRL_DN | 0x80
 #define KEY_ALT_UP      KEY_ALT_DN | 0x80
 #define KEY_CAPSLOCK_UP KEY_CAPSLOCK_DN | 0x80
@@ -86,8 +88,8 @@ static const unsigned char keyboard_map_up[128] =
   'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',      /* Enter key */
     0,         /* 29   - Control */
   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':',   /* 39 */
-'|', '~',   42,      /* Left shift */
-'\\', 'Z', 'X', 'C', 'V', 'B', 'N',         /* 49 */
+'\"', '~',   42,      /* Left shift */
+'|', 'Z', 'X', 'C', 'V', 'B', 'N',         /* 49 */
   'M', '<', '>', '?',   0,               /* Right shift */
   0,
     0,   /* Alt */

@@ -81,13 +81,13 @@ static const unsigned char keyboard_map[128] =
 static const unsigned char keyboard_map_up[128] =
 {
 0,  0, '!', '@', '#', '$', '%', '^', '&', '*',   /* 9 */
-  '(', ')', '_', '+', '\b', '\t',
-  'Q', 'W', 'E', 'R',
-  'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',      /* Enter key */
+  '(', ')', '_', '+', '\b', '\t', //15
+  'Q', 'W', 'E', 'R', //19
+  'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',      /* Enter key  - 28*/
     0,         /* 29   - Control */
   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':',   /* 39 */
-'|', '~',   42,      /* Left shift */
-'\\', 'Z', 'X', 'C', 'V', 'B', 'N',         /* 49 */
+'\"', '~',   42,      /* Left shift */
+'|', 'Z', 'X', 'C', 'V', 'B', 'N',         /* 49 */
   'M', '<', '>', '?',   0,               /* Right shift */
   0,
     0,   /* Alt */

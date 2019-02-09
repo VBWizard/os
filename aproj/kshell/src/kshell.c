@@ -56,10 +56,14 @@ char** parseCmds(char *command)
     //Find ; or | which both separate commands
     while (1==1)
     {
-        if (*ltemp==';' || *ltemp==0)
+        if (*ltemp==';' || *ltemp=='|' || *ltemp==0)
         {
             kCmdline[cmdptr]=kCmdline+(PARSE_CMD_COUNT*4) + (cmdptr*CMDLINE_MAX_SIZE);
-            strncpy(kCmdline[cmdptr++],cmdbegin,(uint32_t)ltemp-(uint32_t)cmdbegin);
+            
+            if (*ltemp=='|')
+                strncpy(kCmdline[cmdptr++],cmdbegin,(uint32_t)ltemp-(uint32_t)cmdbegin+1);
+            else
+                strncpy(kCmdline[cmdptr++],cmdbegin,(uint32_t)ltemp-(uint32_t)cmdbegin);
             if (*ltemp=='\0')
                 break;
             cmdbegin=ltemp+1;

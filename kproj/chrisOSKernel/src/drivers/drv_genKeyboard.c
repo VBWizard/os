@@ -55,11 +55,13 @@ void kbd_handler_generic()
     //printd(DEBUG_KEYBOARD,"got a key: %c (0x%04X)\n",kKeyChar,kKeyChar);
     switch(rawKey)
     {
-    case KEY_SHIFT_DN:
+    case KEY_LEFT_SHIFT_DN:
+    case KEY_RIGHT_SHIFT_DN:
         kKeyStatus[INDEX_SHIFT]=1;
         //printd(DEBUG_KEYBOARD,"Shift down\n");
         goto timeToReturn;
-    case KEY_SHIFT_UP:
+    case KEY_LEFT_SHIFT_UP:
+    case KEY_RIGHT_SHIFT_UP:
         kKeyStatus[INDEX_SHIFT]=0;
         //printd(DEBUG_KEYBOARD,"Shift up\n");
         goto timeToReturn;
@@ -131,8 +133,9 @@ void kbd_handler_generic()
             }
         }
 
-        if (translatedKeypress==124)
-            translatedKeypress=34;
+        //01/09/2019 Don't know why next two lines of code exists but remove them in a while if not needed
+        //if (translatedKeypress==124)
+        //    translatedKeypress=34;
         //CLR 01/24/2019: Added stdin check because we don't care how full the keyboard buffer is if we're going to write the results to the STDIN pipe
         if (tty1->stdInWritePipe)
         {
