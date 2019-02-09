@@ -63,7 +63,7 @@ VISIBLE int seek(void* handle, long position, int whence)
     return do_syscall3(SYSCALL_SEEK, (uint32_t)handle, position, whence);
 }
 
-VISIBLE int stat(void *path, fstat_t *stat)
+VISIBLE int stat(char *path, fstat_t *stat)
 {
     return do_syscall2(SYSCALL_STAT, (uint32_t)path, (uint32_t)stat);
 }

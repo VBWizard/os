@@ -169,18 +169,26 @@ void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned l
     return dest;
 }
 
-char* processGetCWD(char* buf, unsigned long size) //NOTE buf required to be not NULL
+int processSetCWD(process_t *process, char* buf, unsigned long size) //NOTE buf required to be not NULL
+{
+    int retVal=0, cwdSize=1024;
+
+    if (buf==NULL)
+        process->errno=ERROR_INVALID_DEST;
+    else if (size>cwdSize)
+        process->errno=ERROR_SIZE_TOO_SMALL;
+    else
+        copyToKernel(process,process->cwd,buf,cwdSize);
+    if (process->errno)
+        return -1;
+    else
+        return 0;
+}
+
+int processGetCWD(process_t *process, char* buf, unsigned long size) //NOTE buf required to be not NULL
 {
     char* retVal=0, cwdSize=0;
-    SAVE_CURRENT_CR3(userCR3);
-    //Get the process from 
-    process_t* process;
-    //GET_PROCESS_POINTER(process);
-    uint32_t taskNum;
-    LOAD_KERNEL_CR3;
-    __asm__("str eax\n":"=a" (taskNum));
-    taskNum>>=3;
-    process=findTaskByTaskNum(taskNum);
+
     cwdSize=strlen(process->cwd)+1;
     if (buf==NULL)
         process->errno=ERROR_INVALID_DEST;
@@ -189,11 +197,9 @@ char* processGetCWD(char* buf, unsigned long size) //NOTE buf required to be not
     else
         copyFromKernel(process,buf,process->cwd,cwdSize);
     if (process->errno)
-        retVal=NULL;
+        return -1;
     else
-        retVal=buf;
-    LOAD_CR3(userCR3);
-    return retVal;
+        return 0;
 }
 
 //This runs in user space.  We're just calling startup procedures
@@ -399,9 +405,6 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     process->elf=NULL;
     gmtime_r((time_t*)&kSystemCurrentTime,&process->startTime);
     
-    //Initialize the current working directory and set it to '/'
-    memset(process->cwd,0,PAGE_SIZE);
-    strcpy(process->cwd,"/");
     
     process->heapStart=PROCESS_HEAP_START;
     process->heapEnd=PROCESS_HEAP_START;
@@ -410,6 +413,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     {
        process->parent=parentProcessPtr->parent;
        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
+       //Initialize the current working directory to parent's cwd
+       strcpy(process->cwd, parentProcessPtr->cwd);
        //CLR 02/05/2019: If we forked we don't want to mess with the pipes established 
        /*process->stdin=((process_t*)parentProcessPtr)->stdin;
        process->stdout=((process_t*)parentProcessPtr)->stdout;
@@ -419,12 +424,17 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     {
        process->parent=parentProcessPtr;
        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
+       //Initialize the current working directory to parent's cwd
+       strcpy(process->cwd, parentProcessPtr->cwd);
        process->stdin=((process_t*)parentProcessPtr)->stdin;
        process->stdout=((process_t*)parentProcessPtr)->stdout;
        process->stderr=((process_t*)parentProcessPtr)->stderr;
     }
     else
     {
+        //Initialize the current working directory and set it to '/'
+        memset(process->cwd,0,PAGE_SIZE);
+        strcpy(process->cwd,"/");
        process->kernelProcess=isKernelProcess;
        process->stdin=0;
        process->stdout=1;

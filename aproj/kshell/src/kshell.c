@@ -43,23 +43,30 @@ char** parseCmds(char *command)
 {
     char delims[3] = ";";
     char **cmds;
-    char *lcommand=malloc(1024);
+    char *ltemp=command; //malloc(1024);
+    int lCommandPtr=0;
     char *cmd;
-    int cmdptr=0;
-    
-    //Get a local copy of the command for strtok which will modify the string
-    strncpy(lcommand,command,1024);
-    
+    char cmdptr=0;
+    char *cmdbegin=command;
+
     memset(kCmdline,0,CMDLINE_BUFFER_SIZE);
-    cmd = strtok(lcommand, delims);
-    while( cmd != NULL )
+
+    ltemp=command;
+    
+    //Find ; or | which both separate commands
+    while (1==1)
     {
-        kCmdline[cmdptr]=kCmdline+(PARSE_CMD_COUNT*4) + (cmdptr*CMDLINE_MAX_SIZE);
-        strcpy(kCmdline[cmdptr],cmd);
-        cmd = strtok(NULL, delims);
-        if (cmd!=NULL)
-            cmdptr++;
-    };
+        if (*ltemp==';' || *ltemp==0)
+        {
+            kCmdline[cmdptr]=kCmdline+(PARSE_CMD_COUNT*4) + (cmdptr*CMDLINE_MAX_SIZE);
+            strncpy(kCmdline[cmdptr++],cmdbegin,(uint32_t)ltemp-(uint32_t)cmdbegin);
+            if (*ltemp=='\0')
+                break;
+            cmdbegin=ltemp+1;
+        }
+        ltemp++;
+    }
+
     return kCmdline;
 }
 

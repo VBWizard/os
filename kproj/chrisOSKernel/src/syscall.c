@@ -30,8 +30,7 @@
 
 extern int kTimeZone;
 extern time_t kSystemCurrentTime;
-char* processGetCWD(char* buf, unsigned long size);
-
+int processGetCWD(process_t *process, char* buf, unsigned long size);
 
 //NOTE: Upon entering _sysCall, the process' CR3 is still being used
 void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param3)
@@ -41,7 +40,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     void* parentProcess;
     process_t* process;
     task_t* task;
-    char path[255];
+    char path[1024];
     uint32_t param4;
     uint32_t processCR3;  //NOTE: Moved from module level to here because this needs to be a stack variable for fork()
     bool taskExited = false;
@@ -184,8 +183,19 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_GETCWD:    //param1=buffer *, param2=size of buffer
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: getCWD(%s,0x%08x)\n",param1,param2);
-            retVal=(uint32_t)processGetCWD((char*)param1,param2);
+            retVal=processGetCWD(process, (char*)param1,param2);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
+        case SYSCALL_SETCWD:
+            strcpy(path, param1);
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            process=getCurrentProcess();
+            printd(DEBUG_SYSCALL,"\tsyscall: getCWD(%s,0x%08x)\n",path,param2);
+            retVal=processSetCWD(process, (char*)path,param2);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_EXEC:
         case SYSCALL_EXECNEW:      //***exec: param1=program path

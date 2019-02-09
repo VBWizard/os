@@ -83,7 +83,7 @@ extern "C" {
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);
-    char* processGetCWD(char* buf, unsigned long size);
+    int processGetCWD(process_t *process, char* buf, unsigned long size);
     void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size); //Copy memory from kernel to user space (assumes dest is user page)
     void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size); //Copy memory from user space to kernel (assumes dest is kernel page)
     process_t *getCurrentProcess ();

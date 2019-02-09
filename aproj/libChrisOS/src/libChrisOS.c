@@ -224,6 +224,10 @@ VISIBLE char* getcwd(char* buf, size_t size)
     return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
 }
 
+VISIBLE char* setcwd(char* buf, size_t size)
+{
+    return (char*)do_syscall2(SYSCALL_SETCWD,(uint32_t)buf,size);
+}
 
 size_t splitI(char *buffer, char *argv[], size_t argv_size)
 {

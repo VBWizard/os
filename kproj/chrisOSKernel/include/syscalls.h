@@ -32,6 +32,7 @@ extern "C" {
         SYSCALL_SEEK                    = 0x9,
         SYSCALL_STAT                    = 0xa,
         SYSCALL_GETCWD                  = 0x4f,
+        SYSCALL_SETCWD                  = 0x50,
         SYSCALL_EXEC			= 0x59,
         SYSCALL_WAITFORPID		= 0x61,
         SYSCALL_SETPRIORITY             = 0x97,

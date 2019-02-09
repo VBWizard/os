@@ -31,6 +31,7 @@ typedef struct
 } command_table_t;
 
     void cmdHelp(char *cmdline);
+    void cmdChangeDirectory(char *cmdline);
     void cmdClearScreen();
     void cmdExit(char *cmdline);
     void cmdExecp(char* cmdline);
@@ -58,6 +59,7 @@ typedef struct
     bool bSigIntReceived;
 
 static command_table_t cmds[] = { 
+        {"cd","Change directory",cmdChangeDirectory,1},
         {"clear","Clear the screen",cmdClearScreen,0},
         {"env","Print environment",cmdPrintEnv,0},
         {"exec","Execute a program",cmdExecp,1},

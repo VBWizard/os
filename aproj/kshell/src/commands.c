@@ -85,41 +85,60 @@ int resolvePathToExecutable(const char *inPath, char *outPath)
     char *lInPath=NULL;
     char *resPath=NULL;
     int retVal=-1;
+    fstat_t fstat;
     
     //using the PATH variable, attempt to resolve the path to an executable when a path isn't given in the commandline
     
     //If there is a / character in the path, then don't attempt to resolve
-    if (strstr(inPath, "/"))
-    {
-        strcpy(outPath,inPath);
-        return 0;
-    }
-    
-    lInPath=malloc(1024);
-    strcpy(lInPath,inPath);
-    
     envPath=malloc(1024);
     getenv("PATH",envPath);
-    
-    resPath=malloc(1024);
-    
-    token=strtok(envPath,delim);
-    while (token!=NULL)
-    {
-        strcpy(resPath,token);
-        strcat(resPath,"/");
-        strcat(resPath,inPath);
-        fstat_t fstat;
-        int res=stat(resPath,&fstat);
-        if (res==0)
-        {
-            strcpy(outPath,resPath);
-            retVal=0;
-            break;
-        }
-        token=strtok(NULL,delim);
-    }
 
+    if (strstr(inPath, "/"))
+    {
+        if (*inPath!='/')
+        {
+            strcpy(outPath,cwd);
+        }
+        strcat(outPath,inPath);
+        retVal=0;
+    }
+    else
+    {
+        lInPath=malloc(1024);
+        strcpy(lInPath,inPath);
+
+        resPath=malloc(1024);
+
+        token=strtok(envPath,delim);
+        while (token!=NULL)
+        {
+            strcpy(resPath,token);
+            strcat(resPath,"/");
+            strcat(resPath,inPath);
+            int res=stat(resPath,&fstat);
+            if (res==0)
+            {
+                strcpy(outPath,resPath);
+                retVal=0;
+                break;
+            }
+            token=strtok(NULL,delim);
+        }
+
+        if (retVal==-1)
+        {
+            strcpy(resPath,cwd);
+            strcat(resPath,"/");
+            strcat(resPath,inPath);
+            int res=stat(resPath,&fstat);
+            if (res==0)
+            {
+                strcpy(outPath,resPath);
+                retVal=0;
+            }
+        }
+    }
+    
     if (lInPath)
         free(lInPath);
     if (envPath)
@@ -138,7 +157,8 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     char* pgm=NULL;
     char fileToExec[256];
     char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH];  //strangely, if I remove this variable I get a SEGV at 0x009B:0x7000e0bf for 0x00000023
-    char *stdinRedir, *stdoutRedir;
+    char *stdinRedir=NULL, *stdoutRedir=NULL;
+    char *stdoutPipe=NULL;
     char *stdinfile=NULL, *stdoutfile=NULL, *stderrfile=NULL;
     int argc = 0;
     char **argv;
@@ -146,7 +166,14 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     char *temp=NULL;
     
     //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
-    stdinRedir = strstr(cmdline,"<");
+    stdinRedir=strstr(cmdline,"<");
+    stdoutPipe=strstr(cmdline,"|");
+    
+    if (stdoutPipe)
+    {
+        
+    }
+    
     if (stdinRedir)
     {
         stdinfile = malloc(256);
@@ -249,6 +276,32 @@ kexecReturn:
     if (temp)
         free(temp);
     
+}
+
+void cmdChangeDirectory(char *cmdline)
+{
+    fstat_t fstat;
+    char *lcmdline=malloc(1024);
+    bool error=false;
+    
+    strtrim(cmdline);
+            
+    if (*cmdline!='/')
+        strcpy(lcmdline,"/");
+    strcat(lcmdline,cmdline);
+    if (strncmp(cmdline,"/",512)!=0)
+        if (stat(cmdline,&fstat)) 
+        {
+            printf("Invalid directory '%s'\n",lcmdline);
+            error=true;
+        }
+    if (!error)
+    {
+        setcwd(lcmdline, sizeof(lcmdline));
+        setenv("CWD",lcmdline);
+    }
+    
+    free(lcmdline);
 }
 
 void cmdTime(char* cmdline)

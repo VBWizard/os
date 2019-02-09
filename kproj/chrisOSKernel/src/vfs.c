@@ -407,31 +407,36 @@ void fs_closedir(void* dir)
 /*SYSCALL_GETDENTS:*/
 int getDirEntries(void *process, char* path, dirent_t *buffer, int buflen)
 {
-    void* dirp = fs_opendir(path);
     directory_t* dir;
     dirent_t *dirEntry = kMalloc(sizeof(dirent_t));
     process_t *proc = process;
-    int dirCount=0, retVal=0;
+    int dirCount=0, retVal=-1;
     dirent_t *bufptr=buffer;
-    
-    dir = (directory_t*)dirp;
-    
-    if (dir->handle)
-    {
-        while (fs_readdir(dirp,dirEntry)>=0 && dirCount*sizeof(dirent_t) < buflen)
-        {
-            if (proc)
-                copyFromKernel(proc, bufptr, dirEntry, sizeof(dirent_t));
-            else
-                memcpy(bufptr, dirEntry, sizeof(dirent_t));
-            dirCount++;
-            int a = sizeof(dirent_t);
-            bufptr++;
-        }
-        
-        retVal=dirCount;
-    }
+    void* dirp = fs_opendir(path);
+
     if (dirp)
-        fs_closedir(dirp);
+    {
+        dir = (directory_t*)dirp;
+
+        if (dir->handle)
+        {
+            while (fs_readdir(dirp,dirEntry)>=0 && dirCount*sizeof(dirent_t) < buflen)
+            {
+                if (proc)
+                    copyFromKernel(proc, bufptr, dirEntry, sizeof(dirent_t));
+                else
+                    memcpy(bufptr, dirEntry, sizeof(dirent_t));
+                dirCount++;
+                int a = sizeof(dirent_t);
+                bufptr++;
+            }
+
+            retVal=dirCount;
+        }
+        if (dirp)
+            fs_closedir(dirp);
+    }
+    
+    kFree(dirEntry);
     return retVal;
 }
