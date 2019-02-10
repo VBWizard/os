@@ -78,6 +78,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/fat/fat_table.o \
 	${OBJECTDIR}/src/fat/fat_write.o \
 	${OBJECTDIR}/src/fat/taskSwitch.o \
+	${OBJECTDIR}/src/filesystem/memdisk.o \
 	${OBJECTDIR}/src/filesystem/pipe.o \
 	${OBJECTDIR}/src/filesystem/procfs.o \
 	${OBJECTDIR}/src/kIRQHandlers.o \
@@ -338,6 +339,11 @@ ${OBJECTDIR}/src/fat/fat_write.o: src/fat/fat_write.c
 ${OBJECTDIR}/src/fat/taskSwitch.o: src/fat/taskSwitch.s
 	${MKDIR} -p ${OBJECTDIR}/src/fat
 	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/src/fat/taskSwitch.o src/fat/taskSwitch.s
+
+${OBJECTDIR}/src/filesystem/memdisk.o: src/filesystem/memdisk.c
+	${MKDIR} -p ${OBJECTDIR}/src/filesystem
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/filesystem/memdisk.o src/filesystem/memdisk.c
 
 ${OBJECTDIR}/src/filesystem/pipe.o: src/filesystem/pipe.c
 	${MKDIR} -p ${OBJECTDIR}/src/filesystem

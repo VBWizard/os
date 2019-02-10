@@ -53,6 +53,7 @@
       <itemPath>include/kernelVariables.h</itemPath>
       <itemPath>include/kmalloc.h</itemPath>
       <itemPath>include/kutility.h</itemPath>
+      <itemPath>include/filesystem/memdisk.h</itemPath>
       <itemPath>include/mm.h</itemPath>
       <itemPath>include/mmap.h</itemPath>
       <itemPath>include/paging.h</itemPath>
@@ -116,6 +117,7 @@
       <itemPath>src/mm/kmalloc.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
+      <itemPath>src/filesystem/memdisk.c</itemPath>
       <itemPath>src/mm/mm.c</itemPath>
       <itemPath>src/mm/mmap.c</itemPath>
       <itemPath>../chrisOS/src/cpu/msr.c</itemPath>
@@ -298,6 +300,8 @@
       </item>
       <item path="include/errors.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/filesystem/memdisk.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
@@ -409,6 +413,8 @@
       <item path="src/fat/taskSwitch.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/filesystem/memdisk.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -601,6 +607,8 @@
       </item>
       <item path="include/errors.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/filesystem/memdisk.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
@@ -712,6 +720,8 @@
       <item path="src/fat/taskSwitch.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/filesystem/memdisk.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
       </item>

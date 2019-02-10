@@ -34,6 +34,7 @@ char *console;
 void initTerm()
 {
     terminfos = (terminfo_t*)kMalloc(sizeof(terminfo_t) * TERM_MAX_TERMINALS);
+    memset(terminfos,0,sizeof(terminfo_t)*TERM_MAX_TERMINALS);
     termsRegistered = 0;
     pipeContents = kMalloc(PIPE_FILE_SIZE);
     kTermLock = 0;
