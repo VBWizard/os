@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
         //print("Started PID %u\n",pid);
     }
     printf("%u children spawned\n",pidsToSpawn);
-    printf("Waiting for all children to quit");
+    printf("Waiting for all children to quit\n");
     while (pidCount<pidsToSpawn)
     {
         int thePid = pids[pidCount];
@@ -66,8 +66,7 @@ int main(int argc, char** argv) {
         rets[pidCount]=waitpid(thePid);
         pidCount++;
     }
-    for (int cnt=0;cnt<pidsToSpawn;cnt++)
-        print("Child %u return %u\n",cnt+1,rets[cnt]);
+    printf("All children ended\n");
     return 0;
 /*    pid=fork();
     if (pid==0)

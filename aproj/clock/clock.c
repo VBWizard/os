@@ -19,10 +19,11 @@
  */
 int main(int argc, char** argv) {
 
+    struct tm *timeinfo = malloc(sizeof(struct tm));
+
     while (1==1)
     {
         time_t theTime = time(&theTime);
-        struct tm *timeinfo = malloc(sizeof(struct tm));
         
         timeinfo = localtime(&theTime);
 
@@ -32,6 +33,7 @@ int main(int argc, char** argv) {
         restoreCursorPosition();
         sleep(1);
     }
+    free(timeinfo);
     return 0;
 }
 

@@ -37,14 +37,16 @@ extern bool signalCheckEnabled;
 bool schedulerTaskSwitched=0;
 extern uint32_t* isrSavedStack; 
 extern uint32_t kNextSignalCheckTicks;
+extern pipe_t *activeSTDOUT;
+extern pipe_t *activeSTDIN;
+
 extern void keyboardInit();
 extern void initTerm();
 extern int initTTY();
 extern void globalMMapInit();
 
 filesystem_t *rootFs, *pipeFs;
-terminfo_t *sysConsole;
-ttydevice_t *tty1;
+terminfo_t *sysConsole1, *sysConsole2, *sysConsole3, *sysConsole4, *sysConsole5, *sysConsole6, *sysConsole7, *sysConsole8;
 process_t* kIdleProcess;
 task_t* kIdleTask;
 uint32_t kIdleTicks=0;
@@ -101,11 +103,28 @@ int main(int argc, char** argv)  {
     globalMMapInit();
     initTerm();
     initTTY();
-    sysConsole = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 0, 80, 50, "Main system console 0");
-    tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 0);
+    sysConsole1 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 0, 80, 50, "Main system console 0");
+    sysConsole2 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 1, 80, 50, "Main system console 0");
+    sysConsole3 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 2, 80, 50, "Main system console 0");
+    sysConsole4 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 3, 80, 50, "Main system console 0");
+    sysConsole5 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 4, 80, 50, "Main system console 0");
+    sysConsole6 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 5, 80, 50, "Main system console 0");
+    sysConsole7 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 6, 80, 50, "Main system console 0");
+    sysConsole8 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 7, 80, 50, "Main system console 0");
+    tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 1);
+    tty2 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 2);
+    tty3 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 3);
+    tty4 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 4);
+    tty5 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 5);
+    tty6 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 6);
+    tty7 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 7);
+    tty8 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 8);
     kKernelProcess->stdout = tty1->stdOutWritePipe;
     kKernelProcess->stdin = tty1->stdInReadPipe;
     kKernelProcess->stderr = tty1->stdErrWritePipe;
+    activeSTDOUT = tty1->stdOutWritePipe;
+    activeSTDIN=tty1->stdInReadPipe;
+    activeTTY=tty1;
     
     printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
             tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);
@@ -131,6 +150,31 @@ int main(int argc, char** argv)  {
 
     
     process_t* initialShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    process_t* tty2ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    tty2ShellProcess->stdout=tty2->stdOutWritePipe;
+    tty2ShellProcess->stdin=tty2->stdInReadPipe;
+    tty2ShellProcess->stderr=tty2->stdErrWritePipe;
+    tty2ShellProcess->childNumber=1;
+    process_t* tty3ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    tty3ShellProcess->stdout=tty3->stdOutWritePipe;
+    tty3ShellProcess->stdin=tty3->stdInReadPipe;
+    tty3ShellProcess->stderr=tty3->stdErrWritePipe;
+    tty3ShellProcess->childNumber=2;
+    process_t* tty4ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    tty4ShellProcess->stdout=tty4->stdOutWritePipe;
+    tty4ShellProcess->stdin=tty4->stdInReadPipe;
+    tty4ShellProcess->stderr=tty4->stdErrWritePipe;
+    tty4ShellProcess->childNumber=3;
+    process_t* tty5ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    tty5ShellProcess->stdout=tty5->stdOutWritePipe;
+    tty5ShellProcess->stdin=tty5->stdInReadPipe;
+    tty5ShellProcess->stderr=tty5->stdErrWritePipe;
+    tty5ShellProcess->childNumber=4;
+    process_t* tty6ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    tty6ShellProcess->stdout=tty6->stdOutWritePipe;
+    tty6ShellProcess->stdin=tty6->stdInReadPipe;
+    tty6ShellProcess->stderr=tty6->stdErrWritePipe;
+    tty6ShellProcess->childNumber=5;
     printk("KSHELL LOADED!!!");
 //    waitTicks(3);
     schedulerEnabled=true;

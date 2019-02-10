@@ -21,6 +21,7 @@
 #include "schedule.h" 
 #include "thesignals.h"
 #include "filesystem/pipe.h"
+#include "drivers/tty_driver.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
@@ -194,6 +195,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     
     if (pagingExceptionCR3 == KERNEL_CR3)
     {
+        exceptionInKernelMode=true;
         printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception was in kernel CR3 (0x%08x), victim CR3=0x%08x (Process 0x%04x).\n",pagingExceptionCR3, victimProcess->pageDirPtr, victimTaskNum);
         //CLR 01/27/2019: TODO: This is a total HACK.  For some reason QEMU is storing the kernel CR3 on task switch from obvious non-kernel code, to this exception handler.
         //So I'm switching it back, in the TSS too!
@@ -204,27 +206,31 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             printd(DEBUG_EXCEPTIONS,"Switching to victim CR3 (updating TSS.CR3 too which is a HACK)\n");
             victimTask->tss->CR3 = victimProcess->pageDirPtr;
             pagingExceptionCR3 = victimProcess->pageDirPtr;
-            exceptionInKernelMode=true;
         }
     }
-    lPTEAddress=kPagingGet4kPTEntryAddressCR3(pagingExceptionCR3,pagingExceptionCR2);
-    lPDEAddress=kPagingGet4kPDEntryAddressCR3(pagingExceptionCR3,pagingExceptionCR2);
-    lPDEValue=kPagingGet4kPDEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
-    lPTEValue=kPagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
+    lPTEAddress=kPagingGet4kPTEntryAddressCR3(victimProcess->pageDirPtr,pagingExceptionCR2);
+    lPDEAddress=kPagingGet4kPDEntryAddressCR3(victimProcess->pageDirPtr,pagingExceptionCR2);
+    lPDEValue=kPagingGet4kPDEntryValueCR3(victimProcess->pageDirPtr,pagingExceptionCR2);
+    lPTEValue=kPagingGet4kPTEntryValueCR3(victimProcess->pageDirPtr,pagingExceptionCR2);
+    uint32_t lKPTEValue=kPagingGet4kPTEntryValueCR3(KERNEL_CR3,pagingExceptionCR2);
     nullPointer=lPDEValue==0;
     
     uint32_t pagePhysAddr=lPTEValue&0xFFFFF000;
     uint32_t pageFlags=lPTEValue&0x00000FFF;
     elfInfo_t* elf=victimProcess->elf;
     
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x, VPTE=0x%08X, KPTE=0x%08X)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3,lPTEValue,lKPTEValue);
+
     if (exceptionInKernelMode)
     {
         //More hacking
         if ( ( (ErrorCode & 0x2) && (lPTEValue & 0x7) )               //either request was write and PTE is write 
                 || ( (ErrorCode & 0x2==0) && lPTEValue & 0x5) )    //or request was read and 
         {
-            pagingMapPage(KERNEL_CR3,pagingExceptionCR2,lPTEValue & 0xFFFFF000,(uint16_t)0x7);
-            pagingMapPage(KERNEL_CR3,pagingExceptionCR2& 0xC0000000, lPTEValue & 0xFFFFF000,(uint16_t)0x7);
+            pagingMapPage(KERNEL_CR3,(pagingExceptionCR2 & 0xFFFFF000),pagePhysAddr,(uint16_t)0x7);
+            printd(DEBUG_EXCEPTIONS,"\tpagingMapPage(0x%08x,0x%08x,0x%08x,0x%04x)\n",KERNEL_CR3, (pagingExceptionCR2 & 0xFFFFF000), pagePhysAddr, 0x7);
+            pagingMapPage(KERNEL_CR3,(pagingExceptionCR2 & 0xFFFFF000) | 0xC0000000, pagePhysAddr,(uint16_t)0x7);
+            printd(DEBUG_EXCEPTIONS,"\tpagingMapPage(0x%08x,0x%08x,0x%08x,0x%04x)\n",KERNEL_CR3, (pagingExceptionCR2 & 0xFFFFF000) | 0xC0000000, pagePhysAddr, 0x7);
             printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Kernel mapping was missing, Mapped it.  Returning\n");
             goto kPagingExceptionHandlerNewReturn;
         }
@@ -233,7 +239,6 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     pagingMapPage(victimProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)victimProcess & 0xFFFFF000, (uint16_t)0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
    __asm__("clts\n"); //TODO: Didn't save fpu registers
     //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08x (CR3=0x%08x)\n",exceptionCR2,exceptionCR3);
-    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
     printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08x)\n\tChecking for uninitialized mmap page, pt entry=0x%08x\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
 
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
@@ -303,10 +308,11 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             uintptr_t exceptionPhysicalCR2Address=pagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2) & 0xFFFFF000;
             uint32_t newPhys=(uint32_t)allocPages(PAGE_SIZE);
             pagingMapPage(KERNEL_CR3,exceptionPhysicalCR2Address,exceptionPhysicalCR2Address,(uint16_t)0x7);
-            pagingMapPage(KERNEL_CR3,exceptionPhysicalCR2Address & 0xC0000000,exceptionPhysicalCR2Address,(uint16_t)0x7);
+            pagingMapPage(KERNEL_CR3,exceptionPhysicalCR2Address | 0xC0000000,exceptionPhysicalCR2Address,(uint16_t)0x7);
             pagingMapPage(KERNEL_CR3,newPhys,newPhys,(uint16_t)0x7);
             memcpy((void*)newPhys,(void*)(exceptionPhysicalCR2Address),PAGE_SIZE);
             pagingMapPage(pagingExceptionCR3,pagingExceptionCR2 & 0xFFFFF000,newPhys,(uint16_t)0x7);
+            pagingMapPage(victimProcess->pageDirPtr,pagingExceptionCR2 & 0xFFFFF000,newPhys,(uint16_t)0x7);
             printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08x (0x%08x) with writable page 0x%08x (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
         }
 kPagingExceptionHandlerNewReturn:
@@ -333,7 +339,7 @@ kPagingExceptionHandlerNewReturn:
     {
         char err[256];
         sprintf(err, "\nsegfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
-        fs_write(NULL, activeSTDOUT, err,strlen(err),1);
+        fs_write(NULL, victimProcess->stdout, err,strlen(err),1);
     }
     else
         printk("\nsegfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);

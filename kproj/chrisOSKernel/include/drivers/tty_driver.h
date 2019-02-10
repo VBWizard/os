@@ -29,7 +29,8 @@
     int ttysRegistered;
     
     ttydevice_t *registerTTY(int deviceMajor, int deviceMinor);
-    
+    ttydevice_t *tty1, *tty2, *tty3, *tty4, *tty5, *tty6, *tty7, *tty8;
+    ttydevice_t *activeTTY;
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -71,7 +71,7 @@ extern "C" {
         char* mappedEnv;
         char* realEnv;
         bool justForked;
-        uint32_t lastChildCR3;
+        uint32_t forkChildCR3;
         uint32_t childNumber;
         uint32_t lastChildNumber;
         bool execDontSaveRegisters;

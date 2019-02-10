@@ -28,15 +28,18 @@ extern task_t* submitNewTask(task_t *task);
 extern uint32_t kIdleTicks;
 extern uintptr_t *qRunnable;
 void CoWProcess(process_t* process);
-void dupPageTables(process_t* newProcess, process_t* currProcess);
+uint32_t dupPageTables(process_t* newProcess, process_t* currProcess);
 process_t* kKernelProcess;
 extern void _schedule();
+extern struct gdt_ptr kernelGDT;
 
 #define PAGE_USER_READABLE 0x4
 #define PAGE_USER_WRITABLE 0x6           //0x4 for "User" | 0x2 for "Writable"
 #define PAGE_PRESENT 0x1
 #define GET_PROCESS_POINTER(process) {process=(process_t*)(PROCESS_STRUCT_VADDR);process=(process_t*)process->this;} //Use the process' virtual process pointer to get the kernel friendly pointer to the process
 #define PATH_MAX 512
+
+extern void kSetGDT(struct gdt_ptr *);
 
 uintptr_t userCR3=0;
 
@@ -343,6 +346,7 @@ process_t *initializeProcess(bool isKernelProcess)
     memset(process->task->tss->IOs,0,200);
     process->task->tss->IOPB = sizeof(tss_t)-200;
     gdtEntryOS(process->task->taskNum,(uint32_t)process->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
+    installGDT();
     process->execDontSaveRegisters = false;
     return process;
 }
@@ -419,6 +423,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
        /*process->stdin=((process_t*)parentProcessPtr)->stdin;
        process->stdout=((process_t*)parentProcessPtr)->stdout;
        process->stderr=((process_t*)parentProcessPtr)->stderr;*/
+       for (int cnt=0;cnt<PROCESS_MAX_EXIT_HANDLERS;cnt++)
+           process->exitHandler[cnt]=NULL;
     }
     else if (parentProcessPtr != NULL)
     {
@@ -654,7 +660,7 @@ uint32_t process_fork(process_t* currProcess)
     newProcess->childNumber = ++currProcess->lastChildNumber;
     
     __asm__("cli\n");
-    dupPageTables(newProcess, currProcess); //Duplicates the current process' page tables to the new one
+    newProcess->pageDirPtr = dupPageTables(newProcess, currProcess); //Duplicates the current process' page tables to the new one
 
     //CLR 01/17/2019: Changed order of dup & CoW and now CoWing the child instead of the parent.
     //The parent will maintain direct access to all of its memory.  Whenever the child tries to access the paren't memory
@@ -677,12 +683,14 @@ uint32_t process_fork(process_t* currProcess)
     newProcess->task->tss->IOPB = sizeof(tss_t)-200;
     gdtEntryOS(newProcess->task->taskNum,(uintptr_t)newProcess->task->tss,sizeof(tss_t), tssFlags ,GDT_GRANULAR | GDT_32BIT,true);
     pagingMapPage(newProcess->task->tss->CR3,(uintptr_t)newProcess->task->tss,(uintptr_t)newProcess->task->tss,(uint16_t)0x7);
+    kSetGDT(&kernelGDT);
     
     //Clone the parent's ESP1 Stack
-    ((process_t*)newTask->process)->stack1Start=kMalloc(newProcess->stack1Size);
     newProcess->stack1Size = currProcess->stack1Size;
+    ((process_t*)newTask->process)->stack1Start=kMalloc(newProcess->stack1Size);
     pagingMapPageCount(newTask->tss->CR3, newProcess->stack1Start, newProcess->stack1Start, currProcess->stack1Size / PAGE_SIZE, 0x7, true);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
     pagingMapPageCount(KERNEL_CR3, newProcess->stack1Start, newProcess->stack1Start, currProcess->stack1Size / PAGE_SIZE, 0x7, true);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
+    pagingMapPageCount(KERNEL_CR3, newProcess->stack1Start | 0xC0000000, newProcess->stack1Start, currProcess->stack1Size / PAGE_SIZE, 0x7, true);  //NOTE: the -0x15000 is because after we allocated the stack, we set it 0x15000 forward
     pagingMapPageCount(newTask->tss->CR3, newProcess->stack1Start | KERNEL_PAGED_BASE_ADDRESS, newProcess->stack1Start, 0x16, 0x7, true);
     printd(DEBUG_PROCESS,"process_fork: Allocated task ESP1 for syscall at 0x%08x (0x%08x bytes)\n",newProcess->stack1Start,currProcess->stack1Size);
     newProcess->task->tss->ESP1 = newProcess->stack1Start + newProcess->stack1Size - 0x1000;
@@ -691,7 +699,7 @@ uint32_t process_fork(process_t* currProcess)
     //Don't forget to map the new process to VADDR!
     pagingMapPage(newProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)newProcess & 0xFFFFF000, (uint16_t)0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
     
-    currProcess->lastChildCR3 = newProcess->pageDirPtr;
+    newProcess->parent->forkChildCR3 = newProcess->pageDirPtr;
     newProcess->task->pageDir = (uint32_t*)newProcess->pageDirPtr;
 
     submitNewTask(newTask);
@@ -699,7 +707,7 @@ uint32_t process_fork(process_t* currProcess)
     retVal = newTask->taskNum;      //parent gets this
     triggerScheduler();
     __asm__("sti\nhlt\n");
-    printd(DEBUG_PROCESS, "fork: lastChildCR3 = 0x%08x\n",getCurrentProcess()->lastChildCR3);
+    //printd(DEBUG_PROCESS, "fork: lastChildCR3 = 0x%08x\n",getCurrentProcess()->parent->forkChildCR3);
     if (returnCount++ > 0)
         return retVal;
     else
@@ -742,20 +750,20 @@ void CoWProcess(process_t* process)
     printd(DEBUG_PROCESS, "\tCoW'd the stack at 0x%08x for 0x%08x bytes\n",process->stackStart, process->stackSize);
 }
 
-void dupPageTables(process_t* newProcess, process_t* currProcess)
+uintptr_t dupPageTables(process_t* newProcess, process_t* currProcess)
 {
-    newProcess->pageDirPtr = (uint32_t)pagingAllocatePagingTablePage();
-    newProcess->task->pageDir = newProcess->pageDirPtr;
-    newProcess->task->tss->CR3 = newProcess->pageDirPtr;
-    memset(newProcess->pageDirPtr, 0, PAGE_SIZE);
-    newProcess->task->tss->CR3 = newProcess->pageDirPtr;
-    printd(DEBUG_PROCESS, "\tdupPageTables: Duping page tables from 0x%08x to 0x%08x\n",currProcess->pageDirPtr, newProcess->pageDirPtr);
+    uintptr_t pageDirPtr=(uintptr_t)pagingAllocatePagingTablePage();
+    newProcess->task->pageDir = pageDirPtr;
+    newProcess->task->tss->CR3 = pageDirPtr;
+    memset(pageDirPtr, 0, PAGE_SIZE);
+    newProcess->task->tss->CR3 = pageDirPtr;
+    printd(DEBUG_PROCESS, "\tdupPageTables: Duping page tables from 0x%08x to 0x%08x\n",currProcess->pageDirPtr, pageDirPtr);
     pagingMapPage(KERNEL_CR3,newProcess->task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,newProcess->task->tss->CR3,(uint16_t)0x3);
     pagingMapPage(KERNEL_CR3,newProcess->task->tss->CR3, newProcess->task->tss->CR3,(uint16_t)0x3);
-    pagingMapPage(newProcess->pageDirPtr,newProcess->task->tss->CR3, newProcess->task->tss->CR3,(uint16_t)0x7);
+    pagingMapPage(pageDirPtr,newProcess->task->tss->CR3, newProcess->task->tss->CR3,(uint16_t)0x7);
 
     uint32_t* oldCR3 = (uint32_t*)currProcess->pageDirPtr;
-    uint32_t* newCR3 = (uint32_t*)newProcess->pageDirPtr;
+    uint32_t* newCR3 = (uint32_t*)pageDirPtr;
     uint32_t textMin = currProcess->elf->textAddress;
     uint32_t textMax = currProcess->elf->textAddress + currProcess->elf->textSize;
     uint32_t dataMin = currProcess->elf->dataAddress;
@@ -777,7 +785,7 @@ void dupPageTables(process_t* newProcess, process_t* currProcess)
             uint32_t *newPT = pagingAllocatePagingTablePage();
             pagingMapPage(KERNEL_CR3,(uint32_t)newPT | KERNEL_PAGED_BASE_ADDRESS,(uint32_t)newPT | ((uint16_t)oldPT & 0x00000FFF),(uint16_t)0x3);
             pagingMapPage(KERNEL_CR3, newPT, newPT, (uint16_t)0x7);
-            pagingMapPage(newProcess->pageDirPtr,newPT, newPT,(uint16_t)0x7);
+            pagingMapPage(pageDirPtr,newPT, newPT,(uint16_t)0x7);
             
             //Put the address of the page table in the CR3 page directory
             newCR3[cr3Ptr] = (uint32_t)newPT | ((uint32_t)oldPT & 0x00000FFF);
@@ -785,15 +793,15 @@ void dupPageTables(process_t* newProcess, process_t* currProcess)
             //Now iterate the old page table creating entries on the new table where they exist on the old
             //Now dup the page table
             memcpy(newPT, (uint32_t)oldPT & 0xFFFFF000, PAGE_SIZE);
-            pagingMapPage(newProcess->pageDirPtr,newPT, newPT,(uint16_t)((uint16_t)oldPT & 0x00000FFF)); //**NOTE**: 3ff is because we don't want to copy PAGE_MMAP_FLAG
+            pagingMapPage(pageDirPtr,newPT, newPT,(uint16_t)((uint16_t)oldPT & 0x00000FFF)); //**NOTE**: 3ff is because we don't want to copy PAGE_MMAP_FLAG
             printd(DEBUG_PROCESS,"\t\tDup'd PT from 0x%08x to 0x%08x\n",(uint32_t)oldPT & 0xFFFFF000, newPT);
         }
     }
     //We overwrote the new page directory's entry in the new directory, so re-create it!
     pagingMapPage(KERNEL_CR3,newProcess->task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,newProcess->task->tss->CR3,(uint16_t)0x7);
     pagingMapPage(KERNEL_CR3,newProcess->task->tss->CR3, newProcess->task->tss->CR3,(uint16_t)0x7);
-    pagingMapPage(newProcess->pageDirPtr,newProcess->task->tss->CR3, newProcess->task->tss->CR3,(uint16_t)0x7);
-
+    pagingMapPage(pageDirPtr,newProcess->task->tss->CR3, newProcess->task->tss->CR3,(uint16_t)0x7);
+    return pageDirPtr;
 }
 
 void removeProgramSegmentMappings(process_t *currProcess, process_t *newProcess)

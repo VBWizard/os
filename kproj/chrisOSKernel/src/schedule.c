@@ -8,6 +8,7 @@
 #include "strings.h"
 #include "filesystem/pipe.h"
 #include "thesignals.h"
+#include "drivers/tty_driver.h"
 
 #define SCHEDULER_DEBUG 1
 #define MAX_TASKS 1000
@@ -46,6 +47,7 @@ uint32_t nextScheduleTicks;
 uint32_t kPagingExceptionCount;
 
 pipe_t *activeSTDOUT, *activeSTDIN, *activeSTDERR;
+
 
 const char* TASK_STATE_NAMES[] = {"Zombie","Running","Runnable","Stopped","Uninterruptable Sleep","Interruptable Sleep","Exited","None"};
 
@@ -620,14 +622,15 @@ void runAnotherTask(bool schedulerRequested)
         loadISRSavedRegs(taskToRun);
         if (!(strcmp(process->path,"/sbin/idle")==0))
         {
-            activeSTDOUT = ((process_t *)taskToRun->process)->stdout;
-            activeSTDIN = ((process_t *)taskToRun->process)->stdin;
+            //activeSTDOUT = process->stdout;
+            activeSTDIN = process->stdin;
             activeSTDIN->owner = taskToRun->process;
             activeSTDOUT->owner = taskToRun->process;
             activeSTDERR = ((process_t *)taskToRun->process)->stderr;
             activeSTDERR->owner = taskToRun->process;
         }
-        printd(DEBUG_PROCESS,"Active STDIN = 0x%08X\n",activeSTDIN);
+        printd(DEBUG_PROCESS,"Active STDIN/STDOUT/STDERR=0x%08x/0x%08x/0x%08x\n",activeSTDIN, activeSTDOUT, activeSTDERR);
+        
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04X) @ 0x%04X:0x%08x\n",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
@@ -703,10 +706,11 @@ int32_t getExitCode(uint32_t taskNum)
         task=(task_t*)*q;
         if (task->taskNum!=0)
         {
-            //printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04X\n", task->taskNum);
+            printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04X\n", task->taskNum);
             if (task->taskNum == taskNum)
             {
                 uint32_t retVal = ((process_t*)task->process)->retVal;
+                removeFromQ(qExited,task);
                 freeTask(taskNum);
                 return retVal;
             }

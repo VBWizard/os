@@ -11,8 +11,8 @@ _schedule:
     call    scheduler
     call updateTerms
     mov eax, isrSavedCS
-    and eax, 2
-    cmp eax, 2
+    and eax, 3
+    cmp eax, 3
     je nonKernelProcess
     mov eax,1
     mov scheduleIsKernelProcess, eax

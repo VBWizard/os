@@ -36,9 +36,11 @@ extern volatile uint32_t* kTicksSinceStart;
 extern void* kKeyboardHandlerRoutine;
 extern struct idt_entry* idtTable;
 extern void vector21();
-extern ttydevice_t *tty1;
+extern ttydevice_t *tty1, *tty2, *tty3, *tty4, *tty5, *tty6, *tty7, *tty8;
 extern pipe_t *activeSTDIN;
-        
+extern pipe_t *activeSTDOUT;
+extern ttydevice_t *activeTTY;
+
 uint32_t kbdTop=KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE;
 
 void kbd_handler_generic()
@@ -120,30 +122,80 @@ void kbd_handler_generic()
         }
         else
             translatedKeypress=keyboard_map[rawKey];
+
+        if (kKeyStatus[INDEX_ALT])
+        {
+            switch (translatedKeypress)
+            {
+                case '1':
+                    activeTTY=tty1;
+                    switchTerm(1);
+                    goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
+                    break;
+                case '2':
+                    activeTTY=tty2;
+                    switchTerm(2);
+                    goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
+                    break;
+                case '3':
+                    activeTTY=tty3;
+                    switchTerm(3);
+                    goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
+                    break;
+                case '4':
+                    activeTTY=tty4;
+                    switchTerm(4);
+                    goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
+                    break;
+                case '5':
+                    activeTTY=tty5;
+                    switchTerm(5);
+                    goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
+                    break;
+                case '6':
+                    activeTTY=tty6;
+                    switchTerm(6);
+                    goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
+                    break;
+                case '7':
+                    activeTTY=tty7;
+                    switchTerm(7);
+                    goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
+                    break;
+                case '8':
+                    activeTTY=tty8;
+                    switchTerm(8);
+                    goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
+                    break;
+                     
+            }
+        }
+
         if (kKeyStatus[INDEX_CTRL])
         {
             //printk("^");
             if (translatedKeypress=='c') //CLR 12/30/2018: ^C pressed
             {
                 //TODO: sigint broken till I can figure out how to pass the process struct for the correct struct
-                sys_sigaction2(SIGINT, NULL, 0, activeSTDIN->owner);
-                if (tty1->stdInWritePipe)
-                    pipewrite("^C\n", 2, 1, tty1->stdInWritePipe);
+                if (activeTTY->stdInWritePipe)
+                    pipewrite("^C\n", 2, 1, activeTTY->stdInWritePipe);
+                sys_sigaction2(SIGINT, NULL, 0, activeTTY->stdInReadPipe->owner);
                 goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
             }
         }
 
+        
         //01/09/2019 Don't know why next two lines of code exists but remove them in a while if not needed
         //if (translatedKeypress==124)
         //    translatedKeypress=34;
         //CLR 01/24/2019: Added stdin check because we don't care how full the keyboard buffer is if we're going to write the results to the STDIN pipe
-        if (tty1->stdInWritePipe)
+        if (activeTTY->stdInWritePipe)
         {
             //CLR 01/10/2017: Increment the buffer pointer first
-            pipewrite(&translatedKeypress, 1, 1, tty1->stdInWritePipe);
-            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Translated key '%c' delivered to stdin pipe 0x%08X (CR3=0x%08X)\n",translatedKeypress, tty1->stdInWritePipe, CURRENT_CR3);
+            pipewrite(&translatedKeypress, 1, 1, activeTTY->stdInWritePipe);
+            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Translated key '%c' delivered to stdin pipe 0x%08X (CR3=0x%08X)\n",translatedKeypress, activeTTY->stdInWritePipe, CURRENT_CR3);
 	    //NOTE: We are passing data but no process.  sigaction2 knows to not expect a process for SIGIO
-            sys_sigaction2(SIGIO, NULL, (uintptr_t)activeSTDIN, NULL);
+            sys_sigaction2(SIGIO, NULL, (uintptr_t)activeTTY->stdInReadPipe, NULL);
         }
         else
             panic("kbd_handler_generic: STDIN pipe is null! (2)\n");

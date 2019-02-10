@@ -200,9 +200,9 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     
     if (vfs_readBuffer==NULL)
         vfs_readBuffer = allocPagesAndMap(FS_BUFFERSIZE);
-    while (__sync_lock_test_and_set(&kFileReadLock, 1));
+    //while (__sync_lock_test_and_set(&kFileReadLock, 1));
     retVal = theFile->fops->read(vfs_readBuffer, size, length, theFile->handle);
-    __sync_lock_release(&kFileReadLock);   
+    //__sync_lock_release(&kFileReadLock);   
 
     if (retVal > 0)
     {

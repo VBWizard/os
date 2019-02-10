@@ -30,6 +30,7 @@
 
 extern int kTimeZone;
 extern time_t kSystemCurrentTime;
+uint32_t temp=0;
 int processGetCWD(process_t *process, char* buf, unsigned long size);
 
 //NOTE: Upon entering _sysCall, the process' CR3 is still being used
@@ -70,21 +71,25 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              printd(DEBUG_PROCESS,"\tsyscall: Ending process with CR3=0x%08x with return value %u\n",param1,param2);
              markTaskEnded(param1, param2);
              panic("syscall: exit call, continued after halt!");
-             __asm__("mov eax,0xbadbadba;mov ebx,0xbadbadba;mov ecx,0xbadbadba; mov edx,0xbadbadba\n\cli\nhlt\n");               //We should never get here
+             __asm__("mov eax,0xbadbadba;mov ebx,0xbadbadba;mov ecx,0xbadbadba; mov edx,0xbadbadba\ncli\nhlt\n");               //We should never get here
             break;
         case SYSCALL_FORK:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_PROCESS,"\tsyscall: Fork called by %s-%u\n", process->path, process->childNumber);
             retVal=process_fork(process);
-            if (process->lastChildCR3 > 0)
+            if (process->forkChildCR3 > 0)
             {
-                uint32_t temp = process->lastChildCR3;
-                process->lastChildCR3 = 0;
+                temp = process->forkChildCR3;
+                //printd(DEBUG_PROCESS,"\tsyscall: Child return from fork with CR3=0x%08X",temp);
+                process->forkChildCR3 = 0;
                 __asm__("mov cr3,eax\n"::"a" (temp));
             }
             else
+            {
+                printd(DEBUG_PROCESS,"\tsyscall: Parent return from fork with CR3=0x%08X",processCR3);
                 __asm__("mov cr3,eax\n"::"a" (processCR3));
+            }
             break;
         case SYSCALL_OPEN: //param1=path, param2=mode, param3=used by freopen, stream
             strcpy(path, (void*)param1);

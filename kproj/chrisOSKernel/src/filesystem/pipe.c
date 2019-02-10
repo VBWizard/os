@@ -138,7 +138,7 @@ size_t piperead(void *buffer, int size, int length, void *f)
                 break;
             //yield here
             printd(DEBUG_FILESYS, "\tpiperead: Need %u bytes, not available, sleeping until they are\n",size*length);
-            sys_sigaction2(SIGSLEEP, 0, *kTicksSinceStart+kTicksPerSecond, getCurrentProcess());
+            sys_sigaction2(SIGSLEEP, 0, *kTicksSinceStart+kTicksPerSecond*9999, getCurrentProcess());
             triggerScheduler();
             __asm__("sti\nhlt\n");
         }
@@ -180,7 +180,6 @@ size_t pipewrite(const void *data, int size, int count, void *f)
 
     while (written < size*count)
     {
-        while (__sync_lock_test_and_set(&kPipeWriteLock, 1));
         //If there isn't as much data as the caller wanted, give them what we have
         int available = (uintptr_t)file->buffer + PIPE_FILE_SIZE - (uintptr_t)*file->bufferPtr;
         if (copySize > available)
@@ -190,7 +189,6 @@ size_t pipewrite(const void *data, int size, int count, void *f)
             memcpy(*file->bufferPtr, data+written, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
             *file->bufferPtr+=copySize;    
         }
-        __sync_lock_release(&kPipeWriteLock);   
         printd(DEBUG_FILESYS, "\t\tpipewrite: wrote %u bytes to pipe %s (0x%08x)\n", copySize, file->f_path);
         written += copySize;
         if (written < size*count)
@@ -292,9 +290,8 @@ int fs_pipeI(process_t *process, int pipefd[2], int flags)
     pipe.file[1] = filew;
     
     pipe.owner = process;
-    printd(DEBUG_FILESYS, "\tCreated pipe pair %s/%s (0x%08X/0x%08X) for %s\n", 
+    printd(DEBUG_FILESYS, "\tCreated pipe pair %s (r=0x%08X/w=0x%08X) for %s\n", 
             pipe.file[0]->f_path, 
-            pipe.file[1]->f_path, 
             pipe.file[0], 
             pipe.file[1], 
             process->exename);
