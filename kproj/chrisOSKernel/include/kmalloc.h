@@ -37,6 +37,7 @@ extern "C" {
     } heapPtrPage;
 
 void* kMalloc(size_t size);
+void* kCalloc(size_t num, size_t size);
 void* mallocI(uint32_t cr3, size_t size);
 void kFree(void* address);
 

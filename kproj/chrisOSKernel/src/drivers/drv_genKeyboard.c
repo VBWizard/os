@@ -16,6 +16,7 @@
 #include "alloc.h"
 #include "kutility.h"
 #include "thesignals.h"
+#include "io.h"
 
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61

@@ -19,7 +19,6 @@ extern "C" {
 #endif
 #include <stdint.h>
 #include "task.h"
-#include "kernel.h"
 
     extern task_t* findTaskByCR3(uint32_t cr3);
     extern uint32_t NO_PREV;

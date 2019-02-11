@@ -1,7 +1,6 @@
 #define USE_FILELIB_STDIO_COMPAT_NAMES 1
 #include "chrisos.h"
 #include <elf.h>
-#include "elfloader.h"
 #include "printf.h"
 #include "utility.h"
 #include "task.h"
@@ -18,9 +17,6 @@
 #include "dllist.h"
 
 extern dllist_t* kLoadedElfInfo;
-
-uint32_t libLoadOffset=LIBRARY_BASE_LOAD_ADDRESS;
-uintptr_t previousCR3=0,newCR3;
 
 #define GET_OLD_CR3 __asm__("mov ebx,cr3\n":[previousCR3] "=b" (previousCR3));
 #define SWITCH_CR3 __asm__("mov cr3,eax\n"::[newCR3] "a" (newCR3));
@@ -718,6 +714,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
 {
     GET_OLD_CR3;
 
+    libLoadOffset==LIBRARY_BASE_LOAD_ADDRESS;
     __asm__("push ds");                 //clr 09/24/2017: This code is blowing away the DS so save it for restoration later
     
     if (CR3==0x0)
@@ -734,6 +731,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     memset(elfInfo,0,sizeof(elfInfo_t));
     memset(&elfInfo->dynamicInfo,0,sizeof(elfDynamic_t));
     elfInfo->elfLoadedPages=allocPagesAndMap(PAGE_SIZE);
+    pagingMapPage(KERNEL_CR3, elfInfo->elfLoadedPages, elfInfo->elfLoadedPages,0x7);
     memset(elfInfo->elfLoadedPages,0,PAGE_SIZE);
     printd(DEBUG_ELF_LOADER,"alloc'd elfLoadPages @ 0x%08x\n",elfInfo->elfLoadedPages);
     //NOTE: Any elfInfo_t added to the kLoadedElfInfo list must exist (not be free()d until after it is removed from the list!

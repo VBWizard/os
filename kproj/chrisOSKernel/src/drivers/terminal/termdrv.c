@@ -25,7 +25,7 @@
 #include "printf.h"
 #include "drivers/tty_driver.h"
 #include "filesystem/pipe.h"
-
+#include "io.h"
 
 char *pipeContents;
 volatile int kTermLock;

@@ -61,11 +61,11 @@ void* findFreeMallocPointer()
     {
         printd(DEBUG_KMALLOC,"findFreeMallocPointer: Scanning for a free memory pointer\n");
         for (int cnt=0;cnt<(int)(POINTERS_PER_HEAP_PTR_PAGE);cnt++)
-        if (ptrPg->ptrs[cnt].address==NULL)
-        {
-            printd(DEBUG_KMALLOC,"findFreeMallocPointer: Found memory pointer on page 0 (0x%08X)\n",ptrPg);
-            return &ptrPg->ptrs[cnt];
-        }
+            if (ptrPg->ptrs[cnt].address==NULL)
+            {
+                printd(DEBUG_KMALLOC,"findFreeMallocPointer: Found memory pointer on page 0 (0x%08X)\n",ptrPg);
+                return &ptrPg->ptrs[cnt];
+            }
         
         //If we've reached the last memory pointer on the page
         if (ptrPg->next==NO_NEXT_HEAP_PTR)
@@ -122,6 +122,42 @@ void* kMalloc(size_t size)
     ptr->size=size;
     allocateMemoryToProcess(ptr,size,isKernel);
     return ptr->address;
+}
+
+
+heapPtrPage *getHeapPtr(uintptr_t address)
+{
+/*    heapPtrPage* ptrPg=kHeapPagePtr;
+    
+    while (1==1)
+    {
+        for (int cnt=0;cnt<(int)(POINTERS_PER_HEAP_PTR_PAGE);cnt++)
+        {
+            if (ptrPg->ptrs[cnt]->address <= address &&
+                    ptrPg->ptrs[cnt]->address+ptrPg->ptrs[cnt]->size >= address)
+                return ptrPg[cnt];
+            if (ptrPg->next==NO_NEXT_HEAP_PTR)
+                break;
+        }
+        if (ptrPg->next==NO_NEXT_HEAP_PTR)
+            return NULL;
+        ptrPg=(heapPtrPage*)ptrPg->next;
+    }*/
+    return NULL;
+}
+
+void* kCalloc(size_t num, size_t size)
+{
+    uintptr_t* addr=kMalloc(num*size);
+    memset(addr,0,num*size);
+    return addr;
+}
+
+void kRealloc(void *ptr, size_t size)
+{
+    uintptr_t* addr=kMalloc(size);
+    
+    
 }
 
 //Called by syscall only

@@ -1,4 +1,9 @@
 #include "mm.h"
+#include "i386/kPaging.h"
+#include "charDev.h"
+#include "printf.h"
+#include "paging.h"
+#include "alloc.h"
 
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;

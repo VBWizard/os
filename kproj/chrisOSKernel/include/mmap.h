@@ -19,7 +19,6 @@
 extern "C" {
 #endif
 #include <stdint.h>
-#include <stddef.h> 
 #include <sys/types.h>
 #include "config.h"
 #include "process.h"

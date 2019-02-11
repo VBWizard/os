@@ -11,19 +11,19 @@
  * Created on February 14, 2017, 5:32 AM
  */
 
-#include "task.h"
-#include "../../chrisOS/include/i386/gdt.h"
-#include "../../chrisOS/include/elfloader.h"
-#include "time_os.h"
-#include "rusage.h"
-#include "signals.h"
-
 #ifndef PROCESS_H
 #define PROCESS_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "task.h"
+#include "../../chrisOS/include/i386/gdt.h"
+#include "time_os.h"
+#include "rusage.h"
+#include "signals.h"
+#include "dllist.h"
 
 #define PROCESS_HEAP_START 0x70000000
 #define PROCESS_HEAP_END   0xBFFFFFFF
@@ -45,7 +45,7 @@ extern "C" {
         struct sprocess* this;                     //NOTE: This must remain the second item in the struct at offset +4
         task_t* task;
         sGDT* gdtEntry;
-        elfInfo_t* elf;
+        void* elf;
         char* path;
         uint32_t retVal;
         signal_t signals;

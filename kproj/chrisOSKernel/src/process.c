@@ -11,7 +11,6 @@
 #include "alloc.h"
 #include "printf.h"
 #include "kmalloc.h"
-#include "sysloader.h"
 #include "strings.h"
 #include "paging.h"
 #include "kutility.h"
@@ -22,6 +21,7 @@
 #include "schedule.h"
 #include "mmap.h"
 #include "task.h"
+#include "sysloader.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
@@ -52,6 +52,61 @@ process_t *getCurrentProcess()
     return process;
 }
 
+void freeProcess(process_t *process)
+{
+    elfInfo_t *elf=process->elf;
+    elfPageInfo_t *epi=elf->elfLoadedPages;
+
+    printd(DEBUG_PROCESS,"freeProcess: Freeing process memory for %s (task=0x%08x)\n",process->exename,process->task->taskNum);
+    
+    pagingMapPage(KERNEL_CR3, (uint32_t)elf->elfLoadedPages | 0xFFFFF000, kPagingGet4kPTEntryValueCR3(process->pageDirPtr,elf->elfLoadedPages) | 0xFFFFF000,0x7);
+
+    while (epi->startPhys!=0)
+    {
+        printd(DEBUG_PROCESS,"\tFreeing %u bytes at Phys/Virt 0x%08x/0x%08x\n",epi->pages * PAGE_SIZE, epi->startPhys, epi->startVirt);
+        kFree(epi->startPhys);
+        epi++;
+    }
+    if (elf->symTable)
+        kFree(elf->symTable);
+    kFree(elf->fileName);
+    for (int cnt=0;cnt<50;cnt++)
+    {
+        if (elf->dynamicInfo.strTableAddress[cnt] != NULL)
+            if (((uint32_t)elf->dynamicInfo.strTableAddress[cnt] & 0xFFF) == 0) //CLR 02/10/2019: Hackish, sometimes we kMalloc, other times we use an existing loaded address.  Hopefully loaded addresses don't end with 000
+                kFree(elf->dynamicInfo.strTableAddress[cnt]);
+    }
+    if (elf->dynamicInfo.relATable)
+        kFree(elf->dynamicInfo.relATable);
+    if (elf->dynamicInfo.relTable)
+        kFree(elf->dynamicInfo.relTable);
+
+    printd(DEBUG_PROCESS,"\tDe-linking this process' elfInfo from the kLoadedElfInfo list\n");
+
+    dllist_t *next=elf->loadedListItem.next, *prev=elf->loadedListItem.prev, *this=&elf->loadedListItem;
+
+    if (next!=this)
+    {
+        if(prev!=this)
+            prev->next=next;
+    }
+    else
+        prev->next=prev;
+
+    if (prev!=this)
+    {
+        if(next!=this)
+            next->prev=prev;
+    }
+    else
+        next->prev=next;
+    
+    printd(DEBUG_PROCESS,"\tFreeing the elfInfo for this process @ 0x%08x\n",elf->loadedListItem.payload);
+    kFree(elf->loadedListItem.payload);
+    
+    printd(DEBUG_PROCESS,"freeProcess: Done!  Process freed!\n");
+    
+}
 
 //NOTE: Assumes contiguous memory area
 void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size) //Copy memory from user space to kernel (assumes dest is kernel page)
@@ -243,8 +298,6 @@ void processExit()
         fs_close(process->stdout);
     if (process->stderr!=STDERR_FILE)
         fs_close(process->stderr);*/
-    //Can't save endTime here because we had to change VADDR to be read-only for ring 3
-    //gmtime_r((time_t*)&kSystemCurrentTime,&process->endTime);
     //TODO: Clean up list items before clearing the list
 /*    dllist_t *maplist = process->mmaps;
     do
@@ -553,7 +606,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         if (useExistingProcess)
            removeProgramSegmentMappings(process->parent, process);
         process->elf=sysLoadElf(process->path, process->elf, process->task->tss->CR3);
-        if (!process->elf->loadCompleted)
+        if (!((elfInfo_t*)(process->elf))->loadCompleted)
         {
             if (useExistingProcess)
                 enableScheduler();
@@ -561,14 +614,14 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         }
         //CLR 12/23/2018: point to processStart ... which will initialize anything that needs to be initialized 
         //and then jump into the loaded program
-        process->entryPoint = process->elf->hdr.e_entry;
+        process->entryPoint = ((elfInfo_t*)process->elf)->hdr.e_entry;
         //process->task->tss->EIP=process->elf->hdr.e_entry;
         process->task->tss->EIP=(uint32_t)&processStart;
         //Get processStart handlers
         process->startHandlerPtr = 0;
-        for (int cnt=0;cnt<process->elf->libraryElfCount;cnt++)
+        for (int cnt=0;cnt<((elfInfo_t*)process->elf)->libraryElfCount;cnt++)
         {
-            elfInfo_t* lElf = (elfInfo_t*)process->elf->libraryElfPtr[cnt];
+            elfInfo_t* lElf = ((elfInfo_t*)process->elf)->libraryElfPtr[cnt];
             if (lElf->dynamicInfo.initFunctionAddress!=0)
             {
                 process->startHandler[process->startHandlerPtr++]=(void*)lElf->dynamicInfo.initFunctionAddress;
@@ -716,29 +769,30 @@ uint32_t process_fork(process_t* currProcess)
 
 void CoWProcess(process_t* process)
 {
+    elfInfo_t *elf=process->elf;
     printd(DEBUG_PROCESS, "CoWing the child process' copy of the parent's memory\n");
     //CoW the text segment
-    if (process->elf->textAddress>0)
+    if (elf->textAddress>0)
     {
-        cowPages(process->pageDirPtr, (uintptr_t*)(process->elf->textAddress & 0xFFFFFFF0), process->elf->textSize);
-        printd(DEBUG_PROCESS, "\tCoW'd the .text at 0x%08x for 0x%08x bytes\n",process->elf->textAddress, process->elf->textSize);
+        cowPages(process->pageDirPtr, (uintptr_t*)(elf->textAddress & 0xFFFFFFF0), elf->textSize);
+        printd(DEBUG_PROCESS, "\tCoW'd the .text at 0x%08x for 0x%08x bytes\n",elf->textAddress, elf->textSize);
     }
     //CoW the bss segment
-    if (process->elf->bssAddress>0)
+    if (elf->bssAddress>0)
     {
-        cowPages(process->pageDirPtr, (uintptr_t*)(process->elf->bssAddress & 0xFFFFFFF0), process->elf->bssSize);
-        printd(DEBUG_PROCESS, "\tCoW'd the .bss at 0x%08x for 0x%08x bytes\n",process->elf->bssAddress, process->elf->bssSize);
+        cowPages(process->pageDirPtr, (uintptr_t*)(elf->bssAddress & 0xFFFFFFF0), elf->bssSize);
+        printd(DEBUG_PROCESS, "\tCoW'd the .bss at 0x%08x for 0x%08x bytes\n",elf->bssAddress, elf->bssSize);
     }
     //CoW the data/tata segments
-    if (process->elf->dataAddress>0)
+    if (elf->dataAddress>0)
     {
-        cowPages(process->pageDirPtr, (uintptr_t*)(process->elf->dataAddress & 0xFFFFF000), process->elf->dataSize);
-        printd(DEBUG_PROCESS, "\tCoW'd the .data at 0x%08x for 0x%08x bytes\n",process->elf->dataAddress, process->elf->dataSize);
+        cowPages(process->pageDirPtr, (uintptr_t*)(elf->dataAddress & 0xFFFFF000), elf->dataSize);
+        printd(DEBUG_PROCESS, "\tCoW'd the .data at 0x%08x for 0x%08x bytes\n",elf->dataAddress, elf->dataSize);
     }
-    if (process->elf->tdataAddress>0)
+    if (elf->tdataAddress>0)
     {
-        cowPages(process->pageDirPtr, (uintptr_t*)(process->elf->tdataAddress & 0xFFFFF000), process->elf->tdataSize);
-        printd(DEBUG_PROCESS, "\tCoW'd the .tdata at 0x%08x for 0x%08x bytes\n",process->elf->tdataAddress, process->elf->tdataSize);
+        cowPages(process->pageDirPtr, (uintptr_t*)(elf->tdataAddress & 0xFFFFF000), elf->tdataSize);
+        printd(DEBUG_PROCESS, "\tCoW'd the .tdata at 0x%08x for 0x%08x bytes\n",elf->tdataAddress, elf->tdataSize);
     }
     //CoW the heap segment
     if (process->heapEnd - process->heapStart > 0)
@@ -752,6 +806,8 @@ void CoWProcess(process_t* process)
 
 uintptr_t dupPageTables(process_t* newProcess, process_t* currProcess)
 {
+    elfInfo_t *elf=currProcess->elf;
+    
     uintptr_t pageDirPtr=(uintptr_t)pagingAllocatePagingTablePage();
     newProcess->task->pageDir = pageDirPtr;
     newProcess->task->tss->CR3 = pageDirPtr;
@@ -764,14 +820,14 @@ uintptr_t dupPageTables(process_t* newProcess, process_t* currProcess)
 
     uint32_t* oldCR3 = (uint32_t*)currProcess->pageDirPtr;
     uint32_t* newCR3 = (uint32_t*)pageDirPtr;
-    uint32_t textMin = currProcess->elf->textAddress;
-    uint32_t textMax = currProcess->elf->textAddress + currProcess->elf->textSize;
-    uint32_t dataMin = currProcess->elf->dataAddress;
-    uint32_t dataMax = currProcess->elf->dataAddress + currProcess->elf->dataSize;
-    uint32_t tdataMin = currProcess->elf->tdataAddress;
-    uint32_t tdataMax = currProcess->elf->tdataAddress + currProcess->elf->tdataSize;
-    uint32_t bssMin = currProcess->elf->bssAddress;
-    uint32_t bssMax = currProcess->elf->bssAddress + currProcess->elf->bssSize;
+    uint32_t textMin = elf->textAddress;
+    uint32_t textMax = elf->textAddress + elf->textSize;
+    uint32_t dataMin = elf->dataAddress;
+    uint32_t dataMax = elf->dataAddress + elf->dataSize;
+    uint32_t tdataMin = elf->tdataAddress;
+    uint32_t tdataMax = elf->tdataAddress + elf->tdataSize;
+    uint32_t bssMin = elf->bssAddress;
+    uint32_t bssMax = elf->bssAddress + elf->bssSize;
     
     //Iterate the current PDE creating a new page and pointing to it whenever you find an entry
     for (int cr3Ptr=0;cr3Ptr<1024;cr3Ptr++)
@@ -806,14 +862,15 @@ uintptr_t dupPageTables(process_t* newProcess, process_t* currProcess)
 
 void removeProgramSegmentMappings(process_t *currProcess, process_t *newProcess)
 {
-    if (currProcess->elf->textAddress>0)
-        pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->textAddress, 0, currProcess->elf->textSize/PAGE_SIZE+1, 0, false);
-    if (currProcess->elf->dataAddress>0)
-        pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->dataAddress, 0, currProcess->elf->dataSize/PAGE_SIZE+1, 0, false);
-    if (currProcess->elf->tdataAddress>0)
-        pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->tdataAddress, 0, currProcess->elf->tdataSize/PAGE_SIZE+1, 0, false);
-    if (currProcess->elf->bssAddress>0)
-        pagingMapPageCount(newProcess->pageDirPtr, currProcess->elf->bssAddress, 0, currProcess->elf->bssSize/PAGE_SIZE+1, 0, false);
+    elfInfo_t *elf=currProcess->elf;
+    if (elf->textAddress>0)
+        pagingMapPageCount(newProcess->pageDirPtr, elf->textAddress, 0, elf->textSize/PAGE_SIZE+1, 0, false);
+    if (elf->dataAddress>0)
+        pagingMapPageCount(newProcess->pageDirPtr, elf->dataAddress, 0, elf->dataSize/PAGE_SIZE+1, 0, false);
+    if (elf->tdataAddress>0)
+        pagingMapPageCount(newProcess->pageDirPtr, elf->tdataAddress, 0, elf->tdataSize/PAGE_SIZE+1, 0, false);
+    if (elf->bssAddress>0)
+        pagingMapPageCount(newProcess->pageDirPtr, elf->bssAddress, 0, elf->bssSize/PAGE_SIZE+1, 0, false);
     pagingMapPageCount(newProcess->pageDirPtr, currProcess->heapStart, 0, (currProcess->heapEnd - currProcess->heapStart)/PAGE_SIZE+1, 0, false);
 
  

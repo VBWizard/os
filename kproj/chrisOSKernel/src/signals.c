@@ -7,7 +7,10 @@
 #include "signals.h"
 #include "process.h"
 #include "thesignals.h"
+#include "../../chrisOS/include/chrisos.h"
+
 volatile int kSigCheckLock;
+extern volatile uint32_t* kTicksSinceStart;
 
 //TODO: ******************** Tie signals into scheduler ********************************
 extern void sigSleepReturn();
@@ -17,7 +20,6 @@ extern void changeTaskQueue(task_t* task, eTaskState newState);
 extern uintptr_t *qRunning;
 extern uintptr_t *qRunnable;
 extern uintptr_t *qISleep;
-extern uint32_t* kTicksSinceStart;
 extern task_t* findTaskByTaskNum(uint32_t taskNum);
 extern task_t *kTaskList;
 

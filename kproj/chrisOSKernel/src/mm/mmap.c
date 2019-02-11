@@ -5,12 +5,9 @@
  */
 
 #include "mmap.h"
-#include "process.h"
-#include "dllist.h"
 #include "errors.h"
 #include "paging.h"
 #include "kmalloc.h"
-#include "syscalls.h"
 #include "fs.h"
 
 #define ERROR_EXIT(a) {p->errno=a;goto mmap_exit;}

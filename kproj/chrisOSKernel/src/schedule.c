@@ -9,16 +9,17 @@
 #include "filesystem/pipe.h"
 #include "thesignals.h"
 #include "drivers/tty_driver.h"
+#include "../../chrisOS/include/utility.h"
 
 #define SCHEDULER_DEBUG 1
 #define MAX_TASKS 1000
 
-extern uint32_t* kTicksSinceStart;
 extern bool schedulerTaskSwitched;
 extern task_t* kKernelTask;
 extern task_t* kIdleTask;
 extern sGDT* bootGdt;
 extern bool signalCheckEnabled;
+extern volatile uint32_t* kTicksSinceStart;
 
 extern void processSignalDelivery(uintptr_t* sigHandler, uintptr_t* processReturnAddress);
 extern uint32_t kCPUCyclesPerSecond;
@@ -711,6 +712,7 @@ int32_t getExitCode(uint32_t taskNum)
             {
                 uint32_t retVal = ((process_t*)task->process)->retVal;
                 removeFromQ(qExited,task);
+                freeProcess(task->process);
                 freeTask(taskNum);
                 return retVal;
             }

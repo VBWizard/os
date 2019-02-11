@@ -11,6 +11,7 @@
 #include "libChrisOS.h"
 #include "../../../kproj/chrisOSKernel/include/signals.h"
 #include "../../../kproj/chrisOSKernel/include/thesignals.h"
+#include "../../../kproj/chrisOS/include/config.h"
 
 #define INITIAL_MAXARGC 20
 #define EOS '\0'

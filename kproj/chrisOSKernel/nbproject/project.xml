@@ -13,6 +13,8 @@
                 <sourceRootElem>../chrisOS/src/fat</sourceRootElem>
                 <sourceRootElem>../chrisOS/src/strings</sourceRootElem>
                 <sourceRootElem>src/fat</sourceRootElem>
+                <sourceRootElem>src/lwext4</sourceRootElem>
+                <sourceRootElem>include/lwext4</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

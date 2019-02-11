@@ -12,6 +12,7 @@
 #include "dllist.h"
 #include "time_os.h"
 #include "alloc.h"
+#include "../../chrisOS/include/utility.h"
 
 extern void _sysCall();
 extern void _sysEnter();

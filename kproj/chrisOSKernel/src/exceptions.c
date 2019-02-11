@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 
-#include "kernel.h"
 #include "i386/bits/types.h"
 #include "process.h"
 #include <time.h>
@@ -271,7 +270,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     {
         //Check for CoW pages in libraries
         printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bss/data in libraries\n",victimProcess->path);
-        for (int cnt=0;cnt<victimProcess->elf->libraryElfCount;cnt++)
+        for (int cnt=0;cnt<((elfInfo_t*)victimProcess->elf)->libraryElfCount;cnt++)
         {
             elfInfo_t* lib=elf->libraryElfPtr[cnt];
             printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08x, bss=0x%08x/0x%08x, data=0x%08x/0x%08x, tdata=0x%08x/0x%08x\n",

@@ -5,30 +5,30 @@
  * Created on May 31, 2016, 10:47 PM
  */
 
+#include "kernel.h"
+#include <stdint.h>
+#include <unistd.h>
 #include "utility.h"
 #include "charDev.h"
-#include "kernel.h"
 #include "kernelObjects.h"
 #include "mm.h"
 #include "printf.h"
 #include "syscall.h"
-#include "sysloader.h"
 #include "../../chrisOS/include/strings.h"
 #include "../../chrisOS/include/i386/gdt.h"
 #include "process.h"
-#include <stddef.h>
-#include <unistd.h>
-#include "../include/sysloader.h"
 #include "../../chrisOS/src/fat/fat_access.h"
 #include "../include/task.h"
 #include "io.h"
-#include "kbd.h"
 #include "../../chrisOS/src/fat/fat_filelib.h"
 #include "fs.h"
 #include "filesystem/pipe.h"
 #include "drivers/termdrv.h"
 #include "drivers/tty_driver.h"
 #include "thesignals.h"
+#include "chrisos.h"
+#include "io.h"
+#include "utility.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;

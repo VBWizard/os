@@ -19,14 +19,9 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernel.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/drivers/termdrv.h</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/memdisk.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/fat/fat_filelib.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/fat/API.txt</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/filesystem/memdisk.h</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/pipe.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/fs.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/mm/alloc.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/sysloader.c</file>
         </group>
     </open-files>
 </project-private>

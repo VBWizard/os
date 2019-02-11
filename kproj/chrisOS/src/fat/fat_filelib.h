@@ -139,7 +139,7 @@ struct fatfs*       fl_get_fs(void);
 #define feof(a)         fl_feof(a)
 #define remove(a)       fl_remove(a)
 #define mkdir(a)        fl_createdirectory(a)
-#define rmdir(a)        0
+//#define rmdir(a)        0
 
 #endif
 
