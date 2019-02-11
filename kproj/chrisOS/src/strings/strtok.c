@@ -37,6 +37,24 @@
 int strcspnI(char* string, char* chars);
 char *strchrI(const char *s, int c);
 
+char * strtokI(char* s, /*const*/ char* delim)
+{
+    static char *lasts;
+    register int ch;
+
+    if (s == 0)
+	s = lasts;
+    do {
+	if ((ch = *s++) == '\0')
+	    return 0;
+    } while (strchrI(delim, ch));
+    --s;
+    lasts = s + strcspnI(s, delim);
+    if (*lasts != 0)
+	*lasts++ = 0;
+    return s;
+}
+
 VISIBLE char * strtok(char* s, /*const*/ char* delim)
 {
     static char *lasts;

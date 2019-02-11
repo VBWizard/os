@@ -60,7 +60,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strparts.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strstr.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strtol.o \
-	${OBJECTDIR}/_ext/3e0a6d34/strtrim.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
 	${OBJECTDIR}/src/_scheduler.o \
 	${OBJECTDIR}/src/device.o \
@@ -117,6 +116,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/schedule.o \
 	${OBJECTDIR}/src/signals.o \
 	${OBJECTDIR}/src/strtok.o \
+	${OBJECTDIR}/src/strtrim.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
@@ -272,11 +272,6 @@ ${OBJECTDIR}/_ext/3e0a6d34/strtol.o: ../chrisOS/src/strings/strtol.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strtol.o ../chrisOS/src/strings/strtol.c
-
-${OBJECTDIR}/_ext/3e0a6d34/strtrim.o: ../chrisOS/src/strings/strtrim.c
-	${MKDIR} -p ${OBJECTDIR}/_ext/3e0a6d34
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/3e0a6d34/strtrim.o ../chrisOS/src/strings/strtrim.c
 
 ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
@@ -554,6 +549,11 @@ ${OBJECTDIR}/src/strtok.o: src/strtok.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strtok.o src/strtok.c
+
+${OBJECTDIR}/src/strtrim.o: src/strtrim.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strtrim.o src/strtrim.c
 
 ${OBJECTDIR}/src/syscall.o: src/syscall.c
 	${MKDIR} -p ${OBJECTDIR}/src

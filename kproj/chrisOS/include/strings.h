@@ -36,7 +36,7 @@ char * strcpy(char *s1, const char *s2);
 //int strcmp (const char *p1, const char *p2);
 int strncmp(const char *s1, const char *s2, size_t n);
 char * strncpy(char *s1, const char *s2, size_t n);
-char * strtrim(char * *pointerToString);
+void strtrim(char *input);
 long strtol(const char *nptr, char **endptr, register int base);
 unsigned long strtoul(const char *nptr, char **endptr, register int base);
 char* strcat (char *dest, const char *src);

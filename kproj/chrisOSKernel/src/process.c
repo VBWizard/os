@@ -58,15 +58,18 @@ void freeProcess(process_t *process)
     elfPageInfo_t *epi=elf->elfLoadedPages;
 
     printd(DEBUG_PROCESS,"freeProcess: Freeing process memory for %s (task=0x%08x)\n",process->exename,process->task->taskNum);
+
+    gdtEntryOS(process->task->taskNum,0,0, 0,0,false);
+
     
     pagingMapPage(KERNEL_CR3, (uint32_t)elf->elfLoadedPages | 0xFFFFF000, kPagingGet4kPTEntryValueCR3(process->pageDirPtr,elf->elfLoadedPages) | 0xFFFFF000,0x7);
-
     while (epi->startPhys!=0)
     {
         printd(DEBUG_PROCESS,"\tFreeing %u bytes at Phys/Virt 0x%08x/0x%08x\n",epi->pages * PAGE_SIZE, epi->startPhys, epi->startVirt);
         kFree(epi->startPhys);
         epi++;
     }
+
     if (elf->symTable)
         kFree(elf->symTable);
     kFree(elf->fileName);

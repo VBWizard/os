@@ -705,6 +705,7 @@ int32_t getExitCode(uint32_t taskNum)
     while (*q!=NULL)
     {
         task=(task_t*)*q;
+        task_t *taskList=kTaskList;
         if (task->taskNum!=0)
         {
             printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04X\n", task->taskNum);
@@ -714,6 +715,18 @@ int32_t getExitCode(uint32_t taskNum)
                 removeFromQ(qExited,task);
                 freeProcess(task->process);
                 freeTask(taskNum);
+                printd(DEBUG_PROCESS,"\tgetExitCode: Looking for task in kTaskList\n");
+                do
+                {
+                    if (taskList->taskNum==taskNum)
+                    {
+                        memset(taskList,0,sizeof(task_t));
+                        printd(DEBUG_PROCESS,"]tgetExitCode: Removing task from kTaskList\n");
+                        break;
+                    }
+                    taskList++;
+                } 
+                while (taskList->next!=NO_NEXT);
                 return retVal;
             }
         }

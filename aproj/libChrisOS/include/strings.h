@@ -53,6 +53,7 @@ size_t strlen(const char* str);
     void strtrim(char *input);
     void strtrimI(char *input);
     char * strtok(char* s, /*const*/ char* delim);
+    char * strtokI(char* s, /*const*/ char* delim);
     char *strchr(const char *s, int c);
     int strcspn(char* string, char* chars);
     char* strstr(const char* string, const char* substring);

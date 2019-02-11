@@ -77,78 +77,6 @@ int kexec2(char* path, int argc, char** argv, bool background)
 
 }
 
-int resolvePathToExecutable(const char *inPath, char *outPath)
-{
-    char delim[2]=":";
-    char *token;
-    char *envPath=NULL;
-    char *lInPath=NULL;
-    char *resPath=NULL;
-    int retVal=-1;
-    fstat_t fstat;
-    
-    //using the PATH variable, attempt to resolve the path to an executable when a path isn't given in the commandline
-    
-    //If there is a / character in the path, then don't attempt to resolve
-    envPath=malloc(1024);
-    getenv("PATH",envPath);
-
-    if (strstr(inPath, "/"))
-    {
-        if (*inPath!='/')
-        {
-            strcpy(outPath,cwd);
-        }
-        strcat(outPath,inPath);
-        retVal=0;
-    }
-    else
-    {
-        lInPath=malloc(1024);
-        strcpy(lInPath,inPath);
-
-        resPath=malloc(1024);
-
-        token=strtok(envPath,delim);
-        while (token!=NULL)
-        {
-            strcpy(resPath,token);
-            strcat(resPath,"/");
-            strcat(resPath,inPath);
-            int res=stat(resPath,&fstat);
-            if (res==0)
-            {
-                strcpy(outPath,resPath);
-                retVal=0;
-                break;
-            }
-            token=strtok(NULL,delim);
-        }
-
-        if (retVal==-1)
-        {
-            strcpy(resPath,cwd);
-            strcat(resPath,"/");
-            strcat(resPath,inPath);
-            int res=stat(resPath,&fstat);
-            if (res==0)
-            {
-                strcpy(outPath,resPath);
-                retVal=0;
-            }
-        }
-    }
-    
-    if (lInPath)
-        free(lInPath);
-    if (envPath)
-        free(envPath);
-    if (resPath)
-        free(resPath);
-    
-    return retVal;
-}
-
 int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
 {
     bool background=false;
@@ -207,7 +135,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
         temp=malloc(1024);
         fstat_t fstat;
 
-        if (resolvePathToExecutable(argv[0], temp)==0)
+        if (resolvePath(argv[0], temp)==0)
             argv[0]=temp;
         else if (stat(argv[0],&fstat)) //stat returns 0 if successful
         {

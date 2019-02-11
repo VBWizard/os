@@ -43,7 +43,8 @@ extern "C" {
     typedef enum
     {
         FILETYPE_FILE,
-        FILETYPE_PIPE
+        FILETYPE_PIPE,
+        FILETYPE_PROCFILE
     } eFileType;
     
     typedef struct file file_t;
@@ -184,6 +185,7 @@ extern "C" {
     void fs_close(void* file);
     int fs_stat(process_t *process, void *path, fstat_t *buffer);
     int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);
+    int parsePath(const char *inPath, char *outPath, char *outFilename, char** outPathTokens, int outPathTokensArrayCount);
 #ifdef __cplusplus
 }
 #endif

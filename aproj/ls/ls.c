@@ -41,7 +41,11 @@ int main(int argc, char** argv)
         for (int cnt=0;cnt<entryCount;cnt++)
         {
             //printf("%s\t\t\t\t%u\t%s\n",buffer[cnt].filename, buffer[cnt].size, buffer[cnt].is_dir?"drw":"rwx");
-            printf("%s\t\t%uK\t%s\n", buffer[cnt].is_dir?"drw":"rwx", buffer[cnt].size/1024, buffer[cnt].filename);
+            printf("%s\t\t%u%s\t%s\n", 
+                    buffer[cnt].is_dir?"drw":"rwx", 
+                    buffer[cnt].size>=1024?buffer[cnt].size/1024:buffer[cnt].size, 
+                    buffer[cnt].size>=1024?"K":" ",
+                    buffer[cnt].filename);
             retVal=0;
         }
     

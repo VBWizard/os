@@ -15,7 +15,7 @@
         </group>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/include/elfloader.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOS/src/init/utility.c</file>
         </group>
     </open-files>
 </project-private>

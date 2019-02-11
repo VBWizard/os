@@ -29,6 +29,7 @@
 #include "chrisos.h"
 #include "io.h"
 #include "utility.h"
+#include "filesystem/procfs.h"
 
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
@@ -45,7 +46,7 @@ extern void initTerm();
 extern int initTTY();
 extern void globalMMapInit();
 
-filesystem_t *rootFs, *pipeFs;
+filesystem_t *rootFs, *pipeFs, *procFs;
 terminfo_t *sysConsole1, *sysConsole2, *sysConsole3, *sysConsole4, *sysConsole5, *sysConsole6, *sysConsole7, *sysConsole8;
 process_t* kIdleProcess;
 task_t* kIdleTask;
@@ -97,8 +98,9 @@ int main(int argc, char** argv)  {
     dops.close = &fl_closedir;
     dops.read = &fl_readdir;
     
-    rootFs = kRegisterFileSystem("/", &fops, &dops);
-    pipeFs = initpipefs();
+    rootFs=kRegisterFileSystem("/", &fops, &dops);
+    pipeFs=initpipefs();
+    procFs=initprocfs();
     
     globalMMapInit();
     initTerm();

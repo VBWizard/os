@@ -50,12 +50,6 @@ extern "C" {
         dllist_t listItem;
     } interrupt_t;
     
-    typedef enum eseektype
-    {
-        SEEK_SET,
-        SEEK_CUR,
-        SEEK_END
-    } eSeekType;
     
     typedef struct sdevice
     {
@@ -66,7 +60,7 @@ extern "C" {
         devicePort_t* ports;
         int (*read) (uint64_t node, uint64_t targetAddress, void* buffer, uint64_t count);          //Function prototype for reading
         int (*write) (uint64_t node, uint64_t targetAddress, void* buffer, uint64_t count);          //Function prototype for writing
-        int (*seek) (uint64_t node, uint64_t targetAddress, eSeekType seek_type);          //Function prototype for seeking
+        int (*seek) (uint64_t node, uint64_t targetAddress, int seek_type);          //Function prototype for seeking
     } device_t;
 
     dllist_t* kDevList;

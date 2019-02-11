@@ -15,6 +15,7 @@
 
 extern filesystem_t* rootFs;
 extern filesystem_t* pipeFs;
+extern filesystem_t* procFs;
 
 struct fs_dir_list_status
 {
@@ -48,6 +49,8 @@ filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const
     if (strncmp(mountPoint,"/",1024)==0)
         fs->mount->mnt_root->d_parent = (dentry_t*)DENTRY_ROOT;
     else if (strncmp(mountPoint,"/pipe/",1024)==0)
+    {}
+    else if (strncmp(mountPoint,"/proc",1024)==0)
     {}
     else
         panic("Mounting filesystem as non-root ... this is not yet supported");
@@ -107,7 +110,8 @@ void* fs_open(char* path, const char* mode)
     void* handle;
     dllist_t* list;
     file_t *file;
-    bool isPipeFile = false;
+    bool isPipeFile=false;
+    bool isProcFile=false;
     
     printd(DEBUG_FILESYS, "\t\tfs_open: called with path=%s, mode=%s\n", path, mode);
     file = kMalloc(sizeof(file_t));
@@ -119,6 +123,12 @@ void* fs_open(char* path, const char* mode)
         //handle = (uintptr_t*)pipeFileHandle--;
         handle = file;
         isPipeFile = true;
+    }
+    else if (strncmp(path,"/proc",5)==0)
+    {
+        handle = file;
+        isProcFile = true;
+        handle=procFs->fops->open(path, mode);
     }
     else
         handle = rootFs->fops->open(path, mode);
@@ -151,7 +161,10 @@ void* fs_open(char* path, const char* mode)
             file->f_path = kMalloc(1024);
             file->fops = kMalloc(sizeof(file_operations_t));
             strncpy(file->f_path, path, 1024);
-            memcpy(file->fops, rootFs->fops, sizeof(file_operations_t));
+            if (isProcFile)
+                memcpy(file->fops, procFs->fops, sizeof(file_operations_t));
+            else
+                memcpy(file->fops, rootFs->fops, sizeof(file_operations_t));
         }
         //identify the fs that the path is on
 
@@ -299,10 +312,16 @@ void* fs_opendir(char* path)
     void *handle;
     dllist_t* list;
     directory_t *dir;
+    bool isProcFS;
+    
+    isProcFS=strncmp(path,"/proc",5)==0?1:0;
 
     //call the fs's open method
     handle = kMalloc(sizeof(FL_DIR));
-    handle = rootFs->dops->open(path, handle);
+    if (isProcFS)
+        handle = procFs->dops->open(path, handle);
+    else
+        handle = rootFs->dops->open(path, handle);
     if (handle)
     {
         list = kMalloc(sizeof(dllist_t));
@@ -312,7 +331,10 @@ void* fs_opendir(char* path)
         //identify the fs that the path is on
 
         strncpy(dir->f_path, path, 1024);
-        memcpy(dir->dops, rootFs->dops, sizeof(file_operations_t));
+        if (isProcFS)
+            memcpy(dir->dops, procFs->dops, sizeof(dirops_t));
+        else
+            memcpy(dir->dops, rootFs->dops, sizeof(dirops_t));
         dir->handle = handle;
 
         if (rootFs->dirs == NULL)
@@ -338,19 +360,22 @@ int fs_readdir(void* file, dirent_t *dirEntry)
     return retVal;
 }
 
-int parsePath(const char *inPath, char *outPath, char *outFilename)
+int parsePath(const char *inPath, char *outPath, char *outFilename, char** outPathTokens, int outPathTokensArrayCount)
 {
     char *lpath[512];
     char *token, *lasttoken;
     char tok[2] = "/";
+    int tokensCreated=0;
     
     strcpy((char*)lpath,inPath);
     token=strtok(lpath,tok);
     strcpy(outPath,"/");
-    
+
     while (token!=NULL)
     {
         lasttoken=token;
+        if (tokensCreated<outPathTokensArrayCount)
+            strcpy(outPathTokens[tokensCreated++],token);
         token=strtok(NULL,tok);
         if (token!=NULL)
         {
@@ -371,7 +396,7 @@ int fs_stat(process_t *process, void *path, fstat_t *buffer)
     int dircnt=0;
     int retVal=-1;
     
-    parsePath(path, lpath, lfile);
+    parsePath(path, lpath, lfile, NULL, 0);
     
     dircnt=getDirEntries(NULL, lpath, dir, 16384);
     

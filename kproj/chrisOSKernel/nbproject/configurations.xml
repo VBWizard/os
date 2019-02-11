@@ -92,6 +92,7 @@
       <itemPath>../../chrisOS/include/pci/pci.h</itemPath>
       <itemPath>include/filesystem/pipe.h</itemPath>
       <itemPath>include/process.h</itemPath>
+      <itemPath>include/filesystem/procfs.h</itemPath>
       <itemPath>include/rusage.h</itemPath>
       <itemPath>include/schedule.h</itemPath>
       <itemPath>../../chrisOS/include/strings.h</itemPath>
@@ -150,7 +151,7 @@
         <itemPath>../chrisOS/src/strings/strstr.c</itemPath>
         <itemPath>src/strtok.c</itemPath>
         <itemPath>../chrisOS/src/strings/strtol.c</itemPath>
-        <itemPath>../chrisOS/src/strings/strtrim.c</itemPath>
+        <itemPath>src/strtrim.c</itemPath>
       </logicalFolder>
       <itemPath>src/_scheduler.s</itemPath>
       <itemPath>../chrisOS/src/block/ahci.c</itemPath>
@@ -331,8 +332,6 @@
       </item>
       <item path="../chrisOS/src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="/home/yogi/src/os/chrisOSKernel/include/kInit.h"
@@ -362,6 +361,8 @@
       <item path="include/filesystem/memdisk.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/filesystem/procfs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -565,6 +566,8 @@
       </item>
       <item path="src/strtok.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/strtrim.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
@@ -695,8 +698,6 @@
       </item>
       <item path="../chrisOS/src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="/home/yogi/src/os/chrisOSKernel/include/kInit.h"
@@ -726,6 +727,8 @@
       <item path="include/filesystem/memdisk.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/filesystem/procfs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -972,6 +975,8 @@
       <item path="src/signals.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/strtok.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strtrim.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>

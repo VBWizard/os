@@ -53,6 +53,7 @@ extern "C" {
     int seek(void* handle, long position, int whence);
     void* freopen(char* path, const char* mode, void *stream);
     int stat(char *path, fstat_t *stat);
+    int resolvePath(const char *inPath, char *outPath);
     
     int writeI(void* handle, void *buffer, int size, int length);
     void file_cleanup();

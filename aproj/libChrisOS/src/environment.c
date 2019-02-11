@@ -6,7 +6,7 @@
 #include "libChrisOS.h"
 #include "strings.h"
 
-VISIBLE int getenv(char *varname, char *value)
+int getenvI(char *varname, char *value)
 {
     for (int cnt=0;cnt<100;cnt++)
         if (strncmpI(processEnvp[cnt],varname, strlenI(varname))==0)
@@ -15,6 +15,11 @@ VISIBLE int getenv(char *varname, char *value)
             return cnt+1;
         }
     return 0;
+}
+
+VISIBLE int getenv(char *varname, char *value)
+{
+    return getenvI(varname, value);
 }
 
 VISIBLE void  setenv(char *varname, char *value)

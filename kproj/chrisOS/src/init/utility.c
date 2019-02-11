@@ -49,7 +49,7 @@ extern void doPagingJump();
          s[j] = c;
      }
  }
- void itoa(int n, char s[])
+ char *itoa(int n, char s[])
  {
      int i, sign;
 
@@ -63,6 +63,7 @@ extern void doPagingJump();
          s[i++] = '-';
      s[i] = '\0';
      reverse(s);
+     return s;
  }
 void itox(unsigned int i, char *s)
 {

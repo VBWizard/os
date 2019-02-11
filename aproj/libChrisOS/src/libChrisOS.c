@@ -218,10 +218,14 @@ VISIBLE void exit (int status)
     do_syscall2(SYSCALL_ENDPROCESS, 0, status);
 }
 
-
-VISIBLE char* getcwd(char* buf, size_t size)
+char* getcwdI(char* buf, size_t size)
 {
     return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
+    
+}
+VISIBLE char* getcwd(char* buf, size_t size)
+{
+    return getcwdI(buf,size);
 }
 
 VISIBLE char* setcwd(char* buf, size_t size)
