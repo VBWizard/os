@@ -108,6 +108,8 @@ int main(int argc, char** argv) {
         free(qualifiedFileName);
     if (temp)
         free(temp);
+    if (dirbuff)
+        free(dirbuff);
     return 0;
 /*    file = open(argv[1],"r");
     if (file)

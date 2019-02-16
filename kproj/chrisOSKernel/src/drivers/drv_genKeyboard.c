@@ -36,7 +36,7 @@ extern volatile uint32_t exceptionSavedESP;
 extern volatile uint32_t* kTicksSinceStart;
 extern void* kKeyboardHandlerRoutine;
 extern struct idt_entry* idtTable;
-extern void vector21();
+extern void vector33();
 extern ttydevice_t *tty1, *tty2, *tty3, *tty4, *tty5, *tty6, *tty7, *tty8;
 extern pipe_t *activeSTDIN;
 extern pipe_t *activeSTDOUT;
@@ -254,6 +254,6 @@ timeToReturn:
 void kbd_handler_generic_init()
 {
     kKeyboardHandlerRoutine=&kbd_handler_generic;
-    idt_set_gate (&idtTable[0x21], 0x08, (int)&vector21, ACS_INT); //Keyboard IRQ
+    idt_set_gate (&idtTable[0x21], 0x08, (int)&vector33, ACS_INT); //Keyboard IRQ
 
 }

@@ -26,18 +26,13 @@ int main(int argc, char** argv)
 
     if (argc==1)
         getcwd(currPath,512);
-    else if (*argv[1]!='/')
-    {
-        getcwd((char*)cwd,512);
-        strcpy(currPath,(char*)cwd);
-        if (strncmp(currPath,"/",100)!=0)
-            strcat(currPath,"/");
-        strcat(currPath,argv[1]);
-    }
-    else
+    else 
         strcpy(currPath,argv[1]);
-    
-    int entryCount = getdir(currPath, (direntry_t*)buffer, 16384);
+
+    char *resolvedPath=malloc(1024);
+    resolvePath(currPath, resolvedPath);
+
+    int entryCount = getdir(resolvedPath, (direntry_t*)buffer, 16384);
         for (int cnt=0;cnt<entryCount;cnt++)
         {
             //printf("%s\t\t\t\t%u\t%s\n",buffer[cnt].filename, buffer[cnt].size, buffer[cnt].is_dir?"drw":"rwx");
@@ -51,6 +46,7 @@ int main(int argc, char** argv)
     
     if (retVal==-1)
         printf("Invalid file or directory name '%s'\n",currPath);
+    free (resolvedPath);
     free(currPath);
     return retVal;
 }

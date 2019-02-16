@@ -14,12 +14,16 @@
 #include "alloc.h"
 #include "task.h"
 #include "process.h"
+#include "schedule.h"
+#include "kernelVariables.h"
 
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kmmHeapMemoryTotal;
 extern uint32_t kernelPoolMemorySize;
 extern sMemInfo* heapMemoryInfo;
 extern task_t *kTaskList;;
+
+char **pathTokens;
 
 filesystem_t *initprocfs()
 {
@@ -49,44 +53,28 @@ void buildProcfs()
     updateRootDirFiles();
 }
 
-size_t procFileSize(procfile_t *file)
+size_t procFileSize(char *procfilename, procfile_t* procfile)
 {
     char content[1024];
     
-    if (strcmp(file->filename,"meminfo")==0)
+    if (strcmp(procfilename,"meminfo")==0)
     {
         getMemInfo(content,1024);
-        return strlen(content);
     }
-    return 0;
-}
-
-void getMemInfo(char *buffer, int buffersize)
-{
-    char *bufptr=buffer;
-    sMemInfo* mInfo=heapMemoryInfo;
-    uint32_t usedHeap=0, availableHeap=0;
-    
-    do
+    if (strcmp(procfilename,"interrupts")==0)
     {
-        if (mInfo->inUse)
-            usedHeap+=mInfo->size;
-        else
-            availableHeap+=mInfo->size;
-        if (mInfo->next)
-            mInfo++;
+        getInterruptInfo(content,1024);
+
     }
-    while (mInfo->next);
     
-    sprintf(buffer, "SystemMemory=%i\n",kE820MemoryBytes);
-    bufptr=buffer+strlen(buffer);
-    sprintf(bufptr,"KernelMemory=%i\n",kernelPoolMemorySize);
-    bufptr=buffer+strlen(buffer);
-    sprintf(bufptr,"HeapMemory=%i\n",kmmHeapMemoryTotal);
-    bufptr=buffer+strlen(buffer);
-    sprintf(bufptr,"UsedHeap=%i\n",usedHeap);
-    bufptr=buffer+strlen(buffer);
-    sprintf(bufptr,"AvailableHeap=%i\n",availableHeap);
+    if (strcmp(procfilename,"cmdline")==0)
+    {
+        getCmdline(content, 1024, procfile);
+    }
+    if (!procfile->content)
+        procfile->content=kMalloc(1024);
+    strcpy(procfile->content,content);
+    return strlen(content);
 }
 
 void updateRootDirFiles()
@@ -96,21 +84,29 @@ void updateRootDirFiles()
     if (!procRootDir.dirs)
         procRootDir.dirs=kMalloc(PROCFS_DIR_MAXDIRS*sizeof(procdir_t));
 
-    procRootDirFilePtr=0;
+    procRootDirFilePtr=procRootDirDirPtr=0;
     memset(&procRootDir.files,0,PROCFS_DIR_MAXFILES*sizeof(procfile_t));
     memset(procRootDir.dirs,0,PROCFS_DIR_MAXDIRS*sizeof(procdir_t));
+
     strcpy(procRootDir.files[procRootDirFilePtr].filename,"meminfo");
     procRootDir.files[procRootDirFilePtr].parentDir=&procRootDir;
-    char meminfo[1024];
-    getMemInfo(meminfo,1024);
     procRootDir.files[procRootDirFilePtr++].size=&procFileSize;
+
+    strcpy(procRootDir.files[procRootDirFilePtr].filename,"interrupts");
+    procRootDir.files[procRootDirFilePtr].parentDir=&procRootDir;
+    procRootDir.files[procRootDirFilePtr++].size=&procFileSize;
+
     do
     {
         if (taskList->taskNum!=0)
         {
-            sprintf(procRootDir.dirs[procRootDirDirPtr].dirname, "%u (%s)",taskList->taskNum,((process_t*)taskList->process)->exename);
+            //sprintf(procRootDir.dirs[procRootDirDirPtr].dirname, "%u (%s)",taskList->taskNum,((process_t*)taskList->process)->exename);
+            sprintf(procRootDir.dirs[procRootDirDirPtr].dirname, "%u",taskList->taskNum);
             procRootDir.dirs[procRootDirDirPtr].size=0;
             procRootDir.dirs[procRootDirDirPtr].parentDir=&procRootDir;
+            strcpy(procRootDir.dirs[procRootDirDirPtr].files[0].filename,"cmdline");
+            procRootDir.dirs[procRootDirDirPtr].files[0].size=&procFileSize;
+            procRootDir.dirs[procRootDirDirPtr].files[0].parentDir=&procRootDir.dirs[procRootDirDirPtr];
             procRootDirDirPtr++;
         }
         taskList++;
@@ -118,6 +114,17 @@ void updateRootDirFiles()
     while (taskList->next!=NO_NEXT);
 }
 
+void initPathTokens()
+{
+    if (!pathTokens)
+        pathTokens=kMalloc(20*sizeof(char*));
+    if (pathTokens[0]==NULL)
+        for (int cnt=0;cnt<20;cnt++)
+            pathTokens[cnt]=kMalloc(128);
+    else
+        for (int cnt=0;cnt<20;cnt++)
+            memset(pathTokens[cnt],0,128);
+}
 
 void *procOpenFile(void *file, const char *mode)
 {
@@ -125,11 +132,7 @@ void *procOpenFile(void *file, const char *mode)
     char filename[128];
     char *subdir;
     
-    if (!pathTokens)
-        pathTokens=kMalloc(20*sizeof(char*));
-    if (pathTokens[0]==NULL)
-        for (int cnt=0;cnt<20;cnt++)
-            pathTokens[cnt]=kMalloc(128);
+    initPathTokens();
     
     for (int cnt=0;cnt<20;cnt++)
         memset(pathTokens[cnt],0,128);
@@ -138,8 +141,6 @@ void *procOpenFile(void *file, const char *mode)
     if (strncmp(path,"/proc",5))
         return NULL;
 
-    
-    
     subdir=strstr(path+6,"/");
     
     if (subdir!=NULL)
@@ -153,13 +154,57 @@ void *procOpenFile(void *file, const char *mode)
         pFile->offset=0;
         pFile->handle=pFile;
         pFile->content=kMalloc(1024);
-        getMemInfo(pFile->content,1024);
+        procRootDir.files[0].size("meminfo",&procRootDir.files[0]);
+        strcpy(pFile->content,procRootDir.files[0].content);
         pFile->offset=0;
         pFile->fops=&procFOps;
+        return pFile;
+    }
+    else if (strcmp(filename,"interrupts")==0)
+    {
+        pfile_t *pFile=kMalloc(sizeof(pfile_t));
+        pFile->procfile=&procRootDir.files[1];
+        pFile->offset=0;
+        pFile->handle=pFile;
+        pFile->content=kMalloc(1024);
+        procRootDir.files[0].size("interrupts",&procRootDir.files[1]);
+        strcpy(pFile->content,procRootDir.files[1].content);
+        pFile->offset=0;
+        pFile->fops=&procFOps;
+        return pFile;
+    }
+    else if (strcmp(filename,"cmdline")==0)
+    {
+        pfile_t *pFile=kMalloc(sizeof(pfile_t));
+        pFile->offset=0;
+        pFile->handle=pFile;
+        pFile->content=kMalloc(1024);
+        pFile->offset=0;
+        pFile->fops=&procFOps;
+        updateRootDirFiles();
+        procdir_t *dir=NULL;
+        for (int cnt=0;cnt<PROCFS_DIR_MAXDIRS;cnt++)
+            if (strcmp(procRootDir.dirs[cnt].dirname,pathTokens[1])==0)
+            {
+                dir=&procRootDir.dirs[cnt];
+                break;
+            }
+
+        if (dir==NULL)
+            panic("procOpenFile: assert 1\n");
         
-        //Build the content of the file
-        
-        
+        for (int cnt=0;cnt<PROCFS_DIR_MAXFILES;cnt++)
+            if (strcmp(dir->files[cnt].filename,"cmdline")==0)
+            {
+                pFile->procfile=&dir->files[cnt];
+                break;
+            }
+
+        if (pFile->procfile==NULL)
+            panic("procOpenFile: assert 2\n");
+
+        pFile->procfile->size("cmdline",pFile->procfile);
+        strcpy(pFile->content,pFile->procfile->content);
         return pFile;
     }
 }
@@ -232,20 +277,54 @@ int procSeekFile(void *f, long offset, int origin)
 void *procDirOpen(const char* path, void* dir)
 {
     char lPath[256];
+    char resolvedPath[128];
+    char resolvedFilename[128];
+    int taskNum=0;
+    char taskNumString[7] = {0,0,0,0,0,0,0};
     
     strncpy((char*)lPath,(char*)path,256);
     strtrim(lPath);
     if (strncmp(lPath,"/proc",5)!=0)
         panic("procDirOpen: Opening subdirectories of /proc is not implemented\n");
     
+    initPathTokens();
+    parsePath(lPath, resolvedPath, resolvedFilename, pathTokens, 20);
+    
     pdir_t *pdir=kMalloc(sizeof(pdir_t));
     pdir->handle=pdir;
     pdir->offset=0;
-    pdir->procdir=&procRootDir;
     pdir->dops=&procDOps;
     pdir->returningFileSet=false;
     dir=pdir;
-    updateRootDirFiles();
+    if (strcmp(lPath,"/proc")==0 || strcmp(lPath,"/proc/")==0)
+    {
+        pdir->procdir=&procRootDir;
+        updateRootDirFiles();
+    }
+    else 
+    {
+        int tnsptr=0;
+        char temp[10];
+        
+        strcpy(temp,pathTokens[1]);
+        for (int cnt=0;cnt<10;cnt++)
+            if (temp[cnt]==0)
+                break;
+            else if (temp[cnt]>='0' && temp[cnt]<='9')
+                taskNumString[tnsptr++]=temp[cnt];
+        if (strlen(taskNumString)>0)
+            taskNum=atoi(taskNumString);
+        else
+            panic("procDirOpen: Not implemented\n");
+        
+        for (int cnt=0;cnt<PROCFS_DIR_MAXFILES;cnt++)
+            if (strcmp(procRootDir.dirs[cnt].dirname,taskNumString)==0)
+            {
+                pdir->procdir=&procRootDir.dirs[cnt];
+                break;
+            }
+        
+    }
     return pdir;
 }
 
@@ -269,33 +348,85 @@ int procDirRead(void *dir, dirent_t *entry)
 
     memset(entry,0,sizeof(dirent_t));
 
-    if (!pdir->returningFileSet && pdir->offset>=procRootDirDirPtr)
+    if (!pdir->returningFileSet && pdir->procdir->dirs[pdir->offset].dirname[0]==0)
     {
         pdir->returningFileSet=true;
         pdir->offset=0;
     }
-    else if (pdir->returningFileSet && pdir->offset>=procRootDirFilePtr)
+    if (pdir->returningFileSet && pdir->procdir->files[pdir->offset].filename[0]==0)
     {
         return -1;
     }
     
     if (!pdir->returningFileSet)
     {
-        strcpy(entry->filename,procRootDir.dirs[pdir->offset].dirname);
+        strcpy(entry->filename,pdir->procdir->dirs[pdir->offset].dirname);
         entry->is_dir=true;
         entry->size=0;
         pdir->offset++;
     }
     else
     {
-        strcpy(entry->filename,procRootDir.files[pdir->offset].filename);
+        strcpy(entry->filename,pdir->procdir->files[pdir->offset].filename);
         entry->is_dir=false;
-        if (procRootDir.files[pdir->offset].size)
-            entry->size=procRootDir.files[pdir->offset].size(&procRootDir.files[pdir->offset]);
+        if (pdir->procdir->files[pdir->offset].size)
+            entry->size=pdir->procdir->files[pdir->offset].size((char*)&pdir->procdir->files[pdir->offset].filename, &pdir->procdir->files[pdir->offset]);
         else
             entry->size=0;
         pdir->offset++;
     }
     
     return 0;
+}
+
+void getMemInfo(char *buffer, int buffersize)
+{
+    char *bufptr=buffer;
+    sMemInfo* mInfo=heapMemoryInfo;
+    uint32_t usedHeap=0, availableHeap=0;
+    
+    do
+    {
+        if (mInfo->inUse)
+            usedHeap+=mInfo->size;
+        else
+            availableHeap+=mInfo->size;
+        if (mInfo->next)
+            mInfo++;
+    }
+    while (mInfo->next);
+    
+    sprintf(buffer, "SystemMemory=%i\n",kE820MemoryBytes);
+    bufptr=buffer+strlen(buffer);
+    sprintf(bufptr,"KernelMemory=%i\n",kernelPoolMemorySize);
+    bufptr=buffer+strlen(buffer);
+    sprintf(bufptr,"HeapMemory=%i\n",kmmHeapMemoryTotal);
+    bufptr=buffer+strlen(buffer);
+    sprintf(bufptr,"UsedHeap=%i\n",usedHeap);
+    bufptr=buffer+strlen(buffer);
+    sprintf(bufptr,"AvailableHeap=%i\n",availableHeap);
+}
+
+void getInterruptInfo(char *buffer, int buffersize)
+{
+    char *bufptr=buffer;
+
+    sprintf(buffer, "Interrupts\n");
+    bufptr=buffer+strlen(buffer);
+    for (int cnt=0;cnt<100;cnt++)
+    {
+        if (isrCounts[cnt]!=0)
+        {
+            sprintf(bufptr, "%u=%u\n",cnt,isrCounts[cnt]);
+            bufptr=buffer+strlen(buffer);
+        }
+    }
+}
+
+void getCmdline(char *buffer, int buffersize, procfile_t *pf)
+{
+    int taskNum=atoi(pf->parentDir->dirname);
+    
+    task_t *task=findTaskByTaskNum(taskNum);
+    strcpy(buffer,((process_t*)task->process)->exename);
 }

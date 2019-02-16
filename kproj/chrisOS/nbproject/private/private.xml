@@ -15,7 +15,7 @@
         </group>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/src/init/utility.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOS/src/init/kpaging.c</file>
         </group>
     </open-files>
 </project-private>

@@ -129,6 +129,8 @@ char *findPrevNewline(const char *buffer, const char *pos)
     while (lPos>=buffer)
         if (*lPos=='\n')
             return lPos+1;
+        else if (lPos==buffer)
+            return lPos;
         else
             lPos--;
     
@@ -137,10 +139,14 @@ char *findPrevNewline(const char *buffer, const char *pos)
 void doFound(char *buffer, int buflen, char* location, char *needle)
 {
     int sz;
+    char *newlineB;
     
     if (printbuffer==NULL)
         printbuffer=malloc(65535);
-    char *newlineB = findPrevNewline(buffer, location);
+    if (buffer!=location)
+        newlineB = findPrevNewline(buffer, location);
+    else
+        newlineB = location;
     char *newlineA = strstr(newlineB,"\n");
     if (newlineA > buffer+buflen)
         newlineA = buffer+buflen;

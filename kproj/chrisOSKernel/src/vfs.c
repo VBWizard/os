@@ -292,6 +292,14 @@ void close(eListType listType, void* entry)
     else
         theFile->fops->close(theFile->handle);
     
+    if (theFile->filetype!=FILETYPE_FILE)
+    {
+        printd(DEBUG_FILESYS, "\t\tFreeing handle (type=%u) @ 0x%08x\n",theFile->handle, theFile->filetype);
+        kFree(theFile->handle);
+    }
+    printd(DEBUG_FILESYS, "\t\tFreeing file @ 0x%08x\n",theFile);
+    kFree(theFile);
+    
 //    rootFs->files = listRemove(rootFs->files,foundEntry); //NOTE: listRemove will effectively de-init the list if it becomes empty
 //    kFree(foundEntry);
 
@@ -395,6 +403,15 @@ int fs_stat(process_t *process, void *path, fstat_t *buffer)
     dirent_t *dir=kMalloc(16384);
     int dircnt=0;
     int retVal=-1;
+    
+    strcpy(lpath,path);
+    strtrim(lpath);
+    if (*lpath==0 || strcmp(lpath,"/")==0)
+    {
+        buffer->st_size=0;
+        buffer->st_lastmod=0;
+        return 0;
+    }
     
     parsePath(path, lpath, lfile, NULL, 0);
     

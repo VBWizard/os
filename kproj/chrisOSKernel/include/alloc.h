@@ -20,18 +20,18 @@ typedef struct smeminfo
 {
     struct smeminfo* prev;       //4
     const char verify[8];
-    uint32_t address;       //4
+    uint32_t address;   //4
     uint32_t size;          //4
     bool inUse;             //4
     uint32_t pid;           //4
     uint32_t cr3;           //4
     struct smeminfo* next;        //4
-} __attribute__((packed)) sMemInfo;                 //28
+} __attribute__((packed)) sMemInfo;                 //44
 
 
 void* allocPages(uint32_t size);
 void* allocPagesAndMap(uint32_t size);
-void freeI(void* address);
+void freeI(uintptr_t cr3, void* address, uintptr_t* virtAddress);
 uint32_t memAvailable();
 
 #endif	/* ALLOC_H */

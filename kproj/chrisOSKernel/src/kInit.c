@@ -13,6 +13,7 @@
 #include "time_os.h"
 #include "alloc.h"
 #include "../../chrisOS/include/utility.h"
+#include "kernelVariables.h"
 
 extern void _sysCall();
 extern void _sysEnter();
@@ -35,7 +36,7 @@ extern uint32_t getGS();
 extern uint32_t getSS();
 extern uint32_t getESP();
 extern uint64_t kCPUCyclesPerSecond;
-extern uint32_t* isrSavedStack;
+extern volatile uint32_t* isrSavedStack;
 extern bool schedulerTaskSwitched;
 extern cpuid_features_t kCPUFeatures;
 extern time_t kSystemCurrentTime;
@@ -155,7 +156,7 @@ __asm__("cli\n");
     wrmsr32(SYSENTER_EIP_MSR,(uint32_t)&_sysEnter,0);       //Set sysenter EIP
     printd(DEBUG_PROCESS,"Setup SYSENTER MSRs as CS:EIP=0x%04X:0x%08x, ESP=0x%08x\n",0x88,&_sysEnter,kKernelTask->tss->ESP1);
 
-    printk("Installing new IRQ0 handler\n");
+    printk("Installing new IRQ0 handlers\n");
     //idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
     idt_set_gate (&idtTable[0xa], 0x08, (int)&vector10, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0xd], 0x08, (int)&vector13, ACS_INT); //Scheduler is on IRQ 0
@@ -210,5 +211,8 @@ void hardwareInit()
             "or ax, 3 << 9\n"   //set CR4.OSFXSR and CR4.OSXMMEXCPT at the same time
             "mov cr4, eax\n"
             ".noSSE:\n");
+    
+    for (int cnt=0;cnt<NUMBER_OF_ISRS;cnt++)
+        isrCounts[cnt]=0;
     
 }

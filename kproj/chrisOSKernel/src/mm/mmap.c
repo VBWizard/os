@@ -249,3 +249,8 @@ void* syscall_mmap (process_t *p, syscall_mmap_t *callParams)
             sm.fd, 
             sm.offset);
 }
+
+void free_mmaps(process_t *p)
+{
+    printd(DEBUG_PROCESS,"free_mmaps: Not yet implemented");
+}

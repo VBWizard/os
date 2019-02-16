@@ -105,7 +105,8 @@ void allocateMemoryToProcess(heapPtr* ptr, size_t size, bool isKernel)
 
 void kFree(void* address)
 {
-    freeI(address);
+    process_t *p=getCurrentProcess();
+    freeI(p->pageDirPtr, address, NULL);
 }
 
 void* kMalloc(size_t size)

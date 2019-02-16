@@ -382,7 +382,7 @@ task_t* findTaskToRun()
                     queEntryNum,
                     task->taskNum, process->exename,
                     process->childNumber,
-                    process->parent->exename,
+                    process->task->taskNum==0x20?"":process->parent->exename,
                     process->priority,
                     oldTicks,
                     task->prioritizedTicksInRunnable, process->totalRunTicks);

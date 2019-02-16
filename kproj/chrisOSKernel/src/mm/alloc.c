@@ -183,9 +183,11 @@ void* allocPagesAndMap(uint32_t size)
     return allocPagesAndMapI(CURRENT_CR3, size);
 }
 
-void freeI(void* address)
+void freeI(uintptr_t cr3, void* physAddress, uintptr_t* virtAddress)
 {
-    sMemInfo* mInfo = findBlockByMemoryAddress(address);
+    sMemInfo* mInfo = findBlockByMemoryAddress(physAddress);
+    int pageCounter=0;
+    
     if (mInfo!=NULL)
         if (mInfo->inUse)
         {
@@ -194,13 +196,16 @@ void freeI(void* address)
             mInfo->inUse=false;
             mInfo->cr3 = 0;
             mInfo->pid = 0;
-            printd(DEBUG_MEMORY_MANAGEMENT,"Freed block 0x%08x for memory address 0x%08x\n",mInfo,address);
+            if (virtAddress!=NULL)
+                for (uintptr_t cnt=mInfo->address;cnt<mInfo->address+mInfo->size;cnt+=PAGE_SIZE)
+                    pagingMapPage(cr3, virtAddress+(pageCounter*PAGE_SIZE), mInfo->address, 0x0);
+            printd(DEBUG_MEMORY_MANAGEMENT,"Freed block 0x%08x for memory address 0x%08x\n",mInfo,physAddress);
         }
         else
-            printd(DEBUG_MEMORY_MANAGEMENT,"Block 0x%08x for memory address 0x%08 already freed, doing nothing\n",mInfo,address);
+            printd(DEBUG_MEMORY_MANAGEMENT,"Block 0x%08x for memory address 0x%08 already freed, doing nothing\n",mInfo,physAddress);
             
     else
-        printd(DEBUG_MEMORY_MANAGEMENT,"free: Could not find memory block for 0x%08X to free, doing nothing\n",address);
+        printd(DEBUG_MEMORY_MANAGEMENT,"free: Could not find memory block for 0x%08X to free, doing nothing\n",physAddress);
 }
 
 uintptr_t* mallocA1k(uint32_t size)

@@ -124,14 +124,14 @@ void* listTail(dllist_t* list)
     return list;
 }
 
-//TODO: UNTESTED
+//TODO: FINISH ME
 void listFree(dllist_t* theList)
 {
     dllist_t *list=listHead(theList);
     
     do
     {
-        freeI(list->payload);
+//        freeI(list->payload);
         if (list->next!=list)
             list = list->next;
         else

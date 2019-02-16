@@ -27,7 +27,8 @@
     {
         char filename[128];
         procdir_t *parentDir;
-        size_t (*size) (procfile_t *file);
+        size_t (*size) (char *procfilename, procfile_t *procfile);
+        char *content;
     } ;
     
     struct sprocdir
@@ -68,15 +69,17 @@
     void *procDirOpen(const char* path, void* dir);
     int procDirClose(void *dir);
     int procDirRead(void *dir, dirent_t *entry);
-    size_t procFileSize(procfile_t *file);
+    size_t procFileSize(char *procfilename, procfile_t* procfile);
     void getMemInfo(char *buffer, int buffersize);
+    void getInterruptInfo(char *buffer, int buffersize);
+    void getCmdline(char *buffer, int buffersize, procfile_t *pf);
+    
     procdir_t procRootDir;
     int procRootDirFilePtr, procRootDirDirPtr;
     procfile_t *procFileMemInfo;
     dirops_t procDirOps;
     file_operations_t procFOps;
     dirops_t procDOps;
-    char **pathTokens;
 
     
 #ifdef __cplusplus

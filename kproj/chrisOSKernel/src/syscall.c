@@ -267,7 +267,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 printd(DEBUG_SYSCALL,"\t_syscall: free(0x%08x): Couldn't find physical memory mapping in process %s (cr3=0x%08x)\n",param1, process->exename, processCR3);
             else
             {
-                freeI(physAddr);
+                freeI(process->pageDirPtr, (uintptr_t*)physAddr, (uintptr_t*)param1);
                 printd(DEBUG_SYSCALL,"\t_syscall: free(0x%08x): Freed physical memory at 0x%08X for process %s (cr3=0x%08x)\n",param1, physAddr, process->exename, processCR3);
             }
             __asm__("mov cr3,eax\n"::"a" (processCR3));

@@ -19,10 +19,13 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/mm/alloc.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/schedule.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/filesystem/procfs.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/paging.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/mm/kmalloc.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/vfs.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/procfs.c</file>
         </group>
     </open-files>
 </project-private>

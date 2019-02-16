@@ -22,11 +22,14 @@
 .extern schedulerTriggered
 .extern kPagingExceptionHandlerNew
 .extern kPagingExceptionCount
+.extern isrCounts
 
 .globl pagingExceptionHandler
 .type pagingExceptionHandler, @function
 pagingExceptionHandler:
     cli #NOTE: don't need to STI later as jumping back to the tss that caused the exception will set/clear the if
+    #02/11/2019: Count ISRs
+    incd [0xe*4+isrCounts]
     mov ebp, esp
     #Increment the paging exception count
     mov eax,kPagingExceptionCount
@@ -62,6 +65,8 @@ cli
     mov isrSavedEAX,eax
     mov eax,[esp]
     mov isrNumber,eax         #second vector push was ISR #
+    #02/11/2019: Count ISRs
+    incd [eax*4+isrCounts]
     mov eax,esp
     add eax,8                 #Get rid of the vector parameters in the saved esp
     mov isrSavedESP,eax
@@ -209,7 +214,7 @@ sysCallHandler:
     mov cr3,eax
     jmp noIRQResponseRequired
 notSysCallHandler:
-    cmp ax,21
+    cmp ax,33
     jne notKbdHandler
     mov eax,kKeyboardHandlerRoutine
     cmp eax,0
@@ -237,7 +242,7 @@ ckeckForIRQResponse:
     mov eax,isrNumber
     cmp eax,0x20                    #If this is the IRQ0 exception, respond to the PIC
     je irqResponseRequired
-    cmp eax, 21
+    cmp eax, 33
     jne noIRQResponseRequired
 irqResponseRequired:
     mov al,0x20

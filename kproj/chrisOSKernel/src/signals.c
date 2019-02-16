@@ -258,7 +258,7 @@ scanSleep:
             if (process->signals.sigdata[SIGSLEEP]<=*kTicksSinceStart || 
                     process->signals.sigind & SIGIO)
             {
-                while (__sync_lock_test_and_set(&kSigCheckLock, 1));
+                //while (__sync_lock_test_and_set(&kSigCheckLock, 1));
                 if (process->signals.sigdata[SIGSLEEP]<=*kTicksSinceStart)
                     printd(DEBUG_SIGNALS,"\tWaking task 0x%04X as wakeTicks (0x%08x) < kTicksSinceStart (0x%08x)\n",task->taskNum,((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
                 else
@@ -267,7 +267,7 @@ scanSleep:
                 process->signals.sigdata[SIGSLEEP]=0;
                 process->signals.sigind&=~SIGSLEEP;
                 process->signals.sigind&=~SIGIO;
-                __sync_lock_release(&kSigCheckLock);   
+                //__sync_lock_release(&kSigCheckLock);   
                 //CLR 01/17/2019: Don't make sure the task is chosen next!
                 //task->prioritizedTicksInRunnable=1000000;  //Make this the next chosen task
                 awoken=true;

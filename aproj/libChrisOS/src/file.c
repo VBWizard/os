@@ -114,7 +114,8 @@ VISIBLE int resolvePath(const char *inPath, char *outPath)
         while (token!=NULL)
         {
             strcpyI(resPath,token);
-            strcatI(resPath,"/");
+            if (strcmpI(resPath,"/")!=0)
+                strcatI(resPath,"/");
             strcatI(resPath,inPath);
             int res=statI(resPath,&fstat);
             if (res==0)

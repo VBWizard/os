@@ -107,6 +107,15 @@ void freeProcess(process_t *process)
     printd(DEBUG_PROCESS,"\tFreeing the elfInfo for this process @ 0x%08x\n",elf->loadedListItem.payload);
     kFree(elf->loadedListItem.payload);
     
+    //NOTE: Don't free heap, process allocated it with libc malloc and process will free it!
+    
+    //Don't free stack0Start because it belongs to the kernel process and everyone shares it
+    kFree(process->stack1Start);
+    kFree(process->path);
+    kFree(process->cwd);
+    kFree(process->argv);
+    kFree(process);
+    free_mmaps(process);
     printd(DEBUG_PROCESS,"freeProcess: Done!  Process freed!\n");
     
 }
@@ -377,7 +386,7 @@ process_t *initializeProcess(bool isKernelProcess)
     memset(process,0,sizeof(process_t));
     process->task=createTask(process, isKernelProcess);
     process->pageDirPtr=process->task->tss->CR3;
-    process->path=(char*)kMalloc(0x1000); 
+    //process->path=(char*)kMalloc(0x1000); 
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08x for process->path\n",process->path);
     process->cwd=allocPagesAndMap(PAGE_SIZE);
     process->task->process=process;
