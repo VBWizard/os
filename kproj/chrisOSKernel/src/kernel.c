@@ -151,53 +151,44 @@ int main(int argc, char** argv)  {
     args[0]=params[0];
     args[1]=params[1];
 
+    kKernelProcess->cwd=kMalloc(1024);
+    strcpy(kKernelProcess->cwd,"/");
     
-    process_t* initialShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
-    process_t* tty2ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    process_t* initialShellProcess = createProcess(program, 0, args, kKernelProcess, false, false);
+    schedulerEnabled=true;
+    signalCheckEnabled=true;
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    process_t* tty2ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty2ShellProcess->stdout=tty2->stdOutWritePipe;
     tty2ShellProcess->stdin=tty2->stdInReadPipe;
     tty2ShellProcess->stderr=tty2->stdErrWritePipe;
     tty2ShellProcess->childNumber=1;
-    process_t* tty3ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    process_t* tty3ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty3ShellProcess->stdout=tty3->stdOutWritePipe;
     tty3ShellProcess->stdin=tty3->stdInReadPipe;
     tty3ShellProcess->stderr=tty3->stdErrWritePipe;
     tty3ShellProcess->childNumber=2;
-    process_t* tty4ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    process_t* tty4ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty4ShellProcess->stdout=tty4->stdOutWritePipe;
     tty4ShellProcess->stdin=tty4->stdInReadPipe;
     tty4ShellProcess->stderr=tty4->stdErrWritePipe;
     tty4ShellProcess->childNumber=3;
-    process_t* tty5ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    process_t* tty5ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty5ShellProcess->stdout=tty5->stdOutWritePipe;
     tty5ShellProcess->stdin=tty5->stdInReadPipe;
     tty5ShellProcess->stderr=tty5->stdErrWritePipe;
     tty5ShellProcess->childNumber=4;
-    process_t* tty6ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    process_t* tty6ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty6ShellProcess->stdout=tty6->stdOutWritePipe;
     tty6ShellProcess->stdin=tty6->stdInReadPipe;
     tty6ShellProcess->stderr=tty6->stdErrWritePipe;
     tty6ShellProcess->childNumber=5;
-    printk("KSHELL LOADED!!!");
-//    waitTicks(3);
-    schedulerEnabled=true;
-    signalCheckEnabled=true;
+    printk("All terminals started.");
     sys_sigaction(SIGUSLEEP,0,initialShellProcess->task->taskNum, kKernelProcess);
-/*#define pcount 3
-    char* param1[pcount][10];
-    char* param2[pcount][10];
-    char* pptr[pcount][2];
-    process_t* proc[pcount]={0};
-    for (int cnt=0;cnt<pcount;cnt++)
-    {
-        sprintf(&param1[cnt][0],"%u",cnt+2);
-        sprintf(&param2[cnt][0],"%u",cnt+2);
-        pptr[cnt][0]=&param1[cnt][0];
-        pptr[cnt][1]=&param1[cnt][0];
-        proc[cnt]=createProcess(program,2,&pptr[cnt],false);
-    }
-*/
-
     printk("\n\nLast task was killed, shutting down the kernel ...\n");
     schedulerEnabled=false;
     printk("Disabled scheduler ...\n");
