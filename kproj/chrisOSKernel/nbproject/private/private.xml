@@ -19,7 +19,10 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/syscalls.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/syscall.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/x86.s</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/vfs.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/procfs.c</file>
         </group>
     </open-files>
 </project-private>

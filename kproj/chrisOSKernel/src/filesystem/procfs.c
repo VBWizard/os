@@ -296,10 +296,10 @@ void *procDirOpen(const char* path, void* dir)
     pdir->dops=&procDOps;
     pdir->returningFileSet=false;
     dir=pdir;
+    updateRootDirFiles();
     if (strcmp(lPath,"/proc")==0 || strcmp(lPath,"/proc/")==0)
     {
         pdir->procdir=&procRootDir;
-        updateRootDirFiles();
     }
     else 
     {
@@ -325,6 +325,8 @@ void *procDirOpen(const char* path, void* dir)
             }
         
     }
+    if (!pdir->procdir)
+        return 0;
     return pdir;
 }
 
