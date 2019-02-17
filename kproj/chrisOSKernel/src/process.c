@@ -496,10 +496,10 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     {
        process->parent=parentProcessPtr;
        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
-       //Initialize the current working directory to parent's cwd
        process->stdin=((process_t*)parentProcessPtr)->stdin;
        process->stdout=((process_t*)parentProcessPtr)->stdout;
        process->stderr=((process_t*)parentProcessPtr)->stderr;
+       //Initialize the current working directory to parent's cwd
        process->cwd=allocPagesAndMap(PAGE_SIZE);
        if (parentProcessPtr!=NULL && parentProcessPtr->cwd)
            //Initialize the current working directory to parent's cwd
@@ -728,8 +728,9 @@ uint32_t process_fork(process_t* currProcess)
     newProcess->justForked=true;
     newProcess->parent = currProcess;
     newProcess->childNumber = ++currProcess->lastChildNumber;
+    //Initialize the current working directory to parent's cwd
     newProcess->cwd=allocPagesAndMap(PAGE_SIZE);
-    strcpy(newProcess->cwd,currProcess->cwd);
+    strcpy(newProcess->cwd, currProcess->cwd);
     __asm__("cli\n");
     newProcess->pageDirPtr = dupPageTables(newProcess, currProcess); //Duplicates the current process' page tables to the new one
 
