@@ -133,8 +133,13 @@ int printdI(uint32_t DebugLevel, const char *format, ...)
 
 VISIBLE unsigned int sleep (unsigned int __seconds)
 {
-    SLEEP_SECONDS(__seconds)
-    return 0;
+    return SLEEP_SECONDS(__seconds);
+}
+
+VISIBLE unsigned int sleepTicks(unsigned int __milliseconds)
+{
+    return SLEEP_MS(__milliseconds);
+    
 }
 
 void stop()

@@ -48,7 +48,8 @@ extern "C" {
 #define SYSCALL3(a,b,c,d,e) {asm("call sysEnter_Vector\n":"=a" (e):"a" (a), "b" (b), "c" (c), "d" (d), "S" (0));}
 #define SYSCALL4(a,b,c,d,e,f) {asm("call sysEnter_Vector\n":"=a" (f):"a" (a), "b" (b), "c" (c), "d" (d), "S" (e));}
 #define GET_TICKS(t) SYSCALL0(SYSCALL_GETTICKS,t);
-#define SLEEP_SECONDS(s) {uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; SYSCALL1(SYSCALL_SLEEP,s,s2);}
+#define SLEEP_SECONDS(s) ({uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; SYSCALL1(SYSCALL_SLEEP,s,s2);s2;})
+#define SLEEP_MS(s) ({uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=s+ct-1; SYSCALL1(SYSCALL_SLEEP,s,s2);s2;})
 
     void libc_init();
     int do_syscall0(int callnum);
@@ -64,6 +65,7 @@ extern "C" {
     int printdI(uint32_t DebugLevel, const char *format, ...);
     int printd(uint32_t DebugLevel, const char *format, ...);
     unsigned int VISIBLE sleep (unsigned int __seconds);
+    unsigned int sleepTicks(unsigned int __milliseconds);
     void stop();
     void modifySignal(int signal, void* sigHandler, int sigData);
     void libc_cleanup(void);

@@ -77,6 +77,7 @@ extern "C" {
         bool execDontSaveRegisters;
         bool foreground, stdinRedirected, stdoutRedirected, stderrRedirected;
         uintptr_t *stackInitialPage;
+        uint32_t minorFaults, majorFaults;
     } process_t;
 
 
@@ -88,6 +89,7 @@ extern "C" {
     void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size); //Copy memory from kernel to user space (assumes dest is user page)
     void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size); //Copy memory from user space to kernel (assumes dest is kernel page)
     process_t *getCurrentProcess ();
+    void freeProcess(process_t *process);
 
 #define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus

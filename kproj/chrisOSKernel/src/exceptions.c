@@ -304,6 +304,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     {
         if (isCow) //if isMMap then the page was already fixed.  This is the "success" exit point, so skip fixing up the page, clear the CR2 and exit
         {
+            victimProcess->minorFaults++;
             uintptr_t exceptionPhysicalCR2Address=pagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2) & 0xFFFFF000;
             uint32_t newPhys=(uint32_t)allocPages(PAGE_SIZE);
             pagingMapPage(KERNEL_CR3,exceptionPhysicalCR2Address,exceptionPhysicalCR2Address,(uint16_t)0x7);

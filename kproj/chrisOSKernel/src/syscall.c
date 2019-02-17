@@ -233,7 +233,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             printd(DEBUG_SYSCALL,"\tsyscall: waitForPid(0x%08x)\n",param1);
             task = findTaskByTaskNum(param1);
             //If it has
-            if (task->taskState == TASK_EXITED)
+            if (task->taskState == TASK_EXITED || task->taskState==TASK_ZOMBIE)
             {
                 //Set the return value that we'll pass back
                 retVal = ((process_t*)task->process)->retVal;

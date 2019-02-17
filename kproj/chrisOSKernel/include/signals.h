@@ -36,6 +36,7 @@ extern "C" {
     void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *process);
     void* sys_sigaction(int signal, uintptr_t* sigAction, uint32_t sigData, void *process);
     void sys_masksig(int signal, bool mask);
+    void processSignals();
 
 #ifdef __cplusplus
 }

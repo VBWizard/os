@@ -46,8 +46,9 @@ VISIBLE int gets(char* buffer, int maxlen, int stream)
 {
     char inchar;
     int len=0;
-    char lbuf[2]={0,0};
+    char lbuf[2];
     
+    lbuf[0]=lbuf[1]=0;
     if (stream!=1)
     {
         printI("Stream %u not implemented\n",stream);

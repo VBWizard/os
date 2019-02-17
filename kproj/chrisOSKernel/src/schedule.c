@@ -10,6 +10,7 @@
 #include "thesignals.h"
 #include "drivers/tty_driver.h"
 #include "../../chrisOS/include/utility.h"
+#include "printf.h"
 
 #define SCHEDULER_DEBUG 1
 #define MAX_TASKS 1000
@@ -60,23 +61,29 @@ void initSched()
 {
     kPagingExceptionCount = 0;
     schedStack = kMalloc(0x16000);
-    pagingMapPageCount(KERNEL_CR3, schedStack, schedStack, 0x16000/PAGE_SIZE, 0x7, true);
+    pagingMapPageCount(KERNEL_CR3, (uintptr_t)schedStack, (uintptr_t)schedStack, 0x16000/PAGE_SIZE, 0x7, true);
     NO_PREV = 0xFFFFFFFF;
     NO_NEXT = 0xFFFFFFFF;
     kTaskList=kMalloc(1000*sizeof(task_t));
     memset(kTaskList,0,1000*sizeof(task_t));
     printd(DEBUG_PROCESS,"\tInitialized kTaskList @ 0x%08x, sizeof(task_t)=0x%02X\n",kTaskList,sizeof(task_t));
-    kTaskList[0].prev=NO_PREV;
-    kTaskList[999].next=NO_NEXT;
+    kTaskList[0].prev=(task_t*)NO_PREV;
+    kTaskList[999].next=(task_t*)NO_NEXT;
     //TODO: Change # of array elements to # of processors
     qRunning=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qRunning,0,MAX_TASKS*sizeof(uintptr_t));
     qRunning[MAX_TASKS-1]=NO_NEXT;
+    
     //TODO: Change # of array elements to # of processors
     qRunnable=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qRunnable,0,MAX_TASKS*sizeof(uintptr_t));
     qRunnable[MAX_TASKS-1]=NO_NEXT;
-
+    
+    //TODO: Change # of array elements to # of processors
+    qZombie=kMalloc(MAX_TASKS*sizeof(uintptr_t));
+    memset(qZombie,0,MAX_TASKS*sizeof(uintptr_t));
+    qZombie[MAX_TASKS-1]=NO_NEXT;
+    
     qStopped=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qStopped,0,MAX_TASKS*sizeof(uintptr_t));
     qStopped[MAX_TASKS-1]=NO_NEXT;
@@ -112,7 +119,7 @@ task_t* findTaskByCR3(uint32_t cr3)
         if ((uint32_t)taskList->pageDir==cr3)
             break;
         taskList++;
-    } while (taskList->next!=NO_NEXT);
+    } while (taskList->next!=(task_t*)NO_NEXT);
 
     if (taskList->taskNum==0x0 || (uint32_t)taskList->pageDir!=cr3)
     {
@@ -134,7 +141,7 @@ task_t* findTaskByTaskNum(uint32_t taskNum)
         if (taskList->taskNum==taskNum)
             break;
         taskList++;
-    } while (taskList->next!=NO_NEXT);
+    } while (taskList->next!=(task_t*)NO_NEXT);
 
     if (taskList->taskNum==0x0)
     {
@@ -327,7 +334,7 @@ void addToQ(uintptr_t* queue, task_t* taskPtr);
 
 task_t* submitNewTask(task_t *task)
 {
-	uint32_t prev=0, next=0;
+	task_t *prev=NULL, *next=NULL;
 	task_t *slot=findOpenTaskSlot();
 	printd(DEBUG_PROCESS,"\taddTaskToTaskList: Found open slot @ 0x%08x\n",slot);
 	prev=slot->prev;
@@ -488,7 +495,7 @@ void disableScheduler()
     schedulerEnabled = false;
 }
 
-void checkUSleepTasks(task_t* taskToStop, uint32_t retVal)
+void checkUSleepTasks(task_t* taskToStop)
 {
     uintptr_t* q=qUSleep;
     task_t* task;
@@ -537,10 +544,10 @@ void runAnotherTask(bool schedulerRequested)
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_PROCESS,"*Task (0x%04X) ended, removing it from %s list.\n",taskToStop->taskNum,TASK_STATE_NAMES[taskToStop->taskState]);
 #endif
-        taskToStopNewQueue=TASK_EXITED;
+        taskToStopNewQueue=TASK_ZOMBIE;
         gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
         //Look through the USleep looking for task that is waiting on this one to end
-        checkUSleepTasks(taskToStop, ((process_t*)taskToStop->process)->retVal);
+        checkUSleepTasks(taskToStop);
     }
     else if (pToStop->signals.sigind)
     {
@@ -552,7 +559,7 @@ void runAnotherTask(bool schedulerRequested)
         else if ((pToStop->signals.sigind & SIGSEGV) == SIGSEGV)
         {
             taskToStopNewQueue=TASK_EXITED;
-            checkUSleepTasks(taskToStop, -1);
+            checkUSleepTasks(taskToStop);
         }
         else if ((pToStop->signals.sigind & SIGSTOP) == SIGSTOP)
         {
@@ -570,7 +577,7 @@ void runAnotherTask(bool schedulerRequested)
                 {
                     printd(DEBUG_PROCESS,"*Task 0x%04X: SIGINT received, no default handler  Executing default action (kill process).\n",taskToStop->taskNum);
                     taskToStopNewQueue=TASK_EXITED;
-                    checkUSleepTasks(taskToStop, -1);
+                    checkUSleepTasks(taskToStop);
                 }   
                 else
                 {
@@ -696,11 +703,11 @@ __asm__("clts\n");  //TODO: Hackish but have to clear the task switched flag BEF
 
 int32_t getExitCode(uint32_t taskNum)
 {
-    uintptr_t* q=qExited;
+    uintptr_t* q=qZombie;
     task_t* task;
     process_t* process;
     
-    printd(DEBUG_PROCESS,"getExitCode: Looking through EXITED queue for exit code for task 0x%04X\n", taskNum);
+    printd(DEBUG_PROCESS,"getExitCode: Looking through ZOMBIE queue for exit code for task 0x%04X\n", taskNum);
 
     while (*q!=NULL)
     {
@@ -713,7 +720,7 @@ int32_t getExitCode(uint32_t taskNum)
             {
                 disableScheduler();
                 uint32_t retVal = ((process_t*)task->process)->retVal;
-                removeFromQ(qExited,task);
+                removeFromQ(qZombie,task);
                 freeProcess(task->process);
                 freeTask(taskNum);
                 printd(DEBUG_PROCESS,"\tgetExitCode: Looking for task in kTaskList\n");
@@ -722,7 +729,7 @@ int32_t getExitCode(uint32_t taskNum)
                     if (taskList->taskNum==taskNum)
                     {
                         memset(taskList,0,sizeof(task_t));
-                        printd(DEBUG_PROCESS,"]tgetExitCode: Removing task from kTaskList\n");
+                        printd(DEBUG_PROCESS,"\tgetExitCode: Removing task from kTaskList\n");
                         break;
                     }
                     taskList++;
