@@ -356,13 +356,8 @@ int processSignal(int signal)
     return 0;
 }
 
-int kShell(int argc, char** argv, char** envp)
+void kInit(int **initFile)
 {
-    uint8_t lCurrKey=0;
-    int lCurrKeyCount=0;
-    int commandWasFromThisBufferPtr=0;
-    char ansiSeq[20];
-
     execPipes[0]=0;
     execPipes[1]=0;
     kCmdline = malloc(CMDLINE_BUFFER_SIZE);  //Possibility of 25 chained commands
@@ -370,14 +365,44 @@ int kShell(int argc, char** argv, char** envp)
     exitCode = 0;
     timeToExit = false;
     strcpy(delim," \t\n-,");
-    environmentLoc = envp;
-    ansiSeq[0]=0x1b;
     sKShellProgramName=malloc(1024);
     strcpy(sKShellProgramName,"kShell");
     strcpy(sExecutingProgram,sKShellProgramName);
     //puts("\nWelcome to kShell ... hang a while!\n");
-
     modifySignal(SIGINT, handleSignals, 0);
+    
+    fstat_t fstat;
+    memset(&fstat,0,sizeof(fstat_t));
+    stat("/.krc",&fstat);
+    if(fstat.st_size>0);
+    {
+        *initFile=open("/.krc","r");
+    }
+    
+}
+
+int kShell(int argc, char** argv, char** envp)
+{
+    uint8_t lCurrKey=0;
+    int lCurrKeyCount=0;
+    int commandWasFromThisBufferPtr=0;
+    char ansiSeq[20];
+    int *inputFile=STDIN_FILE;
+    int *initFile=NULL;
+    
+    if (argc>1)
+    {
+        inputFile=open(argv[1],"r");
+        if (!inputFile)
+        {
+            printf("Cannot open script file %s",argv[1]);
+            return -1;
+        }
+    }
+
+    environmentLoc = envp;
+    ansiSeq[0]=0x1b;
+    kInit(&initFile);
     
     while (!timeToExit)
     {
@@ -393,14 +418,25 @@ getAKey:
         lCurrKey=0;
         while(lCurrKey==0)
         {
-            //Reading from STDIN blocks until a key is available.  It will only return 0 when STDIN is redirected to a file
-            int retVal=read(STDIN_FILE, &lCurrKey, 1, 1);
+            int retVal=0;
+            if (initFile)
+            {
+                retVal=read(initFile, &lCurrKey, 1, 1);
+                if (!retVal)
+                {
+                    close(initFile);
+                    initFile=0;
+                    retVal=read(inputFile, &lCurrKey, 1, 1);
+                }
+            }
+            else
+                //Reading from STDIN blocks until a key is available.  It will only return 0 when STDIN is redirected to a file
+                retVal=read(inputFile, &lCurrKey, 1, 1);
             if (retVal==0)
             {
                 timeToExit=true;
                 break;
             }
-//            gets(&lCurrKey,1,1);
             if (bSigIntReceived)
             {
                 if (processSignal(SIGINT)==SIGINT)
@@ -509,6 +545,8 @@ doneGettingKeys:
         }
     }
     free(sKShellProgramName);
+    if (inputFile!=STDIN_FILE)
+        close(inputFile);
     if (kCmdline)
         free(kCmdline);
     return exitCode;

@@ -31,8 +31,9 @@ int main(int argc, char** argv)
 
     char *resolvedPath=malloc(1024);
     resolvePath(currPath, resolvedPath);
-
-    int entryCount = getdir(resolvedPath, (direntry_t*)buffer, 16384);
+    if (strcmp(resolvedPath,"")!=0)
+    {
+        int entryCount = getdir(resolvedPath, (direntry_t*)buffer, 16384);
         for (int cnt=0;cnt<entryCount;cnt++)
         {
             //printf("%s\t\t\t\t%u\t%s\n",buffer[cnt].filename, buffer[cnt].size, buffer[cnt].is_dir?"drw":"rwx");
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
                     buffer[cnt].filename);
             retVal=0;
         }
-    
+    }
     if (retVal==-1)
         printf("Invalid file or directory name '%s'\n",currPath);
     free (resolvedPath);

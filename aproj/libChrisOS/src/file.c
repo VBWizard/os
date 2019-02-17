@@ -70,7 +70,7 @@ int seekI(void* handle, long position, int whence)
 
 VISIBLE int seek(void* handle, long position, int whence)
 {
-    return seek(handle, position, whence);
+    return seekI(handle, position, whence);
 }
 int statI(char *path, fstat_t *stat)
 {
@@ -106,7 +106,8 @@ VISIBLE int resolvePath(const char *inPath, char *outPath)
     {
         if (*inPath!='/')
         {
-            strcpy(outPath,cwd);
+            strcpyI(outPath,cwd);
+            strcatI(outPath,"/");
         }
         strcatI(outPath,inPath);
         retVal=0;
