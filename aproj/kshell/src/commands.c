@@ -156,11 +156,13 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
 
         if (execPipes[STDOUT_FILE]!=0)
         {
+            printd(DEBUG_LIBC,"kshell: Setting stdout for %s to 0x%08x\n",fileToExec,execPipes[STDOUT_FILE]);
             yourSTDOUT=execPipes[STDOUT_FILE];
             execPipes[STDOUT_FILE]=0;
         }
         else if (execPipes[STDIN_FILE]!=0)
         {
+            printd(DEBUG_LIBC,"kshell: Setting stdin for %s to 0x%08x\n",fileToExec,execPipes[STDIN_FILE]);
             yourSTDIN=execPipes[STDIN_FILE];
             execPipes[STDIN_FILE]=0;
         }

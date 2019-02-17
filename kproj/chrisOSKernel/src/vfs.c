@@ -259,6 +259,63 @@ int fs_seek(void* file, long offset, int whence)
     return theFile->fops->seek(theFile->handle, offset, whence);
 }
 
+int fs_stat(process_t *process, void *path, fstat_t *buffer)
+{
+    
+    char lpath[512], lfile[512];
+    dirent_t *dir=kMalloc(16384);
+    int dircnt=0;
+    int retVal=-1;
+    
+    strcpy(lpath,path);
+    strtrim(lpath);
+    if (*lpath==0 || strcmp(lpath,"/")==0)
+    {
+        buffer->st_size=0;
+        buffer->st_lastmod=0;
+        return 0;
+    }
+    
+    parsePath(path, lpath, lfile, NULL, 0);
+    
+    dircnt=getDirEntries(NULL, lpath, dir, 16384);
+    
+    for (int cnt=0;cnt<dircnt;cnt++)
+        if (strcmp(dir[cnt].filename,lfile)==0)
+        {
+            if (process)
+            {
+                uint32_t lastMod=dir[cnt].write_date << 16 | dir[cnt].write_time;
+                copyFromKernel(process,&buffer->st_size,&dir[cnt].size,sizeof(dir[cnt].size));
+                copyFromKernel(process,&buffer->st_lastmod,&lastMod,sizeof(uint32_t));
+            }
+            else
+            {
+                buffer->st_size=dir[cnt].size;
+                buffer->st_lastmod=dir[cnt].write_date << 16 | dir[cnt].write_time;
+            }
+            retVal=0;
+            break;
+        }
+    
+    if (dir)
+        kFree(dir);
+    
+    return retVal;
+}
+
+long fs_tell(void* file)
+{
+    file_t* theFile = file;
+    
+    printd(DEBUG_FILESYS, "\t\tfs_tell: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
+
+    if (theFile->verification!=0xBABAABAB)
+        panic("fs_tell: Referenced a file that is not a file",file);
+    
+    return theFile->fops->tell(theFile->handle);
+}
+
 void close(eListType listType, void* entry)
 {
 /*    dllist_t* foundEntry;
@@ -393,52 +450,6 @@ int parsePath(const char *inPath, char *outPath, char *outFilename, char** outPa
         else
             strcpy(outFilename,lasttoken);
     }
-}
-
-
-int fs_stat(process_t *process, void *path, fstat_t *buffer)
-{
-    
-    char lpath[512], lfile[512];
-    dirent_t *dir=kMalloc(16384);
-    int dircnt=0;
-    int retVal=-1;
-    
-    strcpy(lpath,path);
-    strtrim(lpath);
-    if (*lpath==0 || strcmp(lpath,"/")==0)
-    {
-        buffer->st_size=0;
-        buffer->st_lastmod=0;
-        return 0;
-    }
-    
-    parsePath(path, lpath, lfile, NULL, 0);
-    
-    dircnt=getDirEntries(NULL, lpath, dir, 16384);
-    
-    for (int cnt=0;cnt<dircnt;cnt++)
-        if (strcmp(dir[cnt].filename,lfile)==0)
-        {
-            if (process)
-            {
-                uint32_t lastMod=dir[cnt].write_date << 16 | dir[cnt].write_time;
-                copyFromKernel(process,&buffer->st_size,&dir[cnt].size,sizeof(dir[cnt].size));
-                copyFromKernel(process,&buffer->st_lastmod,&lastMod,sizeof(uint32_t));
-            }
-            else
-            {
-                buffer->st_size=dir[cnt].size;
-                buffer->st_lastmod=dir[cnt].write_date << 16 | dir[cnt].write_time;
-            }
-            retVal=0;
-            break;
-        }
-    
-    if (dir)
-        kFree(dir);
-    
-    return retVal;
 }
 
 void fs_closedir(void* dir)

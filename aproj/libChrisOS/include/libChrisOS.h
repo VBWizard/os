@@ -62,6 +62,7 @@ extern "C" {
     int printfI(const char *format, ...);
     int printI(const char *format, ...);         //NOTE: Works with linker option  -fvisibility=hidden
     int printdI(uint32_t DebugLevel, const char *format, ...);
+    int printd(uint32_t DebugLevel, const char *format, ...);
     unsigned int VISIBLE sleep (unsigned int __seconds);
     void stop();
     void modifySignal(int signal, void* sigHandler, int sigData);

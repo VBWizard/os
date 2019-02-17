@@ -64,12 +64,6 @@ sMemInfo* findAvailableBlockBySize(uint32_t pSize)
             if (!mInfo->inUse)
                 if (mInfo->size >= pSize)
                 {
-                    if (mInfo->address==0x00000fa0)
-                    {
-                        dumpAllHeapPointers();
-                        int a = 0;
-                        a+=1-1;
-                    }
                     printd(DEBUG_MEMORY_MANAGEMENT,"findAvailableBlockBySize: Reusing previously allocated block at address 0x%08x, size =  0x%08x (zeroed)\n",mInfo->address, mInfo->size);
                     pagingMapPageCount(KERNEL_CR3, 
                             mInfo->address, 

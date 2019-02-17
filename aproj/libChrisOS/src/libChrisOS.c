@@ -111,6 +111,16 @@ int printI(const char *format, ...)
     return 0;
 }
 
+VISIBLE int printd(uint32_t DebugLevel, const char *format, ...)
+{
+    va_list args;
+    va_start( args, format );
+    
+    do_syscall3(SYSCALL_PRINTD, DebugLevel, (uint32_t)format, (uint32_t)args);
+    return 0;
+    va_end(args);
+}
+
 int printdI(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
@@ -216,16 +226,6 @@ VISIBLE int waitpid(uint32_t pid)
 VISIBLE void exit (int status)
 {
     do_syscall2(SYSCALL_ENDPROCESS, 0, status);
-}
-
-char* getcwdI(char* buf, size_t size)
-{
-    return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
-    
-}
-VISIBLE char* getcwd(char* buf, size_t size)
-{
-    return getcwdI(buf,size);
 }
 
 VISIBLE char* setcwd(char* buf, size_t size)

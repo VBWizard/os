@@ -711,6 +711,7 @@ int32_t getExitCode(uint32_t taskNum)
             printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04X\n", task->taskNum);
             if (task->taskNum == taskNum)
             {
+                disableScheduler();
                 uint32_t retVal = ((process_t*)task->process)->retVal;
                 removeFromQ(qExited,task);
                 freeProcess(task->process);
@@ -727,6 +728,7 @@ int32_t getExitCode(uint32_t taskNum)
                     taskList++;
                 } 
                 while (taskList->next!=NO_NEXT);
+                enableScheduler();
                 return retVal;
             }
         }

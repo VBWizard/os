@@ -50,3 +50,14 @@ VISIBLE void  setenv(char *varname, char *value)
     //NOTE: if we get here, the value is thrown away!        
     
 }
+
+char* getcwdI(char* buf, size_t size)
+{
+    return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
+    
+}
+
+VISIBLE char* getcwd(char* buf, size_t size)
+{
+    return getcwdI(buf,size);
+}

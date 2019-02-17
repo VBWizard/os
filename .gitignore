@@ -85,3 +85,5 @@ gdb_history
 /build_dir/*
 /kproj/chrisOS/dist/log
 */Debug/*
+/aproj/free/build/
+/aproj/free/dist/

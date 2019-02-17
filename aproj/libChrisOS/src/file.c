@@ -5,7 +5,6 @@
  */
 
 #include "libChrisOS.h"
-#include "file.h"
 
 VISIBLE int getdir(char* path, char *buffer, int buflen)
 {
@@ -44,9 +43,14 @@ VISIBLE void close(void* handle)
     do_syscall1(SYSCALL_CLOSE, (uint32_t)handle);
 }
 
-VISIBLE int read(void* handle, void *buffer, int size, int length)
+int readI(void* handle, void *buffer, int size, int length)
 {
     return do_syscall4(SYSCALL_READ, (uint32_t)handle, (uint32_t)buffer, size, length);
+}
+
+VISIBLE int read(void* handle, void *buffer, int size, int length)
+{
+    return readI(handle, buffer, size, length);
 }
 
 int writeI(void* handle, void *buffer, int size, int length)
@@ -59,11 +63,15 @@ VISIBLE int write(void* handle, void *buffer, int size, int length)
     return writeI(handle, buffer, size, length);
 }
 
-VISIBLE int seek(void* handle, long position, int whence)
+int seekI(void* handle, long position, int whence)
 {
     return do_syscall3(SYSCALL_SEEK, (uint32_t)handle, position, whence);
 }
 
+VISIBLE int seek(void* handle, long position, int whence)
+{
+    return seek(handle, position, whence);
+}
 int statI(char *path, fstat_t *stat)
 {
     return do_syscall2(SYSCALL_STAT, (uint32_t)path, (uint32_t)stat);
@@ -150,4 +158,62 @@ VISIBLE int resolvePath(const char *inPath, char *outPath)
     if (cwd)
         freeI(cwd);
     return retVal;
+}
+
+long tellI(void *stream)
+{
+    return do_syscall1(SYSCALL_TELL,(uint32_t)stream);
+}
+
+VISIBLE long tell(void *stream)
+{
+    return tellI(stream);
+}
+
+size_t getlineI(char **lineptr, size_t *n, void *stream)
+{
+    char *buffer;
+    int bytesReturned=0;
+    size_t bytesParsed=0;
+    char *crPtr=NULL;
+    char *lineToOutput=*lineptr;
+    size_t lLinePtrLen=*n;
+    int startFilePos=tellI(stream);
+    int retVal=-1;
+    
+    buffer=mallocI(GETLINE_BUFFER_SIZE);        
+    
+    while ((bytesReturned=readI(stream, buffer,GETLINE_BUFFER_SIZE,1))>0)
+    {
+        if (crPtr==strstrI(buffer,"\n"))
+        { 
+            if (crPtr-buffer+bytesParsed<*n)
+                strncatI(lineToOutput,buffer,crPtr-buffer);
+            if (bytesParsed+(crPtr-buffer)>*n)
+                reallocI(lineToOutput,bytesParsed+(crPtr-buffer));
+            strncatI(lineToOutput,buffer,crPtr-buffer);
+            bytesParsed+=(crPtr-buffer);
+            seekI(stream, startFilePos+bytesParsed,SEEK_SET);
+            *n=lLinePtrLen;
+            lineptr=&lineToOutput;
+            retVal=bytesParsed;
+            goto getlineReturn;
+        }
+        else
+        {
+            lLinePtrLen+=bytesReturned;
+            bytesParsed+=bytesReturned;
+            reallocI(lineToOutput,lLinePtrLen);
+            strncatI(lineToOutput,buffer,GETLINE_BUFFER_SIZE);
+        }
+    }
+
+getlineReturn:    
+    freeI(buffer);
+    return retVal;
+}
+
+VISIBLE size_t getline(char **lineptr, size_t *n, void *stream)
+{
+    return getlineI(lineptr, n, stream);
 }

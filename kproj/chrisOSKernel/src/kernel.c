@@ -94,6 +94,7 @@ int main(int argc, char** argv)  {
     fops.close = &fl_fclose;
     fops.read = &fl_fread;
     fops.seek = &fl_fseek;
+    fops.tell = &fl_ftell;
     dops.open = &fl_opendir;
     dops.close = &fl_closedir;
     dops.read = &fl_readdir;

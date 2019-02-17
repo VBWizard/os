@@ -191,8 +191,8 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
                         panic("handleMMapPagingException: mmap is marked MAP_STACK but page exception was outside the process' stack space");
                 }
                 printd(DEBUG_MMAP,"\t\thandleMMapPagingException: Found private, anonymous mmap.  Will allocate, map this page and add to mmap->mmappedPages\n");
-                mmapAllocatePages(victimProcess, mmap, pageVirtAddress, 1);
-                printd(DEBUG_MMAP,"\t\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x)\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr);
+                uint32_t phys=mmapAllocatePages(victimProcess, mmap, pageVirtAddress, 1);
+                printd(DEBUG_MMAP,"\t\thandleMMapPagingException: Mapped v=0x%08x to p=0x%08x (CR3=0x%08x)\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr);
             }
             else if (mmap->fd) //file mapping
             {
@@ -202,7 +202,7 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
                     printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: ERROR!  Attempt to read past end of mmap'd file. (handle=0x%08x)  File length = %u, read offset = %u\n", mmap->fd, mmap->len, targetFileOffset);
                     return false;
                 }
-                printd(DEBUG_MMAP,"\t\tFound private, mmap for handle 0x%08x, offset = %u, will fulfill\n", mmap->fd, targetFileOffset);
+                printd(DEBUG_MMAP,"\t\thandleMMapPagingException: Found private, mmap for handle 0x%08x, offset = %u, will fulfill\n", mmap->fd, targetFileOffset);
 
                 if (targetFileOffset + (4*PAGE_SIZE) < mmap->len)
                     pagesToMap = 4;

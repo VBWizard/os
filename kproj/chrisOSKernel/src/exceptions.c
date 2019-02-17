@@ -313,6 +313,11 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             pagingMapPage(pagingExceptionCR3,pagingExceptionCR2 & 0xFFFFF000,newPhys,(uint16_t)0x7);
             pagingMapPage(victimProcess->pageDirPtr,pagingExceptionCR2 & 0xFFFFF000,newPhys,(uint16_t)0x7);
             printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08x (0x%08x) with writable page 0x%08x (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
+            if (pagingExceptionCR2>=STACK_INITIAL_PAGE_VIRT_ADDRESS && pagingExceptionCR2<=STACK_INITIAL_PAGE_VIRT_ADDRESS+PAGE_SIZE)
+            {
+                victimProcess->stackInitialPage=(uintptr_t*)newPhys;
+                printd(DEBUG_MMAP,"\tPaging exception was in process' initial stack page.  Updated stackInitialPage to 0x%08x\n",newPhys);
+            }
         }
 kPagingExceptionHandlerNewReturn:
         printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: returning\n");

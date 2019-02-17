@@ -12,6 +12,10 @@
 #include "tss.h"
 
 #define RESERVED_TASKS 32
+#define STACK_INITIAL_PAGE_VIRT_ADDRESS 0x9e023000
+#define STACK_VIRTUAL_START 0x9e000000
+#define STACK_VIRTUAL_SIZE  0x23000
+
 #define CURRENT_TASKNUM ({uint32_t taskNum; \
                       __asm__("str eax\nshr eax,3\n":"=a" (taskNum));\
                       taskNum;})

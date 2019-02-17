@@ -16,11 +16,13 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <strings.h>
 
 /* Compare S1 and S2, returning less than, equal to or
    greater than zero if S1 is lexicographically less than,
    equal to or greater than S2.  */
+
+#include "libChrisOS.h"
+
 int strcmpI (const char *p1, const char *p2)
 {
   register const unsigned char *s1 = (const unsigned char *) p1;

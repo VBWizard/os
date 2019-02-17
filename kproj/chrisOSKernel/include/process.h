@@ -76,6 +76,7 @@ extern "C" {
         uint32_t lastChildNumber;
         bool execDontSaveRegisters;
         bool foreground, stdinRedirected, stdoutRedirected, stderrRedirected;
+        uintptr_t *stackInitialPage;
     } process_t;
 
 

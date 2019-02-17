@@ -126,6 +126,7 @@ extern "C" {
         //size_t (*read) (file_t *, char *, size_t, uint64_t *);
         size_t (*read) (void * buffer, int size, int length, void *f);
         //size_t (*write) (file_t *, const char *, size_t, uint64_t *);
+        long (*tell) (void *f);
         size_t (*write) (const void * data, int size, int count, void *f);
     };
 
@@ -182,6 +183,7 @@ extern "C" {
     int fs_read(process_t* process, void* file, void * buffer, int size, int length);
     int fs_write(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);
+    long fs_tell(void* file);
     void fs_close(void* file);
     int fs_stat(process_t *process, void *path, fstat_t *buffer);
     int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);

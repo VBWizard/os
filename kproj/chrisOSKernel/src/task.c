@@ -239,7 +239,8 @@ task_t* createTask(void* process, bool kernelTSS)
     
     if (kernelTSS)
     {
-        task->tss->ESP=(uint32_t)allocPages(0x16000);
+        theProcess->stackInitialPage=allocPages(0x16000);
+        task->tss->ESP=theProcess->stackInitialPage;
         ((process_t*)task->process)->stackStart=task->tss->ESP;
         ((process_t*)task->process)->stackSize=0x16000;
         printd(DEBUG_TASK,"createTask: ESP for task allocated at 0x%08x\n",task->tss->ESP);
@@ -252,17 +253,18 @@ task_t* createTask(void* process, bool kernelTSS)
     }
     else
     {
-        //first page has to be physically backed
-        task->tss->ESP=(uint32_t)allocPages(PAGE_SIZE);
-        pagingMapPageCount(task->tss->CR3, 0x9e023000, task->tss->ESP, 0x1, 0x7, true);
-        pagingMapPageCount(task->tss->CR3, 0x9e023000 | KERNEL_PAGED_BASE_ADDRESS, task->tss->ESP, 0x1, 0x7, true);
-        pagingMapPageCount(KERNEL_CR3, 0x9e023000, task->tss->ESP, 0x1, 0x7, true);
+        //first page has to be physically backed because we write argv, argc, envp, to there
+        theProcess->stackInitialPage=allocPages(PAGE_SIZE);
+        task->tss->ESP=(uint32_t)theProcess->stackInitialPage;
+        pagingMapPageCount(task->tss->CR3, STACK_INITIAL_PAGE_VIRT_ADDRESS, task->tss->ESP, 0x1, 0x7, true);
+        pagingMapPageCount(task->tss->CR3, STACK_INITIAL_PAGE_VIRT_ADDRESS | KERNEL_PAGED_BASE_ADDRESS, task->tss->ESP, 0x1, 0x7, true);
+        pagingMapPageCount(KERNEL_CR3, STACK_INITIAL_PAGE_VIRT_ADDRESS, task->tss->ESP, 0x1, 0x7, true);
         pagingMapPageCount(KERNEL_CR3, task->tss->ESP | KERNEL_PAGED_BASE_ADDRESS, task->tss->ESP, 0x1, 0x7, true);
-        printd(DEBUG_TASK, "createTask: First page of ESP allocated at 0x%08x and mapped to 0x9e023000\n", task->tss->ESP);
+        printd(DEBUG_TASK, "createTask: First page of ESP allocated at 0x%08x and mapped to 0x%08x\n", task->tss->ESP,STACK_INITIAL_PAGE_VIRT_ADDRESS);
         
     //No longer physically allocating stack spage, instead we'll mmap it so that it is allocated on demand
-    ((process_t*)task->process)->stackStart=0x9e000000;  //TODO: make start address a #define?
-    ((process_t*)task->process)->stackSize=0x23000;     //TODO: make size a #define?
+    ((process_t*)task->process)->stackStart=STACK_VIRTUAL_START;
+    ((process_t*)task->process)->stackSize=STACK_VIRTUAL_SIZE;
     theProcess->pageDirPtr=task->tss->CR3;
     if (sys_mmap(theProcess, 
             (uintptr_t*)theProcess->stackStart, 

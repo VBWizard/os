@@ -19,6 +19,12 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+
+#define SEEK_SET	0	/* Seek from beginning of file.  */
+#define SEEK_CUR	1	/* Seek from current position.  */
+#define SEEK_END	2	/* Seek from end of file.  */
+#define GETLINE_BUFFER_SIZE 1024
+
     
     struct direntry
     {
@@ -53,6 +59,8 @@ extern "C" {
     int seek(void* handle, long position, int whence);
     void* freopen(char* path, const char* mode, void *stream);
     int stat(char *path, fstat_t *stat);
+    long tell(void *stream);
+    size_t getline(char **lineptr, size_t *n, void *stream);
     int resolvePath(const char *inPath, char *outPath);
     
     int writeI(void* handle, void *buffer, int size, int length);

@@ -16,9 +16,9 @@
    15    License along with the GNU C Library; if not, see
    16    <http://www.gnu.org/licenses/>.  */
    
-   #include <strings.h>
-   
-   #undef strcat
+#include "strings.h"
+
+    #undef strcat
    
    #ifndef STRCAT
    # define STRCAT strcat
@@ -38,22 +38,21 @@
      return dest;
    }
    
-   void concatenate(char p[], char q[]) {
-   int c, d;
- 
-   c = 0;
- 
-   while (p[c] != '\0') {
-      c++;  	
-   }
- 
-   d = 0;
- 
-   while (q[d] != '\0') {
-      p[c] = q[d];
-      d++;
-      c++;	
-   }
- 
-   p[c] = '\0';
+char *strncatI(char *dest, const char *src, size_t n)
+{
+    size_t bytesToCopy=0;
+    size_t srcStringLen=strlenI(src);;
+    
+    if (n<=srcStringLen)
+        bytesToCopy=n;
+    else
+        bytesToCopy=srcStringLen;
+    
+     strncpyI (dest + strlenI (dest),src,bytesToCopy);
+     return dest;
+}
+
+VISIBLE char *strncat(char *dest, const char *src, size_t n)
+{
+    return strncatI(dest, src, n);
 }

@@ -110,6 +110,10 @@ void freeProcess(process_t *process)
     //NOTE: Don't free heap, process allocated it with libc malloc and process will free it!
     
     //Don't free stack0Start because it belongs to the kernel process and everyone shares it
+    printd(DEBUG_PROCESS,"\tFreeing initial stack page @ 0x%08x\n",process->stackInitialPage);
+    //TODO: Fix this.  Unremarking this causes paging exception SEGV in /sbin/idle
+    //kFree(process->stackInitialPage);
+
     kFree(process->stack1Start);
     kFree(process->path);
     kFree(process->cwd);
@@ -388,7 +392,6 @@ process_t *initializeProcess(bool isKernelProcess)
     process->pageDirPtr=process->task->tss->CR3;
     //process->path=(char*)kMalloc(0x1000); 
     printd(DEBUG_PROCESS,"createProcess: Malloc'd 0x%08x for process->path\n",process->path);
-    process->cwd=allocPagesAndMap(PAGE_SIZE);
     process->task->process=process;
     process->processSyscallESP=process->task->tss->ESP1;
     process->priority=PROCESS_DEFAULT_PRIORITY;
@@ -482,8 +485,6 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     {
        process->parent=parentProcessPtr->parent;
        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
-       //Initialize the current working directory to parent's cwd
-       strcpy(process->cwd, parentProcessPtr->cwd);
        //CLR 02/05/2019: If we forked we don't want to mess with the pipes established 
        /*process->stdin=((process_t*)parentProcessPtr)->stdin;
        process->stdout=((process_t*)parentProcessPtr)->stdout;
@@ -496,16 +497,20 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
        process->parent=parentProcessPtr;
        process->kernelProcess=((process_t*)process->parent)->kernelProcess;
        //Initialize the current working directory to parent's cwd
-       strcpy(process->cwd, parentProcessPtr->cwd);
        process->stdin=((process_t*)parentProcessPtr)->stdin;
        process->stdout=((process_t*)parentProcessPtr)->stdout;
        process->stderr=((process_t*)parentProcessPtr)->stderr;
+       process->cwd=allocPagesAndMap(PAGE_SIZE);
+       if (parentProcessPtr!=NULL && parentProcessPtr->cwd)
+           //Initialize the current working directory to parent's cwd
+           strcpy(process->cwd, parentProcessPtr->cwd);
     }
     else
     {
         //Initialize the current working directory and set it to '/'
-        memset(process->cwd,0,PAGE_SIZE);
-        strcpy(process->cwd,"/");
+       process->cwd=allocPagesAndMap(PAGE_SIZE);
+       memset(process->cwd,0,PAGE_SIZE);
+       strcpy(process->cwd,"/");
        process->kernelProcess=isKernelProcess;
        process->stdin=0;
        process->stdout=1;
@@ -723,7 +728,8 @@ uint32_t process_fork(process_t* currProcess)
     newProcess->justForked=true;
     newProcess->parent = currProcess;
     newProcess->childNumber = ++currProcess->lastChildNumber;
-    
+    newProcess->cwd=allocPagesAndMap(PAGE_SIZE);
+    strcpy(newProcess->cwd,currProcess->cwd);
     __asm__("cli\n");
     newProcess->pageDirPtr = dupPageTables(newProcess, currProcess); //Duplicates the current process' page tables to the new one
 
