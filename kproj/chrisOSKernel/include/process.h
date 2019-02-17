@@ -90,6 +90,7 @@ extern "C" {
     void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size); //Copy memory from user space to kernel (assumes dest is kernel page)
     process_t *getCurrentProcess ();
     void freeProcess(process_t *process);
+    int calcProcessSize(process_t *process);
 
 #define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus

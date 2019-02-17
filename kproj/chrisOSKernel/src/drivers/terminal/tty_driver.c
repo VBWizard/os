@@ -24,6 +24,7 @@
 
 #include "drivers/tty_driver.h"
 #include "kmalloc.h"
+#include "drivers/termdrv.h"
 
 int initTTY()
 {
@@ -67,3 +68,16 @@ void unregisterTTY(int deviceMajor, int deviceMinor)
             return;
         }
 }
+
+int getTTYForPipe(int pipefd)
+{
+    for (int cnt=0;cnt<ttysRegistered;cnt++)
+    {
+        if (ttyDevices[cnt].termDeviceMajor == TERMINAL_CONSOLE_MAJOR_NUMBER)
+        {
+            if (ttyDevices[cnt].stdOutWritePipe==(file_t*)pipefd)
+                return cnt;
+        }
+    }
+    return 0xFF;
+}    

@@ -87,3 +87,5 @@ gdb_history
 */Debug/*
 /aproj/free/build/
 /aproj/free/dist/
+/aproj/top/build/
+/aproj/top/dist/

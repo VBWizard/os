@@ -16,6 +16,8 @@
 #include "process.h"
 #include "schedule.h"
 #include "kernelVariables.h"
+#include "drivers/termdrv.h"
+#include "task.h"
 
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kmmHeapMemoryTotal;
@@ -66,11 +68,15 @@ size_t procFileSize(char *procfilename, procfile_t* procfile)
         getInterruptInfo(content,1024);
 
     }
-    
     if (strcmp(procfilename,"cmdline")==0)
     {
         getCmdline(content, 1024, procfile);
     }
+    if (strcmp(procfilename,"stat")==0)
+    {
+        getStat(content, 1024, procfile);
+    }
+    
     if (!procfile->content)
         procfile->content=kMalloc(1024);
     strcpy(procfile->content,content);
@@ -107,6 +113,9 @@ void updateRootDirFiles()
             strcpy(procRootDir.dirs[procRootDirDirPtr].files[0].filename,"cmdline");
             procRootDir.dirs[procRootDirDirPtr].files[0].size=&procFileSize;
             procRootDir.dirs[procRootDirDirPtr].files[0].parentDir=&procRootDir.dirs[procRootDirDirPtr];
+            strcpy(procRootDir.dirs[procRootDirDirPtr].files[1].filename,"stat");
+            procRootDir.dirs[procRootDirDirPtr].files[1].size=&procFileSize;
+            procRootDir.dirs[procRootDirDirPtr].files[1].parentDir=&procRootDir.dirs[procRootDirDirPtr];
             procRootDirDirPtr++;
         }
         taskList++;
@@ -207,6 +216,39 @@ void *procOpenFile(void *file, const char *mode)
         strcpy(pFile->content,pFile->procfile->content);
         return pFile;
     }
+    else if (strcmp(filename,"stat")==0)
+    {
+        pfile_t *pFile=kMalloc(sizeof(pfile_t));
+        pFile->offset=0;
+        pFile->handle=pFile;
+        pFile->content=kMalloc(1024);
+        pFile->offset=0;
+        pFile->fops=&procFOps;
+        updateRootDirFiles();
+        procdir_t *dir=NULL;
+        for (int cnt=0;cnt<PROCFS_DIR_MAXDIRS;cnt++)
+            if (strcmp(procRootDir.dirs[cnt].dirname,pathTokens[1])==0)
+            {
+                dir=&procRootDir.dirs[cnt];
+                break;
+            }
+
+        if (dir==NULL)
+            panic("procOpenFile: assert 3\n");
+        
+        for (int cnt=0;cnt<PROCFS_DIR_MAXFILES;cnt++)
+            if (strcmp(dir->files[cnt].filename,"stat")==0)
+            {
+                pFile->procfile=&dir->files[cnt];
+                break;
+            }
+
+        if (pFile->procfile==NULL)
+            panic("procOpenFile: assert 4\n");
+
+        pFile->procfile->size("stat",pFile->procfile);
+        strcpy(pFile->content,pFile->procfile->content);
+        return pFile;    }
 }
 
 void procCloseFile(void *file)
@@ -234,9 +276,10 @@ size_t procReadFile(void *buffer, int size, int length, void *file)
     copySize=contentLen-pf->offset>size*length
             ?size*length:
                 contentLen-pf->offset;
-    
-    memcpy(buffer,pf->content,copySize);
-    return copySize;
+
+    memset(buffer,0,length*size);
+    strncpy(buffer,pf->content,copySize);
+    return copySize+1;
 }
 
 size_t procWriteFile(const void *buffer, int size, int count, void *file)
@@ -431,4 +474,66 @@ void getCmdline(char *buffer, int buffersize, procfile_t *pf)
     
     task_t *task=findTaskByTaskNum(taskNum);
     strcpy(buffer,((process_t*)task->process)->exename);
+}
+
+void getStat(char *buffer, int buffersize, procfile_t *pf)
+{
+     int taskNum=atoi(pf->parentDir->dirname);
+     process_t *proc;
+     char procState=0;
+     task_t *task=findTaskByTaskNum(taskNum);
+     proc=task->process;
+     int tty=getTTYForPipe((int)proc->stdout);
+     switch (task->taskState)
+     {
+         case TASK_RUNNING:
+             procState='R';
+             break;
+         case TASK_ISLEEP:
+             procState='S';
+             break;
+         case TASK_USLEEP:
+             procState='D';
+             break;
+         case TASK_ZOMBIE:
+             procState='Z';
+             break;
+         case TASK_RUNNABLE:
+             procState='W';
+             break;
+         case TASK_EXITED:
+             procState='E';
+             break;
+         case TASK_STOPPED:
+             procState='T';
+             break;
+         default:
+             procState='X';
+             break;
+     }
+     sprintf(buffer,"%d (%s) %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %u %u %u",
+             taskNum,                       //pid
+             proc->exename,                 //comm
+             procState,                     //state
+             proc->parent->task->taskNum,   //ppid
+             0,                             //pgrp
+             0,                             //session
+             tty,                           //tty_nr
+             0,                             //tpgid
+             0,                             //flags
+             proc->minorFaults,             //minflt
+             proc->majorFaults,              //majflt
+             0,                             //cmajflt
+             proc->totalRunTicks,           //utime
+             0,                             //stime
+             0,                             //cutime
+             0,                             //cstime
+             proc->priority,                 //priority
+             0,                             //nice*
+             1,                             //num_threads
+             0,                             //itrealvalue
+             0,                             //starttime
+             (uint32_t)proc->heapEnd-(uint32_t)proc->heapStart>0?(uint32_t)proc->heapEnd-(uint32_t)proc->heapStart:0, //vsize
+             calcProcessSize(proc)          //rss
+             );
 }

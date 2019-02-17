@@ -43,6 +43,7 @@ char* strcat (char *dest, const char *src);
 char* strleft(char* val, int cnt);
 char* strstr(const char* string, char* substring);
 int strcmp (const char *p1, const char *p2);
+static char *strreplace(const char *in, const char *pattern, const char *by);
 
 #endif	/* STRINGS_H */
 

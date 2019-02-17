@@ -21,6 +21,8 @@ char *strncpyI(char *s1, const char *s2, size_t n)
 	*s++ = '\0';
 	--n;
     }
+    if (n==0)
+        *s='\0';
     return s1;
 }
 

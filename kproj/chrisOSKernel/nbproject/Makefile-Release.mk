@@ -122,7 +122,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/task.o \
 	${OBJECTDIR}/src/vfs.o \
 	${OBJECTDIR}/src/x86.o \
-	${OBJECTDIR}/src/x86idt.o
+	${OBJECTDIR}/src/x86idt.o \
+	${OBJECTDIR}/strreplace.o
 
 
 # C Compiler Flags
@@ -583,6 +584,11 @@ ${OBJECTDIR}/src/x86idt.o: src/x86idt.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/x86idt.o src/x86idt.c
+
+${OBJECTDIR}/strreplace.o: strreplace.c
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/strreplace.o strreplace.c
 
 # Subprojects
 .build-subprojects:

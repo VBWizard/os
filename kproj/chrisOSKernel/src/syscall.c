@@ -236,7 +236,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             if (task->taskState == TASK_EXITED || task->taskState==TASK_ZOMBIE)
             {
                 //Set the return value that we'll pass back
-                retVal = ((process_t*)task->process)->retVal;
+                retVal = getExitCode(param1);
                 taskExited = true;
             }
             else //Otherwise

@@ -6,9 +6,9 @@
 
 #include "libChrisOS.h"
 
-VISIBLE int getdir(char* path, char *buffer, int buflen)
+VISIBLE int getdir(char* path, direntry_t *entries, int bufferCount)
 {
-    return do_syscall3(SYSCALL_GETDENTS, (uint32_t)path, (uint32_t)buffer, buflen);
+    return do_syscall3(SYSCALL_GETDENTS, (uint32_t)path, (uint32_t)entries, bufferCount);
 }
 
 VISIBLE void* open(char* path, const char* mode)

@@ -77,6 +77,7 @@ extern "C" {
     void *memsetI(void *d1, int val, size_t len);
     void * memcpy(void *dest, const void *src, size_t n);
     void *memcpyI(void *dest, const void *src, size_t n);
+    time_t time (time_t *result);
     struct tm* gettime(struct tm *time, bool localTime);
     char* getcwd(char* buf, size_t size);
     char* setcwd(char* buf, size_t size);

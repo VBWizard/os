@@ -56,7 +56,7 @@ extern "C" {
     void close(void* handle);
     int read(void* handle, void *buffer, int size, int length);
     int write(void* handle, void *buffer, int size, int length);
-    int getdir(char* path, char *buffer, int bufferCount);
+    int getdir(char* path, direntry_t *entries, int bufferCount);
     int seek(void* handle, long position, int whence);
     void* freopen(char* path, const char* mode, void *stream);
     int stat(char *path, fstat_t *stat);

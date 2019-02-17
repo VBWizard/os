@@ -73,6 +73,7 @@
     void getMemInfo(char *buffer, int buffersize);
     void getInterruptInfo(char *buffer, int buffersize);
     void getCmdline(char *buffer, int buffersize, procfile_t *pf);
+    void getStat(char *buffer, int buffersize, procfile_t *pf);
     
     procdir_t procRootDir;
     int procRootDirFilePtr, procRootDirDirPtr;

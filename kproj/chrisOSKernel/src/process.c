@@ -358,6 +358,18 @@ void waitForDeath()
     goto waitForDeathHere;
 }
 
+int calcProcessSize(process_t *process)
+{
+    int totalBytes=0;
+    elfInfo_t *elf=process->elf;
+    if (elf!=NULL)
+        totalBytes=process->stackSize+elf->textSize+elf->dataSize+elf->tdataSize+elf->bssSize;
+    else
+        totalBytes=0;
+    if (totalBytes<0)
+        totalBytes=0;
+}
+
 void processIdleLoop()
 {
     uint32_t cr3=0;
