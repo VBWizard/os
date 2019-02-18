@@ -14,8 +14,6 @@
             <file>file:/home/yogi/src/os/kproj/chrisOS/src/filesystem/mbr.c</file>
         </group>
         <group name="aproj"/>
-        <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/src/strings/strlen.c</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

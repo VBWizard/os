@@ -140,7 +140,7 @@ void* fs_open(char* path, const char* mode)
             file->handle = handle;
             if (strlen(path)>7)
             {
-                file->pipe = (void*)pipedup(path, mode, file);
+                file->pipe = (void*)pipedup1(path, mode, file);
                 file->f_path = path;
                 if (!file->pipe)
                     return ERROR_FS_PIPE_DOESNT_EXIST;

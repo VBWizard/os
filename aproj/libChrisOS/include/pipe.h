@@ -17,9 +17,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+    
+    typedef enum EPipeMode
+    {
+        PIPEREAD = 1,
+        PIPEWRITE = 2,
+        PIPENOBLOCK = 4
+    } ePipeMode;
+    
     int pipe(int pipefd[2]);
-
+    int dup3(int oldfd, int newfd, int flags);
 
 #ifdef __cplusplus
 }

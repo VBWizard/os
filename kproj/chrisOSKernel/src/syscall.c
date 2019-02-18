@@ -47,7 +47,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     uint32_t processCR3;  //NOTE: Moved from module level to here because this needs to be a stack variable for fork()
     bool taskExited = false;
     bool useExisting = false;
-    uintptr_t *genericFileHandle;
+    uintptr_t *genericFileHandle, *genericFileHandle2;
     syscall_mmap_t mmap_params;
     
     __asm__("mov eax,esi\n": "=a" (param4));
@@ -177,6 +177,32 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
 
+        case SYSCALL_DUP3:
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            printd(DEBUG_SYSCALL,"\tsyscall: dup3(0x%08x,0x%08x,%u)\n",param1,param2,param3);
+            process=getCurrentProcess();
+            
+            genericFileHandle = (uintptr_t*)param1;
+            if (genericFileHandle == (uintptr_t*)STDOUT_FILE)
+                genericFileHandle = process->stdout;
+            else if (genericFileHandle==(uintptr_t*)STDIN_FILE)
+                genericFileHandle = process->stdin;
+            else if (genericFileHandle==(uintptr_t*)STDERR_FILE)
+                genericFileHandle = process->stderr;
+
+            genericFileHandle2 = (uintptr_t*)param2;
+            if (genericFileHandle2 == (uintptr_t*)STDOUT_FILE)
+                genericFileHandle2 = process->stdout;
+            else if (genericFileHandle2==(uintptr_t*)STDIN_FILE)
+                genericFileHandle2 = process->stdin;
+            else if (genericFileHandle2==(uintptr_t*)STDERR_FILE)
+                genericFileHandle2 = process->stderr;
+            
+            retVal = fs_dup3(process, (file_t*)genericFileHandle, (int)genericFileHandle2, param3);
+                
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
+            
         case SYSCALL_MMAP:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();

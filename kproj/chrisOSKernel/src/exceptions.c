@@ -21,6 +21,7 @@
 #include "thesignals.h"
 #include "filesystem/pipe.h"
 #include "drivers/tty_driver.h"
+#include "kutility.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
@@ -61,6 +62,10 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *p
 
 void defaultISRHandler()
 {
+    uintptr_t oldCR3;
+    
+    SAVE_CURRENT_CR3(oldCR3);
+    LOAD_KERNEL_CR3;
     task_t *victimTask = getCurrentTask();
     //terminal_clear();
 
@@ -70,6 +75,7 @@ void defaultISRHandler()
         {
             //printd(DEBUG_EXCEPTIONS,"defaultISRHandler: Exception 0x7 triggered.  We are ignoring the CR0 task switched flag (TS) for now.  Will reset the flag and resume.\n",kPagingExceptionsSinceStart+1);
         }
+        LOAD_CR3(oldCR3);
         __asm__("clts\n");
         return;
     }

@@ -211,7 +211,7 @@ size_t pipewrite(const void *data, int size, int count, void *f)
     return written;
 }
 
-pipe_t *pipedup(void* path, const char *mode, file_t* file)
+pipe_t *pipedup1(void* path, const char *mode, file_t* file)
 {
     pipes_t *op;
     pipe_t *pipe;
@@ -296,4 +296,41 @@ int fs_pipeI(process_t *process, int pipefd[2], int flags)
             pipe.file[1], 
             process->exename);
     return 0;
+}
+
+int fs_dup3(process_t *process, file_t *oldFile, int newFileFD, int flags)
+{
+    char mode[3]={0,0,0};
+
+    pipe_t *pipe = oldFile->pipe;
+
+    file_t *newFile = kMalloc(sizeof(file_t));
+    memset(newFile,0,sizeof(file_t));
+
+    newFile->verification=0xBABAABAB;
+    
+    strncpy(mode,pipe->mode,1);
+    if (flags & PIPENOBLOCK)
+        strcat(mode, "n");
+        
+    newFile->handle=newFile;
+    newFile->pipe = (void*)pipedup1(oldFile->f_path, mode, newFile);
+    newFile->f_path=kMalloc(1024);
+    strcpy(newFile->f_path,oldFile->f_path);
+    
+    if ((int)oldFile==newFileFD)
+    {
+        if (process->stdin==oldFile->handle)
+            process->stdin=newFile;
+        else if (process->stdout==oldFile->handle)
+            process->stdout=newFile;
+        else if (process->stderr==oldFile->handle)
+            process->stderr=newFile;
+        else
+            panic("fs_dup3:Couldn't find old stdio pipe to replace!\n");
+
+        //oldFile->fops->close(oldFile);
+        
+    }
+    return (int)newFile;
 }
