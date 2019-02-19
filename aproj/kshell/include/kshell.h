@@ -42,6 +42,7 @@ typedef struct
     void cmdPwd();
     void cmdSetEnv(char *cmdline);
     void cmdRepeat(char *cmdline);
+    void cmdTakeADump();
     void (*command_function)(void);
     void (*command_function_p)(char*);
     char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char** pptr);
@@ -62,6 +63,7 @@ typedef struct
 static command_table_t cmds[] = { 
         {"cd","Change directory",cmdChangeDirectory,1},
         {"clear","Clear the screen",cmdClearScreen,0},
+        {"dump","Dump kernel info to log",cmdTakeADump,0},
         {"env","Print environment",cmdPrintEnv,0},
         {"exec","Execute a program",cmdExecp,1},
         {"exit","Exit kshell",cmdExit,1},

@@ -95,6 +95,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/signals.o \
 	${OBJECTDIR}/src/strtok.o \
 	${OBJECTDIR}/src/strtrim.o \
+	${OBJECTDIR}/src/sysDump.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
@@ -423,6 +424,11 @@ ${OBJECTDIR}/src/strtrim.o: src/strtrim.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strtrim.o src/strtrim.c
+
+${OBJECTDIR}/src/sysDump.o: src/sysDump.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/sysDump.o src/sysDump.c
 
 ${OBJECTDIR}/src/syscall.o: src/syscall.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src

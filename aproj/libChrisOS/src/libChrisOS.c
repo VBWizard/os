@@ -362,3 +362,8 @@ VISIBLE int setSTD(int std, uint32_t filed)
 {
     return do_syscall2(SYSCALL_SETSTD, std, filed);
 }
+
+VISIBLE void takeADump()
+{
+    return do_syscall0(SYSCALL_TAKEADUMP);
+}

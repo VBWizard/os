@@ -40,7 +40,7 @@ extern "C" {
         SYSCALL_SETPRIORITY             = 0x97,
         SYSCALL_REGEXITHANDLER          = 0x163,
         SYSCALL_FREE			= 0x164,
-        SYSCALL_ALLOCHEAP			= 0x165,
+        SYSCALL_ALLOCHEAP		= 0x165,
         SYSCALL_SLEEP			= 0x166,
         SYSCALL_SETSIGACTION            = 0x167,
         SYSCALL_STOP			= 0x168,
@@ -53,7 +53,8 @@ extern "C" {
         SYSCALL_MASKSIG                 = 0x303,
         SYSCALL_GETDENTS                = 0x304,
         SYSCALL_EXECNEW			= 0x305,
-        SYSCALL_SETSTD                 = 0x306
+        SYSCALL_SETSTD                  = 0x306,
+        SYSCALL_TAKEADUMP               = 0x900
     } E_SYSCALLS;
 
     typedef struct sMMapSyscall

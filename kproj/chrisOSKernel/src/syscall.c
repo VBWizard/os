@@ -361,6 +361,11 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_GETTIME:
             retVal = kSystemCurrentTime;
             break;
+        case SYSCALL_TAKEADUMP:
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            sys_dump();
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
         case SYSCALL_SETSTD:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();

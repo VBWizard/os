@@ -15,20 +15,12 @@
 #include "i386/gdt.h"
 #include "process.h"
 
-heapPtrPage* kHeapPagePtr;
 void* currAssignableMemoryPage;
 int currAssignableMemoryPtr;
 extern sGDT* bootGdt;
 extern uint32_t getCS();
 extern task_t* findTaskByCR3(uint32_t cr3);
 
-
-#define NO_PREV_HEAP_PTR (heapPtrPage*)0xFFFFFFFE
-#define NO_NEXT_HEAP_PTR (heapPtrPage*)0xFFFFFFFF
-#define END_OF_MEMORY_PTRS 0xFFFFFFFF
-#define CURRENT_CR3 ({uint32_t cr3Val; \
-                      __asm__("mov eax,cr3\n mov %[cr3Val],eax\n":[cr3Val] "=r" (cr3Val));\
-                      cr3Val;})
 
 void initHeapPagePtr(heapPtrPage* pagePtr);
 

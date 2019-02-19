@@ -87,6 +87,7 @@ extern "C" {
     void exit (int status);
     char** processEnvp;
     int setSTD(int std, uint32_t filed);
+    void takeADump();
     
 #ifdef __cplusplus
 }

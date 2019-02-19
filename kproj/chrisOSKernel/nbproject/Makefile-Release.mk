@@ -117,6 +117,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/signals.o \
 	${OBJECTDIR}/src/strtok.o \
 	${OBJECTDIR}/src/strtrim.o \
+	${OBJECTDIR}/src/sysDump.o \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
@@ -555,6 +556,11 @@ ${OBJECTDIR}/src/strtrim.o: src/strtrim.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strtrim.o src/strtrim.c
+
+${OBJECTDIR}/src/sysDump.o: src/sysDump.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/sysDump.o src/sysDump.c
 
 ${OBJECTDIR}/src/syscall.o: src/syscall.c
 	${MKDIR} -p ${OBJECTDIR}/src

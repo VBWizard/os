@@ -380,3 +380,7 @@ void cmdSleep(char *cmdline)
     sleep(strtoul(params[0],0,10));
 }
 
+void cmdTakeADump()
+{
+    takeADump();
+}
