@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>include/free.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -12,7 +13,8 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>freemain.c</itemPath>
+      <itemPath>src/freemain.c</itemPath>
+      <itemPath>src/getfree.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -39,6 +41,7 @@
           <standard>3</standard>
           <incDir>
             <pElem>../libChrisOS/include</pElem>
+            <pElem>include</pElem>
           </incDir>
           <incFile>
             <pElem>../libChrisOS/include/libChrisOS.h</pElem>
@@ -63,7 +66,11 @@
           <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
-      <item path="freemain.c" ex="false" tool="0" flavor2="0">
+      <item path="include/free.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/freemain.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/getfree.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -108,7 +115,11 @@
           <commandLine>-ffreestanding -nostdlib -lgcc -T linker.ld</commandLine>
         </linkerTool>
       </compileType>
-      <item path="freemain.c" ex="false" tool="0" flavor2="0">
+      <item path="include/free.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/freemain.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/getfree.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

@@ -35,7 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/freemain.o
+	${OBJECTDIR}/src/freemain.o \
+	${OBJECTDIR}/src/getfree.o
 
 
 # C Compiler Flags
@@ -64,10 +65,15 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/free: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/free ${OBJECTFILES} ${LDLIBSOPTIONS} -ffreestanding -nostdlib -lgcc -T linker.ld
 
-${OBJECTDIR}/freemain.o: freemain.c
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/freemain.o: src/freemain.c
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -I../libChrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/freemain.o freemain.c
+	$(COMPILE.c) -O2 -I../libChrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/freemain.o src/freemain.c
+
+${OBJECTDIR}/src/getfree.o: src/getfree.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -I../libChrisOS/include -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/getfree.o src/getfree.c
 
 # Subprojects
 .build-subprojects:
