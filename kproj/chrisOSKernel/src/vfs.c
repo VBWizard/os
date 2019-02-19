@@ -204,9 +204,10 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     
     if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
     {
-        while (__sync_lock_test_and_set(&kFileReadLock, 1));
+        //CLR 2/18/2019: Commented lock out until we get it figured out
+        //while (__sync_lock_test_and_set(&kFileReadLock, 1));
         bytesRead = theFile->fops->read(buffer, size, length, theFile->handle);
-        __sync_lock_release(&kFileReadLock);   
+        //__sync_lock_release(&kFileReadLock);   
         
         return bytesRead;
     }
@@ -345,18 +346,23 @@ void close(eListType listType, void* entry)
         printd(DEBUG_FILESYS, "\t\tfs_close: called for directory %s (handle=0x%08X)\n", dir->f_path, dir->handle);
     }
     if (listType == LIST_DIRECTORY)
-        dir->dops->close(dir->handle);
-    else
-        theFile->fops->close(theFile->handle);
-    
-    if (theFile->filetype!=FILETYPE_FILE)
     {
-        printd(DEBUG_FILESYS, "\t\tFreeing handle (type=%u) @ 0x%08x\n",theFile->handle, theFile->filetype);
-        kFree(theFile->handle);
+        dir->dops->close(dir->handle);
+        printd(DEBUG_FILESYS, "\t\tfs_close: Freeing directory_t resources\n");
+        kFree(dir->dops);
+        kFree(dir->f_path);
+        kFree(dir);
     }
-    printd(DEBUG_FILESYS, "\t\tFreeing file @ 0x%08x\n",theFile);
-    kFree(theFile);
-    
+    else
+    {
+        theFile->fops->close(theFile->handle);
+        printd(DEBUG_FILESYS, "\t\tfs_close: freeing file_t resources\n");
+        kFree(theFile->fops);
+        kFree(theFile->f_path);
+        printd(DEBUG_FILESYS, "\t\tFreeing handle (type=%u) @ 0x%08x\n",theFile->handle, theFile->filetype);
+        kFree(theFile);
+    }
+   
 //    rootFs->files = listRemove(rootFs->files,foundEntry); //NOTE: listRemove will effectively de-init the list if it becomes empty
 //    kFree(foundEntry);
 

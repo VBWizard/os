@@ -224,7 +224,7 @@ void __attribute__((noinline)) dumpAllHeapPointers()
 }
 
 //Called by exception 0xd & 0xe (possibly more)
-void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bool toLog)
+void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bool toLog, uintptr_t victimCR3)
 {
     tss_t* tss = task->tss;
     uint32_t esp = tss->ESP;
@@ -259,9 +259,13 @@ LOAD_ZERO_BASED_DS
     for (int cnt=0;cnt<20;cnt++)
     {
 #ifdef KERNEL_LOADED
-        int pte=pagingGet4kPTEntryValueCR3(task->tss->CR3,espP);
+        int pte=pagingGet4kPTEntryValueCR3(victimCR3,espP);
         if (!(pte & 0x1))
+        {
+            sprintf(contentP, "Cannot print any more stack due to address not mapped to process (address=0x%08x, pte=0x%08x)\n",pte&0xFFFFF000,pte);
+            contentP=content+strlen(content);
             break;
+        }
 #endif
         sprintf(contentP, "\t0x%08X: 0x%08X\n",esp, *espP);
         espP++;

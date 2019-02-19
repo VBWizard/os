@@ -64,6 +64,8 @@ int main(int argc, char** argv) {
         int thePid = pids[pidCount];
         //print("Waiting for child %u (0x%04X)\n",pidCount+1, thePid);
         rets[pidCount]=waitpid(thePid);
+        if (rets[pidCount]!=pidCount)
+            printf("Wrong return value for child #%u (%u)\n",pidCount,rets[pidCount]);
         pidCount++;
     }
     printf("All children ended\n");

@@ -336,7 +336,7 @@ kPagingExceptionHandlerNewReturn:
           //printk("\nPaging handler: Exception for virtual address 0x%02X\n",pagingExceptionCR2);
           //printk("PDE@0x%08x=0x%08x, PTE@0x%08x=0x%08x\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
           //printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, false);
-          printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, true);
+          printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, true, pagingExceptionCR3);
           //dumpAllHeapPointers();
           //printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
           //printk("Finding symbol for 0x%08x ...\n",pagingExceptionCR2);

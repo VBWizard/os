@@ -234,7 +234,7 @@ void *procOpenFile(void *file, const char *mode)
             }
 
         if (dir==NULL)
-            panic("procOpenFile: assert 3\n");
+            return NULL;
         
         for (int cnt=0;cnt<PROCFS_DIR_MAXFILES;cnt++)
             if (strcmp(dir->files[cnt].filename,"stat")==0)
@@ -258,6 +258,8 @@ void procCloseFile(void *file)
     {
         if (pf->content)
             kFree(pf->content);
+        if (pf->procfile->content)
+            kFree(pf->procfile->content);
         kFree(file);
     }
     return;

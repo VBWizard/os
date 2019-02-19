@@ -257,21 +257,20 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             LOAD_KERNEL_CR3;
             //Find out if the PID to be waited on has already exited
             printd(DEBUG_SYSCALL,"\tsyscall: waitForPid(0x%08x)\n",param1);
-            task = findTaskByTaskNum(param1);
+            process=getCurrentProcess();
             //If it has
-            if (task->taskState == TASK_EXITED || task->taskState==TASK_ZOMBIE)
+            disableScheduler();
+            if (process->task->taskState == TASK_EXITED || process->task->taskState==TASK_ZOMBIE)
             {
                 //Set the return value that we'll pass back
                 retVal = getExitCode(param1);
                 taskExited = true;
+                enableScheduler();
             }
             else //Otherwise
-                taskExited = false;
-            //Only wait for the PID if it hasn't already exited
-            if (!taskExited)
             {
-                process=getCurrentProcess();
                 printd(DEBUG_PROCESS,"\tsyscall: signalling SIG_USLEEP for current task (cr3=0x%08x) on pid=0x%04X.  Good night!\n",processCR3,param1);
+                enableScheduler();
                 retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1, process);
             }
             __asm__("mov cr3,eax\n"::"a" (processCR3));
@@ -301,7 +300,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             }
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_ALLOC:     //***mallocI - allocate system memory
+        case SYSCALL_ALLOCHEAP:     //***mallocI - allocate system memory
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_SYSCALL,"\tsyscall: alloc(0x%08x)\n",param1);
             retVal=(uint32_t)mallocI(processCR3,param1);

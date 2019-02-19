@@ -39,14 +39,17 @@ extern "C" {
 #include "time.h"
     
 //This is the minimum request size for a call to the kernel to ALLOC memory. 
-#define ALLOC_REQUEST_SIZE 0x32000
-#define ALLOC_MARKER_VALUE 0xB00F00D0
-    typedef struct sheap
+#define ALLOC_REQUEST_SIZE 0x1000
+#define ALLOC_MARKER_VALUE 0x4F3F2F1F
+#define ALLOC_MIN_MALLOC_SIZE sizeof(heaprec_t)
+    typedef struct sheap    //20
     {
-        uint32_t marker;
-        uint32_t len;
-        bool inUse;
-        struct sheap* prev;
+        uint32_t marker;    //4
+        uint32_t len;       //4
+        bool inUse;         //1
+        uint16_t uses;      //2
+        uint8_t filler[1];  //1
+        struct sheap* prev, *next; //
     } heaprec_t;
 
 uint32_t heapBase;    

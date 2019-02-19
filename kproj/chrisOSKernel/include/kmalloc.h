@@ -32,7 +32,7 @@ extern "C" {
     typedef struct s_heapptr_page
     {
         void* prev;                     //4
-        heapPtr ptrs[(PAGE_SIZE/sizeof(heapPtr))-1];
+        heapPtr ptrs[(PAGE_SIZE/sizeof(heapPtr))-1]; //-1=8 bytes, which covers our prev & next
         void* next;                     //4
     } heapPtrPage;
 

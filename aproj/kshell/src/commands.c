@@ -94,6 +94,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     char *temp=NULL;
     bool freeCmdline=false;
     int yourSTDIN=0, yourSTDOUT=0;
+    char *cmdline2=malloc(1024);
     
     //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
     stdinRedir=strstr(cmdline,"<");
@@ -102,7 +103,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     if (stdoutPipe)
     {
         pipe(execPipes);
-        cmdline=strreplace(cmdline,"|","");
+        cmdline2=strreplace(cmdline,"|","",cmdline2);
         freeCmdline=true;
     }
     
@@ -136,7 +137,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
         fstat_t fstat;
 
         if (resolvePath(argv[0], temp)==0)
-            argv[0]=temp;
+            strcpy(argv[0],temp);
         else if (stat(argv[0],&fstat)) //stat returns 0 if successful
         {
             printf("invalid path or filename '%s'\n",argv[0]);
@@ -226,7 +227,8 @@ kexecReturn:
         free(stderrfile);
     if (temp)
         free(temp);
-    
+    if (cmdline2)
+        free(cmdline2);
 }
 
 void cmdChangeDirectory(char *cmdline)
@@ -259,6 +261,12 @@ void cmdTime(char* cmdline)
 {
     uint32_t startTicks, endTicks;
     
+    strtrim(cmdline);
+    if (strlen(cmdline)==0)
+    {
+        printf("Error: The time command requires the name of an application to be executed, as input.\n");
+        return;
+    }
     startTicks=getticks();
     execInternalCommand(cmdline);
     endTicks=getticks();

@@ -6,6 +6,11 @@
 
 #include "libChrisOS.h"
 
+    char *resolvePath_envPath;
+    char *resolvePath_inPath;
+    char *resolvePath_resPath;
+    char *resolvePath_cwd;
+
 VISIBLE int getdir(char* path, direntry_t *entries, int bufferCount)
 {
     return do_syscall3(SYSCALL_GETDENTS, (uint32_t)path, (uint32_t)entries, bufferCount);
@@ -86,27 +91,30 @@ VISIBLE int resolvePath(const char *inPath, char *outPath)
 {
     char delim[2]=":";
     char *token;
-    char *envPath=NULL;
-    char *lInPath=NULL;
-    char *resPath=NULL;
-    char *cwd;
     int retVal=-1;
     fstat_t fstat;
     
+    if (!resolvePath_envPath)
+        resolvePath_envPath=mallocI(1024);
+    if (!resolvePath_cwd)
+        resolvePath_cwd=mallocI(1024);
+    if (!resolvePath_inPath)
+            resolvePath_inPath=mallocI(1024);
+    if (!resolvePath_resPath)
+        resolvePath_resPath=mallocI(1024);
+
     //using the PATH variable, attempt to resolve the path to an executable when a path isn't given in the commandline
     
     //If there is a / character in the path, then don't attempt to resolve
-    envPath=mallocI(1024);
-    getenvI("PATH",envPath);
+    getenvI("PATH",resolvePath_envPath);
 
-    cwd=mallocI(1024);
-    getcwdI(cwd,1024);
+    getcwdI(resolvePath_cwd,1024);
     
     if (strstrI(inPath, "/"))
     {
         if (*inPath!='/')
         {
-            strcpyI(outPath,cwd);
+            strcpyI(outPath,resolvePath_cwd);
             strcatI(outPath,"/");
         }
         strcatI(outPath,inPath);
@@ -114,22 +122,18 @@ VISIBLE int resolvePath(const char *inPath, char *outPath)
     }
     else
     {
-        lInPath=mallocI(1024);
-        strcpyI(lInPath,inPath);
-
-        resPath=mallocI(1024);
-
-        token=strtokI(envPath,delim);
+        strcpyI(resolvePath_inPath,inPath);
+        token=strtokI(resolvePath_envPath,delim);
         while (token!=NULL)
         {
-            strcpyI(resPath,token);
-            if (strcmpI(resPath,"/")!=0)
-                strcatI(resPath,"/");
-            strcatI(resPath,inPath);
-            int res=statI(resPath,&fstat);
+            strcpyI(resolvePath_resPath,token);
+            if (strcmpI(resolvePath_resPath,"/")!=0)
+                strcatI(resolvePath_resPath,"/");
+            strcatI(resolvePath_resPath,inPath);
+            int res=statI(resolvePath_resPath,&fstat);
             if (res==0)
             {
-                strcpyI(outPath,resPath);
+                strcpyI(outPath,resolvePath_resPath);
                 retVal=0;
                 break;
             }
@@ -138,26 +142,18 @@ VISIBLE int resolvePath(const char *inPath, char *outPath)
 
         if (retVal==-1)
         {
-            strcpyI(resPath,cwd);
-            strcatI(resPath,"/");
-            strcatI(resPath,inPath);
-            int res=statI(resPath,&fstat);
+            strcpyI(resolvePath_resPath,resolvePath_cwd);
+            strcatI(resolvePath_resPath,"/");
+            strcatI(resolvePath_resPath,inPath);
+            int res=statI(resolvePath_resPath,&fstat);
             if (res==0)
             {
-                strcpyI(outPath,resPath);
+                strcpyI(outPath,resolvePath_resPath);
                 retVal=0;
             }
         }
     }
     
-    if (lInPath)
-        freeI(lInPath);
-    if (envPath)
-        freeI(envPath);
-    if (resPath)
-        freeI(resPath);
-    if (cwd)
-        freeI(cwd);
     return retVal;
 }
 

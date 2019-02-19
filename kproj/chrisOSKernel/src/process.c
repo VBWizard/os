@@ -382,11 +382,9 @@ void processIdleLoop()
     while (1==1)
     {
         kIdleTicks++;
-        if (kIdleTicks%10==0)
+/*        if (kIdleTicks%10==0)
         printd(DEBUG_PROCESS, "tick (%u)\n",kIdleTicks);
-/*        if (++kIdleTicks % 10 == 0)
-            printd(DEBUG_PROCESS,"IDLE TASK: Idle ticks = %u\n",kIdleTicks);*/
-        __asm__("sti;hlt;");
+*/        __asm__("sti;hlt;");
      }   
 }
 

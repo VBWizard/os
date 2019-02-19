@@ -40,7 +40,7 @@ extern "C" {
         SYSCALL_SETPRIORITY             = 0x97,
         SYSCALL_REGEXITHANDLER          = 0x163,
         SYSCALL_FREE			= 0x164,
-        SYSCALL_ALLOC			= 0x165,
+        SYSCALL_ALLOCHEAP			= 0x165,
         SYSCALL_SLEEP			= 0x166,
         SYSCALL_SETSIGACTION            = 0x167,
         SYSCALL_STOP			= 0x168,
