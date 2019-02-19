@@ -44,7 +44,9 @@ extern bool kPagingInitDone;
 extern volatile char* kKbdBuffCurrTop;
 extern void* kMalloc(size_t size);
 extern tss_t* pagingExceptionTSS;
+extern tss_t* gpfExceptionTSS;
 extern void pagingExceptionHandler();
+extern void _gpfExceptionHandler();
 extern task_t* kKernelTask;
 extern struct idt_entry* idtTable;
 extern uint16_t isrNumber;
@@ -133,6 +135,85 @@ void doubleFaultHandler()
     __asm__("hlt");
 }
 
+void GeneralProtectionFaultHandler(int ErrorCode)
+{
+    tss_t* ourTSS = gpfExceptionTSS;
+    uint32_t victimTaskNum = ourTSS->LINK;
+    victimTaskNum >>= 3;
+    if (victimTaskNum==0x16 || victimTaskNum==0)
+        panic("Paging exception in paging exception handler at, error 0x%08x",ErrorCode);
+    task_t* victimTask = findTaskByTaskNum(victimTaskNum);
+    process_t* victimProcess = victimTask->process;
+
+    __asm__("clts\n");
+    sys_sigaction2(SIGSEGV,0,0xe, victimProcess);
+
+    if (activeSTDOUT)
+    {
+        char err[256];
+        sprintf(err,"\ngpfault in '%s' at 0x%08x (errorcode=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,ErrorCode);
+        fs_write(NULL, victimProcess->stdout, err,strlen(err),1);
+    }
+    else
+        printk("\ngpfault in '%s' at 0x%08x (errorcode=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,ErrorCode);
+    
+    //Set the return address from the exception to a loop where the process can ... wait for death
+    victimTask->tss->EIP = (uint32_t)&waitForDeath;
+    victimProcess->retVal = -1;
+    return;
+    
+    
+GPFLoopOfDeath:
+    goto GPFLoopOfDeath;
+}
+
+void setupGPFHandler()
+{
+    gpfExceptionTSS = allocPages(sizeof(tss_t));
+    printd(DEBUG_PROCESS, "Allocated TSS for GPF exception task gate at 0x%08x",gpfExceptionTSS);
+    pagingMapPageCount(KERNEL_CR3, ((uint32_t)gpfExceptionTSS | KERNEL_PAGED_BASE_ADDRESS),(uint32_t)gpfExceptionTSS,0x1,0x7,true);
+    pagingMapPageCount(KERNEL_CR3, (uint32_t)gpfExceptionTSS,(uint32_t)gpfExceptionTSS,0x1,0x7,true);
+    memset(gpfExceptionTSS, 0, sizeof(tss_t));
+    
+    gpfExceptionTSS->CR3=KERNEL_CR3;
+    gpfExceptionTSS->CS=0x8;
+    gpfExceptionTSS->EIP=(uint32_t)&_gpfExceptionHandler;
+    gpfExceptionTSS->DS=kKernelTask->tss->DS;
+    
+    gpfExceptionTSS->ES=kKernelTask->tss->ES;
+    gpfExceptionTSS->FS=kKernelTask->tss->FS;
+    gpfExceptionTSS->GS=kKernelTask->tss->GS;
+    gpfExceptionTSS->DS=kKernelTask->tss->DS;
+    gpfExceptionTSS->SS=kKernelTask->tss->SS;
+    gpfExceptionTSS->SS0=kKernelTask->tss->SS0;
+
+    gpfExceptionTSS->ESP0=allocPagesAndMap(0x16000);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for GPF exception handler ESP0\n",gpfExceptionTSS->ESP0);
+    pagingMapPageCount(KERNEL_CR3, gpfExceptionTSS->ESP0 | KERNEL_PAGED_BASE_ADDRESS, gpfExceptionTSS->ESP0, 0x16, 0x7, true);
+    pagingMapPageCount(KERNEL_CR3, gpfExceptionTSS->ESP0, gpfExceptionTSS->ESP0, 0x16, 0x7, true);
+    gpfExceptionTSS->ESP0+=0x10000;
+    printd(DEBUG_PROCESS,"Offset GPF exception handler ESP0 to 0x%08x\n",gpfExceptionTSS->ESP0);
+    
+    gpfExceptionTSS->ESP=allocPagesAndMap(0x16000);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for GPF exception handler ESP\n",gpfExceptionTSS->ESP);
+    pagingMapPageCount(KERNEL_CR3, gpfExceptionTSS->ESP | KERNEL_PAGED_BASE_ADDRESS, gpfExceptionTSS->ESP, 0x16, 0x7, true);
+    pagingMapPageCount(KERNEL_CR3, gpfExceptionTSS->ESP , gpfExceptionTSS->ESP, 0x16, 0x7, true);
+    gpfExceptionTSS->ESP+=0x10000;
+    printd(DEBUG_PROCESS,"Offset GPF exception handler ESP to 0x%08x\n",gpfExceptionTSS->ESP);
+
+    gpfExceptionTSS->SS1=gpfExceptionTSS->SS0;
+    gpfExceptionTSS->ESP1=gpfExceptionTSS->ESP0;
+    gpfExceptionTSS->SS2=gpfExceptionTSS->SS0;
+    gpfExceptionTSS->ESP2=gpfExceptionTSS->ESP0;
+    
+    gpfExceptionTSS->EFLAGS=0x200007;
+
+    gdtEntryOS(0x16,(int)gpfExceptionTSS,sizeof(tss_t), ACS_TSS,GDT_GRANULAR | GDT_32BIT,true);
+
+    //install the paging exception handler task TSS
+    idt_set_gate (&idtTable[0xd], 0xB0, 0, ACS_TASK | ACS_DPL_0); //paging exception
+}
+
 void setupPagingHandler()
 {
     pagingExceptionTSS = allocPages(sizeof(tss_t));
@@ -142,7 +223,7 @@ void setupPagingHandler()
     memset(pagingExceptionTSS, 0, sizeof(tss_t));
     pagingExceptionTSS->CR3=KERNEL_CR3;
     pagingExceptionTSS->CS=0x8;
-    pagingExceptionTSS->EIP=&pagingExceptionHandler;
+    pagingExceptionTSS->EIP=(uint32_t)&pagingExceptionHandler;
     pagingExceptionTSS->DS=kKernelTask->tss->DS;
     
     pagingExceptionTSS->ES=kKernelTask->tss->ES;
@@ -175,7 +256,7 @@ void setupPagingHandler()
     
     pagingExceptionTSS->EFLAGS=0x200007;
 
-    gdtEntryOS(0x17,pagingExceptionTSS,sizeof(tss_t), ACS_TSS,GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryOS(0x17,(int)pagingExceptionTSS,sizeof(tss_t), ACS_TSS,GDT_GRANULAR | GDT_32BIT,true);
 
     //install the paging exception handler task TSS
     idt_set_gate (&idtTable[0xe], 0xB8, 0, ACS_TASK | ACS_DPL_0); //paging exception
@@ -360,7 +441,6 @@ kPagingExceptionHandlerNewReturn:
     //Set the return address from the exception to a loop where the process can ... wait for death
     victimTask->tss->EIP = (uint32_t)&waitForDeath;
     victimProcess->retVal = -1;
-    //Return 1 which means SEGV
     return;
     
 }

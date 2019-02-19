@@ -22,7 +22,26 @@
 .extern schedulerTriggered
 .extern kPagingExceptionHandlerNew
 .extern kPagingExceptionCount
+.extern GeneralProtectionFaultHandler
 .extern isrCounts
+
+.globl _gpfExceptionHandler
+.type _gpfExceptionHandler, @function
+_gpfExceptionHandler:
+    cli #NOTE: don't need to STI later as jumping back to the tss that caused the exception will set/clear the if
+    #02/11/2019: Count ISRs
+    incd [0xd*4+isrCounts]
+    mov ebp, esp
+    #Push the error code
+    mov eax,[esp]
+    push eax
+    call GeneralProtectionFaultHandler
+    #For fatals the paging handler will have set the victimTask's return address already for the IRET
+    #For non-fatals, the IRET will jump back into the task that triggered the exception
+    #either way we don't need to do anything before IRETing except reset the stack and enable interrupts
+    mov esp, ebp
+    iret
+    jmp _gpfExceptionHandler #Next paging exception the handler will start here so jump back to the beginning of the handler
 
 .globl pagingExceptionHandler
 .type pagingExceptionHandler, @function

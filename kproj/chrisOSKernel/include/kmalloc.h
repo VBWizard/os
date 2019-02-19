@@ -21,9 +21,9 @@ extern "C" {
 #include <stddef.h>
 #include "../../chrisOS/include/chrisos.h"
     
-    typedef struct s_heapptr
+    typedef struct s_heapptr    //8
     {
-        void* address;     //4
+        void* address;          //4
         size_t size;            //4
     } heapPtr;
 

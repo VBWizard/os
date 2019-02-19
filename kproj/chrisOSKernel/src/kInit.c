@@ -50,7 +50,7 @@ dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call lis
 
 char env[50][50];
 char* envs[100];
-tss_t* pagingExceptionTSS;
+tss_t* pagingExceptionTSS, *gpfExceptionTSS;
 
 
 void initKernelInternals()
@@ -159,7 +159,7 @@ __asm__("cli\n");
     printk("Installing new IRQ0 handlers\n");
     //idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
     idt_set_gate (&idtTable[0xa], 0x08, (int)&vector10, ACS_INT); //Scheduler is on IRQ 0
-    idt_set_gate (&idtTable[0xd], 0x08, (int)&vector13, ACS_INT); //Scheduler is on IRQ 0
+    //idt_set_gate (&idtTable[0xd], 0x08, (int)&vector13, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x7], 0x08, (int)&vector7, ACS_INT);
     
@@ -178,8 +178,8 @@ outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the 
 IRQ_clear_mask(2);
 IRQ_clear_mask(8);
 */
+      setupGPFHandler();
       setupPagingHandler();
-
     __asm__("jmp 0x88:kernJump1\nkernJump1:\n");
 
 kernJump1:    

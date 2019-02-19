@@ -23,6 +23,7 @@ extern uint32_t* sysEnter_Vector;
 extern uint32_t* isrSavedStack;
 extern uintptr_t schedStack;
 extern tss_t* pagingExceptionTSS;
+extern tss_t* gpfExceptionTSS;
 
 task_t* getAvailableTask();
 //max tasks = max GDT entries (256) - 32 reserved tasks
@@ -155,6 +156,11 @@ void mmMapKernelIntoTask(task_t* task, bool kernelTSS)
     pagingMapPageCount(task->tss->CR3, ((uint32_t)pagingExceptionTSS),(uint32_t)pagingExceptionTSS,0x1,0x7, true);
     pagingMapPageCount(task->tss->CR3, ((uint32_t)task->tss),(uint32_t)task->tss,0x1,0x7, true);
     pagingMapPageCount(task->tss->CR3, pagingExceptionTSS->ESP , pagingExceptionTSS->ESP, 0x16, 0x7, true);
+
+    //Not sure if I should do these next 3 but I have to in order to get the exception 0xd task gate working
+    pagingMapPageCount(task->tss->CR3, ((uint32_t)gpfExceptionTSS),(uint32_t)gpfExceptionTSS,0x1,0x7, true);
+    pagingMapPageCount(task->tss->CR3, ((uint32_t)task->tss),(uint32_t)task->tss,0x1,0x7, true);
+    pagingMapPageCount(task->tss->CR3, gpfExceptionTSS->ESP , gpfExceptionTSS->ESP, 0x16, 0x7, true);
 
 }
 
