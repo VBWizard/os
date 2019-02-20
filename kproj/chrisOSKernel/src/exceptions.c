@@ -141,7 +141,7 @@ void GeneralProtectionFaultHandler(int ErrorCode)
     uint32_t victimTaskNum = ourTSS->LINK;
     victimTaskNum >>= 3;
     if (victimTaskNum==0x16 || victimTaskNum==0)
-        panic("Paging exception in paging exception handler at, error 0x%08x",ErrorCode);
+        panic("GPF exception in paging GPF handler at, error 0x%08x",ErrorCode);
     task_t* victimTask = findTaskByTaskNum(victimTaskNum);
     process_t* victimProcess = victimTask->process;
 

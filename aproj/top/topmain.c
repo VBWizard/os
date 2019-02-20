@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        printf("%s2JTop\t\t\t%s\t%02i:%02i:%02i\nPID\tCommand\tStts\tPPID\tTTY\tMIF\tMAF\tCPU\tTime\t\tPRI\tVSiz\t\tPSiz\n",ansiEscSeq,sysmem,timeinfo->tm_hour,timeinfo->tm_min,timeinfo->tm_sec);
+        printf("%s2JTop\t%02i:%02i:%02i\nHeapAvail:%sPID\tCommand\tStts\tPPID\tTTY\tMIF\tMAF\tCPU\tTime\t\tPRI\tVSiz\t\tPSiz\n",ansiEscSeq,timeinfo->tm_hour,timeinfo->tm_min,timeinfo->tm_sec,sysmem);
 
         for (int cnt=0;cnt<TOP_MAX_PROCESSES;cnt++)
             if (topinfo[cnt]!=NULL && topinfo[cnt]->lastUpdateIteration!=iteration)

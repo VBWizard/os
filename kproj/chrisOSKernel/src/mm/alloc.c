@@ -8,6 +8,7 @@ extern uint32_t kmmHeapMemoryBaseAddress,kMallocBaseAddress,kMallocCurrAddress;
 extern int heapMemoryBlockAvailIndMax;
 extern uint32_t* heapMemoryBlockAvailInd;
 extern sMemInfo* heapMemoryInfo;
+extern uint32_t **kTicksSinceStart;
 
 //Returns pointer to first empty block found
 sMemInfo* findEmptyBlock()
@@ -34,7 +35,7 @@ sMemInfo* findBlockByMemoryAddress(uintptr_t* address)
     sMemInfo* mInfo=heapMemoryInfo;
     do
     {
-        if (mInfo->address==address)
+        if (mInfo->address==(uintptr_t)address)
         {
             printd(DEBUG_MEMORY_MANAGEMENT,"findBlockByMemoryAddress: Found block 0x%08X for memory address 0x%08X\n",mInfo,address);
             return (sMemInfo*)mInfo;
@@ -90,19 +91,21 @@ uintptr_t* allocateBlockFrom(sMemInfo* mInfoToAllocateFrom, uint32_t size)
 {
     sMemInfo* mNewInfo=findEmptyBlock();
     sMemInfo* mPriorInfo=mNewInfo-1;
+    uint32_t taskNum;
+    __asm__("str eax\nshr eax,3\n":"=a" (taskNum));
     
     printd(DEBUG_MEMORY_MANAGEMENT,"allocateBlockFrom: findEmptyBlock returned 0x%08X\n",mNewInfo);
     
-    mPriorInfo->next=(uintptr_t*)mNewInfo;
+    mPriorInfo->next=(sMemInfo*)mNewInfo;
     
     //Set up the new sMemInfo
-    mNewInfo->prev=(uintptr_t*)mPriorInfo;
+    mNewInfo->prev=(sMemInfo*)mPriorInfo;
     mNewInfo->address=mInfoToAllocateFrom->address;
     mNewInfo->size=size;
     mNewInfo->inUse=true;
-    mNewInfo->cr3=CURRENT_CR3;
-    //mNewInfo pid and next don't get set
-    
+    mNewInfo->useCount++;
+    mNewInfo->pid=taskNum;
+    mNewInfo->lastAllocTicks=*kTicksSinceStart;
     mInfoToAllocateFrom->address+=size;
     mInfoToAllocateFrom->size-=size;
     return (uintptr_t*)mNewInfo->address;
@@ -111,6 +114,8 @@ uintptr_t* allocateBlockFrom(sMemInfo* mInfoToAllocateFrom, uint32_t size)
 void* allocPages(uint32_t size)
 {
     uint32_t newSize=size;
+    uint32_t taskNum;
+    __asm__("str eax\nshr eax,3\n":"=a" (taskNum));
 
     if (newSize%PAGE_SIZE)
     {
@@ -131,8 +136,10 @@ void* allocPages(uint32_t size)
        lRetVal=allocateBlockFrom(block,newSize);
     else
     {
-        lRetVal=block->address;
+        lRetVal=(void*)block->address;
         block->inUse=true;
+        block->useCount++;
+        block->pid=taskNum;
     }
     return lRetVal;
 }
@@ -155,9 +162,9 @@ void* allocPagesAndMapI(uintptr_t cr3,uint32_t size)
     //uintptr_t virtualAddress=pagingFindAvailableAddressToMapTo(cr3,newSize/PAGE_SIZE);
     
     //Map page into cr3 address space
-    pagingMapPageCount(cr3, phys, phys, newSize/PAGE_SIZE, 0x7, true); //CLR 02/25/2017 - changed map page to map page count
+    pagingMapPageCount(cr3, (uintptr_t)phys, (uintptr_t)phys, newSize/PAGE_SIZE, 0x7, true); //CLR 02/25/2017 - changed map page to map page count
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",phys,phys);
-    pagingMapPageCount(KERNEL_CR3, (uint32_t)(phys) | 0xC0000000, phys, newSize/PAGE_SIZE, 0x7, true); //CLR 02/25/2017 - changed map page to map page count
+    pagingMapPageCount(KERNEL_CR3, (uint32_t)(phys) | 0xC0000000, (uintptr_t)phys, newSize/PAGE_SIZE, 0x7, true); //CLR 02/25/2017 - changed map page to map page count
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Mapped v=0x%08X to p=0x%08X\n",(uint32_t)(phys) | 0xC0000000,phys);
     printd(DEBUG_MEMORY_MANAGEMENT,"allocPagesAndMap: Zeroing out page(s) at 0x%08X for 0x%08X\n",phys,newSize);
     //Zero out the memory
@@ -192,7 +199,7 @@ void freeI(uintptr_t cr3, void* physAddress, uintptr_t* virtAddress)
             mInfo->pid = 0;
             if (virtAddress!=NULL)
                 for (uintptr_t cnt=mInfo->address;cnt<mInfo->address+mInfo->size;cnt+=PAGE_SIZE)
-                    pagingMapPage(cr3, virtAddress+(pageCounter*PAGE_SIZE), mInfo->address, 0x0);
+                    pagingMapPage(cr3, (uintptr_t)virtAddress+(pageCounter*PAGE_SIZE), mInfo->address, 0x0);
             printd(DEBUG_MEMORY_MANAGEMENT,"Freed block 0x%08x for memory address 0x%08x\n",mInfo,physAddress);
         }
         else

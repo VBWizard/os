@@ -20,7 +20,7 @@ char lCommand[256];
 char **kCmdline;
 int findCommand(char* command);
 char **buildargv (const char *input);
-
+bool echoInput;
 
 void preprocessCmd(char *command)
 {
@@ -390,6 +390,7 @@ int kShell(int argc, char** argv, char** envp)
     int *inputFile=STDIN_FILE;
     int *initFile=NULL;
     
+    echoInput=true;
     if (argc>1)
     {
         inputFile=open(argv[1],"r");
@@ -398,6 +399,7 @@ int kShell(int argc, char** argv, char** envp)
             printf("Cannot open script file %s",argv[1]);
             return -1;
         }
+        echoInput=false;
     }
 
     environmentLoc = envp;
@@ -413,7 +415,8 @@ getACommand:
         lCurrKeyCount=0;
         memset(lCommand,0,256);
         getenv("CWD",cwd);
-        prompt();
+        if (!initFile)
+            prompt();
 getAKey:
         lCurrKey=0;
         while(lCurrKey==0)
@@ -421,11 +424,14 @@ getAKey:
             int retVal=0;
             if (initFile)
             {
+                echoInput=false;
                 retVal=read(initFile, &lCurrKey, 1, 1);
                 if (!retVal)
                 {
                     close(initFile);
                     initFile=0;
+                    echoInput=true;
+                    prompt();
                     retVal=read(inputFile, &lCurrKey, 1, 1);
                 }
             }
@@ -443,8 +449,11 @@ getAKey:
                 {
                     lCommand[0] = 0x0;
                     lCurrKeyCount = 0;
-                    printf("\n");
-                    prompt();
+                    if (echoInput)
+                    {
+                        printf("\n");
+                        prompt();
+                    }
                 }
             }
         }
@@ -517,7 +526,8 @@ getAKey:
         }
         else if (lCurrKey==0xa) //Enter
         {
-            print("\n");
+            if (echoInput)
+                print("\n");
             goto doneGettingKeys;
         }
         else if (lCurrKey==0x0)
@@ -529,7 +539,8 @@ getAKey:
         {
             lCommand[lCurrKeyCount++]=lCurrKey;
             //reprintCommand(lCommand);
-            printf("%c",lCurrKey);
+            if (echoInput)
+                printf("%c",lCurrKey);
             //Reset pointer to command buffer so that this possibly modified command gets written as a new one
             commandWasFromThisBufferPtr=-1;
         }

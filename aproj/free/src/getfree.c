@@ -51,5 +51,6 @@ char *getFree(bool humanReadable, char *in, int inLen)
         }
     }    
     free(buffer);
+    strtrim(in);
     return in;
 }

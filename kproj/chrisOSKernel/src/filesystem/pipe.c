@@ -254,9 +254,12 @@ pipe_t *pipedup1(void* path, const char *mode, file_t* file)
 
 int fs_pipe(process_t *process, int pipefd[2])
 {
-
+    int lpipes[2];
+    
+    copyToKernel(process, lpipes, pipefd,sizeof(int)*2);
     int flags = PIPENOBLOCK;
-    fs_pipeI(process, pipefd, flags);
+    fs_pipeI(process, lpipes, flags);
+    copyFromKernel(process,pipefd,lpipes,sizeof(int)*2);
     return 0;
 }
 

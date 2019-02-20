@@ -143,6 +143,7 @@ extern "C" {
         inode_t* f_inode;
         dirops_t* dops;
         void* handle;
+        dllist_t listEntry;
     };
     
     struct direntry

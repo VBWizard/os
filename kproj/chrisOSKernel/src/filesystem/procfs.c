@@ -26,6 +26,7 @@ extern sMemInfo* heapMemoryInfo;
 extern task_t *kTaskList;;
 
 char **pathTokens;
+volatile int kProcRefreshLock;
 
 filesystem_t *initprocfs()
 {
@@ -47,6 +48,7 @@ filesystem_t *initprocfs()
     
     fs = kRegisterFileSystem("/proc", &procFOps, &procDOps);
     buildProcfs();
+    kProcRefreshLock=0;
     return fs;
 }
 
@@ -87,6 +89,8 @@ void updateRootDirFiles()
 {
     task_t* taskList=kTaskList;
 
+    //kProcRefreshLock
+    while (__sync_lock_test_and_set(&kProcRefreshLock, 1));
     if (!procRootDir.dirs)
         procRootDir.dirs=kMalloc(PROCFS_DIR_MAXDIRS*sizeof(procdir_t));
 
@@ -101,7 +105,6 @@ void updateRootDirFiles()
     strcpy(procRootDir.files[procRootDirFilePtr].filename,"interrupts");
     procRootDir.files[procRootDirFilePtr].parentDir=&procRootDir;
     procRootDir.files[procRootDirFilePtr++].size=&procFileSize;
-
     do
     {
         if (taskList->taskNum!=0)
@@ -121,6 +124,7 @@ void updateRootDirFiles()
         taskList++;
     }
     while (taskList->next!=NO_NEXT);
+    __sync_lock_release(&kProcRefreshLock);   
 }
 
 void initPathTokens()
@@ -262,6 +266,8 @@ void procCloseFile(void *file)
             kFree(pf->procfile->content);
         kFree(file);
     }
+    else
+        panic("procCloseFile: passed file is not a proc file\n");
     return;
 }
 

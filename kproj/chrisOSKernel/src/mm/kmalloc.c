@@ -76,7 +76,7 @@ void* findFreeMallocPointer()
     panic("findFreeMallocPointer: Should not have gotten to this point");
 }
 
-void allocateMemoryToProcess(heapPtr* ptr, size_t size, bool isKernel)
+uintptr_t allocateMemoryToProcess(size_t size, bool isKernel)
 {
     uint32_t newSize=size;
     uint32_t* allocdPage;
@@ -90,9 +90,8 @@ void allocateMemoryToProcess(heapPtr* ptr, size_t size, bool isKernel)
     }
     //*******************************************************************************
     allocdPage=allocPagesAndMap(newSize);
-    printd(DEBUG_KMALLOC,"aMTP: Used allocPagesAndMap to allocate 0x%08X bytes at 0x%08X\n",ptr->size,allocdPage);
-    uintptr_t virtualAddress=allocdPage;  //=pagingFindAvailableAddressToMapTo(CURRENT_CR3,newSize/PAGE_SIZE);
-   ptr->address=virtualAddress;
+    printd(DEBUG_KMALLOC,"aMTP: Used allocPagesAndMap to allocate 0x%08X bytes at 0x%08X\n",newSize,allocdPage);
+    return (uintptr_t)allocdPage;
 }
 
 void kFree(void* address)
@@ -106,15 +105,7 @@ void* kMalloc(size_t size)
     uint32_t cs=getCS()>>3;
     bool isKernel=(bootGdt[cs].access & 0x60)==0x0;
     
-    heapPtr* ptr=NULL;
-    //First find a page to place the memory pointer on
-    ptr=findFreeMallocPointer();
-    //Next get a memory address to point to and map the memory into the process
-    
-    ptr->address=0;
-    ptr->size=size;
-    allocateMemoryToProcess(ptr,size,isKernel);
-    return ptr->address;
+    return (void*)allocateMemoryToProcess(size,isKernel);
 }
 
 

@@ -126,7 +126,6 @@ void* fs_open(char* path, const char* mode)
     }
     else if (strncmp(path,"/proc",5)==0)
     {
-        handle = file;
         isProcFile = true;
         handle=procFs->fops->open(path, mode);
     }
@@ -267,13 +266,23 @@ int fs_stat(process_t *process, void *path, fstat_t *buffer)
     dirent_t *dir=kMalloc(16384);
     int dircnt=0;
     int retVal=-1;
+    fstat_t lbuffer;
     
     strcpy(lpath,path);
     strtrim(lpath);
     if (*lpath==0 || strcmp(lpath,"/")==0)
     {
-        buffer->st_size=0;
-        buffer->st_lastmod=0;
+        if (process)
+        {
+            lbuffer.st_size=0;
+            lbuffer.st_lastmod=0;
+            copyFromKernel(process,buffer,&lbuffer,sizeof(fstat_t));
+        }
+        else
+        {
+            buffer->st_size=0;
+            buffer->st_lastmod=0;
+        }
         return 0;
     }
     
@@ -351,6 +360,7 @@ void close(eListType listType, void* entry)
         printd(DEBUG_FILESYS, "\t\tfs_close: Freeing directory_t resources\n");
         kFree(dir->dops);
         kFree(dir->f_path);
+        kFree(dir->handle);
         kFree(dir);
     }
     else
@@ -427,8 +437,7 @@ int fs_readdir(void* file, dirent_t *dirEntry)
     
     if (foundFile==NULL)
         panic("fs_readdir: file handle not found in fs->files");
-    int retVal = foundFile->dops->read(foundFile->handle, dirEntry);
-    return retVal;
+    return foundFile->dops->read(foundFile->handle, dirEntry);
 }
 
 int parsePath(const char *inPath, char *outPath, char *outFilename, char** outPathTokens, int outPathTokensArrayCount)
