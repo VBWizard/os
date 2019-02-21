@@ -88,7 +88,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             }
             else
             {
-                printd(DEBUG_PROCESS,"\tsyscall: Parent return from fork with CR3=0x%08X",processCR3);
+                printd(DEBUG_PROCESS,"\tsyscall: Parent return from fork with CR3=0x%08X\n",processCR3);
                 __asm__("mov cr3,eax\n"::"a" (processCR3));
             }
             break;
@@ -122,8 +122,17 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_CLOSE: //param1=handle
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+
+            process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: close(0x%08x)\n",param1);
-            fs_close((void*)param1);
+            genericFileHandle=(uintptr_t*)param1;
+            if (genericFileHandle==(uintptr_t*)STDOUT_FILE)
+                genericFileHandle=process->stdout;
+            else if (genericFileHandle==(uintptr_t*)STDIN_FILE)
+                genericFileHandle=process->stdin;
+            else if (genericFileHandle==(uintptr_t*)STDERR_FILE)
+                genericFileHandle=process->stderr;
+            fs_close((void*)genericFileHandle);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_READ:       //***read from descriptor, param1 = descriptor #
@@ -257,11 +266,12 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_WAITFORPID:      //***waitForPID - param1=pid to check
             LOAD_KERNEL_CR3;
             //Find out if the PID to be waited on has already exited
-            printd(DEBUG_SYSCALL,"\tsyscall: waitForPid(0x%08x)\n",param1);
             process=getCurrentProcess();
+            printd(DEBUG_SYSCALL,"\tsyscall: waitForPid(0x%08x)\n",param1);
+            task_t *waitForTask=findTaskByTaskNum(param1);
             //If it has
             disableScheduler();
-            if (process->task->taskState == TASK_EXITED || process->task->taskState==TASK_ZOMBIE)
+            if (waitForTask->taskState == TASK_EXITED || waitForTask->taskState==TASK_ZOMBIE)
             {
                 //Set the return value that we'll pass back
                 retVal = getExitCode(param1);

@@ -313,6 +313,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
         if ( ( (ErrorCode & 0x2) && (lPTEValue & 0x7) )               //either request was write and PTE is write 
                 || ( (ErrorCode & 0x2==0) && lPTEValue & 0x5) )    //or request was read and 
         {
+            printd(DEBUG_EXCEPTIONS,"\tflags=0x%03x\n",lPTEValue & 0xFFF);
             pagingMapPage(KERNEL_CR3,(pagingExceptionCR2 & 0xFFFFF000),pagePhysAddr,(uint16_t)0x7);
             printd(DEBUG_EXCEPTIONS,"\tpagingMapPage(0x%08x,0x%08x,0x%08x,0x%04x)\n",KERNEL_CR3, (pagingExceptionCR2 & 0xFFFFF000), pagePhysAddr, 0x7);
             pagingMapPage(KERNEL_CR3,(pagingExceptionCR2 & 0xFFFFF000) | 0xC0000000, pagePhysAddr,(uint16_t)0x7);

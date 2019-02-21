@@ -19,15 +19,7 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/mm/alloc.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernel.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/exceptions.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/alloc.h</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/sysDump.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/dllist.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/vfs.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/procfs.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/dllist.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/task.c</file>
         </group>
     </open-files>
 </project-private>

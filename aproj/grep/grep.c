@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     char haystack[512];
     int argCount=argc, filesize=0;
     bool useStdIn = false;
-    int *handle=0;
+    int *handle=NULL;
     char *buffer;
     
     if (argc==1)

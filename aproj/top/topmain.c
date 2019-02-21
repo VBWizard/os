@@ -131,6 +131,7 @@ int main(int argc, char** argv) {
         if (topinfo[cnt])
             free(topinfo[cnt]);
     free(topinfo);
+    close(STDIN_FILE);
     return 0;
 }
 

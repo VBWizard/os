@@ -134,7 +134,7 @@ task_t* findTaskByCR3(uint32_t cr3)
 task_t* findTaskByTaskNum(uint32_t taskNum)
 {
     task_t* taskList;
-    printd(DEBUG_TASK | DEBUG_DETAILED,"\tfindTaskByNum: Finding task 0x%04X\n",taskNum);
+    printd(DEBUG_DETAILED,"\tfindTaskByNum: Finding task 0x%04X\n",taskNum);
     taskList=kTaskList;
     do
     {
@@ -145,11 +145,11 @@ task_t* findTaskByTaskNum(uint32_t taskNum)
 
     if (taskList->taskNum==0x0)
     {
-        printd(DEBUG_TASK | DEBUG_DETAILED,"\tfindTaskByTaskNum: Could not find task with TaskNum=0x%08x\n",taskNum);
+        printd(DEBUG_EXCEPTIONS,"\tfindTaskByTaskNum: Could not find task with TaskNum=0x%08x\n",taskNum);
         return NULL;
     }
 
-    printd(DEBUG_TASK | DEBUG_DETAILED,"\tfindTaskByNum: Found task @ 0x%08x\n",taskList);
+    printd(DEBUG_DETAILED,"\tfindTaskByNum: Found task @ 0x%08x\n",taskList);
     return taskList;
 }
 
@@ -385,11 +385,10 @@ task_t* findTaskToRun()
             //This is where we increment all the runnable ticks, based on the process' priority
             if ( task!=kIdleTask || (task==kIdleTask) && task->prioritizedTicksInRunnable==0)
                 task->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-process->priority)+1;
-            printd(DEBUG_PROCESS,"*\t(%u) Task 0x%04X (%s-%u[%s]), priority=%u, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
+            printd(DEBUG_PROCESS,"*\t(%u) Task 0x%04X (%s-%u[%s-%u]), priority=%u, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
                     queEntryNum,
-                    task->taskNum, process->exename,
-                    process->childNumber,
-                    process->task->taskNum==0x20?"":process->parent->exename,
+                    task->taskNum, process->exename,process->childNumber,
+                    process->task->taskNum==0x20?"":process->parent->exename, process->parent->task->taskNum,
                     process->priority,
                     oldTicks,
                     task->prioritizedTicksInRunnable, process->totalRunTicks);

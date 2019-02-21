@@ -103,12 +103,13 @@ void kbd_handler_generic()
     }
     //changed from if rawkey & 0x80, so that keydown triggers the key being input
     if (rawKey==BREAK_RIGHT || rawKey==BREAK_LEFT || rawKey==BREAK_UP || rawKey==BREAK_DOWN)
-        if (tty1->stdInWritePipe)
+        if (activeTTY->stdInWritePipe)
         {
-            pipewrite(&rawKey, 1, 1, tty1->stdInWritePipe);
-            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Raw key '%u' delivered to stdin pipe 0x%08X\n",rawKey, tty1->stdInWritePipe);
+            //CLR 01/10/2017: Increment the buffer pointer first
+            pipewrite(&rawKey, 1, 1, activeTTY->stdInWritePipe);
+            printd(DEBUG_KEYBOARD, "kbd_handler_generic: Raw key '%c' delivered to stdin pipe 0x%08X (CR3=0x%08X)\n",translatedKeypress, activeTTY->stdInWritePipe, CURRENT_CR3);
 	    //NOTE: We are passing data but no process.  sigaction2 knows to not expect a process for SIGIO
-            sys_sigaction2(SIGIO, NULL, (uintptr_t)activeSTDIN, NULL);
+            sys_sigaction2(SIGIO, NULL, (uintptr_t)activeTTY->stdInReadPipe, NULL);
         }
         else
             panic("kbd_handler_generic: STDIN pipe is null! (1)\n");

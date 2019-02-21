@@ -138,7 +138,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
 
         if (resolvePath(argv[0], temp)==0)
             strcpy(argv[0],temp);
-        else if (stat(argv[0],&fstat)) //stat returns 0 if successful
+        if (stat(argv[0],&fstat)) //stat returns 0 if successful
         {
             printf("invalid path or filename '%s'\n",argv[0]);
             retVal=-4;

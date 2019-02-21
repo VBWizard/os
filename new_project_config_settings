@@ -1,0 +1,8 @@
+C Compiler
+	Include Directories: ../libChrisOS/include;include
+	Additional Options: -masm=intel -ffreestanding -nostdlib
+
+Linker
+	Libraries: libchrisOS
+	Additional Options: -ffreestanding -nostdlib -lgcc -T linker.ld
+

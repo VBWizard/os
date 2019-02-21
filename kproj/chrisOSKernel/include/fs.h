@@ -31,7 +31,7 @@ extern "C" {
 #define EOF (-1)
     
 #define FS_BUFFERSIZE 1048576
-    
+#define FS_FILE_COPYBUFFER_SIZE 65535
 #define DENTRY_ROOT 0xFFFFFFFF    
 
     typedef enum
@@ -109,7 +109,8 @@ extern "C" {
         inode_t* f_inode;
         fileops_t* fops;
         void* handle;
-        void *pipe, *buffer, **bufferPtr;
+        void *pipe, *pipeContent, **pipeContentPtr;
+        void *copyBuffer;
         uint32_t verification;
         void *owner;
     };

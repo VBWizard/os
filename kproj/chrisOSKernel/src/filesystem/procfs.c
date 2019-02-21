@@ -273,21 +273,31 @@ void procCloseFile(void *file)
 
 size_t procReadFile(void *buffer, int size, int length, void *file)
 {
-    int contentLen=0;
-    int copySize=0;
+    int contentLen=0,available=0;
+    int copySize=size*length;
     pfile_t *pf=file;
     
     if (pf->handle!=file)
         panic("procReadFile: passed file is not pfile_t\n");
     
     contentLen=strlen(pf->content);
-    copySize=contentLen-pf->offset>size*length
-            ?size*length:
-                contentLen-pf->offset;
 
-    memset(buffer,0,length*size);
-    strncpy(buffer,pf->content,copySize);
-    return copySize+1;
+    if (pf->offset>=contentLen)
+        return 0;
+    
+    available=contentLen-(pf->offset-contentLen);
+    if (available)
+    {
+        copySize=available>size*length?
+                size*length:
+                    available;
+
+        memset(buffer,0,length*size);
+        strncpy(buffer,pf->content+pf->offset,copySize);
+        pf->offset+=copySize;
+        return copySize+1;
+    }
+    return 0;
 }
 
 size_t procWriteFile(const void *buffer, int size, int count, void *file)

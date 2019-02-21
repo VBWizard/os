@@ -91,7 +91,7 @@ VISIBLE int printf(const char *format, ...)
     va_start( args, format );
     
     int size = vsprintf(printBuffer, format, args);
-    return do_syscall3(SYSCALL_WRITE, 1, (uint32_t)printBuffer, size);
+    return do_syscall3(SYSCALL_WRITE, STDOUT_FILE, (uint32_t)printBuffer, size);
 }
 
 int printfI(const char *format, ...)

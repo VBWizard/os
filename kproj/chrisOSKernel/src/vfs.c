@@ -178,6 +178,7 @@ void* fs_open(char* path, const char* mode)
             listAdd(rootFs->files,list,file);
 */
         file->verification=0xBABAABAB;
+        file->copyBuffer=kMalloc(FS_FILE_COPYBUFFER_SIZE);
         printd(DEBUG_FILESYS, "\t\tfs_open: returning handle 0x%08x\n",handle);
         return file;
     }
@@ -191,7 +192,7 @@ void* fs_open(char* path, const char* mode)
 int fs_read(process_t* process, void* file, void * buffer, int size, int length)
 {
     file_t* theFile = file;
-    int retVal = 0, bytesRead;
+    int totalBytesRead=0, bytesRead=0, readSize;
     
     printd(DEBUG_FILESYS, "\t\tfs_read: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
 
@@ -201,30 +202,31 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     if (theFile->verification!=0xBABAABAB)
         panic("fs_read: Referenced a file that is not a file");
     
-    if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
-    {
-        //CLR 2/18/2019: Commented lock out until we get it figured out
-        //while (__sync_lock_test_and_set(&kFileReadLock, 1));
-        bytesRead = theFile->fops->read(buffer, size, length, theFile->handle);
-        //__sync_lock_release(&kFileReadLock);   
-        
-        return bytesRead;
-    }
-    
-    if (vfs_readBuffer==NULL)
-        vfs_readBuffer = allocPagesAndMap(FS_BUFFERSIZE);
-    //while (__sync_lock_test_and_set(&kFileReadLock, 1));
-    retVal = theFile->fops->read(vfs_readBuffer, size, length, theFile->handle);
-    //__sync_lock_release(&kFileReadLock);   
-
-    if (retVal > 0)
-    {
-        printd(DEBUG_FILESYS, "\t\tfs_read: Read %u bytes, copying from kernel address 0x%08x to process address 0x%08x\n", retVal, vfs_readBuffer, buffer);
-        copyFromKernel(process, buffer, vfs_readBuffer, retVal);
-    }
-    else
-        retVal = 0; //Regardless of what our disk driver returns for EOF, we return 0
-    return retVal;
+    //For kernel processes, just read the file and return in the kernel's buffer
+    if (process==NULL)
+        totalBytesRead=theFile->fops->read(buffer,size*length,1,theFile->handle);
+    else //For user processes, have to use kernel file_t copy buffer which is limited in length, so loop until all bytes are read
+        while (totalBytesRead<size*length)
+        {
+            //Figure out how many bytes we will read in this iteration
+            readSize=(size*length)-totalBytesRead>FS_FILE_COPYBUFFER_SIZE?FS_FILE_COPYBUFFER_SIZE:(size*length)-totalBytesRead; //Only read up to the size of the file_t buffer
+            //Read the bytes from the file
+            printd(DEBUG_FILESYS, "\t\tfs_read: Reading %u bytes to 0x%08x\n", readSize, theFile->copyBuffer);
+            bytesRead = theFile->fops->read(theFile->copyBuffer,readSize,1,theFile->handle);
+            //If the read returned bytes, copy them from the file_t buffer to the process' buffer
+            if (bytesRead > 0)
+            {
+                printd(DEBUG_FILESYS, "\t\tfs_read: Read %u bytes, copying (partial) from kernel address 0x%08x to process address 0x%08x\n", bytesRead, theFile->copyBuffer, buffer+totalBytesRead);
+                copyFromKernel(process, buffer+totalBytesRead, theFile->copyBuffer, bytesRead);
+                totalBytesRead+=bytesRead;
+            }
+            else //Otherwise, if the read didn't return bytes
+            {
+                break;
+            }
+        }
+        printd(DEBUG_FILESYS, "\t\tfs_read: Done reading.  Read %u bytes to user process buffer at 0x%08x\n", totalBytesRead, buffer);
+    return totalBytesRead;
 }
 
 int fs_write(process_t* process, void* file, void * buffer, int size, int length)
@@ -274,9 +276,10 @@ int fs_stat(process_t *process, void *path, fstat_t *buffer)
     {
         if (process)
         {
-            lbuffer.st_size=0;
+            /*lbuffer.st_size=0;
             lbuffer.st_lastmod=0;
-            copyFromKernel(process,buffer,&lbuffer,sizeof(fstat_t));
+            copyFromKernel(process,buffer,&lbuffer,sizeof(fstat_t));*/
+            return -1;
         }
         else
         {
@@ -369,6 +372,7 @@ void close(eListType listType, void* entry)
         printd(DEBUG_FILESYS, "\t\tfs_close: freeing file_t resources\n");
         kFree(theFile->fops);
         kFree(theFile->f_path);
+        kFree(theFile->copyBuffer);
         printd(DEBUG_FILESYS, "\t\tFreeing handle (type=%u) @ 0x%08x\n",theFile->handle, theFile->filetype);
         kFree(theFile);
     }
