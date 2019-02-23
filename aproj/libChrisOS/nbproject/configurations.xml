@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>include/ascii.h</itemPath>
+      <itemPath>include/common.h</itemPath>
       <itemPath>include/console.h</itemPath>
       <itemPath>include/environment.h</itemPath>
       <itemPath>include/file.h</itemPath>
@@ -130,6 +131,8 @@
             flavor2="0">
       </item>
       <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/console.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -273,6 +276,8 @@
             flavor2="0">
       </item>
       <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/console.h" ex="false" tool="3" flavor2="0">
       </item>

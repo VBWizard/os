@@ -5,15 +5,18 @@
  */
 
 #include "syscalls.h"
-#include "libChrisOS.h"
+#include "common.h"
 #include "time.h"
 #include "strings.h"
+#include "memory.h"
 
 int _daylight=1;                  // Non-zero if daylight savings time is used
 long _dstbias=0;                  // Offset for Daylight Saving Time
 char *_tzname[2] = {"GMT", "GMT"};  // Standard/daylight savings time zone names
 int ticksToWait;
 struct tm tmbuf;
+
+__attribute__((visibility("default"))) long libcTZ=0;
 
 const int _ytab[2][12] = {
   {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},

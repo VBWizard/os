@@ -98,6 +98,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     
     //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
     stdinRedir=strstr(cmdline,"<");
+    stdoutRedir=strstr(cmdline,">");
     stdoutPipe=strstr(cmdline,"|");
     
     if (stdoutPipe)
@@ -122,6 +123,22 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
         else
             strcpy(stdinfile, start);
         stdinRedir='\0';
+    }
+    
+    if (stdoutRedir)
+    {
+        stdoutfile = malloc(256);
+        char *start = strstr(stdoutRedir," ")+1;
+        if (!start)
+            start=stdoutRedir;
+        char *end = strstr(start," ");
+        if (!end)
+            end = strstr(start,"\n");
+        if (end)
+            strncpy(stdoutfile,start,end-start);
+        else
+            strcpy(stdoutfile, start);
+        stdoutRedir='\0';
     }
     
     argv = cmdlineToArgv(realCmdline, &argc);

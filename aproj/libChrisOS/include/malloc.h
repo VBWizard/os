@@ -54,11 +54,6 @@ extern "C" {
         struct sheap* prev, *next; //8
     } heaprec_t;
 
-__attribute__((visibility("default"))) uint32_t heapBase;
-__attribute__((visibility("default"))) uint32_t heapCurr;
-__attribute__((visibility("default"))) uint32_t heapEnd;
-__attribute__((visibility("default"))) long libcTZ;
-
 void initmalloc();
 void* malloc(size_t size);
 void*  mallocI(size_t size);

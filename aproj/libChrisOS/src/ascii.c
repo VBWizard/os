@@ -4,7 +4,8 @@
  * and open the template in the editor.
  */
 
-#include "libChrisOS.h"
+#include "common.h"
+#include "strings.h"
 
 void reverseI(char s[])
  {

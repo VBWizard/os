@@ -4,7 +4,11 @@
  * and open the template in the editor.
  */
 
-#include "libChrisOS.h"
+#include "common.h"
+#include "file.h"
+#include "malloc.h"
+#include "strings.h"
+#include "environment.h"
 
     char *resolvePath_envPath;
     char *resolvePath_inPath;

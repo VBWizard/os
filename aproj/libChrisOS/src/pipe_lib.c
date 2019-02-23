@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-#include "libChrisOS.h"
+#include "common.h"
 #include "pipe.h"
 
 VISIBLE int pipe(int pipefd[2])

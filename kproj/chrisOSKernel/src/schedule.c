@@ -17,6 +17,7 @@
 
 extern bool schedulerTaskSwitched;
 extern task_t* kKernelTask;
+extern process_t *kKernelProcess;
 extern task_t* kIdleTask;
 extern sGDT* bootGdt;
 extern bool signalCheckEnabled;

@@ -1,8 +1,8 @@
 #!/bin/bash
 clear
-
+shopt -s dotglob
 echo "Initiating builds"
-mountCmd="sudo mount /dev/disk/by-id/ata-ST31000528AS_5VP8R4ME-part6 /mnt/loop/"
+mountCmd="sudo mount /dev/disk/by-id/ata-HGST_HTS541075A9E680_JD12021A0DR07L-part1 /mnt/loop/"
 CLEAN=0
 if [ "$1" != "" ]
 then
@@ -88,6 +88,12 @@ do
 	echo -en "\t$i ...done\n"
 done
 basePath=/home/yogi/src/os/aproj
+if [ ! -d "/mnt/loop/bin" ]; then
+	sudo mkdir /mnt/loop/bin
+	echo bin directory created
+else
+	echo bin directory exists
+fi
 for i in "${appOutputArray[@]}"
 do
 	sudo cp $basePath/$i /mnt/loop/bin
@@ -98,6 +104,9 @@ done
 echo "Copying done"
 echo "Builds complete"
 tabs -8
+echo "Copying extra stuff to disk"
+sudo cp -r ../../../build_dir/diskdir/* /mnt/loop/
+sudo cp ../../../build_dir/diskdir/.krc /mnt/loop/
 cp Debug/GNU-Linux/chrisos ../../../build_dir/isodir/boot/myos.bin
 rm ./myos.iso
 grub-mkrescue -o myos.iso ../../../build_dir/isodir > /dev/null

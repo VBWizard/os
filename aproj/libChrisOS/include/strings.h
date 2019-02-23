@@ -8,8 +8,8 @@
 #ifndef STRINGS_H
 #define	STRINGS_H
 
-#include "libChrisOS.h"
 #include <stddef.h>
+#include <stdarg.h>
 
 #define ISSPACE(c) ({bool isspace = c==' '?true:false;isspace;})
 #define ISDIGIT(c) ((c) - '0' + 0U <= 9U)

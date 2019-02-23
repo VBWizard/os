@@ -12,17 +12,13 @@ qemu-system-i386 							\
 	-cdrom myos.iso 	\
 	-boot order=d							\
 	-drive file=./myos.iso,if=none,id=sata-cd-0,format=raw 			\
-	-drive file=~/qemu-test-disk.img,if=none,id=sata-disk-0,format=raw 	\
-        -drive file=/dev/disk/by-id/ata-ST31000528AS_5VP8R4ME,index=4,format=raw,cache=none,if=none,id=sata-disk-1 \
-        -drive file=~/qemu-test-disk3.img,if=none,id=sata-disk-2,format=raw 	\
+        -drive file=/dev/disk/by-id/ata-HGST_HTS541075A9E680_JD12021A0DR07L,index=4,format=raw,cache=none,if=none,id=sata-disk-1 \
 	-device ich9-ahci,id=ahci0 					\
 	-device ich9-ahci,id=ahci1 					\
 	-device ide-drive,drive=sata-disk-1,bus=ahci0.0			\
 	-device ide-cd,drive=sata-cd-0,bus=ahci0.1			\
-        -device ide-drive,drive=sata-disk-0,bus=ahci1.1 		\
 	-serial file:"qemu_port.log"					\
 	-d int,cpu_reset,pcall,guest_errors                        		\
-	-hda ~/qemu-test-disk2.img                                     \
 	-usb -device usb-host,hostbus=2,hostaddr=3 			\
 	$@ 
 #	--enable-kvm

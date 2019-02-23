@@ -7,6 +7,8 @@
 #include "file.h"
 #include "strings.h"
 #include "console.h"
+#include "common.h"
+#include "ascii.h"
 
 const char ansiEscSeq[3] =  {0x1b,0x5b,0};
 

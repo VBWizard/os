@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-#include "libChrisOS.h"
+#include "common.h"
 #include "strings.h"
 
 int getenvI(char *varname, char *value)

@@ -17,6 +17,7 @@
    16    <http://www.gnu.org/licenses/>.  */
    
 #include "strings.h"
+#include "common.h"
 
     #undef strcat
    

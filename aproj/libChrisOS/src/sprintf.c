@@ -5,6 +5,7 @@
  */
 
 #include <stdarg.h>
+#include "common.h"
 #include "strings.h"
 
 static int skip_atoi(const char **s)

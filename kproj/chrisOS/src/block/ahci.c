@@ -605,7 +605,77 @@ int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count) 
 }
 
 int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count) {
+    int prdCntr = 0;
+
     return 0;
+    //CLR 06/07/2016 - Must add partition start sector
+    sector+=kAHCICurrentPart.partStartSector;
+    
+    memset(buffer,0,sector_count*512);
+    
+    printd(DEBUG_AHCI, "AHCI: write on port=0x%08X,sector=0x%08X,buffer=0x%08X,sector_count=%u\n", kAHCICurrentDisk,sector,buffer,sector_count);
+
+    kAHCICurrentDisk->pxis.AsUlong = (uint32_t) - 1; // Clear pending interrupt bits
+    //int spin = 0; // Spin lock timeout counter
+
+    HBA_CMD_HEADER* cmdhdr = (HBA_CMD_HEADER*) kAHCICurrentDisk->clb;
+    int slot = find_cmdslot(kAHCICurrentDisk);
+    if (slot == -1)
+        return false;
+    HBA_CMD_HEADER* cmdheader = cmdhdr + slot;
+    printd(DEBUG_AHCI, "AHCI: cmdheader=0x%08X\n", cmdheader);
+    cmdheader->prdtl = (uint16_t) ((sector_count - 1) >> 4) + 1; // PRDT entries count
+
+    HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*) (cmdheader->ctba);
+    memset(cmdtbl, 0, sizeof (HBA_CMD_TBL) +
+            (cmdheader->prdtl - 1) * sizeof (HBA_PRDT_ENTRY));
+    printd(DEBUG_AHCI, "AHCI: write - cmdtable=0x%08X,ctba=0x%08X\n", cmdtbl, cmdheader->ctba);
+
+    // 8K bytes (16 sectors) per PRDT
+    for (int i = 0; i < cmdheader->prdtl - 1; i++) {
+        cmdtbl->prdt_entry[prdCntr].dba = (uint32_t) buffer;
+        cmdtbl->prdt_entry[prdCntr].dbc = 8 * 1024; // 8K bytes
+        cmdtbl->prdt_entry[prdCntr].i = 1;
+        buffer += 4 * 1024; // 4K words
+        sector_count -= 16; // 16 sectors
+        prdCntr++;
+    }
+    // Last entry
+    cmdtbl->prdt_entry[prdCntr].dba = (uint32_t) buffer;
+    cmdtbl->prdt_entry[prdCntr].dbc = sector_count << 9; // 512 bytes per sector
+    cmdtbl->prdt_entry[prdCntr].i = 1;
+
+    // Setup command
+    FIS_REG_H2D *cmdfis = (FIS_REG_H2D*) (&cmdtbl->cfis);
+
+    cmdfis->fis_type = FIS_TYPE_REG_H2D;
+    cmdfis->c = 1; // Command
+    cmdfis->command = ATA_CMD_WRITE_DMA_EX;
+    cmdfis->lba0 = (uint8_t) sector;
+    cmdfis->lba1 = (uint8_t) (sector >> 8);
+    cmdfis->lba2 = (uint8_t) (sector >> 16);
+    cmdfis->device = 1 << 6; // LBA mode
+
+    cmdfis->lba3 = (uint8_t) (sector >> 24);
+    cmdfis->lba4 = (uint8_t) 0;
+    cmdfis->lba5 = (uint8_t) 0;
+
+    cmdfis->countl = LOBYTE((uint16_t) sector_count);
+    cmdfis->counth = HIBYTE((uint16_t) sector_count);
+
+    int lCMdVal = AhciIssueCmd(kAHCICurrentDisk, slot);
+    if (!lCMdVal) {
+        printd(DEBUG_AHCI, "AHCI: ***Error writing from disk***\n");
+        return -1;
+    }
+
+    // Check again
+    if (kAHCICurrentDisk->pxis.TFES) {
+        printd(DEBUG_AHCI, "AHCI: Write disk error\n");
+        return false;
+    }
+
+    return true;
 }
 
 bool ahciInit() {

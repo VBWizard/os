@@ -34,6 +34,8 @@
  */
 
 #include "strings.h"
+#include "common.h"
+
 int strcspnI(char* string, char* chars);
 char *strchrI(const char *s, int c);
 

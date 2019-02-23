@@ -187,16 +187,19 @@ __asm__("sti\n");
 
 }
 
-int tscGetTicksPerSecond()
+int tscGetCyclesPerSecond()
 {
-    uint64_t ticksBefore=rdtsc();
+    uint64_t cyclesBefore=rdtsc();
+    uint64_t cyclesDiff;
     wait(500);
-    return (rdtsc()-ticksBefore)*2;
+    cyclesDiff=(rdtsc()-cyclesBefore)*2;
+    printd(DEBUG_EXCEPTIONS,"tscGetCyclesPerSecond: TSC cycles per second = %u\n",cyclesDiff);
+    return cyclesDiff;
 }
 
 void hardwareInit()
 {
-    kCPUCyclesPerSecond = tscGetTicksPerSecond();
+    kCPUCyclesPerSecond = tscGetCyclesPerSecond();
 
     //Check for SEE and enable it if available, also disabling co emu and monitoring
     __asm__("mov eax, 0x1\n"

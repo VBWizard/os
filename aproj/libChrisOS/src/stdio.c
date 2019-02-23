@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 
-#include "libChrisOS.h"
+#include "common.h"
 #include "stdio.h"
 #include "ascii.h"
+#include "memory.h"
 
 extern int printI(const char *format, ...);
 extern int gets(char* buffer, int maxlen, int stream);

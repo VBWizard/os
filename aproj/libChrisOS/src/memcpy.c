@@ -1,6 +1,6 @@
 #include <sys/types.h>
 #include <stdbool.h>
-#include "libChrisOS.h"
+#include "common.h"
 /*
  * This is designed to be small, not fast.
  */

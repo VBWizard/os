@@ -93,8 +93,8 @@ int main(int argc, char** argv) {
         }
         printf("%s",printBuffer);
         lastSleepTicks=currTicks;
-        sleepTicks(25);
-        //sleep(intervalDelay);
+        //sleepTicks(25);
+        sleep(intervalDelay);
     }
     if (sysmem)
         free(sysmem);

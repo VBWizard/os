@@ -5,20 +5,25 @@
  */
 
 #include "malloc.h"
-#include "libChrisOS.h"
+#include "common.h"
 #include "config.h"
+#include "memory.h"
 
 #define HEAP_GET_NEXT(s,t) {t=(uint8_t*)s+s->len+sizeof(heaprec_t);}
 #define HEAP_GET_NEXTr(s) ({s=(uint8_t*)s+s->len+sizeof(heaprec_t);s;})
 #define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
 #define HEAP_PTR_MEM_ADDR(s) ({void *ptr=((void*)heapCurr)+sizeof(heaprec_t);ptr;})
+
+__attribute__((visibility("default"))) uint32_t heapBase=0;
+__attribute__((visibility("default"))) uint32_t heapCurr=0;
+__attribute__((visibility("default"))) uint32_t heapEnd=0;
+
 void initmalloc()
 {
     printdI(DEBUG_MALLOC,"heapBase @ 0X%08X = 0x%08X before\n", &heapBase, heapBase);
     heapBase=0;
     heapCurr=0;
     heapEnd=0;
-    libcTZ=-5;
 
 }
 
