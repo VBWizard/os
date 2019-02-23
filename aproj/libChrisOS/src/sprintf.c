@@ -274,6 +274,17 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 	return str - buf;
 }
 
+int sprintfI(char *buf, const char *fmt, ...)
+{
+	va_list args;
+	int i;
+
+	va_start(args, fmt);
+	i = vsprintf(buf, fmt, args);
+	va_end(args);
+	return i;
+}
+
 VISIBLE int sprintf(char *buf, const char *fmt, ...)
 {
 	va_list args;

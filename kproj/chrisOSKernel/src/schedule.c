@@ -68,7 +68,7 @@ void initSched()
     memset(kTaskList,0,1000*sizeof(task_t));
     printd(DEBUG_PROCESS,"\tInitialized kTaskList @ 0x%08x, sizeof(task_t)=0x%02X\n",kTaskList,sizeof(task_t));
     kTaskList[0].prev=(task_t*)NO_PREV;
-    kTaskList[999].next=(task_t*)NO_NEXT;
+    kTaskList[MAX_TASKS-1].next=(task_t*)NO_NEXT;
     //TODO: Change # of array elements to # of processors
     qRunning=kMalloc(MAX_TASKS*sizeof(uintptr_t));
     memset(qRunning,0,MAX_TASKS*sizeof(uintptr_t));
@@ -475,7 +475,8 @@ void changeTaskQueue(task_t* task, eTaskState newState)
 
 void taskYield()
 {
-    
+    triggerScheduler();
+    __asm__("sti\nhlt\n");
 }
 
 void triggerScheduler()
@@ -557,7 +558,7 @@ void runAnotherTask(bool schedulerRequested)
             taskToStopNewQueue=TASK_USLEEP;
         else if ((pToStop->signals.sigind & SIGSEGV) == SIGSEGV)
         {
-            taskToStopNewQueue=TASK_EXITED;
+            taskToStopNewQueue=TASK_ZOMBIE;
             checkUSleepTasks(taskToStop);
         }
         else if ((pToStop->signals.sigind & SIGSTOP) == SIGSTOP)

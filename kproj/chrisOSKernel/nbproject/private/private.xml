@@ -20,6 +20,8 @@
         <group name="aproj"/>
         <group>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/task.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/drivers/drv_genKeyboard.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
         </group>
     </open-files>
 </project-private>

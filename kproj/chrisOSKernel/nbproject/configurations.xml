@@ -198,7 +198,7 @@
       <itemPath>src/drivers/terminal/termdrv.c</itemPath>
       <itemPath>../chrisOS/src/time.c</itemPath>
       <itemPath>src/drivers/terminal/tty_driver.c</itemPath>
-      <itemPath>../chrisOS/src/init/utility.c</itemPath>
+      <itemPath>src/utility.c</itemPath>
       <itemPath>src/vfs.c</itemPath>
       <itemPath>src/x86.s</itemPath>
       <itemPath>src/x86idt.c</itemPath>
@@ -214,6 +214,7 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>kernelData.ld</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>../chrisOS/src/fat</Elem>
@@ -305,8 +306,6 @@
       <item path="../chrisOS/src/init/ata_disk.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/init/utility.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -462,6 +461,8 @@
       </item>
       <item path="include/tty_device.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="kernelData.ld" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/_scheduler.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/device.c" ex="false" tool="0" flavor2="0">
@@ -578,6 +579,8 @@
       </item>
       <item path="src/task.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/vfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/x86.s" ex="false" tool="4" flavor2="0">
@@ -673,8 +676,6 @@
       <item path="../chrisOS/src/init/ata_disk.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../chrisOS/src/init/utility.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -831,6 +832,8 @@
       <item path="include/tss.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tty_device.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="kernelData.ld" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/_scheduler.s" ex="false" tool="4" flavor2="0">
       </item>
@@ -991,6 +994,8 @@
       <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/task.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/utility.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/vfs.c" ex="false" tool="0" flavor2="0">
       </item>

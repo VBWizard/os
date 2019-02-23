@@ -19,8 +19,9 @@ extern "C" {
 #endif
 
     void reverseI(char s[]);
-    void itoaI(int n, char s[]);
+    char *itoaI(int n, char s[]);
     int atoi(char *str);
+    int atoiI(char *str);
     void itoa(int n, char s[]);
     
 #ifdef __cplusplus

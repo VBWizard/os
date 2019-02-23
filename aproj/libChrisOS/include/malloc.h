@@ -42,20 +42,22 @@ extern "C" {
 #define ALLOC_REQUEST_SIZE 0x1000
 #define ALLOC_MARKER_VALUE 0x4F3F2F1F
 #define ALLOC_MIN_MALLOC_SIZE sizeof(heaprec_t)
+#define ALLOC_MALLOC_SANITY_CHECK
+    
     typedef struct sheap    //20
     {
         uint32_t marker;    //4
         uint32_t len;       //4
         bool inUse;         //1
         uint16_t uses;      //2
-        uint8_t filler[1];  //1
-        struct sheap* prev, *next; //
+        uint8_t filler;     //1
+        struct sheap* prev, *next; //8
     } heaprec_t;
 
-uint32_t heapBase;    
-uint32_t heapCurr;
-uint32_t heapEnd;
-long libcTZ;
+__attribute__((visibility("default"))) uint32_t heapBase;
+__attribute__((visibility("default"))) uint32_t heapCurr;
+__attribute__((visibility("default"))) uint32_t heapEnd;
+__attribute__((visibility("default"))) long libcTZ;
 
 void initmalloc();
 void* malloc(size_t size);

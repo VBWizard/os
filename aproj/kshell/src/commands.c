@@ -94,7 +94,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     char *temp=NULL;
     bool freeCmdline=false;
     int yourSTDIN=0, yourSTDOUT=0;
-    char *cmdline2=malloc(1024);
+    char *realCmdline=malloc(1024);
     
     //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
     stdinRedir=strstr(cmdline,"<");
@@ -103,9 +103,10 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     if (stdoutPipe)
     {
         pipe(execPipes);
-        cmdline2=strreplace(cmdline,"|","",cmdline2);
-        freeCmdline=true;
+        realCmdline=strreplace(cmdline,"|","",realCmdline);
     }
+    else
+        strcpy(realCmdline,cmdline);
     
     if (stdinRedir)
     {
@@ -123,7 +124,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
         stdinRedir='\0';
     }
     
-    argv = cmdlineToArgv(cmdline, &argc);
+    argv = cmdlineToArgv(realCmdline, &argc);
 
     if (argc<1)
     {
@@ -214,9 +215,6 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
         }
     }
 kexecReturn:
-    //Its ok to free arguments now because they are copied by the kernel to pgm's memory
-    if (freeCmdline)
-        free(cmdline);
     free(argv);
     free(pgm);
     if (stdinfile)
@@ -227,8 +225,8 @@ kexecReturn:
         free(stderrfile);
     if (temp)
         free(temp);
-    if (cmdline2)
-        free(cmdline2);
+    if (realCmdline)
+        free(realCmdline);
 }
 
 void cmdChangeDirectory(char *cmdline)

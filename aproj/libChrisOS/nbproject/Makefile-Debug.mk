@@ -49,6 +49,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/memcpy.o \
 	${OBJECTDIR}/src/memset.o \
 	${OBJECTDIR}/src/pipe_lib.o \
+	${OBJECTDIR}/src/procinfo.o \
 	${OBJECTDIR}/src/sprintf.o \
 	${OBJECTDIR}/src/stdio.o \
 	${OBJECTDIR}/src/strings/strcat.o \
@@ -160,6 +161,11 @@ ${OBJECTDIR}/src/pipe_lib.o: src/pipe_lib.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pipe_lib.o src/pipe_lib.c
+
+${OBJECTDIR}/src/procinfo.o: src/procinfo.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/procinfo.o src/procinfo.c
 
 ${OBJECTDIR}/src/sprintf.o: src/sprintf.c
 	${MKDIR} -p ${OBJECTDIR}/src

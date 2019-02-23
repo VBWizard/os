@@ -14,6 +14,7 @@
       <itemPath>include/malloc.h</itemPath>
       <itemPath>include/memory.h</itemPath>
       <itemPath>include/pipe.h</itemPath>
+      <itemPath>include/procinfo.h</itemPath>
       <itemPath>include/rusage.h</itemPath>
       <itemPath>include/stdio.h</itemPath>
       <itemPath>include/strings.h</itemPath>
@@ -59,6 +60,7 @@
       <itemPath>src/memcpy.c</itemPath>
       <itemPath>src/memset.c</itemPath>
       <itemPath>src/pipe_lib.c</itemPath>
+      <itemPath>src/procinfo.c</itemPath>
       <itemPath>src/sprintf.c</itemPath>
       <itemPath>src/stdio.c</itemPath>
       <itemPath>src/time.c</itemPath>
@@ -147,6 +149,8 @@
       </item>
       <item path="include/pipe.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/procinfo.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/rusage.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/stdio.h" ex="false" tool="3" flavor2="0">
@@ -178,6 +182,8 @@
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/pipe_lib.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/procinfo.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/sprintf.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -286,6 +292,8 @@
       </item>
       <item path="include/pipe.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/procinfo.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/rusage.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/stdio.h" ex="false" tool="3" flavor2="0">
@@ -317,6 +325,8 @@
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/pipe_lib.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/procinfo.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/sprintf.c" ex="false" tool="0" flavor2="0">
       </item>

@@ -31,20 +31,25 @@ void sys_dump()
     }
     
     printd(DEBUG_EXCEPTIONS,"Tasks\n");
-    
+    printd(DEBUG_EXCEPTIONS,"Name\tNum\tCNum\tPName\tPNum\tcwd\tSt\n");
     do
     {
-        proc=taskList->process;
-        printd("",
-                taskList->taskNum,
-                proc->childNumber,
-                proc->exename,
-                proc->cwd,
-                taskList->taskState
-                );
+        if (taskList->taskNum!=0)
+        {
+            proc=taskList->process;
+            printd(DEBUG_EXCEPTIONS,"%s\t%i\t%i\t%s\t%i\t%s\t%i\n",
+                    proc->exename,
+                    taskList->taskNum,
+                    proc->childNumber,
+                    proc->parent?proc->parent->exename:"",
+                    proc->parent?proc->parent->task->taskNum:0,
+                    proc->cwd,
+                    taskList->taskState
+                    );
+        }
         if (taskList->next!=NO_NEXT)
-            taskList=taskList->next;
+            taskList++;
     }
-    while (taskList->next!=NO_NEXT);
+    while (taskList->next!=(task_t*)NO_NEXT);
     
 }

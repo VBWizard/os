@@ -58,6 +58,7 @@ extern "C" {
 
     time_t getticks(/*time_t* arg*/);
     struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf);
+    struct tm *gmtime_rI(const time_t *timer, struct tm *tmbuf) ;
     struct tm *localtime(const time_t *timer);
     struct tm *localtime_r(const time_t *timer, struct tm *tmbuf);
     time_t mktime(struct tm *tmbuf);

@@ -17,6 +17,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <bits/time.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include "ascii.h"
@@ -31,8 +32,7 @@ extern "C" {
 #include "../../../kproj/chrisOSKernel/include/syscalls.h"
 #include "console.h"
 #include "stdio.h"
-    
-#include <bits/time.h>
+#include "procinfo.h"
 #ifndef NULL
 #define NULL ((void *) 0)
 #endif
@@ -49,7 +49,7 @@ extern "C" {
 #define SYSCALL4(a,b,c,d,e,f) {asm("call sysEnter_Vector\n":"=a" (f):"a" (a), "b" (b), "c" (c), "d" (d), "S" (e));}
 #define GET_TICKS(t) SYSCALL0(SYSCALL_GETTICKS,t);
 #define SLEEP_SECONDS(s) ({uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=(s*TICKS_PER_SECOND)+ct; SYSCALL1(SYSCALL_SLEEP,s,s2);s2;})
-#define SLEEP_MS(s) ({uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=s+ct-1; SYSCALL1(SYSCALL_SLEEP,s,s2);s2;})
+#define SLEEP_TICKS(s) ({uint32_t s2=s; uint32_t ct; GET_TICKS(ct); s=s+ct-1; SYSCALL1(SYSCALL_SLEEP,s,s2);s2;})
 
     void libc_init();
     int do_syscall0(int callnum);

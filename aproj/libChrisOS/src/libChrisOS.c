@@ -131,14 +131,20 @@ int printdI(uint32_t DebugLevel, const char *format, ...)
     va_end(args);
 }
 
+VISIBLE unsigned int sleepMS (unsigned int __ms)
+{
+    int ms=__ms*MS_PER_TICK;
+    return SLEEP_TICKS(ms);
+}
+
 VISIBLE unsigned int sleep (unsigned int __seconds)
 {
     return SLEEP_SECONDS(__seconds);
 }
 
-VISIBLE unsigned int sleepTicks(unsigned int __milliseconds)
+VISIBLE unsigned int sleepTicks(unsigned int __ticks)
 {
-    return SLEEP_MS(__milliseconds);
+    return SLEEP_TICKS(__ticks);
     
 }
 
@@ -365,5 +371,5 @@ VISIBLE int setSTD(int std, uint32_t filed)
 
 VISIBLE void takeADump()
 {
-    return do_syscall0(SYSCALL_TAKEADUMP);
+    do_syscall0(SYSCALL_TAKEADUMP);
 }

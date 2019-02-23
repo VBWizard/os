@@ -299,9 +299,8 @@ task_t* createTask(void* process, bool kernelTSS)
     
     
     //set task's IOPL
-    task->tss->EFLAGS=0x200046;
-    task->tss->EFLAGS |= 0x200; //Flags on!
-    task->tss->LINK=0x0; //need an old TSS entry (garbage) to "store" the old variables to on LTR
+    task->tss->EFLAGS=0x200246;
+    task->tss->LINK=0x0; 
     //If it is a kernel task
     task->kernel=kernelTSS;
     task->tss->IOPB=sizeof(tss_t);

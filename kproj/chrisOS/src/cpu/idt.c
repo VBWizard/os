@@ -37,6 +37,7 @@ void idt_init(struct idt_ptr* idtp, int remap_offset)
     idt_set_gate (&idtTable[0], 0x08, (int)&_isr_00_wrapper, ACS_INT); //divide by zero exception
     idt_set_gate (&idtTable[1], 0x08, (int)&_isr_31_wrapper, ACS_INT); //debug exception:1gdkmd64. triggered when TF=1 (I set TF=1 with INT03)
     idt_set_gate (&idtTable[2], 0x08, (int)&_isr_02_wrapper, ACS_INT); 
+    //Breakpoint exception ... remarked out 2/21/2019
     idt_set_gate (&idtTable[3], 0x08, (int)&_isr_03_wrapper, ACS_INT | ACS_DPL_3); //this is the breakpoint exception.  Called with INT03.  Has to be CPL=3
     idt_set_gate (&idtTable[4], 0x08, (int)&_isr_04_wrapper, ACS_INT);
     idt_set_gate (&idtTable[5], 0x08, (int)&_isr_05_wrapper, ACS_INT);

@@ -11,21 +11,31 @@
     char *resolvePath_resPath;
     char *resolvePath_cwd;
 
-VISIBLE int getdir(char* path, direntry_t *entries, int bufferCount)
+int getdirI(char* path, direntry_t *entries, int bufferCount)
 {
     return do_syscall3(SYSCALL_GETDENTS, (uint32_t)path, (uint32_t)entries, bufferCount);
+    
+}
+VISIBLE int getdir(char* path, direntry_t *entries, int bufferCount)
+{
+    return getdirI(path, entries, bufferCount);
 }
 
-VISIBLE void* open(char* path, const char* mode)
+void* openI(char* path, const char* mode)
 {
     //NOTE: Using syscall3 and passing -1 as 3rd parameter, otherwise param3 will be 0 and syscall will think freopen is calling!
     return (void*)do_syscall3(SYSCALL_OPEN, (uint32_t)path, (uint32_t)mode,-1);
 }
 
+VISIBLE void* open(char* path, const char* mode)
+{
+    return openI(path, mode);
+}
+
 void file_cleanup()
 {
     while (filesToClose)
-        close(filesToClose++);
+        closeI(filesToClose++);
     freeI(filesToClose);
 }
 
@@ -43,9 +53,14 @@ VISIBLE void* freopen(char* path, const char* mode, void *stream)
     return retVal;
 }
 
-VISIBLE void close(void* handle)
+void closeI(void* handle)
 {
     do_syscall1(SYSCALL_CLOSE, (uint32_t)handle);
+}
+
+VISIBLE void close(void* handle)
+{
+    return closeI(handle);
 }
 
 int readI(void* handle, void *buffer, int size, int length)
@@ -57,7 +72,6 @@ VISIBLE int read(void* handle, void *buffer, int size, int length)
 {
     return readI(handle, buffer, size, length);
 }
-
 int writeI(void* handle, void *buffer, int size, int length)
 {
     return do_syscall4(SYSCALL_WRITE, (uint32_t)handle, (uint32_t)buffer, size, length);

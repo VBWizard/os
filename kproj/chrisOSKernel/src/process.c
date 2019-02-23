@@ -114,6 +114,13 @@ void freeProcess(process_t *process)
     //TODO: Fix this.  Unremarking this causes paging exception SEGV in /sbin/idle
     //kFree(process->stackInitialPage);
 
+    if (process->stdinRedirected)
+        fs_close(process->stdin);
+    if (process->stdoutRedirected)
+        fs_close(process->stdout);
+    if (process->stderrRedirected)
+        fs_close(process->stderr);
+    
     kFree(process->stack1Start);
     kFree(process->path);
     kFree(process->cwd);
@@ -308,12 +315,6 @@ void processExit()
             printd(DEBUG_PROCESS,"processExit: Executing exitHandler %u @ 0x%08x\n",lCounter,process->exitHandler[lCounter]);
             x();
         }
-/*    if (process->stdinRedirected)
-        fs_close(process->stdin);
-    if (process->stdout!=STDOUT_FILE)
-        fs_close(process->stdout);
-    if (process->stderr!=STDERR_FILE)
-        fs_close(process->stderr);*/
     //TODO: Clean up list items before clearing the list
 /*    dllist_t *maplist = process->mmaps;
     do
@@ -449,6 +450,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     {
         process = parentProcessPtr;
         process->mmaps = NULL;
+        process->totalRunTicks=0;
     }
     else
         process = initializeProcess(isKernelProcess);

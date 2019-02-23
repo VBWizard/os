@@ -20,6 +20,7 @@ int main(int argc, char** argv)
     char *buffer=NULL;
     int readSize;
     int words=0, lines=0, bytes=0;
+    char lastChar=0;
 
     if (argc==1)
     {
@@ -40,6 +41,9 @@ int main(int argc, char** argv)
                 switch(buffer[cnt])
                 {
                     case ' ':
+                        if (lastChar==' ')
+                            break;
+                    case '\t':
                         words++;
                         break;
                     case '\n':
@@ -48,6 +52,7 @@ int main(int argc, char** argv)
                         break;
 
                 }
+                lastChar=buffer[cnt];
             }
         }
         free(buffer);

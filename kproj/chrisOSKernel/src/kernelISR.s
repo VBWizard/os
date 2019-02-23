@@ -7,6 +7,7 @@
 .extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, isrSavedTR
 .extern kIRQ0_handler
 .extern kIRQ8_handler
+.extern triggerScheduler
 .extern _sysCall
 .extern _schedule
 .extern schedulerTaskSwitched
@@ -40,6 +41,7 @@ _gpfExceptionHandler:
     #For non-fatals, the IRET will jump back into the task that triggered the exception
     #either way we don't need to do anything before IRETing except reset the stack and enable interrupts
     mov esp, ebp
+    call triggerScheduler
     iret
     jmp _gpfExceptionHandler #Next paging exception the handler will start here so jump back to the beginning of the handler
 

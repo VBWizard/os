@@ -88,6 +88,7 @@ size_t procFileSize(char *procfilename, procfile_t* procfile)
 void updateRootDirFiles()
 {
     task_t* taskList=kTaskList;
+    uint32_t currentTaskNum=getCurrentTask()->taskNum;
 
     //kProcRefreshLock
     while (__sync_lock_test_and_set(&kProcRefreshLock, 1));
@@ -120,10 +121,23 @@ void updateRootDirFiles()
             procRootDir.dirs[procRootDirDirPtr].files[1].size=&procFileSize;
             procRootDir.dirs[procRootDirDirPtr].files[1].parentDir=&procRootDir.dirs[procRootDirDirPtr];
             procRootDirDirPtr++;
+            if (taskList->taskNum==currentTaskNum)
+            {
+                sprintf(procRootDir.dirs[procRootDirDirPtr].dirname, "self");
+                procRootDir.dirs[procRootDirDirPtr].size=0;
+                procRootDir.dirs[procRootDirDirPtr].parentDir=&procRootDir;
+                strcpy(procRootDir.dirs[procRootDirDirPtr].files[0].filename,"cmdline");
+                procRootDir.dirs[procRootDirDirPtr].files[0].size=&procFileSize;
+                procRootDir.dirs[procRootDirDirPtr].files[0].parentDir=&procRootDir.dirs[procRootDirDirPtr];
+                strcpy(procRootDir.dirs[procRootDirDirPtr].files[1].filename,"stat");
+                procRootDir.dirs[procRootDirDirPtr].files[1].size=&procFileSize;
+                procRootDir.dirs[procRootDirDirPtr].files[1].parentDir=&procRootDir.dirs[procRootDirDirPtr];
+                procRootDirDirPtr++;
+            }
         }
         taskList++;
     }
-    while (taskList->next!=NO_NEXT);
+    while (taskList->next!=(task_t*)NO_NEXT);
     __sync_lock_release(&kProcRefreshLock);   
 }
 
@@ -342,6 +356,7 @@ void *procDirOpen(const char* path, void* dir)
     char resolvedFilename[128];
     int taskNum=0;
     char taskNumString[7] = {0,0,0,0,0,0,0};
+    uint32_t currentTaskNum=getCurrentTask()->taskNum;
     
     strncpy((char*)lPath,(char*)path,256);
     strtrim(lPath);
@@ -367,17 +382,21 @@ void *procDirOpen(const char* path, void* dir)
         int tnsptr=0;
         char temp[10];
         
-        strcpy(temp,pathTokens[1]);
-        for (int cnt=0;cnt<10;cnt++)
-            if (temp[cnt]==0)
-                break;
-            else if (temp[cnt]>='0' && temp[cnt]<='9')
-                taskNumString[tnsptr++]=temp[cnt];
-        if (strlen(taskNumString)>0)
-            taskNum=atoi(taskNumString);
+        if (strcmp(pathTokens[1],"self")==0)
+            strcpy(taskNumString,pathTokens[1]);
         else
-            panic("procDirOpen: Not implemented\n");
-        
+        {
+            strcpy(temp,pathTokens[1]);
+            for (int cnt=0;cnt<10;cnt++)
+                if (temp[cnt]==0)
+                    break;
+                else if (temp[cnt]>='0' && temp[cnt]<='9')
+                    taskNumString[tnsptr++]=temp[cnt];
+            if (strlen(taskNumString)>0)
+                taskNum=atoi(taskNumString);
+            else
+                panic("procDirOpen: Not implemented\n");
+        }    
         for (int cnt=0;cnt<PROCFS_DIR_MAXFILES;cnt++)
             if (strcmp(procRootDir.dirs[cnt].dirname,taskNumString)==0)
             {
@@ -488,7 +507,12 @@ void getInterruptInfo(char *buffer, int buffersize)
 
 void getCmdline(char *buffer, int buffersize, procfile_t *pf)
 {
-    int taskNum=atoi(pf->parentDir->dirname);
+    int taskNum=0;
+    //parent directory name
+    if (strcmp(pf->parentDir->dirname,"self")==0)
+        taskNum=getCurrentTask()->taskNum;
+    else
+        taskNum=atoi(pf->parentDir->dirname);
     
     task_t *task=findTaskByTaskNum(taskNum);
     strcpy(buffer,((process_t*)task->process)->exename);
@@ -496,11 +520,18 @@ void getCmdline(char *buffer, int buffersize, procfile_t *pf)
 
 void getStat(char *buffer, int buffersize, procfile_t *pf)
 {
-     int taskNum=atoi(pf->parentDir->dirname);
-     process_t *proc;
-     char procState=0;
-     task_t *task=findTaskByTaskNum(taskNum);
-     proc=task->process;
+    process_t *proc;
+    char procState=0;
+    int taskNum=0;
+
+    if (strcmp(pf->parentDir->dirname,"self")==0)
+        taskNum=getCurrentTask()->taskNum;
+    else
+        taskNum=atoi(pf->parentDir->dirname);
+
+    task_t *task=findTaskByTaskNum(taskNum);
+
+    proc=task->process;
      int tty=getTTYForPipe((int)proc->stdout);
      switch (task->taskState)
      {

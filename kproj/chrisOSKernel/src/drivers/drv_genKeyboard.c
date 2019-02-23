@@ -184,6 +184,8 @@ void kbd_handler_generic()
                 sys_sigaction2(SIGINT, NULL, 0, activeTTY->stdInReadPipe->owner);
                 goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
             }
+            else 
+                panic("ctrl-c handler: pipe is NULL");
         }
 
         

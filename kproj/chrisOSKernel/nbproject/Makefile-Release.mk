@@ -45,7 +45,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/101a755a/msr.o \
 	${OBJECTDIR}/_ext/f336e79e/ata_disk.o \
 	${OBJECTDIR}/_ext/f336e79e/kpaging.o \
-	${OBJECTDIR}/_ext/f336e79e/utility.o \
 	${OBJECTDIR}/_ext/9e02dec1/iodugging.o \
 	${OBJECTDIR}/_ext/9e02dec1/memcpy.o \
 	${OBJECTDIR}/_ext/9e02dec1/panic.o \
@@ -121,6 +120,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/syscall.o \
 	${OBJECTDIR}/src/sysloader.o \
 	${OBJECTDIR}/src/task.o \
+	${OBJECTDIR}/src/utility.o \
 	${OBJECTDIR}/src/vfs.o \
 	${OBJECTDIR}/src/x86.o \
 	${OBJECTDIR}/src/x86idt.o \
@@ -199,11 +199,6 @@ ${OBJECTDIR}/_ext/f336e79e/kpaging.o: ../chrisOS/src/init/kpaging.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/f336e79e
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/f336e79e/kpaging.o ../chrisOS/src/init/kpaging.c
-
-${OBJECTDIR}/_ext/f336e79e/utility.o: ../chrisOS/src/init/utility.c
-	${MKDIR} -p ${OBJECTDIR}/_ext/f336e79e
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/f336e79e/utility.o ../chrisOS/src/init/utility.c
 
 ${OBJECTDIR}/_ext/9e02dec1/iodugging.o: ../chrisOS/src/iodugging.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
@@ -576,6 +571,11 @@ ${OBJECTDIR}/src/task.o: src/task.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/task.o src/task.c
+
+${OBJECTDIR}/src/utility.o: src/utility.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/utility.o src/utility.c
 
 ${OBJECTDIR}/src/vfs.o: src/vfs.c
 	${MKDIR} -p ${OBJECTDIR}/src

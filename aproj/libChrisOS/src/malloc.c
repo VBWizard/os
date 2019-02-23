@@ -11,6 +11,7 @@
 #define HEAP_GET_NEXT(s,t) {t=(uint8_t*)s+s->len+sizeof(heaprec_t);}
 #define HEAP_GET_NEXTr(s) ({s=(uint8_t*)s+s->len+sizeof(heaprec_t);s;})
 #define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
+#define HEAP_PTR_MEM_ADDR(s) ({void *ptr=((void*)heapCurr)+sizeof(heaprec_t);ptr;})
 void initmalloc()
 {
     printdI(DEBUG_MALLOC,"heapBase @ 0X%08X = 0x%08X before\n", &heapBase, heapBase);
@@ -59,43 +60,50 @@ void freeI(void* fpointer)
     //printDebug(DEBUG_MALLOC,"libc_free: Freeing heap @ fp=0x%08X (mp=0x%08X)\n",fpointer,mp);
     if (mp->marker!=ALLOC_MARKER_VALUE)
     {
-        //print("malloc: marker not found error!!!\n");
+        printI("malloc: marker not found error!!!\n");
         return; //Return silently ... for now
     }
     mp->inUse=false;
+    
 }
 
 heaprec_t *mallocFindAvailableMemory(size_t size)
 {
     heaprec_t* heapPtr=(heaprec_t*)heapBase;
-    uint8_t *ptr=(uint8_t*)heapPtr;
-    heaprec_t *he=heapEnd;
     do
     {
-        if (!heapPtr->inUse && heapPtr->len>=size)
+        if (!heapPtr->inUse && heapPtr->len>=size && heapPtr->marker==ALLOC_MARKER_VALUE)
             return heapPtr;
         if (heapPtr->next)
             heapPtr=heapPtr->next;
         
     }
-    while(heapPtr->next && heapPtr->marker==ALLOC_MARKER_VALUE);
+    while(heapPtr<(heaprec_t*)heapCurr && heapPtr->next && heapPtr->marker==ALLOC_MARKER_VALUE);
     //while (heapPtr->marker==ALLOC_MARKER_VALUE);
     return NULL;
 }
 
 void mallocSanityCheck(heaprec_t *heaprec)
 {
+#ifdef ALLOC_MALLOC_SANITY_CHECK
     heaprec_t *heapPtr=heaprec;
-    while (heapPtr>=heapBase && heapPtr->prev!=heapPtr)
+    while (heapPtr>=(heaprec_t*)heapBase && heapPtr->prev!=heapPtr)
     {
+        if (heapBase<(uintptr_t)heapPtr-8)
+        {
+                printfI("\n**************************malloc base error!!!**************************\n");
+    SanityLoop2:
+                goto SanityLoop2;
+        }
         if (heapPtr->marker!=ALLOC_MARKER_VALUE)
         {
-            printfI("\n**************************malloc error!!!**************************\n");
+            printfI("\n**************************malloc pointer error!!!**************************\n");
 SanityLoop:
             goto SanityLoop;
         }
         heapPtr=heapPtr->prev;
     }
+#endif
 }
 
 void*  mallocI(size_t size)
@@ -106,7 +114,6 @@ void*  mallocI(size_t size)
     uint32_t allocatedPtr;
     heaprec_t* heapPtr=NULL;
     size_t requestSize=size;
-    uint8_t* heapPtrNext;
     static heaprec_t *lastHRCreated=NULL;
 
     if (size<ALLOC_MIN_MALLOC_SIZE)
@@ -119,7 +126,8 @@ void*  mallocI(size_t size)
         {
             heapPtr->inUse=true;
             heapPtr->uses++;
-            return ((void*)heapCurr)+sizeof(heaprec_t);
+            printdI(DEBUG_MALLOC,"libc_malloc: Reusing heaprec=0x%08x, address=0x%08x (uses=%u)",heapPtr,HEAP_PTR_MEM_ADDR(heapPtr),heapPtr->uses);
+            return ((void*)heapPtr)+sizeof(heaprec_t);
         }
     }
 */    
@@ -131,7 +139,7 @@ void*  mallocI(size_t size)
             mallocSanityCheck(((heaprec_t*)heapCurr)->prev);        
         allocatedPtr = do_syscall1(SYSCALL_ALLOCHEAP, needed);
         //This is needed to keep in sync with what the kernel thinks
-        memset((char*)allocatedPtr,0,needed);
+        memsetI((char*)allocatedPtr,0,needed);
         printdI(DEBUG_MALLOC,"libc_malloc: heaEnd=0x%08X\n",heapEnd);
         heapEnd=allocatedPtr+needed;
         printdI(DEBUG_MALLOC,"libc_malloc: Req 0x%08X bytes, ret was 0x%08X, heapEnd=0x%08X\n",needed,allocatedPtr,heapEnd);
@@ -147,6 +155,7 @@ void*  mallocI(size_t size)
     heapPtr->marker=ALLOC_MARKER_VALUE;
     heapPtr->len=requestSize;
     heapPtr->inUse=true;
+    heapPtr->uses++;
     if (lastHRCreated!=NULL)
     {
         heapPtr->prev=lastHRCreated;

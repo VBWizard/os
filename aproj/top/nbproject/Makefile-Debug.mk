@@ -36,7 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/_ext/8318ef30/getfree.o \
-	${OBJECTDIR}/topmain.o
+	${OBJECTDIR}/src/topmain.o
 
 
 # C Compiler Flags
@@ -70,10 +70,10 @@ ${OBJECTDIR}/_ext/8318ef30/getfree.o: ../free/src/getfree.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I../libChrisOS/include -Iinclude -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/8318ef30/getfree.o ../free/src/getfree.c
 
-${OBJECTDIR}/topmain.o: topmain.c
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/topmain.o: src/topmain.c
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../libChrisOS/include -Iinclude -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/topmain.o topmain.c
+	$(COMPILE.c) -g -I../libChrisOS/include -Iinclude -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/topmain.o src/topmain.c
 
 # Subprojects
 .build-subprojects:

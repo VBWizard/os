@@ -8,19 +8,17 @@
 
 char *getFree(bool humanReadable, char *in, int inLen)
 {
-    char *buffer=NULL;
     char *freeMemPtr=NULL;
     char *printPtr=NULL, *printEndPtr=NULL;
     char *printVal=NULL;
     int freeMemory=0;
     char temp[20]={0};
     int* file=open("/proc/meminfo","r");
+    char buffer[512];
     
-    
-    buffer=malloc(inLen);
     if (file)
     {
-        int readCount=read(file,buffer,inLen,1);
+        int readCount=read(file,buffer,512,1);
         close(file);
         if (readCount)
         {
@@ -50,7 +48,6 @@ char *getFree(bool humanReadable, char *in, int inLen)
                 
         }
     }    
-    free(buffer);
     strtrim(in);
     return in;
 }

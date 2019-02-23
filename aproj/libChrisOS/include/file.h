@@ -53,10 +53,14 @@ extern "C" {
     uint32_t filesToCloseCount;
 
     void* open(char* path, const char* mode);
+    void* openI(char* path, const char* mode);
     void close(void* handle);
+    void closeI(void* handle);
     int read(void* handle, void *buffer, int size, int length);
+    int readI(void* handle, void *buffer, int size, int length);
     int write(void* handle, void *buffer, int size, int length);
     int getdir(char* path, direntry_t *entries, int bufferCount);
+    int getdirI(char* path, direntry_t *entries, int bufferCount);
     int seek(void* handle, long position, int whence);
     void* freopen(char* path, const char* mode, void *stream);
     int stat(char *path, fstat_t *stat);

@@ -383,7 +383,7 @@ void updateTermBuffer(ttydevice_t *device, int bytesToUpdate)
 void updateTerms()
 {
     int pipeReadSize;
-   printd(DEBUG_TERM,"Updating terms\n");
+   printd(DEBUG_TERMINAL,"Updating terms\n");
    for (int cnt=0;cnt<ttysRegistered;cnt++)
     {
         if (ttyDevices[cnt].termDeviceMajor == TERMINAL_CONSOLE_MAJOR_NUMBER)
@@ -397,12 +397,12 @@ void updateTerms()
             //pipeReadSize = fs_read(NULL, ttyDevices[cnt].piper, pipeContents, PIPE_FILE_SIZE, 1);
             if (pipeReadSize > 0)
             {
-               printd(DEBUG_TERM,"Starting terminal update\n");
+               printd(DEBUG_TERMINAL,"Starting terminal update\n");
                updateTermBuffer(&ttyDevices[cnt], pipeReadSize);
-               printd(DEBUG_TERM,"Done terminal update\n");
+               printd(DEBUG_TERMINAL,"Done terminal update\n");
             }
             else
-               printd(DEBUG_TERM,"No terminal update necessary for tty%u\n",cnt);
+               printd(DEBUG_TERMINAL,"No terminal update necessary for tty%u\n",cnt);
            __sync_lock_release(&kTermLock);
         }
     }
