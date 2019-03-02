@@ -43,6 +43,7 @@ typedef struct
     void cmdSetEnv(char *cmdline);
     void cmdRepeat(char *cmdline);
     void cmdTakeADump();
+    void cmdRm(char *cmdline);
     void (*command_function)(void);
     void (*command_function_p)(char*);
     char** paramsToArgv(int pcount, char params[MAX_PARAM_COUNT][MAX_PARAM_WIDTH], char** pptr);
@@ -70,6 +71,7 @@ static command_table_t cmds[] = {
         {"help","Get help (this information)",cmdHelp,1},
         {"pwd","Print working directory",cmdPwd,0},
         {"repeat","Repeat a command x times",cmdRepeat,1},
+        {"rm","Remove a file/directory",cmdRm,1},
         {"set","Set an environment variable",cmdSetEnv,1},
         {"sleep","Sleep for x seconds",cmdSleep,1},
         {"time","Time a program while it runs.\n\t\tUsage: time program [parameters]",cmdTime,1}

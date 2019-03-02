@@ -153,6 +153,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             genericFileHandle = (uintptr_t*)param1;
             if (genericFileHandle == (uintptr_t*)STDOUT_FILE)
                 genericFileHandle = process->stdout;
+            if (genericFileHandle == (uintptr_t*)STDERR_FILE)
+                genericFileHandle = process->stderr;
             retVal=fs_write(process, genericFileHandle, (void*)param2, param3, 1);
             printd(DEBUG_FILESYS, "\t_sysCall: write() wrote %u bytes to %s from %s\n",retVal, ((file_t*)genericFileHandle)->f_path, process->exename);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
@@ -177,7 +179,12 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             retVal = fs_tell((void*)param1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-
+        case SYSCALL_UNLINK:
+            strcpy(path, (void*)param1);
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            retVal=fs_unlink(path);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
         case SYSCALL_PIPE:
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_SYSCALL,"\tsyscall: pipe(0x%08x)\n",param1);
@@ -274,7 +281,10 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             if (waitForTask->taskState == TASK_EXITED || waitForTask->taskState==TASK_ZOMBIE)
             {
                 //Set the return value that we'll pass back
+                printd(DEBUG_PROCESS,"\tsyscall: waitForPid: Found task 0x%08x in queue %u\n",waitForTask->taskNum, waitForTask->taskState);
                 retVal = getExitCode(param1);
+                if (retVal==0)
+                    panic("syscall: waitForPid: Unexpected, zombie task not found\n");
                 taskExited = true;
                 enableScheduler();
             }
@@ -287,8 +297,10 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SETPRIORITY:      //***Set process priority - param1=new priority, returns old priority
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_SYSCALL,"\tsyscall: setPriority(0x%08x)\n",param1);
             retVal=sys_setpriority(getCurrentProcess(),param1);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_REGEXITHANDLER:     //***Register exit handler
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
@@ -304,10 +316,12 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             uintptr_t physAddr = pagingGet4kPTEntryValueCR3(process->pageDirPtr, param1) & 0xFFFFF000;
             if (!physAddr)
                 printd(DEBUG_SYSCALL,"\t_syscall: free(0x%08x): Couldn't find physical memory mapping in process %s (cr3=0x%08x)\n",param1, process->exename, processCR3);
+            else if (physAddr & PAGE_COW_FLAG)
+                printd(DEBUG_SYSCALL,"\t_syscall: free(0x%08x): Page is CoW in process maps so it is not owned by this process.  Not freeing\n");
             else
             {
                 freeI(process->pageDirPtr, (uintptr_t*)physAddr, (uintptr_t*)param1);
-                printd(DEBUG_SYSCALL,"\t_syscall: free(0x%08x): Freed physical memory at 0x%08X for process %s (cr3=0x%08x)\n",param1, physAddr, process->exename, processCR3);
+                printd(DEBUG_SYSCALL,"\t_syscall: free(0x%08x): Freed physical memory at 0x%08X for process %s (cr3=0x%08x, PTE=0x%08x)\n",param1, physAddr, process->exename, processCR3, physAddr);
             }
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;

@@ -62,6 +62,8 @@ int main(int argc, char** argv, char** envp) {
     
     int textStart = processCommandLine(argc, argv);
     
+    __asm__("mov ebx,0\nmov [ebx],eax\n");
+    
     if (textStart < 0)
         return textStart;
 

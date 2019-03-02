@@ -105,7 +105,7 @@ VISIBLE int stat(char *path, fstat_t *stat)
     return statI(path, stat);
 }
 
-VISIBLE int resolvePath(const char *inPath, char *outPath)
+VISIBLE int resolvePath(const char *inPath, char *outPath, bool usePathVariable)
 {
     char delim[2]=":";
     char *token;
@@ -124,7 +124,10 @@ VISIBLE int resolvePath(const char *inPath, char *outPath)
     //using the PATH variable, attempt to resolve the path to an executable when a path isn't given in the commandline
     
     //If there is a / character in the path, then don't attempt to resolve
-    getenvI("PATH",resolvePath_envPath);
+    if (usePathVariable)
+        getenvI("PATH",resolvePath_envPath);
+    else
+        resolvePath_envPath[0]='\0';
 
     getcwdI(resolvePath_cwd,1024);
     
@@ -141,7 +144,10 @@ VISIBLE int resolvePath(const char *inPath, char *outPath)
     else
     {
         strcpyI(resolvePath_inPath,inPath);
-        token=strtokI(resolvePath_envPath,delim);
+        if (resolvePath_envPath[0])
+            token=strtokI(resolvePath_envPath,delim);
+        else
+            token=NULL;
         while (token!=NULL)
         {
             strcpyI(resolvePath_resPath,token);
@@ -231,4 +237,9 @@ getlineReturn:
 VISIBLE size_t getline(char **lineptr, size_t *n, void *stream)
 {
     return getlineI(lineptr, n, stream);
+}
+
+VISIBLE int unlink(char *filename)
+{
+    return do_syscall1(SYSCALL_UNLINK,(uintptr_t)filename);
 }

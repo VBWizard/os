@@ -20,6 +20,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
     
 #define SEEK_SET	0	/* Seek from beginning of file.  */
 #define SEEK_CUR	1	/* Seek from current position.  */
@@ -56,6 +57,7 @@ extern "C" {
     void* openI(char* path, const char* mode);
     void close(void* handle);
     void closeI(void* handle);
+    int unlink(char *filename);
     int read(void* handle, void *buffer, int size, int length);
     int readI(void* handle, void *buffer, int size, int length);
     int write(void* handle, void *buffer, int size, int length);
@@ -66,7 +68,7 @@ extern "C" {
     int stat(char *path, fstat_t *stat);
     long tell(void *stream);
     size_t getline(char **lineptr, size_t *n, void *stream);
-    int resolvePath(const char *inPath, char *outPath);
+    int resolvePath(const char *inPath, char *outPath, bool usePathVariable);
     
     int writeI(void* handle, void *buffer, int size, int length);
     void file_cleanup();

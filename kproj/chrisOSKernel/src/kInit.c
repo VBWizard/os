@@ -75,7 +75,7 @@ __asm__("cli\n");
     //Set up our kernel task
     kKernelTask->kernel=true;
     kKernelTask->pageDir=(uint32_t*)KERNEL_CR3;
-//    kKernelProcess->pageDirPtr=oldCR3;
+    kKernelProcess->pageDirPtr=KERNEL_CR3;
     kKernelTask->tss->EIP=(uint32_t)0xBADBADBA;
     kKernelTask->tss->CS=0x20;
     kKernelTask->tss->DS=0x10;

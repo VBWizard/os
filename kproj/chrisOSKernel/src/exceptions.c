@@ -153,6 +153,7 @@ void GeneralProtectionFaultHandler(int ErrorCode)
         char err[256];
         sprintf(err,"\ngpfault in '%s' at 0x%08x (errorcode=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,ErrorCode);
         fs_write(NULL, victimProcess->stdout, err,strlen(err),1);
+        fs_write(NULL, victimProcess->stderr, err,strlen(err),1);
     }
     else
         printk("\ngpfault in '%s' at 0x%08x (errorcode=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,ErrorCode);
@@ -210,7 +211,7 @@ void setupGPFHandler()
 
     gdtEntryOS(0x16,(int)gpfExceptionTSS,sizeof(tss_t), ACS_TSS,GDT_GRANULAR | GDT_32BIT,true);
 
-    //install the paging exception handler task TSS
+    //install the GPF exception handler task TSS (0xB0=0x16<<3)
     idt_set_gate (&idtTable[0xd], 0xB0, 0, ACS_TASK | ACS_DPL_0); //paging exception
 }
 
@@ -222,7 +223,7 @@ void setupPagingHandler()
     pagingMapPageCount(KERNEL_CR3, ((uint32_t)pagingExceptionTSS),(uint32_t)pagingExceptionTSS,0x1,0x7,true);
     memset(pagingExceptionTSS, 0, sizeof(tss_t));
     pagingExceptionTSS->CR3=KERNEL_CR3;
-    pagingExceptionTSS->CS=0x8;
+    pagingExceptionTSS->CS=0x88;
     pagingExceptionTSS->EIP=(uint32_t)&pagingExceptionHandler;
     pagingExceptionTSS->DS=kKernelTask->tss->DS;
     
@@ -427,6 +428,8 @@ kPagingExceptionHandlerNewReturn:
     kPagingExceptionsSinceStart++;
     printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08x\n",pagingExceptionCR3);
     
+//brokeIt:
+//    goto brokeIt;
     //Print to pipe instead of printk if available
     if (activeSTDOUT)
     {

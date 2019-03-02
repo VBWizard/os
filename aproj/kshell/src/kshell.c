@@ -322,7 +322,7 @@ void saveCommand(char* command)
 
 void prompt()
 {
-    print("%s %s> ",sExecutingProgram, cwd);
+    print("%s$ ",cwd);
 }
 
 int reprintCommand(char* command)
@@ -370,7 +370,7 @@ void kInit(int **initFile)
     strcpy(sExecutingProgram,sKShellProgramName);
     //puts("\nWelcome to kShell ... hang a while!\n");
     modifySignal(SIGINT, handleSignals, 0);
-    
+    write(STDERR_FILE,"Hello from kShell!\n",19,1);
     fstat_t fstat;
     memset(&fstat,0,sizeof(fstat_t));
     stat("/.krc",&fstat);

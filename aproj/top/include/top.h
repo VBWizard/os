@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#define TOP_MAX_PROCESSES 128
+#define TOP_MAX_PROCESSES 1000
     
 #ifdef __cplusplus
 }

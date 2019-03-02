@@ -173,24 +173,28 @@ task_t* createTask(void* process, bool kernelTSS)
     
     task->process=process;
     theProcess->task = task;
-    task->tss->CR3=(uint32_t)pagingAllocatePagingTablePage();
-    //Configure the task registers
-    printd(DEBUG_TASK,"createTask: Set task CR3 to 1k page directory @ 0x%08x\n",task->tss->CR3);
-    
-    //Map the CR3 into our memory space for before the iRet
-    pagingMapPage(KERNEL_CR3,task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,task->tss->CR3,(uint16_t)0x3);
+    if (kernelTSS)
+        task->tss->CR3=KERNEL_CR3;
+    else
+    {
+        task->tss->CR3=(uint32_t)pagingAllocatePagingTablePage();
+        //Configure the task registers
+        printd(DEBUG_TASK,"createTask: Set task CR3 to 1k page directory @ 0x%08x\n",task->tss->CR3);
+
+        //Map the CR3 into our memory space for before the iRet
+        pagingMapPage(KERNEL_CR3,task->tss->CR3 | KERNEL_PAGED_BASE_ADDRESS,task->tss->CR3,(uint16_t)0x3);
+        //TODO: Fix this.  At the minimum, this will break when we start free()ing stuff.
+        //Map TSS of task 0 since we are always using it
+        pagingMapPage(task->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,(uint16_t)0x7);
+
+        mmMapKernelIntoTask(task,kernelTSS);
+        //Map our CR3 into program's memory space, needed before the iRet
+        printd(DEBUG_TASK,"Mapping our CR3 into program, v=0x%08x, p=0x%08x\n",KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS);
+        pagingMapPageCount(task->tss->CR3, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, (0xFFFFFFFF/0x400000)+1, 0x7, true);
+        printd(DEBUG_TASK,"createTask: Mapping kernel into task\n");
+    }
     task->pageDir=(uint32_t*)task->tss->CR3;
 
-    //TODO: Fix this.  At the minimum, this will break when we start free()ing stuff.
-    //Map TSS of task 0 since we are always using it
-    pagingMapPage(task->tss->CR3,(uintptr_t)kKernelTask->tss,(uintptr_t)kKernelTask->tss,(uint16_t)0x7);
-    
-    mmMapKernelIntoTask(task,kernelTSS);
-    
-    //Map our CR3 into program's memory space, needed before the iRet
-    printd(DEBUG_TASK,"Mapping our CR3 into program, v=0x%08x, p=0x%08x\n",KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS);
-    pagingMapPageCount(task->tss->CR3, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, (0xFFFFFFFF/0x400000)+1, 0x7, true);
-    printd(DEBUG_TASK,"createTask: Mapping kernel into task\n");
     
     //Initialize task registers
     task->tss->EAX=0;
@@ -200,7 +204,7 @@ task_t* createTask(void* process, bool kernelTSS)
     {
         task->tss->SS=0x18;
         task->tss->DS=task->tss->ES=task->tss->FS=task->tss->GS=0x10;
-        task->tss->CS=0x08;
+        task->tss->CS=0x88;
     }
     else
     {

@@ -5,8 +5,6 @@
  */
 
 
-#include <stdio.h>
-
 #include "kshell.h"
 
 void cmdClearScreen()
@@ -96,9 +94,6 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     int yourSTDIN=0, yourSTDOUT=0;
     char *realCmdline=malloc(1024);
     
-    //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
-    stdinRedir=strstr(cmdline,"<");
-    stdoutRedir=strstr(cmdline,">");
     stdoutPipe=strstr(cmdline,"|");
     
     if (stdoutPipe)
@@ -109,6 +104,10 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
     else
         strcpy(realCmdline,cmdline);
     
+    //look for < and > redirects so that we can strip them from the command line and use them to redirect stdin/stdout
+    stdinRedir=strstr(realCmdline,"<");
+    stdoutRedir=strstr(realCmdline,">");
+
     if (stdinRedir)
     {
         stdinfile = malloc(256);
@@ -122,7 +121,9 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
             strncpy(stdinfile,start,end-start);
         else
             strcpy(stdinfile, start);
-        stdinRedir='\0';
+        //Fixup the original command line
+        
+        *stdinRedir='\0';
     }
     
     if (stdoutRedir)
@@ -138,7 +139,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
             strncpy(stdoutfile,start,end-start);
         else
             strcpy(stdoutfile, start);
-        stdoutRedir='\0';
+        *stdoutRedir='\0';
     }
     
     argv = cmdlineToArgv(realCmdline, &argc);
@@ -154,7 +155,7 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
         temp=malloc(1024);
         fstat_t fstat;
 
-        if (resolvePath(argv[0], temp)==0)
+        if (resolvePath(argv[0], temp,true)==0)
             strcpy(argv[0],temp);
         if (stat(argv[0],&fstat)) //stat returns 0 if successful
         {
@@ -398,4 +399,16 @@ void cmdSleep(char *cmdline)
 void cmdTakeADump()
 {
     takeADump();
+}
+
+void cmdRm(char *cmdline)
+{
+    char *temp;
+    
+    temp=malloc(1024);
+
+    if (resolvePath(cmdline, temp,false)==0)
+        unlink(temp);
+    else
+        printf("rm: Invalid filename %s\n",cmdline);
 }

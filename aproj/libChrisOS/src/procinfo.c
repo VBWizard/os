@@ -52,7 +52,10 @@ procInfo_t *buildProcInfoTI(procInfo_t *procinfo, char *statinfo, int ticksPerUp
                 procinfo->majorFaults=atoiI(token);
                 break;
             case 17://priority
-                procinfo->priority=atoiI(token);
+                if (strstrI(token,"-"))
+                    procinfo->priority= -atoiI(token+1);
+                else
+                    procinfo->priority=atoiI(token);
                 break;
             case 2: //comm
                 strreplaceI(token,"(","",name);

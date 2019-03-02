@@ -60,6 +60,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strtol.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
 	${OBJECTDIR}/src/_scheduler.o \
+	${OBJECTDIR}/src/daemon/syslogd.o \
 	${OBJECTDIR}/src/device.o \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
@@ -251,6 +252,11 @@ ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c nbproject/Makefile-${CN
 ${OBJECTDIR}/src/_scheduler.o: src/_scheduler.s nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/src/_scheduler.o src/_scheduler.s
+
+${OBJECTDIR}/src/daemon/syslogd.o: src/daemon/syslogd.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src/daemon
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DKERNEL_LOADED -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/daemon/syslogd.o src/daemon/syslogd.c
 
 ${OBJECTDIR}/src/device.o: src/device.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src

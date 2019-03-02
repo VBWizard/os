@@ -32,13 +32,15 @@ int main(int argc, char** argv) {
     int intervalDelay=1;
     char *sysmem;
     
+    //__asm__("mov ebx,0\nmov [ebx],eax\n");
+    
     if (argc>1)
     {
         if (strcmp(argv[1],"-d")==0)
             intervalDelay=atoi(argv[2]);
     }
     int pipes[2]={0,0};
-    
+    setpriority(0,0,-20);
     dup3(STDIN_FILE,STDIN_FILE,PIPENOBLOCK);
     topinfo=malloc(TOP_MAX_PROCESSES*sizeof(procInfo_t*));
     memset(topinfo,0,TOP_MAX_PROCESSES*sizeof(procInfo_t*));
@@ -71,7 +73,7 @@ int main(int argc, char** argv) {
                     if (topinfo[cnt]!=NULL && (uint32_t)topinfo[cnt]->cpu>=cpuVal && topinfo[cnt]->cpu<(cpuVal+1)) //ORDER BY cpu DESC
                     {
                         procInfo_t *ti=topinfo[cnt];
-                         sprintf(printBufferPtr,"%u\t%s\t%c\t%u\t%u\t%u\t%u\t%d\t%s\t%u\t%i%c\t\t%iK\n",
+                         sprintf(printBufferPtr,"%u\t%s\t%c\t%u\t%u\t%u\t%u\t%d\t%s\t%i\t%i%c\t\t%iK\n",
                                  ti->pid,
                                  ti->name,
                                  ti->status,
@@ -85,7 +87,7 @@ int main(int argc, char** argv) {
                                  ti->virtualSize>1024*1024?
                                      (ti->virtualSize/1024)/1024:
                                      ti->virtualSize/1024,
-                                 ti->virtualSize>1024*1024?'M':'K',
+                                     ti->virtualSize>1024*1024?'M':'K',
                                  ti->memorySize/1024);
                          printBufferPtr=printBuffer+strlen(printBuffer);
                     }

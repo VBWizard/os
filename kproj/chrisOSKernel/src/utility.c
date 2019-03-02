@@ -15,6 +15,7 @@
 #include "../../../chrisOSKernel/include/paging.h"
 #ifdef KERNEL_LOADED
 #include "../../../chrisOSKernel/include/alloc.h"
+#include "process.h"
 #endif
 
 extern int kTimeZone;
@@ -30,6 +31,7 @@ extern struct gdt_ptr kernelGDT;
 extern sGDT* bootGdt;
 #ifdef KERNEL_LOADED
 extern sMemInfo* heapMemoryInfo;
+extern process_t *kKernelProcess;
 #endif
 
 extern void doNonPagingJump();
@@ -228,19 +230,28 @@ void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bo
 {
     tss_t* tss = task->tss;
     uint32_t esp = tss->ESP;
+    char content[2000];
+    char *contentP=content;
     volatile unsigned short *lCSIPPtr=(volatile unsigned short *)tss->CS;
 
-    printd(DEBUG_EXCEPTIONS,"EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", tss->EAX, tss->EBX, tss->ECX, tss->EDX,tss->EFLAGS);
-    printd(DEBUG_EXCEPTIONS,"EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", tss->EBP, tss->ESI, tss->EDI, tss->ESP);
-    printd(DEBUG_EXCEPTIONS,"CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", 0, cr2, task->tss->CR3, 0);
-    printd(DEBUG_EXCEPTIONS," DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", tss->DS, tss->ES, tss->FS, tss->GS);
-    printd(DEBUG_EXCEPTIONS,"GDT=%08X\t TR=0x%08X\tTRL=0x%08X\n",kernelGDT.base,task->taskNum, tss->LINK);
-    printd(DEBUG_EXCEPTIONS,"CS:EIP = %04X:%08X, error code=%08X\n", tss->CS, tss->EIP, errorCode);
+    sprintf(contentP,"EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", tss->EAX, tss->EBX, tss->ECX, tss->EDX,tss->EFLAGS);
+    contentP=content+strlen(content);
+    sprintf(contentP,"EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", tss->EBP, tss->ESI, tss->EDI, tss->ESP);
+    contentP=content+strlen(content);
+    sprintf(contentP,"CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", 0, cr2, task->tss->CR3, 0);
+    contentP=content+strlen(content);
+    sprintf(contentP," DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", tss->DS, tss->ES, tss->FS, tss->GS);
+    contentP=content+strlen(content);
+    sprintf(contentP,"GDT=%08X\t TR=0x%08X\tTRL=0x%08X\n",kernelGDT.base,task->taskNum, tss->LINK);
+    contentP=content+strlen(content);
+    sprintf(contentP,"CS:EIP = %04X:%08X, error code=%08X\n", tss->CS, tss->EIP, errorCode);
+    contentP=content+strlen(content);
 //          printk("Bytes at CS:EIP: ");
 //          for (int cnt=0;cnt<19;cnt++)
 //              printk("%02X ", lCSIPPtr[cnt]);
 //          printk("\n");
-    printd(DEBUG_EXCEPTIONS,"Stack (ss:ebp) @ 0x%08x:0x%08X:\n",tss->SS, esp);
+    sprintf(contentP,"Stack (ss:ebp) @ 0x%08x:0x%08X:\n",tss->SS, esp);
+    contentP=content+strlen(content);
 #ifdef KERNEL_LOADED
     esp-=20;
     for (uint32_t *address=(uint32_t*)esp;address<(uint32_t*)esp+40;address++)
@@ -248,17 +259,20 @@ void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bo
         int pte=pagingGet4kPTEntryValueCR3(victimCR3,(uint32_t)address);
         if (pte & 1!=1)
         {
-            printd(DEBUG_EXCEPTIONS,"Cannot print any more stack due to address not mapped to process. (address=0x%08x, pte=0x%08x)\n",address,pte);
+            sprintf(contentP,"Cannot print any more stack due to address not mapped to process. (address=0x%08x, pte=0x%08x)\n",address,pte);
+            contentP=content+strlen(content);
             break;
         }
         else if ((pte & PAGE_MMAP_FLAG))
         {
-            printd(DEBUG_EXCEPTIONS,"Cannot print any more stack due to address being unmapped MMAP. (address=0x%08x, pte=0x%08x)\n",address,pte);
+            sprintf(contentP,"Cannot print any more stack due to address being unmapped MMAP. (address=0x%08x, pte=0x%08x)\n",address,pte);
+            contentP=content+strlen(content);
             break;
         }
         pte&=0xFFFFF000;
         pte|=((uint32_t)address&0x00000FFF);
-        printd(DEBUG_EXCEPTIONS,"\t0x%08X: 0x%08X\n",address, *(uint32_t*)pte);
+        sprintf(contentP,"\t0x%08X: 0x%08X\n",address, *(uint32_t*)pte);
+        contentP=content+strlen(content);
     }
 #endif
 /*    if (toLog)
@@ -266,6 +280,7 @@ void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bo
     else
         printk("%s", content);
 */
+        fs_write(NULL,kKernelProcess->stderr,content,(uint32_t)contentP-(uint32_t)content,1);
 }
 
 //Called by exception 0xd & 0xe (possibly more)

@@ -313,7 +313,7 @@ __asm__("sti\n");
     else
         printk("E820: not available (%08X ... looking for alternatives.\n", kE820Status);
 
-    printk("E820: Usable memory: Low=%6d (INT12), Total=%10d (E820)\n",lLowMemKB * 1024, kE820MemoryBytes);
+    printk("E820: Usable memory: Low=%6u (INT12), Total=%10u (E820)\n",lLowMemKB * 1024, kE820MemoryBytes);
     if (kE820MemoryBytes < MINIMUM_USABLE_MEMORY)
     {
         printk("\n\nE820: Either the available memory is less than the minimum required of %d MB\nor memory capacity cannot be determined\n.", MINIMUM_USABLE_MEMORY / 1024 / 1024);

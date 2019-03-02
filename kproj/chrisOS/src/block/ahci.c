@@ -251,10 +251,12 @@ void ahciProbePorts(HBA_MEM *abar) {
     int rb = AHCI_PORT_BASE_REMAP_ADDRESS + (0x10000 * ahciHostCount); //probably only need 0xA000
     if (pi > 0)
         printd(DEBUG_AHCI, "AHCI: Probing ports via ABAR 0x%08X, value 0x%02X\n", abar, abar->pi);
-    while (i < 32) {
-        if (pi & 1) {
-        ahci_enable_port(abar,i);
-        //waitForPortIdle(&abar->ports[i]);
+    while (i < 32) 
+    {
+        if (pi & 1) 
+        {
+            ahci_enable_port(abar,i);
+            //waitForPortIdle(&abar->ports[i]);
             uint32_t sig = 0;
             //Get the SATA device signature
             int dt = check_type(&abar->ports[i], &sig);
@@ -359,7 +361,7 @@ void port_rebase(volatile HBA_PORT *port, int portno, uintptr_t remapBase) {
     // Command list entry maxim count = 32
     // Command list maxim size = 32*32 = 1K per port
     port->clbu = 0;
-    port->clb = (remapBase + (portno<<15) + 0x1000) & 0xFFFFF000;
+    port->clb = (remapBase + (portno<<10));
     memset((void*) (port->clb), 0, 1024);
     kMapPage(port->clb,port->clb,0x73); //make un-cached
     
@@ -536,7 +538,6 @@ int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count) 
 
     //CLR 06/07/2016 - Must add partition start sector
     sector+=kAHCICurrentPart.partStartSector;
-    
     memset(buffer,0,sector_count*512);
     
     printd(DEBUG_AHCI, "AHCI: read on port=0x%08X,sector=0x%08X,buffer=0x%08X,sector_count=%u\n", kAHCICurrentDisk,sector,buffer,sector_count);
@@ -600,18 +601,15 @@ int ahciBlockingRead28(uint32_t sector, uint8_t *buffer, uint32_t sector_count) 
         printd(DEBUG_AHCI, "AHCI: Read disk error\n");
         return false;
     }
-
     return true;
 }
 
 int ahciBlockingWrite28(/*unsigned drive, */uint32_t sector, uint8_t *buffer, uint32_t sector_count) {
     int prdCntr = 0;
 
-    return 0;
+    //return 0;
     //CLR 06/07/2016 - Must add partition start sector
     sector+=kAHCICurrentPart.partStartSector;
-    
-    memset(buffer,0,sector_count*512);
     
     printd(DEBUG_AHCI, "AHCI: write on port=0x%08X,sector=0x%08X,buffer=0x%08X,sector_count=%u\n", kAHCICurrentDisk,sector,buffer,sector_count);
 

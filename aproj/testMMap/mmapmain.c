@@ -27,6 +27,7 @@ int doChild(int childNum)
             if (sharedCounter > 0)
                 sleep(1);
         }
+        printf("\tChild %u returning %u\n",childNum,childNum);
         return childNum;
 }
 
@@ -65,7 +66,7 @@ int main(int argc, char** argv) {
         //print("Waiting for child %u (0x%04X)\n",pidCount+1, thePid);
         rets[pidCount]=waitpid(thePid);
         if (rets[pidCount]-1!=pidCount)
-            printf("Wrong return value for child #%u (%u)\n",pidCount,rets[pidCount]);
+            printf("Wrong return value for child #%u, value=%u (pid=0x%08x)\n",pidCount,rets[pidCount],pids[pidCount]);
         pidCount++;
     }
     printf("All children ended\n");

@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
     char *temp=malloc(1024);
     fstat_t fstat;
 
-    if (resolvePath(argv[1], temp)==0)
+    if (resolvePath(argv[1], temp,false)==0)
     {
         strcpy(qualifiedFileName,temp);
     }
@@ -89,8 +89,9 @@ int main(int argc, char** argv) {
         seek(file, 0, 0);
         char *a = mmap(NULL, fstat.st_size, PROT_WRITE, MAP_PRIVATE, (int)file, 0);
 
-        char test[fstat.st_size];
-        strncpy(test,a,fstat.st_size);
+        buffer=malloc(fstat.st_size);
+        
+        strncpy(buffer,a,fstat.st_size);
         
         write(1, a, fstat.st_size, 1);
         printf("\n");

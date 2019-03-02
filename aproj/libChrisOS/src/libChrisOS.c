@@ -373,3 +373,8 @@ VISIBLE void takeADump()
 {
     do_syscall0(SYSCALL_TAKEADUMP);
 }
+
+VISIBLE int setpriority(int which, int who, int prio)
+{
+    return do_syscall1(SYSCALL_SETPRIORITY,prio);
+}

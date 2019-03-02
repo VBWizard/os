@@ -234,7 +234,7 @@ int fs_write(process_t* process, void* file, void * buffer, int size, int length
     file_t* theFile = file;
     int retVal = 0;
 
-    printd(DEBUG_FILESYS, "\t\tfs_write: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
+    printd(DEBUG_FILESYS, "\t\tfs_write: called for file %s (handle=0x%08X), %u bytes from 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
 
     if (theFile->verification!=0xBABAABAB)
         panic("fs_write: Referenced a file that is not a file");
@@ -511,4 +511,9 @@ int getDirEntries(void *process, char* path, dirent_t *buffer, int buflen)
     
     kFree(dirEntry);
     return retVal;
+}
+
+int fs_unlink(char *filename)
+{
+     return rootFs->fops->delete(filename);
 }

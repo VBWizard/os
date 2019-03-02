@@ -30,7 +30,7 @@ int main(int argc, char** argv)
         strcpy(currPath,argv[1]);
 
     char *resolvedPath=malloc(1024);
-    resolvePath(currPath, resolvedPath);
+    resolvePath(currPath, resolvedPath,false);
     if (strcmp(resolvedPath,"")!=0)
     {
         int entryCount = getdir(resolvedPath, (direntry_t*)buffer, 16384);

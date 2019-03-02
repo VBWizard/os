@@ -342,6 +342,9 @@ void HIGH_CODE_SECTION selectHDNum (char* cmdline)
     else
         kSelectedDiskNum=lTemp;
     printd(DEBUG_HARDDRIVE,"Parsing MBR for disk %u\n",kSelectedDiskNum);
+    
+    printk("Parsing MBR for disk %u (%s)\n",kSelectedDiskNum,kATADeviceInfo[kSelectedDiskNum].ATADeviceModel);
+    
     parseMBR(&kATADeviceInfo[kSelectedDiskNum],&mbr);
     printk("Disk %u selected\n",kSelectedDiskNum);
 }
@@ -492,9 +495,9 @@ void HIGH_CODE_SECTION bootShell()
     {
         /*******************************************************/
         //CLR 02/23/2017 - Temporary code to execute commands on boot
-        char lcmd1[40]="disk 4";
+        char lcmd1[40]="disk 6";
         execInternalCommand(lcmd1);
-        char lcmd2[40]="part 0";
+        char lcmd2[40]="part 2";
         execInternalCommand(lcmd2);
         char lcmd3[40]="exec /kernel";
         execInternalCommand(lcmd3);

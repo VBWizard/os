@@ -129,6 +129,8 @@ extern "C" {
         //size_t (*write) (file_t *, const char *, size_t, uint64_t *);
         long (*tell) (void *f);
         size_t (*write) (const void * data, int size, int count, void *f);
+        int (*flush) (void *f);
+        int (*delete) (const char *filename);
     };
 
     struct dir_operations
@@ -187,6 +189,7 @@ extern "C" {
     int fs_seek(void* file, long offset, int whence);
     long fs_tell(void* file);
     void fs_close(void* file);
+    int fs_unlink(char *filename);
     int fs_stat(process_t *process, void *path, fstat_t *buffer);
     int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);
     int parsePath(const char *inPath, char *outPath, char *outFilename, char** outPathTokens, int outPathTokensArrayCount);

@@ -22,6 +22,7 @@
 #include "mmap.h"
 #include "task.h"
 #include "sysloader.h"
+#include "drivers/tty_driver.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
@@ -32,6 +33,7 @@ uint32_t dupPageTables(process_t* newProcess, process_t* currProcess);
 process_t* kKernelProcess;
 extern void _schedule();
 extern struct gdt_ptr kernelGDT;
+extern void syslogd();
 
 #define PAGE_USER_READABLE 0x4
 #define PAGE_USER_WRITABLE 0x6           //0x4 for "User" | 0x2 for "Writable"
@@ -61,66 +63,78 @@ void freeProcess(process_t *process)
 
     gdtEntryOS(process->task->taskNum,0,0, 0,0,false);
 
+    //Only unload the ELF image if the parent is running a different program
+    printd(DEBUG_PROCESS,"freeProcess: Checking if elf is ours to free, our exe=%s, parent exe=%s\n", process->exename, process->parent->exename);
+    if (!process->parent || strcmp(process->parent->exename,process->exename)!=0)
+    {
+        pagingMapPage(KERNEL_CR3, (uint32_t)elf->elfLoadedPages | 0xFFFFF000, kPagingGet4kPTEntryValueCR3(process->pageDirPtr,elf->elfLoadedPages) | 0xFFFFF000,0x7);
+        while (epi->startPhys!=0)
+        {
+            printd(DEBUG_PROCESS,"\tFreeing %u bytes at Phys/Virt 0x%08x/0x%08x\n",epi->pages * PAGE_SIZE, epi->startPhys, epi->startVirt);
+            kFree(epi->startPhys);
+            epi++;
+        }
     
-    pagingMapPage(KERNEL_CR3, (uint32_t)elf->elfLoadedPages | 0xFFFFF000, kPagingGet4kPTEntryValueCR3(process->pageDirPtr,elf->elfLoadedPages) | 0xFFFFF000,0x7);
-    while (epi->startPhys!=0)
-    {
-        printd(DEBUG_PROCESS,"\tFreeing %u bytes at Phys/Virt 0x%08x/0x%08x\n",epi->pages * PAGE_SIZE, epi->startPhys, epi->startVirt);
-        kFree(epi->startPhys);
-        epi++;
+        if (elf->symTable)
+            kFree(elf->symTable);
+        kFree(elf->fileName);
+        for (int cnt=0;cnt<50;cnt++)
+        {
+            if (elf->dynamicInfo.strTableAddress[cnt] != NULL)
+                if (((uint32_t)elf->dynamicInfo.strTableAddress[cnt] & 0xFFF) == 0) //CLR 02/10/2019: Hackish, sometimes we kMalloc, other times we use an existing loaded address.  Hopefully loaded addresses don't end with 000
+                    kFree(elf->dynamicInfo.strTableAddress[cnt]);
+        }
+        if (elf->dynamicInfo.relATable)
+            kFree(elf->dynamicInfo.relATable);
+        if (elf->dynamicInfo.relTable)
+            kFree(elf->dynamicInfo.relTable);
+
+        printd(DEBUG_PROCESS,"\tDe-linking this process' elfInfo from the kLoadedElfInfo list\n");
+
+        dllist_t *next=elf->loadedListItem.next, *prev=elf->loadedListItem.prev, *this=&elf->loadedListItem;
+
+        if (next!=this)
+        {
+            if(prev!=this)
+                prev->next=next;
+        }
+        else
+            prev->next=prev;
+
+        if (prev!=this)
+        {
+            if(next!=this)
+                next->prev=prev;
+        }
+        else
+            next->prev=next;
+
+        printd(DEBUG_PROCESS,"\tFreeing the elfInfo for this process @ 0x%08x\n",elf->loadedListItem.payload);
+        kFree(elf->loadedListItem.payload);
+
     }
-
-    if (elf->symTable)
-        kFree(elf->symTable);
-    kFree(elf->fileName);
-    for (int cnt=0;cnt<50;cnt++)
-    {
-        if (elf->dynamicInfo.strTableAddress[cnt] != NULL)
-            if (((uint32_t)elf->dynamicInfo.strTableAddress[cnt] & 0xFFF) == 0) //CLR 02/10/2019: Hackish, sometimes we kMalloc, other times we use an existing loaded address.  Hopefully loaded addresses don't end with 000
-                kFree(elf->dynamicInfo.strTableAddress[cnt]);
-    }
-    if (elf->dynamicInfo.relATable)
-        kFree(elf->dynamicInfo.relATable);
-    if (elf->dynamicInfo.relTable)
-        kFree(elf->dynamicInfo.relTable);
-
-    printd(DEBUG_PROCESS,"\tDe-linking this process' elfInfo from the kLoadedElfInfo list\n");
-
-    dllist_t *next=elf->loadedListItem.next, *prev=elf->loadedListItem.prev, *this=&elf->loadedListItem;
-
-    if (next!=this)
-    {
-        if(prev!=this)
-            prev->next=next;
-    }
-    else
-        prev->next=prev;
-
-    if (prev!=this)
-    {
-        if(next!=this)
-            next->prev=prev;
-    }
-    else
-        next->prev=next;
-    
-    printd(DEBUG_PROCESS,"\tFreeing the elfInfo for this process @ 0x%08x\n",elf->loadedListItem.payload);
-    kFree(elf->loadedListItem.payload);
-    
-    //NOTE: Don't free heap, process allocated it with libc malloc and process will free it!
+    //NOTE: Don't free heap, process allocated it with libc malloc and libc frees it!
     
     //Don't free stack0Start because it belongs to the kernel process and everyone shares it
     printd(DEBUG_PROCESS,"\tFreeing initial stack page @ 0x%08x\n",process->stackInitialPage);
     //TODO: Fix this.  Unremarking this causes paging exception SEGV in /sbin/idle
     //kFree(process->stackInitialPage);
 
-    if (process->stdinRedirected)
+    if (process->stdinRedirected && process->stdin != process->parent->stdin)
+    {
         fs_close(process->stdin);
-    if (process->stdoutRedirected)
+        process->stdinRedirected=false;
+    }
+    if (process->stdoutRedirected && process->stdout != process->parent->stdout)
+    {
         fs_close(process->stdout);
-    if (process->stderrRedirected)
+        process->stdoutRedirected=false;
+    }
+    if (process->stderrRedirected && process->stderr != process->parent->stderr)
+    {
         fs_close(process->stderr);
-    
+        process->stderrRedirected=false;
+    }
     kFree(process->stack1Start);
     kFree(process->path);
     kFree(process->cwd);
@@ -373,9 +387,6 @@ int calcProcessSize(process_t *process)
 
 void processIdleLoop()
 {
-    uint32_t cr3=0;
-    
-    __asm__("mov eax,cr3\n":"=a" (cr3));
     process_t* process=getCurrentProcess();
     sys_setpriority(process,20);
     //Block idle task SIGINT ... default action for SIGINT is to kill the process
@@ -463,7 +474,6 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     //Copy the path (parameter) value from the parent's memory.
     if (parentProcessPtr!=NULL && parentProcessPtr->pageDirPtr!=0)
     {
-        if (parentProcessPtr->pageDirPtr!=KERNEL_CR3)
            copyToKernel(parentProcessPtr,process->path,path,PATH_MAX);
     }
     else
@@ -618,6 +628,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     //Take care of the special "idle" task 
     if (strncmp(process->path,"/sbin/idle",50)==0)
         process->task->tss->EIP=(uintptr_t)&processIdleLoop;
+    else if (strncmp(process->path,"/sbin/syslogd",50)==0)
+        process->task->tss->EIP=(uintptr_t)&syslogd;
     else
     {
         //The reason kSHell throws a paging exception when you type an invalid filename is because we remove the program segment mappings

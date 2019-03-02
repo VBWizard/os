@@ -61,6 +61,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strtol.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
 	${OBJECTDIR}/src/_scheduler.o \
+	${OBJECTDIR}/src/daemon/syslogd.o \
 	${OBJECTDIR}/src/device.o \
 	${OBJECTDIR}/src/dllist.o \
 	${OBJECTDIR}/src/drivers/drv_genKeyboard.o \
@@ -278,6 +279,11 @@ ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c
 ${OBJECTDIR}/src/_scheduler.o: src/_scheduler.s
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(AS) $(ASFLAGS) -o ${OBJECTDIR}/src/_scheduler.o src/_scheduler.s
+
+${OBJECTDIR}/src/daemon/syslogd.o: src/daemon/syslogd.c
+	${MKDIR} -p ${OBJECTDIR}/src/daemon
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/daemon/syslogd.o src/daemon/syslogd.c
 
 ${OBJECTDIR}/src/device.o: src/device.c
 	${MKDIR} -p ${OBJECTDIR}/src

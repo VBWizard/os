@@ -710,7 +710,7 @@ int32_t getExitCode(uint32_t taskNum)
     
     printd(DEBUG_PROCESS,"getExitCode: Looking through ZOMBIE queue for exit code for task 0x%04X\n", taskNum);
 
-    while (*q!=NULL)
+    while (*q!=NO_NEXT)
     {
         task=(task_t*)*q;
         task_t *taskList=kTaskList;

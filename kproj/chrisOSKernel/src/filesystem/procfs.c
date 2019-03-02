@@ -478,15 +478,15 @@ void getMemInfo(char *buffer, int buffersize)
     }
     while (mInfo->next);
     
-    sprintf(buffer, "SystemMemory=%i\n",kE820MemoryBytes);
+    sprintf(buffer, "SystemMemory=%u\n",kE820MemoryBytes);
     bufptr=buffer+strlen(buffer);
-    sprintf(bufptr,"KernelMemory=%i\n",kernelPoolMemorySize);
+    sprintf(bufptr,"KernelMemory=%u\n",kernelPoolMemorySize);
     bufptr=buffer+strlen(buffer);
-    sprintf(bufptr,"HeapMemory=%i\n",kmmHeapMemoryTotal);
+    sprintf(bufptr,"HeapMemory=%u\n",kmmHeapMemoryTotal);
     bufptr=buffer+strlen(buffer);
-    sprintf(bufptr,"UsedHeap=%i\n",usedHeap);
+    sprintf(bufptr,"UsedHeap=%u\n",usedHeap);
     bufptr=buffer+strlen(buffer);
-    sprintf(bufptr,"AvailableHeap=%i\n",availableHeap);
+    sprintf(bufptr,"AvailableHeap=%u\n",availableHeap);
 }
 
 void getInterruptInfo(char *buffer, int buffersize)

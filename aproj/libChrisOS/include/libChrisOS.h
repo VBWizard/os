@@ -18,19 +18,20 @@
 extern "C" {
 #endif
 #include "ascii.h"
-#include "malloc.h"
-#include "strings.h"
-#include "environment.h"
-#include "input.h"
-#include "time.h"
-#include "file.h"
-#include "pipe.h"
-#include "libcmmap.h"
-#include "console.h"
-#include "stdio.h"
-#include "procinfo.h"
 #include "common.h"
-    
+#include "console.h"
+#include "environment.h"
+#include "file.h"
+#include "input.h"
+#include "libcmmap.h"
+#include "malloc.h"
+#include "memory.h"
+#include "procinfo.h"
+#include "pipe.h"
+#include "stdio.h"
+#include "strings.h"
+#include "time.h"
+
 #ifndef NULL
 #define NULL ((void *) 0)
 #endif
@@ -60,6 +61,7 @@ extern "C" {
     size_t split(char *buffer, char *argv[], size_t argv_size);
     void exit (int status);
     int setSTD(int std, uint32_t filed);
+    int setpriority(int which, int who, int prio);
     void takeADump();
     
 #ifdef __cplusplus

@@ -49,8 +49,9 @@ ttydevice_t *registerTTY(int deviceMajor, int deviceMinor)
     device->stdInReadPipe = (file_t*)stdInPipes[0];
     device->stdInWritePipe = (file_t*)stdInPipes[1];
     printd(DEBUG_TERMINAL,"Creating stderr pipes for tty%u\n",deviceMinor);
-    fs_pipeI(NULL, stdErrPipes, 0); //we want this one to block!
+    fs_pipeI(NULL, stdErrPipes, PIPENOBLOCK); //we want the write to not block, but the read to block
     device->stdErrReadPipe = (file_t*)stdErrPipes[0];
+    ((pipe_t*)device->stdErrReadPipe->pipe)->flags="r"; //make this blocking!
     device->stdErrWritePipe = (file_t*)stdErrPipes[1];
     
     return device;

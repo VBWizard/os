@@ -93,3 +93,5 @@ gdb_history
 /aproj/wc/build/
 /aproj/ps/dist/
 /aproj/ps/build/
+/aproj/syslogd/build/
+/aproj/syslogd/dist/
