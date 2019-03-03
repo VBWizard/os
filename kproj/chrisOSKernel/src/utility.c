@@ -271,7 +271,8 @@ void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bo
         }
         pte&=0xFFFFF000;
         pte|=((uint32_t)address&0x00000FFF);
-        sprintf(contentP,"\t0x%08X: 0x%08X\n",address, *(uint32_t*)pte);
+        sprintf(contentP,"%c\t0x%08X: 0x%08X\n",address==(uintptr_t*)esp?'*':' ',
+                address, *(uint32_t*)pte);
         contentP=content+strlen(content);
     }
 #endif
@@ -280,7 +281,10 @@ void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bo
     else
         printk("%s", content);
 */
-        fs_write(NULL,kKernelProcess->stderr,content,(uint32_t)contentP-(uint32_t)content,1);
+    *(contentP+1)='\0';
+    fs_write(NULL,kKernelProcess->stderr,content,(uint32_t)contentP-(uint32_t)content,1);
+    //This is causing kTaskList to be written over
+        printd(DEBUG_EXCEPTIONS,"%s",content);
 }
 
 //Called by exception 0xd & 0xe (possibly more)

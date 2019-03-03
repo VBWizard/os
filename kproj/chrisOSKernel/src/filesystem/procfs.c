@@ -18,12 +18,14 @@
 #include "kernelVariables.h"
 #include "drivers/termdrv.h"
 #include "task.h"
+#include "assert.h"
 
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kmmHeapMemoryTotal;
 extern uint32_t kernelPoolMemorySize;
 extern sMemInfo* heapMemoryInfo;
 extern task_t *kTaskList;;
+extern task_t *kKernelTask;
 
 char **pathTokens;
 volatile int kProcRefreshLock;
@@ -106,6 +108,7 @@ void updateRootDirFiles()
     strcpy(procRootDir.files[procRootDirFilePtr].filename,"interrupts");
     procRootDir.files[procRootDirFilePtr].parentDir=&procRootDir;
     procRootDir.files[procRootDirFilePtr++].size=&procFileSize;
+    //disableScheduler();
     do
     {
         if (taskList->taskNum!=0)
@@ -138,6 +141,7 @@ void updateRootDirFiles()
         taskList++;
     }
     while (taskList->next!=(task_t*)NO_NEXT);
+    //enableScheduler();
     __sync_lock_release(&kProcRefreshLock);   
 }
 
@@ -523,15 +527,22 @@ void getStat(char *buffer, int buffersize, procfile_t *pf)
     process_t *proc;
     char procState=0;
     int taskNum=0;
-
     if (strcmp(pf->parentDir->dirname,"self")==0)
         taskNum=getCurrentTask()->taskNum;
     else
         taskNum=atoi(pf->parentDir->dirname);
 
+    ASSERTM(taskNum>=32,"getStat: Invalid task number");
+    
     task_t *task=findTaskByTaskNum(taskNum);
 
+    ASSERTM(task!=0,"getStat: task is null\n");
     proc=task->process;
+    if (!proc)
+    {
+        printd(DEBUG_PROCESS,"Can't get process for task number 0x%04x\n",taskNum);
+    }
+    ASSERTM(proc!=0,"getStat: process is null\n");
      int tty=getTTYForPipe((int)proc->stdout);
      switch (task->taskState)
      {
@@ -560,11 +571,14 @@ void getStat(char *buffer, int buffersize, procfile_t *pf)
              procState='X';
              break;
      }
+     int printPPID=0;
+     if (taskNum>kKernelTask->taskNum)
+         printPPID=proc->parent->task->taskNum;
      sprintf(buffer,"%d (%s) %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %u %u %u",
              taskNum,                       //pid
              proc->exename,                 //comm
              procState,                     //state
-             proc->parent->task->taskNum,   //ppid
+             printPPID,                    //ppid
              0,                             //pgrp
              0,                             //session
              tty,                           //tty_nr

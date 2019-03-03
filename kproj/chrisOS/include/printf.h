@@ -9,10 +9,12 @@
 #define	PRINTF_H
 #include <stdarg.h>
 #include <stdint.h>
+
 int printk(const char *format, ...);
 int sprintf(char *out, const char *format, ...);
 int printk_valist(const char *format, va_list args);
-void __attribute__((noinline))panic(const char *format, ...);
+void panic(const char *format, ...);
+void assertPanic(char *message, char *file, int line);
 #ifdef DEBUG_NONE
 int printd();
 #else

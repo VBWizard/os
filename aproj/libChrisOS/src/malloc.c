@@ -14,9 +14,9 @@
 #define HEAP_CURR(s,t) {t=((heaprec_t*)s)-1;}
 #define HEAP_PTR_MEM_ADDR(s) ({void *ptr=((void*)heapCurr)+sizeof(heaprec_t);ptr;})
 
-__attribute__((visibility("default"))) uint32_t heapBase=0;
-__attribute__((visibility("default"))) uint32_t heapCurr=0;
-__attribute__((visibility("default"))) uint32_t heapEnd=0;
+VISIBLE uint32_t heapBase=0;
+VISIBLE uint32_t heapCurr=0;
+VISIBLE uint32_t heapEnd=0;
 
 void initmalloc()
 {
@@ -42,8 +42,8 @@ uint32_t newHeapRequiredToFulfillRequest(size_t size)
            newSize+=(PAGE_SIZE-(newSize % PAGE_SIZE));
            //printDebug(DEBUG_MALLOC,"libcnewHeapRequiredToFulfillRequest: Size adjusted from %u to %u\n",size,newSize);
        }
-        if (newSize < ALLOC_REQUEST_SIZE)
-            return ALLOC_REQUEST_SIZE;
+        if (newSize < MALLOC_MINIMUM_REQUEST_SIZE)
+            return MALLOC_MINIMUM_REQUEST_SIZE;
         else
             return newSize;
     }
@@ -63,13 +63,16 @@ void freeI(void* fpointer)
     HEAP_CURR(fpointer,mp);
     
     //printDebug(DEBUG_MALLOC,"libc_free: Freeing heap @ fp=0x%08X (mp=0x%08X)\n",fpointer,mp);
-    if (mp->marker!=ALLOC_MARKER_VALUE)
+    if (mp->marker!=MALLOC_MARKER_VALUE)
     {
         printI("malloc: marker not found error!!!\n");
         return; //Return silently ... for now
     }
     mp->inUse=false;
-    
+#ifdef MALLOC_CLEAR_ON_FREE
+    uint32_t bytesToClear=0, bytesCleared=0;
+    memset(fpointer,mp->len,MALLOC_DEFAULT_CLEAR_VALUE1);
+#endif
 }
 
 heaprec_t *mallocFindAvailableMemory(size_t size)
@@ -77,20 +80,20 @@ heaprec_t *mallocFindAvailableMemory(size_t size)
     heaprec_t* heapPtr=(heaprec_t*)heapBase;
     do
     {
-        if (!heapPtr->inUse && heapPtr->len>=size && heapPtr->marker==ALLOC_MARKER_VALUE)
+        if (!heapPtr->inUse && heapPtr->len>=size && heapPtr->marker==MALLOC_MARKER_VALUE)
             return heapPtr;
         if (heapPtr->next)
             heapPtr=heapPtr->next;
         
     }
-    while(heapPtr<(heaprec_t*)heapCurr && heapPtr->next && heapPtr->marker==ALLOC_MARKER_VALUE);
+    while(heapPtr<(heaprec_t*)heapCurr && heapPtr->next && heapPtr->marker==MALLOC_MARKER_VALUE);
     //while (heapPtr->marker==ALLOC_MARKER_VALUE);
     return NULL;
 }
 
 void mallocSanityCheck(heaprec_t *heaprec)
 {
-#ifdef ALLOC_MALLOC_SANITY_CHECK
+#ifdef MALLOC_SANITY_CHECK
     heaprec_t *heapPtr=heaprec;
     while (heapPtr>=(heaprec_t*)heapBase && heapPtr->prev!=heapPtr)
     {
@@ -100,7 +103,7 @@ void mallocSanityCheck(heaprec_t *heaprec)
     SanityLoop2:
                 goto SanityLoop2;
         }
-        if (heapPtr->marker!=ALLOC_MARKER_VALUE)
+        if (heapPtr->marker!=MALLOC_MARKER_VALUE)
         {
             printfI("\n**************************malloc pointer error!!!**************************\n");
 SanityLoop:
@@ -121,10 +124,10 @@ void*  mallocI(size_t size)
     size_t requestSize=size;
     static heaprec_t *lastHRCreated=NULL;
 
-    if (size<ALLOC_MIN_MALLOC_SIZE)
-        requestSize=ALLOC_MIN_MALLOC_SIZE;
+    if (size<MALLOC_MIN_SIZE_TO_ALLOCATE)
+        requestSize=MALLOC_MIN_SIZE_TO_ALLOCATE;
     printdI(DEBUG_MALLOC,"libc_malloc: Request for 0x%08x bytes\n",requestSize);
-/*    if (heapBase>0)
+    if (heapBase>0)
     {
         heapPtr=mallocFindAvailableMemory(requestSize);
         if (heapPtr!=NULL)
@@ -135,7 +138,7 @@ void*  mallocI(size_t size)
             return ((void*)heapPtr)+sizeof(heaprec_t);
         }
     }
-*/    
+    
     needed = newHeapRequiredToFulfillRequest(requestSize);
     printdI(DEBUG_MALLOC,"libc_malloc: needed=0x%08X\n",needed);
     if (needed!=0)      //New heap required
@@ -157,7 +160,7 @@ void*  mallocI(size_t size)
     }
     printdI(DEBUG_MALLOC,"libc_malloc:creating heap rec @ 0x%08X\n",heapCurr);
     heapPtr = (heaprec_t*)heapCurr;
-    heapPtr->marker=ALLOC_MARKER_VALUE;
+    heapPtr->marker=MALLOC_MARKER_VALUE;
     heapPtr->len=requestSize;
     heapPtr->inUse=true;
     heapPtr->uses++;
@@ -195,8 +198,8 @@ void* reallocI(void *foldptr, uint32_t newlen)
     if (newlen==0 || newlen<=mp->len)
         return foldptr;
 
-    if (newlen<ALLOC_MIN_MALLOC_SIZE)
-        realSize=ALLOC_MIN_MALLOC_SIZE;
+    if (newlen<MALLOC_MIN_SIZE_TO_ALLOCATE)
+        realSize=MALLOC_MIN_SIZE_TO_ALLOCATE;
     
     //Allocate space of newlen
     uintptr_t *fnewptr = mallocI(realSize);

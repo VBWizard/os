@@ -111,4 +111,4 @@ cp Debug/GNU-Linux/chrisos ../../../build_dir/isodir/boot/myos.bin
 rm ./myos.iso
 grub-mkrescue -o myos.iso ../../../build_dir/isodir > /dev/null
 sudo umount /mnt/loop
-
+sync

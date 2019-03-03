@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
         {
             for (int cnt=0;cnt<TOP_MAX_PROCESSES;cnt++)
             {
-                    if (topinfo[cnt]!=NULL && (uint32_t)topinfo[cnt]->cpu>=cpuVal && topinfo[cnt]->cpu<(cpuVal+1)) //ORDER BY cpu DESC
+                    if (topinfo[cnt]!=NULL && topinfo[cnt]->pid!=0 && (uint32_t)topinfo[cnt]->cpu>=cpuVal && topinfo[cnt]->cpu<(cpuVal+1)) //ORDER BY cpu DESC
                     {
                         procInfo_t *ti=topinfo[cnt];
                          sprintf(printBufferPtr,"%u\t%s\t%c\t%u\t%u\t%u\t%u\t%d\t%s\t%i\t%i%c\t\t%iK\n",
@@ -95,8 +95,8 @@ int main(int argc, char** argv) {
         }
         printf("%s",printBuffer);
         lastSleepTicks=currTicks;
-        //sleepTicks(25);
-        sleep(intervalDelay);
+        sleepTicks(25);
+        //sleep(intervalDelay);
     }
     if (sysmem)
         free(sysmem);

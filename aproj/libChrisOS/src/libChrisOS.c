@@ -162,7 +162,8 @@ VISIBLE int fork()
 {
     uint32_t retVal = 0;
     //return do_syscall0(SYSCALL_FORK);
-    asm("call sysEnter_Vector\n":"=a" (retVal): "a" (SYSCALL_FORK));
+    return do_syscall0(SYSCALL_FORK);
+    //asm("call sysEnter_Vector\n":"=a" (retVal): "a" (SYSCALL_FORK));
     return retVal;
 }
 

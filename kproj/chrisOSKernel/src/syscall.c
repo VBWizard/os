@@ -43,6 +43,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
     process_t* process;
     task_t* task;
     char path[1024];
+    char attrib[10];
     uint32_t param4;
     uint32_t processCR3;  //NOTE: Moved from module level to here because this needs to be a stack variable for fork()
     bool taskExited = false;
@@ -63,7 +64,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             printd(DEBUG_SYSCALL,"\t_syscall: Called with CallNum=0x%08x, invalid call number. (cr3=0x%08x)\n",callNum,processCR3);
             retVal = processCR3;
             break;
-        case SYSCALL_ENDPROCESS:       //***exit
+        case SYSCALL_ENDPROCESS:       //endProcess(returnCode)
+            //TODO: Make this use task number instead of CR3
             __asm__("mov eax,0x10;mov ds,eax;mov es,eax;mov fs,eax;mov gs,eax\n");
              __asm__("mov cr3,%[cr3]\n"::[cr3] "a" (KERNEL_CR3));
              if (param1==0)
@@ -74,7 +76,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
              panic("syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbadbadba;mov ebx,0xbadbadba;mov ecx,0xbadbadba; mov edx,0xbadbadba\ncli\nhlt\n");               //We should never get here
             break;
-        case SYSCALL_FORK:
+        case SYSCALL_FORK: //fork()
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_PROCESS,"\tsyscall: Fork called by %s-%u\n", process->path, process->childNumber);
@@ -92,12 +94,13 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 __asm__("mov cr3,eax\n"::"a" (processCR3));
             }
             break;
-        case SYSCALL_OPEN: //param1=path, param2=mode, param3=used by freopen, stream
-            strcpy(path, (void*)param1);
+        case SYSCALL_OPEN: //open(path,mode,stream) param3=used by freopen, stream
+            strcpy(path, (char*)param1);
+            strcpy(attrib,(char*)param2); //CLR 03/03/2019: Parameter 2 of SYSCALL_OPEN is attributes, which is a string
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
-            printd(DEBUG_SYSCALL,"\tsyscall: open(%s,%s)\n",path, param2);
-            retVal=(uint32_t)fs_open((char*)path, (char*)param2);
+            printd(DEBUG_SYSCALL,"\tsyscall: open(%s,%s)\n",path, attrib);
+            retVal=(uint32_t)fs_open((char*)path, (char*)attrib);
             //NOTE: freopen only works with STDIN/STDOUT/STDERR
             if (retVal)
                 switch (param3)
@@ -120,7 +123,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 }
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_CLOSE: //param1=handle
+        case SYSCALL_CLOSE: // close(handle)
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
 
             process=getCurrentProcess();
@@ -135,7 +138,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             fs_close((void*)genericFileHandle);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_READ:       //***read from descriptor, param1 = descriptor #
+        case SYSCALL_READ:       //read(handle,buffer,size,length)
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: read(0x%08x,0x%08x,0x%08x,0x%08x)\n",param1,param2,param3);
@@ -146,7 +149,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             printd(DEBUG_FILESYS, "\t_sysCall: read() returning %u bytes to %s from %s\n",retVal, process->exename, ((file_t*)genericFileHandle)->f_path);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_WRITE:       //***write to descriptor, param1 = descriptor #, param2 = string to write
+        case SYSCALL_WRITE:       //write(handle,buffer,size,length)
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: write(0x%08x,0x%08x,0x%08x)\n",param1,param2,param3);
@@ -159,13 +162,13 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             printd(DEBUG_FILESYS, "\t_sysCall: write() wrote %u bytes to %s from %s\n",retVal, ((file_t*)genericFileHandle)->f_path, process->exename);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_SEEK:
+        case SYSCALL_SEEK: //seek(position,whence)
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_SYSCALL,"\tsyscall: seek(0x%08x,0x%08x,%u)\n",param1,param2,param3);
             retVal = fs_seek((void*)param1, param2, param3);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_STAT:
+        case SYSCALL_STAT: //stat(path,fstat) param2=fstat_t*, fs_stat does kernel copy
             strcpy(path, (void*)param1);
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
@@ -173,19 +176,19 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             retVal = fs_stat(process, path, param2);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_TELL:
+        case SYSCALL_TELL:      //tell(stream)
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_SYSCALL,"\tsyscall: tell(0x%08x)\n",param1);
             retVal = fs_tell((void*)param1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_UNLINK:
+        case SYSCALL_UNLINK: //unlink(pathtofile)
             strcpy(path, (void*)param1);
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             retVal=fs_unlink(path);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_PIPE:
+        case SYSCALL_PIPE:      //pipe(*fd) *fd=array of 2 ints, fs_pipe does kernel copy
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_SYSCALL,"\tsyscall: pipe(0x%08x)\n",param1);
             process=getCurrentProcess();
@@ -193,7 +196,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
 
-        case SYSCALL_DUP3:
+        case SYSCALL_DUP3:      //dup3(oldfd,newfd,flags)
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             printd(DEBUG_SYSCALL,"\tsyscall: dup3(0x%08x,0x%08x,%u)\n",param1,param2,param3);
             process=getCurrentProcess();
@@ -219,14 +222,14 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
             
-        case SYSCALL_MMAP:
+        case SYSCALL_MMAP:      //mmap(params) params=syscall_mmap_t, syscall_mmap does kernel copy
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: mmap(0x%08x)\n",param1);
             retVal = syscall_mmap(process, (syscall_mmap_t*)param1);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_GETDENTS:
+        case SYSCALL_GETDENTS: //getDents(path,*dents,buffSize) *dents is pointer to dirent_t array, getDirEntries does kernel copy
             strcpy(path,param1);
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
@@ -234,7 +237,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             retVal = getDirEntries(process, path, (void*)param2, param3);
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
-        case SYSCALL_GETCWD:    //param1=buffer *, param2=size of buffer
+        case SYSCALL_GETCWD:        //getCWD(*buffer,buffSize) *buffer is a pointer, processGetCWD does kernel copy
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: getCWD(%s,0x%08x)\n",param1,param2);

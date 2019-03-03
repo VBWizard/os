@@ -135,6 +135,8 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
         char *end = strstr(start," ");
         if (!end)
             end = strstr(start,"\n");
+        if (!end)
+            end = start+strlen(start);
         if (end)
             strncpy(stdoutfile,start,end-start);
         else
@@ -200,7 +202,14 @@ int kexec(char* cmdline, int stdinpipe, int stdoutpipe, int stderrpipe)
                     goto kexecReturn;
                 }
             if (stdoutfile!=NULL)
-                freopen(stdoutfile,"w",(void*)STDOUT_FILE);
+            {
+                if (strcmp(stdoutfile,"1")==0)
+                {}//Don't do anything as 1 is STDOUT
+                else if (strcmp(stdoutfile,"2")==0)
+                    setSTD(STDOUT_FILE, STDERR_FILE);
+                else 
+                    freopen(stdoutfile,"w",(void*)STDOUT_FILE);
+            }
             else if (yourSTDOUT!=0)
                 setSTD(STDOUT_FILE, yourSTDOUT);
             else if (yourSTDIN!=0)

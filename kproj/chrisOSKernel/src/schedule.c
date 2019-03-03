@@ -386,7 +386,7 @@ task_t* findTaskToRun()
             //This is where we increment all the runnable ticks, based on the process' priority
             if ( task!=kIdleTask || (task==kIdleTask) && task->prioritizedTicksInRunnable==0)
                 task->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-process->priority)+1;
-            printd(DEBUG_PROCESS,"*\t(%u) Task 0x%04X (%s-%u[%s-%u]), priority=%u, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
+            printd(DEBUG_PROCESS,"*\t(%u) Task 0x%04X (%s-%u[%s-%u]), priority=%i, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
                     queEntryNum,
                     task->taskNum, process->exename,process->childNumber,
                     process->task->taskNum==0x20?"":process->parent->exename, process->parent->task->taskNum,
@@ -729,8 +729,8 @@ int32_t getExitCode(uint32_t taskNum)
                 {
                     if (taskList->taskNum==taskNum)
                     {
-                        memset(taskList,0,sizeof(task_t));
                         printd(DEBUG_PROCESS,"\tgetExitCode: Removing task from kTaskList\n");
+                        memset(taskList,0,sizeof(task_t));
                         break;
                     }
                     taskList++;

@@ -286,7 +286,7 @@ task_t* createTask(void* process, bool kernelTSS)
 
         task->tss->ESP=((process_t*)task->process)->stackStart;
         printd(DEBUG_TASK,"createTask: ESP for task allocated at 0x%08x\n",task->tss->ESP);
-        task->tss->ESP+=0x23400;
+        task->tss->ESP+=STACK_VIRTUAL_SIZE + 0x400;
     }
     printd(DEBUG_TASK,"createTask: ESP set to 0x%08x\n", task->tss->ESP);
     //Mapping sysEnter (kKernelTask::ESP1) stack into process

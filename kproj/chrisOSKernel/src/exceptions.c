@@ -157,7 +157,10 @@ void GeneralProtectionFaultHandler(int ErrorCode)
     }
     else
         printk("\ngpfault in '%s' at 0x%08x (errorcode=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,ErrorCode);
-    
+    if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
+    {
+          printPagingExceptionRegs(victimTask, 0, ErrorCode, true, victimProcess->pageDirPtr);
+    }    
     //Set the return address from the exception to a loop where the process can ... wait for death
     victimTask->tss->EIP = (uint32_t)&waitForDeath;
     victimProcess->retVal = -1;

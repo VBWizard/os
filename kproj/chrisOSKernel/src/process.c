@@ -289,8 +289,10 @@ int processGetCWD(process_t *process, char* buf, unsigned long size) //NOTE buf 
         process->errno=ERROR_INVALID_DEST;
     else if (size<cwdSize)
         process->errno=ERROR_SIZE_TOO_SMALL;
-    else
+    else if (process)
         copyFromKernel(process,buf,process->cwd,cwdSize);
+    else
+        memcpy(buf,process->cwd,cwdSize);
     if (process->errno)
         return -1;
     else

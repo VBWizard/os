@@ -143,19 +143,21 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *p
             p->signals.sigind|=SIGSEGV;
             printd(DEBUG_EXCEPTIONS,"SEGV signaled for cr3=0x%08x, signald after=0x%08x processing signal\n",callerCR3,p->signals.sigind);
             printd(DEBUG_EXCEPTIONS,"Searching for children to SEGV\n");
-/*            for (int cnt=0;cnt<1000;cnt++)
+            int a=0;
+            __asm__("mov eax,cr3\n":"=a" (a));
+            for (int cnt=0;cnt<1000;cnt++)
             {
                 if (kTaskList[cnt].taskNum != 0)
                 {
                     process_t* pc = ((process_t*)kTaskList[cnt].process);
-                    if (((process_t*)pc->parent)->task->taskNum==pc->task->taskNum)
+                    if (pc->parent->task->taskNum==p->task->taskNum)
                     {
                         p->signals.sigind|=SIGSEGV;
                         printd(DEBUG_EXCEPTIONS,"SEGVing child task %s (0x%04X)\n",pc->path, pc->task->taskNum);
                     }
                 }
             }
-*/            //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
+            //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
             return NULL;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         case SIGINT:

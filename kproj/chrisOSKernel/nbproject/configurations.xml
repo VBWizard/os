@@ -68,6 +68,7 @@
       </logicalFolder>
       <itemPath>../../chrisOS/include/ahci.h</itemPath>
       <itemPath>include/alloc.h</itemPath>
+      <itemPath>include/assert.h</itemPath>
       <itemPath>../../chrisOS/include/i386/bits/bits.h</itemPath>
       <itemPath>../../chrisOS/include/chrisos.h</itemPath>
       <itemPath>../../chrisOS/include/i386/cpu.h</itemPath>
@@ -347,6 +348,8 @@
             flavor2="0">
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/assert.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/device.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -721,6 +724,8 @@
             flavor2="0">
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/assert.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/device.h" ex="false" tool="3" flavor2="0">
       </item>

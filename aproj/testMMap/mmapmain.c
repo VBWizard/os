@@ -21,7 +21,7 @@ int sharedCounter = 10;
 
 int doChild(int childNum)
 {
-        for (int sharedCounter=4;sharedCounter>=0;sharedCounter--)
+        for (int sharedCounter=10;sharedCounter>=0;sharedCounter--)
         {
             //print("Child %u counting: Count = %u\n",childNum, sharedCounter);
             if (sharedCounter > 0)
@@ -68,6 +68,7 @@ int main(int argc, char** argv) {
         if (rets[pidCount]-1!=pidCount)
             printf("Wrong return value for child #%u, value=%u (pid=0x%08x)\n",pidCount,rets[pidCount],pids[pidCount]);
         pidCount++;
+        __asm__("mov ebx,0\nmov [ebx],eax\n");
     }
     printf("All children ended\n");
     return 0;
