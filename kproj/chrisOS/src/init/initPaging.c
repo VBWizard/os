@@ -29,7 +29,7 @@ void initializeKernelPaging()
         {
                 ptr[cnt] = (KERNEL_PAGE_TABLE_BASE_ADDRESS + (cnt*4096)) | 0x7;
                 //Create a guest page table for each Page Directory
-                for (int cnt2=0;cnt2<1024;cnt2++)
+                for (int cnt2=0;cnt2<2048;cnt2++)
                 {
                     ptrT[cnt2] = ((0x400000 * cnt)  + ((cnt2) << 12)) | 0x7;
                 }
@@ -40,7 +40,7 @@ void initializeKernelPaging()
         kKernelPageTables=(uint32_t*)KERNEL_PAGE_TABLE_BASE_ADDRESS;
         //Initialize Kernel Page Directory
         printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: Kernel page dir at 0x%08X, table at 0x%08x\n", ptr2, kKernelPageTables);
-        uint32_t pageDirEntryCount= 0x100;   //Map C0000000-FFFFFFFF=00000000-3FFFFFFF 
+        uint32_t pageDirEntryCount= 0x4000;   //Map C0000000-FFFFFFFF=00000000-3FFFFFFF 
         printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: 0x%08X entries\n", pageDirEntryCount);
         for (uint32_t cnt=0;cnt <= pageDirEntryCount; cnt++)
         {

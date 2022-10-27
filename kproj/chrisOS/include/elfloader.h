@@ -58,7 +58,7 @@ typedef struct sElfInfo
     int usageCount;
 } elfInfo_t;
 
-void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);
+bool loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);
 void sysProcessReturn();
 
 #ifdef	__cplusplus

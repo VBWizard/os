@@ -2,7 +2,10 @@
 clear
 
 echo "Initiating builds"
-mountCmd="sudo mount /dev/disk/by-id/ata-ST31000528AS_5VP8R4ME-part6 /mnt/loop/"
+export writeToDisk=N
+mountCmd="sudo mount /dev/disk/by-id/$DEV_USB /mnt/loop/"
+mountCmd2="sudo /home/yogi/mount_chrisos"
+umountCmd2="sudo /home/yogi/umount_chrisos"
 CLEAN=0
 if [ "$1" != "" ]
 then
@@ -20,6 +23,7 @@ else
 	command="make -j8 CONF=$buildType build "
 fi
 
+/home/yogi/src/os/kproj/chrisOSKernel/local_make
 pathMid=dist/${buildType^}/GNU-Linux #GNU-Linux
 
 declare -a kernProgArray=("chrisOS" "chrisOSKernel")
@@ -77,20 +81,40 @@ then
 	echo "Room's all clean!"
 	exit 0
 fi
+basePath=~/src/os/kproj
+nm $basePath/chrisOS/dist/Debug/GNU-Linux/chrisos > $basePath/chrisOS/chrisos.sym
+nm $basePath/chrisOSKernel/dist/Debug/GNU-Linux/kernel > $basePath/chrisOSKernel/kernel.sym
+cp $basePath/chrisOS/chrisos.sym $basePath/chrisOS/dist/chrisos.map
+cp $basePath/chrisOS/dist/Debug/GNU-Linux/chrisos ~/src/os/build_dir/isodir/boot/myos.bin
+#exit #put this here temporarily
 echo "Copying output to disk and ISO directory"
+if [ "$writeToDisk" = "Y" ]; then
 ($mountCmd)
+fi
+($mountCmd2)
 basePath=/home/yogi/src/os/kproj
-
+if [ "$writeToDisk" = "Y" ]; then
+sudo rm -r /mnt/loop/*
+sudo mkdir /mnt/loop/bin
+sudo rm -r /mnt/chrisos/*
+sudo mkdir /mnt/chrisos/bin
+fi
 for i in "${kernOutputArray[@]}"
 do
-	sudo cp $basePath/$i /mnt/loop/
+if [ "$writeToDisk" = "Y" ]; then
+	sudo cp  $basePath/$i /mnt/loop/
+fi
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
+	sudo cp  $basePath/$i /mnt/chrisos/
 	echo -en "\t$i ...done\n"
 done
 basePath=/home/yogi/src/os/aproj
 for i in "${appOutputArray[@]}"
 do
-	sudo cp $basePath/$i /mnt/loop/bin
+if [ "$writeToDisk" = "Y" ]; then
+	sudo cp $basePath/$i /mnt/loop/bin/
+fi
+	sudo cp $basePath/$i /mnt/chrisos/bin/
 	sudo cp $basePath/libChrisOS/$pathMid/libc.so /mnt/loop/
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
 	echo -en "\t$i ... done\n"
@@ -101,5 +125,9 @@ tabs -8
 cp Debug/GNU-Linux/chrisos ../../../build_dir/isodir/boot/myos.bin
 rm ./myos.iso
 grub-mkrescue -o myos.iso ../../../build_dir/isodir > /dev/null
+if [ "$writeToDisk" = "Y" ]; then
+cp myos.iso /mnt/loop
+($umountCmd2)
+fi
 sudo umount /mnt/loop
 

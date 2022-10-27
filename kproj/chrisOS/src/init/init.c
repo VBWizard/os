@@ -93,7 +93,8 @@ void HIGH_CODE_SECTION gdt_init()
               GDT_GRANULAR | GDT_32BIT,true);
     gdtEntryApplication(0x2, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,       //ring 0 starting at 0x0, updated to 0xC0000000 when paging initialized
               GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntryApplication(0x3, 0, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_WRITABLE,    //18 - ring 0 Kernel starting at 0x0 ***Need to change this to KERNEL_PAGED_BASE_ADDRESS base
+    //Suggestion for new value = 0x96 - P=1, DPL=0, S=1, E=0, DC=1, RW=1, A=0
+    gdtEntryApplication(0x3, 0, 0xFFFFF, 0x96,    //18 - ring 0 Kernel starting at 0x0 ***Need to change this to KERNEL_PAGED_BASE_ADDRESS base
               GDT_GRANULAR | GDT_32BIT,true);
     gdtEntryApplication(0x4, KERNEL_PAGED_BASE_ADDRESS , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - ring 0 Kernel starting at 0xC0000000
               GDT_GRANULAR | GDT_32BIT,true);
@@ -105,7 +106,7 @@ void HIGH_CODE_SECTION gdt_init()
               GDT_GRANULAR | GDT_32BIT,true);
     gdtEntryApplication(0x8, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL3 | GDT_DATA | GDT_WRITABLE /*| GDT_GROW_DOWN*/,       //40 (43) - ring 3 starting at 0x0
           GDT_GRANULAR | GDT_32BIT,true);
-    gdtEntryApplication(0x10, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE,  //20 - ring 0 starting at 0x0
+    gdtEntryApplication(0x10, 0x0 , 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_DATA | GDT_READABLE,  //20 - ring 0 starting at 0x0
               GDT_GRANULAR | GDT_32BIT,true);
 
     gdtEntryApplication(0x11, 0x00000000, 0xFFFFF, GDT_PRESENT | GDT_DPL0 | GDT_CODE | GDT_READABLE, //88 ring 0 starting at 0x0 - code used by sysEnter
@@ -236,8 +237,8 @@ void HIGH_CODE_SECTION testWPBit()
   else
       printk("WP bit does not work\n");
   //Can't unmap page 0x0 or the memory manager will see it as free space, so set it read-only again
-  __asm__("mov eax,0x0\n mov [0x0],eax\n");    //purposely write address 0 which we made "read only"
-  kSetPhysicalRangeRO(0x0,0xFFF,true);
+    printd(0,"Now that we're done testing the WP bit we'll make page 0 inaccessible to combat null pointers");
+    kPagingUpdatePTEPresentFlag(0x0, false);
 }
 
 void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/) {
@@ -260,7 +261,6 @@ gdt_init();
     memset(kATADeviceInfo,0x0,sizeof(struct ataDeviceInfo_t)*20);
     memset(kGDTSlotAvailableInd,0xFF,GDT_TABLE_SIZE);
     memset(kTaskSlotAvailableInd,0xFF,TASK_TABLE_SIZE);
-
     __asm__("mov esp,0xff00\n" /*\
             "mov eax,0\nmov dr6,eax":::"eax"*/);
     /* Initialize terminal interface */
@@ -273,11 +273,13 @@ gdt_init();
     int lLowMemKB = getInt12Memory();
     kE820Status = isE820Available(); //
     if (kE820Status==0x534d4150)
+    {
         kE820RecordCount = getE820Memory_asm();
+    }
     //Move the SMAP table from low memory up to where we want it
     memcpy(smap_table, lowSmapTablePtr, kE820RecordCount*24);
     idt_init(&kInitialIDTReg, PIC_REMAP_OFFSET);
-    init_PIT(kTicksPerSecond);
+    init_PIT(kTicksPerSecond); //issue with EAX value here! 0x9d620
     //Remap the exception vectors (0x0-0x1f)
     PIC_remap(0x00+PIC_REMAP_OFFSET, 0x8+PIC_REMAP_OFFSET);
     IRQ_clear_mask(0);
@@ -286,7 +288,7 @@ __asm__("sti\n");
 
     initSystemDate();
     gmtime_r(&kSystemStartTime,&theDateTime);
-    printk("Boot: ");
+    printk("Boot: "); //CRASHED HERE***
     gets(kBootCmd,150);
     kBootParamCount=parseParamsShell(kBootCmd, kBootParams, MAX_PARAM_COUNT*MAX_PARAM_WIDTH);
     strftime((char*)&currTime, 50, "%H:%M:%S on %m/%d/%y", &theDateTime);
@@ -345,9 +347,9 @@ __asm__("sti\n");
 #endif
 #ifndef DISABLE_PAGING
     kCPU[0].registerBase=apicGetAPICBase();
-    printk("PAGING: enabling 4k paging\n");
+//    printk("PAGING: enabling 4k paging\n");
     initializeKernelPaging();
-    printk("PAGING: remapping APIC from 0x%08X to 0x%08X\n", kCPU[0].registerBase, kAPICRegisterRemapAddress);
+//    printk("PAGING: remapping APIC from 0x%08X to 0x%08X\n", kCPU[0].registerBase, kAPICRegisterRemapAddress);
     //map APIC address 0xFEE00000 to 0x825000
     kMapPage(kAPICRegisterRemapAddress, kCPU[0].registerBase,0x13);  //0x63 + cache disabled
     kSetPhysicalRangeRO(0x0,0xFFF,true);
@@ -365,14 +367,14 @@ __asm__("sti\n");
         printk("SMP: No AP processor startup per 'nosmp' parameter\n");
     else
     {
-        printk("SMP: Initializing, ");
+/*        printk("SMP: Initializing, ");
         printk("%u MP records parsed\n",mpInit());
         //cursorUpdateBiosCursor();
         printk("SMP: Starting up AP processors\n");
         AP_startup();
         wait(500);
         printk("SMP: CPUs 2 thru %u (of %u total) started... done\n",smpBootCPUsStarted+1, smpBootCPUCount+1);
-        //if (kIOAPICPtr)
+*/        //if (kIOAPICPtr)
         //    kMapPage(CPU_IOAPIC_REGISTER_REMAP_BASE_ADDRESS, (uintptr_t)kIOAPICPtr, 0x13);
     }
 #endif
@@ -389,6 +391,7 @@ __asm__("sti\n");
     __asm__("mov eax,0x28\nmov ss,eax\n":::"eax");
 kInitDone = true;
 printk("Boot commandline: %s\n",kBootCmd);
+printd(0,"Hi Chris!");
 goto overStuff; /*******************************************/
     
     bool lRetVal=parseMBR(&kATADeviceInfo[4], (struct mbr_t*)&kMBR[0]);
@@ -421,6 +424,7 @@ overStuff:
         }*/
 MAINLOOPv:
         dupPrintKtoPrintD = false;
+
         bootShell();
     goto MAINLOOPv;
     __asm__("cli\nhlt\n");

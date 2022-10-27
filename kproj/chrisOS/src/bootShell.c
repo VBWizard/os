@@ -449,25 +449,27 @@ void HIGH_CODE_SECTION execCommand(char* cmdline)
 //    for (int cnt=0;cnt<paramCount;cnt++)
 //        printk("%u = '%s'\n",cnt,lTemp[cnt]);
    
-    exec (params[0],paramCount,lTemp);
+    if (exec (params[0],paramCount,lTemp) < 0)
+      printd(DEBUG_ELF_LOADER,"Load failed\n");
     strcpy(sExecutingProgram,sbootShellProgramName);
 }
 
 void HIGH_CODE_SECTION execInternalCommand(char lCommand[256])
 {
-    int i = findCommand(lCommand);
+    int foundCommand = findCommand(lCommand);
 
-    if(i>0)
+    if(foundCommand>0)
     {
-        i--;
+        foundCommand--;
         //printk("Executing command # %u (%s)\n", i, cmds[i].name);
-        command_function = cmds[i].function;
-        command_function_p = cmds[i].function;
-        if (cmds[i].paramCount==0)
+        command_function = cmds[foundCommand].function;
+        command_function_p = cmds[foundCommand].function;
+        if (cmds[foundCommand].paramCount==0)
             command_function();
         else
         {
-            command_function_p(&lCommand[strlen(cmds[i].name)+1]);  
+            command_function_p(&lCommand[strlen(cmds[foundCommand].name)+1]);  
+            printd(DEBUG_ELF_LOADER,"DONE!\n");
         }
     }
     else
@@ -487,17 +489,16 @@ void HIGH_CODE_SECTION bootShell()
     int commandWasFromThisBufferPtr=0;
     strcpy(sExecutingProgram,sbootShellProgramName);
     puts("\nWelcome to bs ... hang a while!\n");
-
     if (kBootCmd[0]==0x0)
     {
         /*******************************************************/
         //CLR 02/23/2017 - Temporary code to execute commands on boot
-        char lcmd1[40]="disk 4";
-        execInternalCommand(lcmd1);
-        char lcmd2[40]="part 5";
-        execInternalCommand(lcmd2);
-        char lcmd3[40]="exec /kernel";
-        execInternalCommand(lcmd3);
+//        char lcmd1[40]="disk 4";
+//        execInternalCommand(lcmd1);
+//        char lcmd2[40]="part 0";
+//        execInternalCommand(lcmd2);
+//        char lcmd3[40]="exec /kernel";
+//        execInternalCommand(lcmd3);
         /*******************************************************/
     }    
     
@@ -587,12 +588,12 @@ getAKey:
 doneGettingKeys:
         if (lCommand[0]==0x0)
             goto getACommand;
-        int i = findCommand(lCommand);
+        int foundCommandBufferCommand = findCommand(lCommand);
 
         execInternalCommand(lCommand);
-        if(i>0)
+        if(foundCommandBufferCommand>0)
         {
-            i--;
+            foundCommandBufferCommand--;
             //printk("Executing command # %u (%s)\n", i, cmds[i].name);
             if (commandWasFromThisBufferPtr)
             {

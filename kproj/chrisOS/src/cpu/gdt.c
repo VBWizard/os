@@ -48,12 +48,13 @@ void HIGH_CODE_SECTION installGDT()
 
 void HIGH_CODE_SECTION gdtEntryI(int entryNo, int base, int limit, char access, char flags,bool inUse,bool setSFlag)
 {
+    
+    bootGdt[entryNo].limit_low       = limit & 0xFFFF;
     bootGdt[entryNo].base_low        = base & 0xFFFF;
     bootGdt[entryNo].base_middle     = (base >> 16) & 0xFF;
-    bootGdt[entryNo].base_high       = (base >> 24) & 0xFF;
-    bootGdt[entryNo].limit_low       = limit & 0xFFFF;
-    bootGdt[entryNo].flags_and_limit = flags | (((limit >> 16) & 0xF));
     bootGdt[entryNo].access          = access;
+    bootGdt[entryNo].flags_and_limit = flags | (((limit >> 16) & 0xF));
+    bootGdt[entryNo].base_high       = (base >> 24) & 0xFF;
     if (setSFlag)
         bootGdt[entryNo].access |= 0x10;
     if (inUse)

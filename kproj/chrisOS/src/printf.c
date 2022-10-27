@@ -197,6 +197,10 @@ static int printI(char **out, const char *format, va_list args )
 	return pc;
 }
 
+int is_transmit_empty() {
+   return inb(0x3f8 + 5) & 0x20;
+}
+
 int printp_valist(const char *format, va_list args)
 {
     char inString[512];
@@ -211,7 +215,8 @@ int printp_valist(const char *format, va_list args)
 //        Uncomment this to get initial logging from VirtualBox
 //        if (cnt%3==0)
 //            wait(10);
-        outb(0x3f8,inString[cnt]);
+        while (is_transmit_empty() == 0);
+			outb(0x3f8,inString[cnt]);
     }
     
 }

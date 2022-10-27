@@ -1,5 +1,3 @@
-pushd ..
-./make_debug
-popd
+./makeall clean && ./makeall
 objdump -x -t Debug/GNU-Linux/chrisos > chrisosD.sym
 vi chrisosD.sym

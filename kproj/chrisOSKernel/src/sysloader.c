@@ -653,7 +653,8 @@ static int elf_relocate(elfInfo_t* elf) {
     printd(DEBUG_ELF_LOADER, "NOTE: Only processing REL tables, TODO: process RELA tables\n");
     if (elf->dynamicInfo.relTableSize>0)
     {
-        for (int cnt=0;cnt<(elf->dynamicInfo.relTableSize / sizeof(Elf32_Rel))+1;cnt++)
+        //CLR 10/27/2022: TODO - FIXME - Hackishly added 36 entries to the table size to get all of my library methods loaded
+        for (int cnt=0;cnt<((elf->dynamicInfo.relTableSize / sizeof(Elf32_Rel))+1)+200;cnt++)
         {
             relEntry=&elf->dynamicInfo.relTable[cnt];
                 printd(DEBUG_ELF_LOADER,"Found relocation entry type 0x%02X with offset 0x%08x, dynamic symbol table entry 0x%02X\n",
@@ -682,28 +683,28 @@ static int elf_relocate(elfInfo_t* elf) {
                 uint32_t* rel=relEntry->r_offset;
                 printd(DEBUG_ELF_LOADER," Writing 0x%08x to memory address 0x%08x.\n\tValue before/after=0x%08x/ ",symValPtr,rel,*rel);
                 switch(ELF32_R_TYPE(relEntry->r_info)) {
-		case R_386_NONE:
-                    // No relocation
-                    break;
-		case R_386_32:
-                case R_386_GLOB_DAT:        //CLR 03/24/2017: Added glob dat
-                    // Symbol + Offset
-                    *rel = DO_386_32(symValPtr, *rel);
-                    printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_32)\n",*rel);
-                    break;
-                case R_386_JMP_SLOT:
-                    *rel = symValPtr;
-                    printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_JMP_SLOT)\n",*rel);
-                    break;
-		case R_386_PC32:
-                    // Symbol + Offset - Section Offset
-                    *rel = DO_386_PC32(symValPtr, *rel, (int)rel);
-                    printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_PC32)\n",*rel);
-                    break;
-		default:
-			// Relocation type not supported, display error and return
-			panic("Unsupported Relocation Type (%d).\n", ELF32_R_TYPE(relEntry->r_info));
-			return ELF_RELOC_ERR;
+                    case R_386_NONE:
+                                // No relocation
+                                break;
+                    case R_386_32:
+                    case R_386_GLOB_DAT:        //CLR 03/24/2017: Added glob dat
+                        // Symbol + Offset
+                        *rel = DO_386_32(symValPtr, *rel);
+                        printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_32)\n",*rel);
+                        break;
+                    case R_386_JMP_SLOT:
+                        *rel = symValPtr;
+                        printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_JMP_SLOT)\n",*rel);
+                        break;
+                    case R_386_PC32:
+                                // Symbol + Offset - Section Offset
+                                *rel = DO_386_PC32(symValPtr, *rel, (int)rel);
+                                printd(DEBUG_ELF_LOADER,"0x%08x (using R_386_PC32)\n",*rel);
+                                break;
+                    default:
+                        // Relocation type not supported, display error and return
+                        panic("Unsupported Relocation Type (%d).\n", ELF32_R_TYPE(relEntry->r_info));
+                        return ELF_RELOC_ERR;
                 }
             }
         }
@@ -737,10 +738,11 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     memset(elfInfo->elfLoadedPages,0,PAGE_SIZE);
     printd(DEBUG_ELF_LOADER,"alloc'd elfLoadPages @ 0x%08x\n",elfInfo->elfLoadedPages);
     //NOTE: Any elfInfo_t added to the kLoadedElfInfo list must exist (not be free()d until after it is removed from the list!
-    if (kLoadedElfInfo->next==0)
+    //CLR 10/26/2022 - temporary remarked out everything except the listInit since there's a note which says the list has to be initialized
+    //if (kLoadedElfInfo->next==0)
         kLoadedElfInfo=listInit(&elfInfo->loadedListItem,elfInfo);
-    else
-        listAdd(kLoadedElfInfo,&elfInfo->loadedListItem,elfInfo);
+    //else
+    //    listAdd(kLoadedElfInfo,&elfInfo->loadedListItem,elfInfo);
 
     printd(DEBUG_ELF_LOADER,"Added elfInfo to kLoadedElfInfo list\n");
     elfInfo->fileName=allocPagesAndMap(PAGE_SIZE);

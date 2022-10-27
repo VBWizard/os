@@ -56,7 +56,10 @@ uint32_t kKernelCR3=KERNEL_CR3;
 void* kKeyboardHandlerRoutine=NULL;
 
 int main(int argc, char** argv)  {
-    printk("\nkernel loaded ... \n");
+    kTermInit();
+    terminal_clear();
+    printd(DEBUG_PROCESS, "Kernel loading\n");
+    //printk("\nkernel loaded ... \n");
 /*    printk("Param count=%u\n",argc);
     for (int cnt=0;cnt<argc;cnt++)
     {
@@ -150,7 +153,7 @@ int main(int argc, char** argv)  {
 
     
     process_t* initialShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
-    process_t* tty2ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
+    /*process_t* tty2ShellProcess = createProcess(program, 2, args, kKernelProcess, false, false);
     tty2ShellProcess->stdout=tty2->stdOutWritePipe;
     tty2ShellProcess->stdin=tty2->stdInReadPipe;
     tty2ShellProcess->stderr=tty2->stdErrWritePipe;
@@ -174,7 +177,7 @@ int main(int argc, char** argv)  {
     tty6ShellProcess->stdout=tty6->stdOutWritePipe;
     tty6ShellProcess->stdin=tty6->stdInReadPipe;
     tty6ShellProcess->stderr=tty6->stdErrWritePipe;
-    tty6ShellProcess->childNumber=5;
+    tty6ShellProcess->childNumber=5;*/
     printk("KSHELL LOADED!!!");
 //    waitTicks(3);
     schedulerEnabled=true;

@@ -51,7 +51,7 @@ extern char* kernelDataLoadAddress;
 #define TSS_TABLE_SIZE (0x68*TSS_TABLE_RECORD_COUNT)
 #define TASK_TABLE_SIZE (((TSS_TABLE_RECORD_COUNT)/sizeof(uint32_t))*sizeof(task_t))          //need task_t size
 
-#define KERNEL_OBJECT_BASE_ADDRESS 0x160000     //NOTE: Needs to be larger than KERNEL_DATA_LOAD_ADDRESS by the size of the kernel variables
+#define KERNEL_OBJECT_BASE_ADDRESS 0x400000     //NOTE: Needs to be larger than KERNEL_DATA_LOAD_ADDRESS by the size of the kernel variables
 #define E820_TABLE_ADDRESS KERNEL_OBJECT_BASE_ADDRESS
 #define MP_CONFIG_TABLE_ADDRESS (E820_TABLE_ADDRESS + E820_TABLE_SIZE)
 #define KEYBOARD_BUFFER_ADDRESS (MP_CONFIG_TABLE_ADDRESS + MP_CONFIG_TABLE_SIZE)
@@ -89,7 +89,7 @@ extern char* kernelDataLoadAddress;
 
 
 #define SYS_VGA_WIDTH 80
-#define SYS_VGA_HEIGHT 50
+#define SYS_VGA_HEIGHT 24
 #define MINIMUM_USABLE_MEMORY (256 * 1024 * 1024)
 #define SMAP_TABLE_MAX_ENTRIES 50
 #define TIMEZONE -4

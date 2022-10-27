@@ -1,14 +1,10 @@
-. = 0x130000;
-   .systemData   (NOLOAD) : ALIGN(4K)
-
+. = 0x00130000;
 { 
 	sysEnter_Vector = 0x0000;
 	_sysEnter = 0x0100;
 	*(.systemData);
 }
-. = 0x00300000;
-   kernelData  BLOCK(8K): ALIGN(8K)  
-
+. = 0x00120000;
 { 
 kernelDataLoadAddress = .;
     terminal_row = 0x0000;

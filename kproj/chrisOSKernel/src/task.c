@@ -146,7 +146,7 @@ void mmMapKernelIntoTask(task_t* task, bool kernelTSS)
 /*    printd(DEBUG_TASK,"Map screen buffer into user process at 0xB8000, 4 pages (r/w)\n");
     pagingMapPageCount(task->tss->CR3,0xB0000,0xB0000,4,0x7);
 */
-    printd(DEBUG_TASK,"Mapping sysEnter_Vector page (0x%08x) to process, r/o\n",&sysEnter_Vector);
+    printd(DEBUG_TASK,"Mapping sysEnter_Vector page (0x%08x) to process pages at 0x%08x, r/o\n",&sysEnter_Vector, task->tss->CR3);
     pagingMapPage(task->tss->CR3,&sysEnter_Vector,&sysEnter_Vector,(uint16_t)0x5);
     pagingMapPageCount(task->tss->CR3, schedStack, schedStack, 0x16000/PAGE_SIZE, 0x7, true);
     kDebugLevel=oldDebugLevel;

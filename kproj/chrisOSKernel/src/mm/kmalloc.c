@@ -111,7 +111,7 @@ void kFree(void* address)
 void* kMalloc(size_t size)
 {
     uint32_t cs=getCS()>>3;
-    bool isKernel=(bootGdt[cs].access & 0x60)==0x0;
+    //bool isKernel=(bootGdt[cs].access & 0x60)==0x0;
     
     heapPtr* ptr=NULL;
     //First find a page to place the memory pointer on
@@ -120,7 +120,7 @@ void* kMalloc(size_t size)
     
     ptr->address=0;
     ptr->size=size;
-    allocateMemoryToProcess(ptr,size,isKernel);
+    allocateMemoryToProcess(ptr,size,true);
     return ptr->address;
 }
 

@@ -23,8 +23,8 @@ extern "C" {
     
     
     struct rusage {
-        struct timeval ru_utime; /* user CPU time used */
-        struct timeval ru_stime; /* system CPU time used */
+//        struct timeval ru_utime; /* user CPU time used */
+//        struct timeval ru_stime; /* system CPU time used */
         long   ru_maxrss;        /* maximum resident set size */
         long   ru_ixrss;         /* integral shared memory size */
         long   ru_idrss;         /* integral unshared data size */

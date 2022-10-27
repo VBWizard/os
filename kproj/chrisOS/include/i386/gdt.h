@@ -13,7 +13,7 @@
 #pragma once
 #pragma pack(1)
 
-typedef struct sgdt
+__attribute__((packed)) typedef struct sgdt
 {
     unsigned short limit_low;       //2
     unsigned short base_low;        //2

@@ -1,11 +1,11 @@
-. = 0x00130000;
-   .systemData BLOCK(8K): ALIGN(8K) 
+. = 0x130000;
+   .systemData BLOCK(1K): ALIGN(1K)
 { 
 	sysEnter_Vector = 0x0000;
 	_sysEnter = 0x0100;
 	*(.systemData);
 }
-. = 0x00120000;
+. = 0x00300000;
    kernelData  (NOLOAD) : ALIGN(8K)  
 
 { 

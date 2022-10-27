@@ -56,7 +56,7 @@ void initKernelInternals()
     char currTime[50];
     getDateTimeString((char*)currTime);
     //printk("Kernel init time is: %s\n",currTime);
-    
+                                                                                                
 __asm__("cli\n");
     uint32_t oldCR3=0;
     isrSavedStack = (uint32_t *)SAVED_STACK_FOR_EXCEPTIONS_ADDRESS;

@@ -196,7 +196,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     if (pagingExceptionCR3 == KERNEL_CR3)
     {
         exceptionInKernelMode=true;
-        printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception was in kernel CR3 (0x%08x), victim CR3=0x%08x (Process 0x%04x).\n",pagingExceptionCR3, victimProcess->pageDirPtr, victimTaskNum);
+        printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred while using kernel CR3 (0x%08x), victim CR3=0x%08x (Process 0x%04x).\n",pagingExceptionCR3, victimProcess->pageDirPtr, victimTaskNum);
         //CLR 01/27/2019: TODO: This is a total HACK.  For some reason QEMU is storing the kernel CR3 on task switch from obvious non-kernel code, to this exception handler.
         //So I'm switching it back, in the TSS too!
         //TODO: This needs to be figured out and fixed!

@@ -255,7 +255,7 @@ LOAD_ZERO_BASED_DS
 //          printk("\n");
     contentP=content+strlen(content);
     sprintf(contentP, "Stack (ss:ebp) @ 0x%08x:0x%08X:\n",tss->SS, esp);
-    for (int cnt=0;cnt<20;cnt++)
+    for (int cnt=0;cnt<10;cnt++)
     {
 #ifdef KERNEL_LOADED
         int pte=pagingGet4kPTEntryValueCR3(task->tss->CR3,espP);
@@ -291,7 +291,7 @@ LOAD_ZERO_BASED_DS
 //              printk("%02X ", lCSIPPtr[cnt]);
 //          printk("\n");
           printk ("Stack (ss:ebp) @ 0x%08x:0x%08X:\n",exceptionSS, esp);
-          for (int cnt=0;cnt<20;cnt++)
+          for (int cnt=0;cnt<10;cnt++)
           {
               printk("\t0x%08X: 0x%08X\n",esp, exceptionSavedStack[cnt]);
               esp+=4;
