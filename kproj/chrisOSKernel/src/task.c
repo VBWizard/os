@@ -189,7 +189,7 @@ task_t* createTask(void* process, bool kernelTSS)
 
         mmMapKernelIntoTask(task,kernelTSS);
         //Map our CR3 into program's memory space, needed before the iRet
-        printd(DEBUG_TASK,"Mapping our CR3 into program, v=0x%08x, p=0x%08x\n",KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS);
+        printd(DEBUG_TASK,"Mapping kernel paging tables into program, v=0x%08x, p=0x%08x\n",KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS);
         pagingMapPageCount(task->tss->CR3, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, KERNEL_CR3 & ~KERNEL_PAGED_BASE_ADDRESS, (0xFFFFFFFF/0x400000)+1, 0x7, true);
         printd(DEBUG_TASK,"createTask: Mapping kernel into task\n");
     }

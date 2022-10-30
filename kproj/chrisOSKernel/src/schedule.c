@@ -337,7 +337,6 @@ task_t* submitNewTask(task_t *task)
 {
 	task_t *prev=NULL, *next=NULL;
 	task_t *slot=findOpenTaskSlot();
-	printd(DEBUG_PROCESS,"\taddTaskToTaskList: Found open slot @ 0x%08x\n",slot);
 	prev=slot->prev;
 	next=slot->next;
 	memcpy(slot,task,sizeof(task_t));

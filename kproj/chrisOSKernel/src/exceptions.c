@@ -309,7 +309,8 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     uint32_t pageFlags=lPTEValue&0x00000FFF;
     elfInfo_t* elf=victimProcess->elf;
     
-    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x, VPTE=0x%08X, KPTE=0x%08X)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3,lPTEValue,lKPTEValue);
+    printd(DEBUG_EXCEPTIONS,"NOTE: Victim CR3 = 0x%08x, pagingExceptionCR3 = 0x%08x\n", victimTask->tss->CR3, pagingExceptionCR3);
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x, VPTE=0x%08x, KPTE=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3,lPTEValue,lKPTEValue);
 
     if (exceptionInKernelMode)
     {

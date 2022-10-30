@@ -141,15 +141,15 @@ void HIGH_CODE_SECTION quietHardware()
 
 void doHDSetup()
 {
-    char *p1;
+    char* p1[512];
+    memset(p1,0,512);
     if (ParamExists(kBootParams,"ata",kBootParamCount))
    {
 	    printk("ATA: Scanning for hard drives on primary bus ...\n");
 	    ataScanForHarddrives();
 	    
-	    p1=(char*)&kATADeviceInfo[0].ATADeviceModel;
-            strtrim(p1);
-	    printk("ATA: \tMaster: %s", kATADeviceInfo[0].ATADeviceAvailable==1?p1:"none\n");
+	    *p1=kATADeviceInfo[0].ATADeviceModel;
+	    printk("ATA: \tMaster: %s", kATADeviceInfo[0].ATADeviceAvailable==1?strtrim(p1):"none\n");
 	    if (kATADeviceInfo[0].ATADeviceAvailable)
 	    {
 		printk("\t%uMB (%ubps%s%s%s)\n", (kATADeviceInfo[0].totalSectorCount*kATADeviceInfo[0].sectorSize) / (1024*1024),
@@ -158,9 +158,8 @@ void doHDSetup()
 		        kATADeviceInfo[0].lba48Supported?",LBA48":"",
 		        kATADeviceInfo[0].dmaSupported?",DMA":"");
 	    }
-	    p1=(char*)&kATADeviceInfo[1].ATADeviceModel;
-            strtrim(p1);
-	    printk("ATA: \tSlave:  %s", kATADeviceInfo[1].ATADeviceAvailable==1?p1:"none\n");
+	    *p1=kATADeviceInfo[1].ATADeviceModel;
+	    printk("ATA: \tSlave:  %s", kATADeviceInfo[1].ATADeviceAvailable==1?strtrim(p1):"none\n");
 	    if (kATADeviceInfo[1].ATADeviceAvailable)
 	    {
 		printk("\t%uMB (%ubps %s%s%s)\n", (kATADeviceInfo[1].totalSectorCount*kATADeviceInfo[1].sectorSize) / (1024*1024),
@@ -170,9 +169,8 @@ void doHDSetup()
 		        kATADeviceInfo[1].dmaSupported?",DMA":"");
 	    }
 	    printk("ATA: Scanning for hard drives on secondary bus ...\n");
-	    p1=(char*)&kATADeviceInfo[2].ATADeviceModel;
-            strtrim(p1);
-	    printk("ATA: \tMaster: %s", kATADeviceInfo[2].ATADeviceAvailable==1?p1:"none\n");
+	    *p1=kATADeviceInfo[2].ATADeviceModel;
+	    printk("ATA: \tMaster: %s", kATADeviceInfo[2].ATADeviceAvailable==1?strtrim(p1):"none\n");
 	    if (kATADeviceInfo[2].ATADeviceAvailable)
 	    {
 		printk("\t%uMB (%ubps%s%s%s)\n", (kATADeviceInfo[2].totalSectorCount*kATADeviceInfo[2].sectorSize) / (1024*1024),
@@ -181,9 +179,8 @@ void doHDSetup()
 		        kATADeviceInfo[2].lba48Supported?",LBA48":"",
 		        kATADeviceInfo[2].dmaSupported?",DMA":"");
 	    }
-	    p1=(char*)&kATADeviceInfo[3].ATADeviceModel;
-            strtrim(p1);
-	    printk("ATA: \tSlave:  %s", kATADeviceInfo[3].ATADeviceAvailable==1?p1:"none\n");
+	    *p1=kATADeviceInfo[3].ATADeviceModel;
+	    printk("ATA: \tSlave:  %s", kATADeviceInfo[3].ATADeviceAvailable==1?strtrim(p1):"none\n");
 	    if (kATADeviceInfo[3].ATADeviceAvailable)
 	    {
 		printk("\t%uMB (%ubps %s%s%s)\n", (kATADeviceInfo[3].totalSectorCount*kATADeviceInfo[3].sectorSize) / (1024*1024),
@@ -204,9 +201,8 @@ void doHDSetup()
         for (int cnt=4;cnt<10;cnt++)
             if (kATADeviceInfo[cnt].ATADeviceAvailable)
             {
-                p1=(char*)&kATADeviceInfo[cnt].ATADeviceModel;
-                strtrim(p1);
-                printk("AHCI: Device %u:  %s", cnt,kATADeviceInfo[cnt].ATADeviceAvailable==1?p1:"none\n");
+                *p1=kATADeviceInfo[cnt].ATADeviceModel;
+                printk("AHCI: Device %u:  %s", cnt,kATADeviceInfo[cnt].ATADeviceAvailable==1?strtrim(p1):"none\n");
                 printk("\t%uMB (%ubps %s%s%s)\n", 
                         (kATADeviceInfo[cnt].totalSectorCount*kATADeviceInfo[cnt].sectorSize) / (1024*1024),
                         kATADeviceInfo[cnt].sectorSize,
@@ -240,8 +236,8 @@ void HIGH_CODE_SECTION testWPBit()
   else
       printk("WP bit does not work\n");
   //Can't unmap page 0x0 or the memory manager will see it as free space, so set it read-only again
-  __asm__("mov eax,0x0\n mov [0x0],eax\n");    //purposely write address 0 which we made "read only"
-  kSetPhysicalRangeRO(0x0,0xFFF,true);
+    printd(0,"Now that we're done testing the WP bit we'll make page 0 inaccessible to combat null pointers");
+    kPagingUpdatePTEPresentFlag(0x0, false);
 }
 
 void HIGH_CODE_SECTION kernel_main(/*multiboot_info_t* mbd, unsigned int magic*/) {
@@ -364,7 +360,7 @@ __asm__("sti\n");
 #endif
     printk("CLOCK: testing ... "); wait(100); printk("works\n");
 
-#ifdef __SMP__
+/*#ifdef __SMP__
     if (ParamExists(kBootParams,"nosmp",kBootParamCount))
         printk("SMP: No AP processor startup per 'nosmp' parameter\n");
     else
@@ -379,7 +375,7 @@ __asm__("sti\n");
         //if (kIOAPICPtr)
         //    kMapPage(CPU_IOAPIC_REGISTER_REMAP_BASE_ADDRESS, (uintptr_t)kIOAPICPtr, 0x13);
     }
-#endif
+#endif*/
     if (ParamExists(kBootParams,"nopci",kBootParamCount))
         printk("PCI: No scanning per parameter 'nopci'\n");
     else

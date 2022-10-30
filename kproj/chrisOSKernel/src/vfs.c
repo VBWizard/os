@@ -271,7 +271,7 @@ int fs_stat(process_t *process, void *path, fstat_t *buffer)
     fstat_t lbuffer;
     
     strcpy(lpath,path);
-    strtrim(lpath);
+    strtrim2(lpath);
     if (*lpath==0 || strcmp(lpath,"/")==0)
     {
         if (process)

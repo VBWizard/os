@@ -225,6 +225,7 @@ void processSignals()
 
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
             :"=b" (priorCR3):[cr3Val] "r" (KERNEL_CR3));
+    printd(DEBUG_PROCESS, "Swapped Kernel CR3 of 0x%08x for user CR3 of 0x%08x\n", KERNEL_CR3, priorCR3);
     run=qRunning;
     sleep=qISleep;
 goto scanSleep; //Currently no running signals to process, remove me later

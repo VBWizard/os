@@ -31,7 +31,7 @@
 
 extern int kTimeZone;
 extern time_t kSystemCurrentTime;
-uint32_t temp=0;
+uint32_t lForkChildCR3=0;
 int processGetCWD(process_t *process, char* buf, unsigned long size);
 
 //NOTE: Upon entering _sysCall, the process' CR3 is still being used
@@ -79,19 +79,19 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         case SYSCALL_FORK: //fork()
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
-            printd(DEBUG_PROCESS,"\tsyscall: Fork called by %s-%u\n", process->path, process->childNumber);
+            printd(DEBUG_PROCESS,"\tsyscall: Fork called by %s-%u (parent CR3=0x%08x\n", process->path, process->childNumber, processCR3);
             retVal=process_fork(process);
             if (process->forkChildCR3 > 0)
             {
-                temp = process->forkChildCR3;
-                //printd(DEBUG_PROCESS,"\tsyscall: Child return from fork with CR3=0x%08X",temp);
+                lForkChildCR3 = process->forkChildCR3;
+                //printd(DEBUG_PROCESS,"\tsyscall: Child return from fork with CR3=0x%08X",lForkChildCR3);
                 process->forkChildCR3 = 0;
-                __asm__("mov cr3,eax\n"::"a" (temp));
+                __asm__("mov cr3,eax\n"::"a" (processCR3));
             }
             else
             {
                 printd(DEBUG_PROCESS,"\tsyscall: Parent return from fork with CR3=0x%08X\n",processCR3);
-                __asm__("mov cr3,eax\n"::"a" (processCR3));
+                __asm__("mov cr3,eax\n"::"a" (lForkChildCR3));
             }
             break;
         case SYSCALL_OPEN: //open(path,mode,stream) param3=used by freopen, stream

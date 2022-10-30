@@ -38,7 +38,6 @@ typedef struct sElfDynamicInfo
 
 typedef struct sElfInfo
 {
-    elfPageInfo_t* elfLoadedPages;
     dllist_t loadedListItem;
     int libraryElfCount;
     void* libraryElfPtr[10];
@@ -54,11 +53,12 @@ typedef struct sElfInfo
     bool loadCompleted,isLibrary;
     int sectionNameStringTable, dynamicNameStringTable, generalNameStringTable;
     char* fileName;
+    elfPageInfo_t* elfLoadedPages;
     bool mapMemoryOnly; //set to true if library is already loaded, and we only want to map it into the new process
     int usageCount;
 } __attribute__((packed)) elfInfo_t;
 
-void loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);
+bool loadElf(void* file,elfInfo_t* elfInfo, bool isLibrary);
 void sysProcessReturn();
 
 #ifdef	__cplusplus

@@ -37,6 +37,7 @@ getInt12Memory:
 mov eax,0x10
 mov ds,eax
 mov saveESP, esp
+mov saveEBX, EBX
 mov sp, 0xfffc
 call leaveProtMode
 .code16
@@ -52,7 +53,8 @@ int 0x10
 call reenterProtMode
 ret
 jmp hang
-//background, do on team, etc.
+
+
 .globl leaveProtMode
 .type leaveProtMode, @function
 leaveProtMode:
@@ -123,6 +125,7 @@ mov gs,ax
 .code32
 mov eax,savedValue
 mov esp,saveESP
+mov EBX, saveEBX
 ret
 
 .globl set_gdt
@@ -176,6 +179,7 @@ idt_load:
  .globl init_PIT
 .type init_PIT, @function
 init_PIT:
+    mov saveEBX, EBX
     push ebp
     mov ebp, esp
     # Do some checking
@@ -269,6 +273,7 @@ init_PIT:
  
     popad
     pop ebp
+    mov EBX,saveEBX
     ret
 
  .globl getE820Memory_asm
@@ -325,6 +330,7 @@ ret
     saved_gdt16_hi: .word 0
     saved_gdt16_hi2: .word 0
     saveESP: .word 0,0
+    saveEBX: .word 0,0
     savedValue: .word 0, 0, 0, 0
     recCnt: .word 0
 idt_real:

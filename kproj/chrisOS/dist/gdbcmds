@@ -1,17 +1,17 @@
-#dashboard -enabled off
 symbol-file Debug/GNU-Linux/chrisos
 symbol-file /home/yogi/src/os/kproj/chrisOS/dist/Debug/GNU-Linux/chrisos
 add-symbol-file /home/yogi/src/os/kproj/chrisOSKernel/dist/Debug/GNU-Linux/kernel 0x01000000
 add-symbol-file /home/yogi/src/os/aproj/testMainProgramEntry/dist/Debug/GNU-Linux/testmainprogramentry 0x02000000
-add-symbol-file /home/yogi/src/os/aproj/libChrisOS/dist/Debug/GNU-Linux/libc.so 0x30000000 
+add-symbol-file /home/yogi/src/os/aproj/libChrisOS/dist/Debug/GNU-Linux/libc.so 0x9f000000
 add-symbol-file /home/yogi/src/os/aproj/kshell/dist/Debug/GNU-Linux/kshell 0x03100000
 add-symbol-file /home/yogi/src/os/aproj/time/dist/Debug/GNU-Linux/time 0x03200000
 add-symbol-file /home/yogi/src/os/aproj/testMMap/dist/Debug/GNU-Linux/testmmap 0x08048000
 set disassembly-flavor intel
 alias sv = set variable 
+##dashboard -enabled off
 #dashboard assembly
 #dashboard history -output /dev/pts/6
 #target remote localhost:1234
-target remote localhost:8832
+target remote localhost:1234
 #c
 

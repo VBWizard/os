@@ -765,6 +765,9 @@ uint32_t process_fork(process_t* currProcess)
     //it is CoWed, so it is copied and the child gets access to the CoW page.
     CoWProcess(newProcess);
 
+    cowPages(currProcess->pageDirPtr, (uintptr_t*)(currProcess->stack1Start & 0xFFFFF000), currProcess->stack1Size);
+    printd(DEBUG_PROCESS, "\tCoW'd the kernel stack at 0x%08x for 0x%08x bytes\n",currProcess->stack1Start, currProcess->stack1Size);
+
     uint32_t tssFlags=ACS_TSS;
     uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;
     if (currProcess->task->kernel)
@@ -845,8 +848,14 @@ void CoWProcess(process_t* process)
         cowPages(process->pageDirPtr, (uintptr_t*)(process->heapStart & 0xFFFFF000), process->heapEnd - process->heapStart);
         printd(DEBUG_PROCESS, "\tCoW'd the heap at 0x%08x for 0x%08x bytes\n",process->heapStart, process->heapEnd - process->heapStart);
     }
-    cowPages(process->pageDirPtr, (uintptr_t*)(process->stackStart & 0xFFFFF000), process->stackSize);
-    printd(DEBUG_PROCESS, "\tCoW'd the stack at 0x%08x for 0x%08x bytes\n",process->stackStart, process->stackSize);
+    //cowPages(process->pageDirPtr, (uintptr_t*)(process->stackStart & 0xFFFFF000), process->stackSize);
+    //printd(DEBUG_PROCESS, "\tCoW'd the stack at 0x%08x for 0x%08x bytes\n",process->stackStart, process->stackSize);
+
+    cowPages(KERNEL_CR3, (uintptr_t*)(process->stack1Start & 0xFFFFF000), process->stack1Size);
+    printd(DEBUG_PROCESS, "\tCoW'd the syscall stack at 0x%08x in the kernel memory spacefor 0x%08x bytes\n",process->stack1Start, process->stack1Size);
+
+    //cowPages(process->pageDirPtr, (uintptr_t*)(process->stack1Start & 0xFFFFF000), process->stack1Size);
+    //printd(DEBUG_PROCESS, "\tCoW'd the syscall stack at 0x%08x for 0x%08x bytes\n",process->stack1Start, process->stack1Size);
 }
 
 uintptr_t dupPageTables(process_t* newProcess, process_t* currProcess)
@@ -881,7 +890,7 @@ uintptr_t dupPageTables(process_t* newProcess, process_t* currProcess)
         if (oldCR3[cr3Ptr] != 0)
         {
             //Create the new page table and a reference to the old one
-            printd(DEBUG_PROCESS,"\tFound PT at 0x%08x to dup (addresses from 0x%08x to 0x%08x\n",&oldCR3[cr3Ptr], cr3Ptr*0x400000, cr3Ptr*0x400000 + 0x3fffff);
+            printd(DEBUG_PROCESS,"\tFound PT at 0x%08x to dup (addresses from 0x%08x to 0x%08x\n (currCR3=0x%08x,newCR3=0x%08x)",&oldCR3[cr3Ptr], cr3Ptr*0x400000, cr3Ptr*0x400000 + 0x3fffff, oldCR3, newCR3);
             uint32_t *oldPT = oldCR3[cr3Ptr];
             uint32_t *newPT = pagingAllocatePagingTablePage();
             pagingMapPage(KERNEL_CR3,(uint32_t)newPT | KERNEL_PAGED_BASE_ADDRESS,(uint32_t)newPT | ((uint16_t)oldPT & 0x00000FFF),(uint16_t)0x3);

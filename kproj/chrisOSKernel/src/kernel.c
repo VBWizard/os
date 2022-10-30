@@ -135,7 +135,7 @@ int main(int argc, char** argv)  {
 
     fstat_t fstat;
     int *errlog;
-    int errstat=fs_stat(NULL,"/var/log/syslog",&fstat);
+/*    int errstat=fs_stat(NULL,"/var/log/syslog",&fstat);
     if (errstat==-1)
     {
         errlog=fs_open("/var/log/syslog","w");
@@ -149,7 +149,7 @@ int main(int argc, char** argv)  {
     fs_close(errlog);
     printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
             tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);
-    
+*/  
     keyboardInit();
     //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS
     //console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);

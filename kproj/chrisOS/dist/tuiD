@@ -1,2 +1,2 @@
 #!/bin/bash
-/home/yogi/src/binutils-gdb/gdb/gdb -x gdbcmds Debug/GNU-Linux/chrisos
+gdb -x gdbcmds Debug/GNU-Linux/chrisos

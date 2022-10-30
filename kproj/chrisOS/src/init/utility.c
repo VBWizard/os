@@ -235,23 +235,23 @@ void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bo
 #ifndef KERNEL_LOADED
     LOAD_ZERO_BASED_DS
 #endif
-    sprintf(content, "EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", tss->EAX, tss->EBX, tss->ECX, tss->EDX,tss->EFLAGS);
+    sprintf(content, "EAX=%08x\tEBX=%08x\tECX=%08x\tEDX=%08x\tEFL=%08x\n", tss->EAX, tss->EBX, tss->ECX, tss->EDX,tss->EFLAGS);
     contentP=content+strlen(content);
-    sprintf(contentP, "EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", tss->EBP, tss->ESI, tss->EDI, tss->ESP);
+    sprintf(contentP, "EBP=%08x\tESI=%08x\tEDI=%08x\tESP=%08x\n", tss->EBP, tss->ESI, tss->EDI, tss->ESP);
     contentP=content+strlen(content);
-    sprintf(contentP, "CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", 0, cr2, task->tss->CR3, 0);
+    sprintf(contentP, "CR0=%08x\tCR2=%08x\tCR3=%08x\tCR4=%08x\n", 0, cr2, task->tss->CR3, 0);
     contentP=content+strlen(content);
-    sprintf(contentP, " DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", tss->DS, tss->ES, tss->FS, tss->GS);
+    sprintf(contentP, " DS=%08x\t ES=%08x\t FS=%08x\t GS=%08x\n", tss->DS, tss->ES, tss->FS, tss->GS);
     contentP=content+strlen(content);
-    sprintf(contentP, "GDT=%08X\t TR=0x%08X\tTRL=0x%08X\n",kernelGDT.base,task->taskNum, tss->LINK);
+    sprintf(contentP, "GDT=%08x\t TR=0x%08x\tTRL=0x%08x\n",kernelGDT.base,task->taskNum, tss->LINK);
     contentP=content+strlen(content);
-    sprintf(contentP, "CS:EIP = %04X:%08X, error code=%08X\n", tss->CS, tss->EIP, errorCode);
+    sprintf(contentP, "CS:EIP = %04X:%08x, error code=%08x\n", tss->CS, tss->EIP, errorCode);
 //          printk("Bytes at CS:EIP: ");
 //          for (int cnt=0;cnt<19;cnt++)
 //              printk("%02X ", lCSIPPtr[cnt]);
 //          printk("\n");
     contentP=content+strlen(content);
-    sprintf(contentP, "Stack (ss:ebp) @ 0x%08x:0x%08X:\n",tss->SS, esp);
+    sprintf(contentP, "Stack (ss:ebp) @ 0x%08x:0x%08x:\n",tss->SS, esp);
 #ifdef KERNEL_LOADED
     esp-=5;
     for (uint32_t *address=(uint32_t*)esp;address<(uint32_t*)esp+20;address++)
@@ -271,7 +271,7 @@ void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bo
         }
         pte&=0xFFFFF000;
         pte|=((uint32_t)address&0x00000FFF);
-        sprintf(contentP, "\t0x%08X: 0x%08X\n",esp, *(uint32_t*)pte);
+        sprintf(contentP, "\t0x%08x: 0x%08x\n",esp, *(uint32_t*)pte);
         esp++;
         contentP=content+strlen(content);
     }
@@ -292,20 +292,20 @@ void printDumpedRegs()
     uint32_t esp = exceptionSavedESP;
     volatile unsigned short *lCSIPPtr=(volatile unsigned short *)exceptionCS;
 LOAD_ZERO_BASED_DS    
-    printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
-    printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
-    printk("CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
-    printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
-    printk("GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
-    printk("CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
+    printk("EAX=%08x\tEBX=%08x\tECX=%08x\tEDX=%08x\tEFL=%08x\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
+    printk("EBP=%08x\tESI=%08x\tEDI=%08x\tESP=%08x\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
+    printk("CR0=%08x\tCR2=%08x\tCR3=%08x\tCR4=%08x\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
+    printk(" DS=%08x\t ES=%08x\t FS=%08x\t GS=%08x\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
+    printk("GDT=%08x\t TR=0x%08x\n",kernelGDT.base,exceptionTR);
+    printk("CS:EIP = %04X:%08x, error code=%08x\n", exceptionCS, exceptionEIP, exceptionErrorCode);
 //          printk("Bytes at CS:EIP: ");
 //          for (int cnt=0;cnt<19;cnt++)
 //              printk("%02X ", lCSIPPtr[cnt]);
 //          printk("\n");
-          printk ("Stack (ss:ebp) @ 0x%08x:0x%08X:\n",exceptionSS, esp);
+          printk ("Stack (ss:ebp) @ 0x%08x:0x%08x:\n",exceptionSS, esp);
           for (int cnt=0;cnt<20;cnt++)
           {
-              printk("\t0x%08X: 0x%08X\n",esp, exceptionSavedStack[cnt]);
+              printk("\t0x%08x: 0x%08x\n",esp, exceptionSavedStack[cnt]);
               esp+=4;
           }
 LOAD_KERNEL_BASED_DS
@@ -317,20 +317,20 @@ void logDumpedRegs()
     uint32_t esp = exceptionSavedESP;
     volatile unsigned short *lCSIPPtr=(volatile unsigned short *)exceptionCS;
 LOAD_ZERO_BASED_DS    
-    printd(DEBUG_EXCEPTIONS,"EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
-    printd(DEBUG_EXCEPTIONS,"EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
-    printd(DEBUG_EXCEPTIONS,"CR0=%08X\tCR2=%08X\tCR3=%08X\tCR4=%08X\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
-    printd(DEBUG_EXCEPTIONS," DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
-    printd(DEBUG_EXCEPTIONS,"GDT=%08X\t TR=0x%08X\n",kernelGDT.base,exceptionTR);
-    printd(DEBUG_EXCEPTIONS,"CS:EIP = %04X:%08X, error code=%08X\n", exceptionCS, exceptionEIP, exceptionErrorCode);
+    printd(DEBUG_EXCEPTIONS,"EAX=%08x\tEBX=%08x\tECX=%08x\tEDX=%08x\tEFL=%08x\n", exceptionAX, exceptionBX, exceptionCX, exceptionDX,exceptionFlags);
+    printd(DEBUG_EXCEPTIONS,"EBP=%08x\tESI=%08x\tEDI=%08x\tESP=%08x\n", exceptionBP, exceptionSI, exceptionDI, exceptionSavedESP);
+    printd(DEBUG_EXCEPTIONS,"CR0=%08x\tCR2=%08x\tCR3=%08x\tCR4=%08x\n", exceptionCR0, exceptionCR2, exceptionCR3, exceptionCR4);
+    printd(DEBUG_EXCEPTIONS," DS=%08x\t ES=%08x\t FS=%08x\t GS=%08x\n", exceptionDS, exceptionES, exceptionFS, exceptionGS);
+    printd(DEBUG_EXCEPTIONS,"GDT=%08x\t TR=0x%08x\n",kernelGDT.base,exceptionTR);
+    printd(DEBUG_EXCEPTIONS,"CS:EIP = %04X:%08x, error code=%08x\n", exceptionCS, exceptionEIP, exceptionErrorCode);
 //          printd(DEBUG_EXCEPTIONS,"Bytes at CS:EIP: ");
 //          for (int cnt=0;cnt<19;cnt++)
 //              printd(DEBUG_EXCEPTIONS,"%02X ", lCSIPPtr[cnt]);
 //          printd(DEBUG_EXCEPTIONS,"\n");
-          printd (DEBUG_EXCEPTIONS,"Stack @ 0x%08x:0x%08X:\n",exceptionSS, esp);
+          printd (DEBUG_EXCEPTIONS,"Stack @ 0x%08x:0x%08x:\n",exceptionSS, esp);
           for (int cnt=0;cnt<40;cnt++)
           {
-              printd(DEBUG_EXCEPTIONS,"\t0x%08X%: 0x%08X\n",esp, exceptionSavedStack[cnt]);
+              printd(DEBUG_EXCEPTIONS,"\t0x%08x%: 0x%08x\n",esp, exceptionSavedStack[cnt]);
               esp+=4;
           }
 LOAD_KERNEL_BASED_DS
@@ -342,19 +342,19 @@ void printDebugRegs()
     uint8_t* lCSIPPtr;
 
     lCSIPPtr=(uint8_t*)(debugEIP);
-    printk("EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", debugAX, debugBX, debugCX, debugDX,debugFlags);
-    printk("EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", debugBP, debugSI, debugDI, debugSavedESP);
-    printk("CR0=%08X\tCR2=%08X\tCR3=%08X\n", debugCR0, debugCR3, debugCR4);
-    printk(" DS=%08X\t ES=%08X\t FS=%08X\t GS=%08X\n", debugDS, debugES, debugFS, debugGS);
-    printk("CS:EIP = %04X:%08X, error code=%08X\n", debugCS, debugEIP, debugErrorCode);
+    printk("EAX=%08x\tEBX=%08x\tECX=%08x\tEDX=%08x\tEFL=%08x\n", debugAX, debugBX, debugCX, debugDX,debugFlags);
+    printk("EBP=%08x\tESI=%08x\tEDI=%08x\tESP=%08x\n", debugBP, debugSI, debugDI, debugSavedESP);
+    printk("CR0=%08x\tCR2=%08x\tCR3=%08x\n", debugCR0, debugCR3, debugCR4);
+    printk(" DS=%08x\t ES=%08x\t FS=%08x\t GS=%08x\n", debugDS, debugES, debugFS, debugGS);
+    printk("CS:EIP = %04X:%08x, error code=%08x\n", debugCS, debugEIP, debugErrorCode);
           printk("Bytes at CS:EIP: ");
           for (int cnt=0;cnt<19;cnt++)
               printk("%02X ", lCSIPPtr[cnt]);
           printk("\n");
-          printk ("Stack @ 0x%08x:0x%08X:\n",debugSS, esp);
+          printk ("Stack @ 0x%08x:0x%08x:\n",debugSS, esp);
           for (int cnt=0;cnt<10;cnt++)
           {
-              printk("\t0x%08X%: 0x%08X\n",esp, debugSavedStack[cnt]);
+              printk("\t0x%08x%: 0x%08x\n",esp, debugSavedStack[cnt]);
               esp+=4;
           }
 
