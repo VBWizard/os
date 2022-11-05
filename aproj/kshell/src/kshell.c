@@ -372,11 +372,10 @@ void kInit(int **initFile)
     modifySignal(SIGINT, handleSignals, 0);
     fstat_t fstat;
     memset(&fstat,0,sizeof(fstat_t));
-//    int retVal = stat("/.krc",&fstat);
-//    if(retVal != -1 && fstat.st_size>0);
-//    {
-//        *initFile=open("/.krc","r");
-//    }
+    if (stat("/.krc",&fstat));
+    {
+        *initFile=open("/.krc","r");
+    }
     
 }
 

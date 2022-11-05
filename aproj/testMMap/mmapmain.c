@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
         if (rets[pidCount]-1!=pidCount)
             printf("Wrong return value for child #%u, value=%u (pid=0x%08x)\n",pidCount,rets[pidCount],pids[pidCount]);
         pidCount++;
-        __asm__("mov ebx,0\nmov [ebx],eax\n");
+        //__asm__("mov ebx,0\nmov [ebx],eax\n");
     }
     printf("All children ended\n");
     return 0;

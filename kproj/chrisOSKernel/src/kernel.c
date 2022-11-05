@@ -132,7 +132,7 @@ int main(int argc, char** argv)  {
     activeSTDOUT = tty1->stdOutWritePipe;
     activeSTDIN=tty1->stdInReadPipe;
     activeTTY=tty1;
-
+/*
     fstat_t fstat;
     int *errlog;
     int errstat=fs_stat(NULL,"/var/log/syslog",&fstat);
@@ -147,7 +147,7 @@ int main(int argc, char** argv)  {
         fs_write(NULL,errlog,"\n********** SYSTEM BOOTING **********\n",38,1);
     }
     fs_close(errlog);
-    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
+*/    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
             tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);
   
     keyboardInit();
@@ -156,7 +156,7 @@ int main(int argc, char** argv)  {
     
     kIdleTicks=0;
     kIdleProcess=createProcess("/sbin/idle", 0, NULL, kKernelProcess, true, false);
-    kIdleProcess=createProcess("/sbin/syslogd", 0, NULL, kKernelProcess, true, false);
+    //kIdleProcess=createProcess("/sbin/syslogd", 0, NULL, kKernelProcess, true, false);
     kIdleTask=kIdleProcess->task;
     //Need to let the idle task run once so that it initializes, so make sure it is the first task to run when the scheduler starts
     kIdleTask->prioritizedTicksInRunnable = 0xDFFFFFFF;

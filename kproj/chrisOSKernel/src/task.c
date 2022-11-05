@@ -53,6 +53,7 @@ void taskInit()
 
 void freeTask(uint32_t taskNum)
 {
+    printd(DEBUG_TASK, "TODO: Free the! task\n");
     uint32_t* ptr=kTaskSlotAvailableInd+1+((taskNum-32)/32);     //don't touch the first 32 tasks
 
     //For now we aren't going to do anything
