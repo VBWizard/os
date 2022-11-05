@@ -18,12 +18,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-uint32_t isrSavedEAX, isrSavedEBX, isrSavedECX, isrSavedEDX, isrSavedESI, isrSavedEDI, isrSavedEBP, isrSavedCR0, isrSavedCR3, isrSavedCR4,
+#define NUMBER_OF_ISRS 100
+    
+volatile uint32_t isrSavedEAX, isrSavedEBX, isrSavedECX, isrSavedEDX, isrSavedESI, isrSavedEDI, isrSavedEBP, isrSavedCR0, isrSavedCR3, isrSavedCR4,
                              isrSavedDS, isrSavedES, isrSavedFS, isrSavedGS, isrSavedSS, isrSavedESP,isrSavedFlags, isrSavedErrorCode, isrSavedEIP, isrSavedCS, isrSavedCR2, isrSavedTR;
-uint32_t*isrSavedStack;
+volatile uint32_t*isrSavedStack;
 
-
+volatile uint32_t isrCounts[NUMBER_OF_ISRS];
 
 #ifdef __cplusplus
 }

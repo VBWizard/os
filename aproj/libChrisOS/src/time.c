@@ -5,15 +5,18 @@
  */
 
 #include "syscalls.h"
-#include "libChrisOS.h"
+#include "common.h"
 #include "time.h"
 #include "strings.h"
+#include "memory.h"
 
 int _daylight=1;                  // Non-zero if daylight savings time is used
 long _dstbias=0;                  // Offset for Daylight Saving Time
 char *_tzname[2] = {"GMT", "GMT"};  // Standard/daylight savings time zone names
 int ticksToWait;
 struct tm tmbuf;
+
+__attribute__((visibility("default"))) long libcTZ=0;
 
 const int _ytab[2][12] = {
   {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
@@ -66,7 +69,7 @@ VISIBLE struct tm *localtime(const time_t *timer) {
   time_t t;
  
   t = *timer + (libcTZ*60*60);
-  return gmtime_r(&t, &tmbuf);
+  return gmtime_rI(&t, &tmbuf);
 }
 
 struct tm *localtime_rI(const time_t *timer, struct tm *tmbuf) 

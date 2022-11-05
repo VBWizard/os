@@ -47,9 +47,10 @@ extern "C" {
     void pipeclose(file_t *file);
     size_t piperead(void *buffer, int size, int length, void *f);
     size_t pipewrite(const void *buffer, int size, int count, void *f);
-    pipe_t *pipedup(void* path, const char *mode, file_t* file);
+    pipe_t *pipedup1(void* path, const char *mode, file_t* file);
     int fs_pipe(process_t *process, int pipefd[2]);
-    int fs_pipeA(process_t *process, int pipefd[2], int flags);
+    int fs_pipeI(process_t *process, int pipefd[2], int flags);
+    int fs_dup3(process_t *process, file_t *oldFile, int newFileFD, int flags);
     
     typedef struct
     {

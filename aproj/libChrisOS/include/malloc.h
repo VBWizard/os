@@ -39,20 +39,24 @@ extern "C" {
 #include "time.h"
     
 //This is the minimum request size for a call to the kernel to ALLOC memory. 
-#define ALLOC_REQUEST_SIZE 0x32000
-#define ALLOC_MARKER_VALUE 0xB00F00D0
-    typedef struct sheap
+//#define MALLOC_CLEAR_ON_FREE
+#define MALLOC_MINIMUM_REQUEST_SIZE 0x1000
+#define MALLOC_MARKER_VALUE 0x4F3F2F1F
+#define MALLOC_MIN_SIZE_TO_ALLOCATE sizeof(heaprec_t)
+#define MALLOC_SANITY_CHECK
+#define MALLOC_DEFAULT_CLEAR_VALUE1 0xD0
+#define MALLOC_DEFAULT_CLEAR_VALUE2 0xD0D0
+#define MALLOC_DEFAULT_CLEAR_VALUE4 0xD0D0D0D0
+    
+    typedef struct sheap    //20
     {
-        uint32_t marker;
-        uint32_t len;
-        bool inUse;
-        struct sheap* prev;
+        uint32_t marker;    //4
+        uint32_t len;       //4
+        bool inUse;         //1
+        uint16_t uses;      //2
+        uint8_t filler;     //1
+        struct sheap* prev, *next; //8
     } heaprec_t;
-
-uint32_t heapBase;    
-uint32_t heapCurr;
-uint32_t heapEnd;
-long libcTZ;
 
 void initmalloc();
 void* malloc(size_t size);

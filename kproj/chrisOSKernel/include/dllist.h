@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include <stdbool.h>
     
     typedef struct slisthead
     {

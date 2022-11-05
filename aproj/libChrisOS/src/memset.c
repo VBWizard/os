@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-#include "libChrisOS.h"
+#include "common.h"
 
 void *memsetI(void *d1, int val, size_t len)
 {

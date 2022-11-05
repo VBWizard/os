@@ -919,6 +919,9 @@ int fl_fflush(void *f)
             // Write back current sector before loading next
             if (_write_sectors(file, file->file_data_address, file->file_data_sector, 1))
                 file->file_data_dirty = 0;
+            //CLR 02/24/2019: Added updating of the filesize as we can't see anything flushed if the file size doesn't change!
+            fatfs_update_file_length(&_fs, file->parentcluster, (char*)file->shortfilename, file->filelength);
+            file->filelength_changed = 0;
         }
 
         FL_UNLOCK(&_fs);

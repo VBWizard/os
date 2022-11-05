@@ -33,6 +33,7 @@
  */
 
 #include "strings.h"
+#include "common.h"
 
 VISIBLE int strcspn(char* string, char* chars)
 {

@@ -11,19 +11,19 @@
  * Created on February 14, 2017, 5:32 AM
  */
 
-#include "task.h"
-#include "../../chrisOS/include/i386/gdt.h"
-#include "../../chrisOS/include/elfloader.h"
-#include "time_os.h"
-#include "rusage.h"
-#include "signals.h"
-
 #ifndef PROCESS_H
 #define PROCESS_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "task.h"
+#include "../../chrisOS/include/i386/gdt.h"
+#include "time_os.h"
+#include "rusage.h"
+#include "signals.h"
+#include "dllist.h"
 
 #define PROCESS_HEAP_START 0x70000000
 #define PROCESS_HEAP_END   0xBFFFFFFF
@@ -45,7 +45,7 @@ extern "C" {
         struct sprocess* this;                     //NOTE: This must remain the second item in the struct at offset +4
         task_t* task;
         sGDT* gdtEntry;
-        elfInfo_t* elf;
+        void* elf;
         char* path;
         uint32_t retVal;
         signal_t signals;
@@ -71,11 +71,13 @@ extern "C" {
         char* mappedEnv;
         char* realEnv;
         bool justForked;
-        uint32_t lastChildCR3;
+        uint32_t forkChildCR3;
         uint32_t childNumber;
         uint32_t lastChildNumber;
         bool execDontSaveRegisters;
-        bool foreground;
+        bool foreground, stdinRedirected, stdoutRedirected, stderrRedirected;
+        uintptr_t *stackInitialPage;
+        uint32_t minorFaults, majorFaults;
     } process_t;
 
 
@@ -83,10 +85,12 @@ extern "C" {
     void processExit();
     bool processRegExit(process_t* process, void* routineAddr);
     int sys_setpriority(process_t* process, int newpriority);
-    char* processGetCWD(char* buf, unsigned long size);
+    int processGetCWD(process_t *process, char* buf, unsigned long size);
     void* copyFromKernel(process_t* process, void* dest, const void* src, unsigned long size); //Copy memory from kernel to user space (assumes dest is user page)
     void* copyToKernel(process_t* srcProcess, void* dest, const void* src, unsigned long size); //Copy memory from user space to kernel (assumes dest is kernel page)
     process_t *getCurrentProcess ();
+    void freeProcess(process_t *process);
+    int calcProcessSize(process_t *process);
 
 #define PROCESS_DEFAULT_PRIORITY 0
 #ifdef __cplusplus

@@ -33,6 +33,7 @@ extern "C" {
         bool refresh;
         void (*updateTerminal)(void);
         int savedCursorX, savedCursorY;
+        int backColor, foreColor;
     } __attribute__((packed)) terminfo_t;
     
     terminfo_t *terminfos;

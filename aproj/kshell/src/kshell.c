@@ -17,9 +17,62 @@ char commandHistory[500][MAX_PARAM_WIDTH];
 int commandHistoryPtr=0;
 int commandHistoryMax=0;
 char lCommand[256];
-
+char **kCmdline;
 int findCommand(char* command);
 char **buildargv (const char *input);
+bool echoInput;
+
+void preprocessCmd(char *command)
+{
+    
+}
+
+void execCmds(char **cmds)
+{
+    char **lcmds = cmds;
+    
+    while (*lcmds)
+    {
+        execInternalCommand(*lcmds);
+        lcmds++;
+    }
+}
+
+//Parse individual commandline (look for pipes)
+char** parseCmds(char *command)
+{
+    char delims[3] = ";";
+    char **cmds;
+    char *ltemp=command; //malloc(1024);
+    int lCommandPtr=0;
+    char *cmd;
+    char cmdptr=0;
+    char *cmdbegin=command;
+
+    memset(kCmdline,0,CMDLINE_BUFFER_SIZE);
+
+    ltemp=command;
+    
+    //Find ; or | which both separate commands
+    while (1==1)
+    {
+        if (*ltemp==';' || *ltemp=='|' || *ltemp==0)
+        {
+            kCmdline[cmdptr]=kCmdline+(PARSE_CMD_COUNT*4) + (cmdptr*CMDLINE_MAX_SIZE);
+            
+            if (*ltemp=='|')
+                strncpy(kCmdline[cmdptr++],cmdbegin,(uint32_t)ltemp-(uint32_t)cmdbegin+1);
+            else
+                strncpy(kCmdline[cmdptr++],cmdbegin,(uint32_t)ltemp-(uint32_t)cmdbegin);
+            if (*ltemp=='\0')
+                break;
+            cmdbegin=ltemp+1;
+        }
+        ltemp++;
+    }
+
+    return kCmdline;
+}
 
 void execInternalCommand(char lCommand[256])
 {
@@ -254,29 +307,6 @@ void freeArgV(int pcount, char **params)
     free(params);
 }
 
-bool getEnvVariableValue(char* evName, char* value)
-{
-    
-    for (int cnt=0;cnt<50;cnt++)
-    {
-        if (environmentLoc[cnt]!=0)
-        {
-            char* idx = strstr((char*)environmentLoc[cnt],evName);
-            if (idx>0)
-            {
-                idx = strstr(idx,"=");
-                //++ because we don't want to include the = sign
-                strcpy(value, ++idx);
-                //print("getEnvVariableValue: value for '%s'='%s'\n",evName, value);
-                return true;
-            }
-        }
-    } 
-    return false;
-}
-
-
-
 /*void getDate()
 {
     struct tm theDate;
@@ -292,7 +322,7 @@ void saveCommand(char* command)
 
 void prompt()
 {
-    print("%s %s> ",sExecutingProgram, cwd);
+    print("%s$ ",cwd);
 }
 
 int reprintCommand(char* command)
@@ -326,25 +356,54 @@ int processSignal(int signal)
     return 0;
 }
 
+void kInit(int **initFile)
+{
+    execPipes[0]=0;
+    execPipes[1]=0;
+    kCmdline = malloc(CMDLINE_BUFFER_SIZE);  //Possibility of 25 chained commands
+    bSigIntReceived = false;
+    exitCode = 0;
+    timeToExit = false;
+    strcpy(delim," \t\n-,");
+    sKShellProgramName=malloc(1024);
+    strcpy(sKShellProgramName,"kShell");
+    strcpy(sExecutingProgram,sKShellProgramName);
+    //puts("\nWelcome to kShell ... hang a while!\n");
+    modifySignal(SIGINT, handleSignals, 0);
+    fstat_t fstat;
+    memset(&fstat,0,sizeof(fstat_t));
+//    int retVal = stat("/.krc",&fstat);
+//    if(retVal != -1 && fstat.st_size>0);
+//    {
+//        *initFile=open("/.krc","r");
+//    }
+    
+}
+
 int kShell(int argc, char** argv, char** envp)
 {
     uint8_t lCurrKey=0;
     int lCurrKeyCount=0;
     int commandWasFromThisBufferPtr=0;
     char ansiSeq[20];
+    int *inputFile=STDIN_FILE;
+    int *initFile=NULL;
+    
+    echoInput=true;
+    if (argc>1)
+    {
+        inputFile=open(argv[1],"r");
+        if (!inputFile)
+        {
+            printf("Cannot open script file %s",argv[1]);
+            return -1;
+        }
+        echoInput=false;
+    }
 
-    bSigIntReceived = false;
-    exitCode = 0;
-    timeToExit = false;
-    strcpy(delim," \t\n-,");
     environmentLoc = envp;
     ansiSeq[0]=0x1b;
-    sKShellProgramName=malloc(1024);
-    strcpy(sKShellProgramName,"kShell");
-    strcpy(sExecutingProgram,sKShellProgramName);
-    //puts("\nWelcome to kShell ... hang a while!\n");
-
-    modifySignal(SIGINT, handleSignals, 0);
+    kInit(&initFile);
     
     while (!timeToExit)
     {
@@ -355,21 +414,45 @@ getACommand:
         lCurrKeyCount=0;
         memset(lCommand,0,256);
         getenv("CWD",cwd);
-        prompt();
+        if (!initFile)
+            prompt();
 getAKey:
         lCurrKey=0;
         while(lCurrKey==0)
         {
-            read(STDIN, &lCurrKey, 1, 1); //Reading from STDIN blocks until a key is available
-//            gets(&lCurrKey,1,1);
+            int retVal=0;
+            if (initFile)
+            {
+                echoInput=false;
+                retVal=read(initFile, &lCurrKey, 1, 1);
+                if (!retVal)
+                {
+                    close(initFile);
+                    initFile=0;
+                    echoInput=true;
+                    prompt();
+                    retVal=read(inputFile, &lCurrKey, 1, 1);
+                }
+            }
+            else
+                //Reading from STDIN blocks until a key is available.  It will only return 0 when STDIN is redirected to a file
+                retVal=read(inputFile, &lCurrKey, 1, 1);
+            if (retVal==0)
+            {
+                timeToExit=true;
+                break;
+            }
             if (bSigIntReceived)
             {
                 if (processSignal(SIGINT)==SIGINT)
                 {
                     lCommand[0] = 0x0;
                     lCurrKeyCount = 0;
-                    printf("\n");
-                    prompt();
+                    if (echoInput)
+                    {
+                        printf("\n");
+                        prompt();
+                    }
                 }
             }
         }
@@ -442,27 +525,39 @@ getAKey:
         }
         else if (lCurrKey==0xa) //Enter
         {
-            print("\n");
+            if (echoInput)
+                print("\n");
+            goto doneGettingKeys;
+        }
+        else if (lCurrKey==0x0)
+        {
+            lCommand[0]=0x0;
             goto doneGettingKeys;
         }
         else
         {
             lCommand[lCurrKeyCount++]=lCurrKey;
             //reprintCommand(lCommand);
-            printf("%c",lCurrKey);
+            if (echoInput)
+                printf("%c",lCurrKey);
             //Reset pointer to command buffer so that this possibly modified command gets written as a new one
             commandWasFromThisBufferPtr=-1;
         }
         goto getAKey;
 //        gets(lCommand,50);
 doneGettingKeys:
-        if (lCommand[0]==0x0)
-            goto getACommand;
-        if (commandWasFromThisBufferPtr == -1)
-            saveCommand(lCommand);
-        int i = findCommand(lCommand);
-        execInternalCommand(lCommand);
+        if (lCommand[0]!=0x0)
+        {
+            if (commandWasFromThisBufferPtr == -1)
+                saveCommand(lCommand);
+            int i = findCommand(lCommand);
+            execCmds(parseCmds(lCommand));
+        }
     }
     free(sKShellProgramName);
+    if (inputFile!=STDIN_FILE)
+        close(inputFile);
+    if (kCmdline)
+        free(kCmdline);
     return exitCode;
 }

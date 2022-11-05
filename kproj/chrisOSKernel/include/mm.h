@@ -8,14 +8,8 @@
 #ifndef MM_H
 #define	MM_H
 
-#include "kernel.h"
-#include "i386/kPaging.h"
-#include "charDev.h"
-#include <stdbool.h>
 #include <stdint.h>
-#include "printf.h"
-#include "paging.h"
-#include "alloc.h"
+#include <stdbool.h>
 
 #define ERROR_MM_CANNOT_ALLOCATE -1
     void mmKernelSetPageRangeInUseFlag(uintptr_t startAddress, uintptr_t endAddress, int pageSize, bool inUse);

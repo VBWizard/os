@@ -55,6 +55,8 @@ VISIBLE void __attribute__((constructor)) libc_init()
     if (!libcInitialized)
     {
         initmalloc();
+        filesToCloseCount=0;
+//        printfI("libc_init: filesToCloseCount=%u\n",filesToCloseCount);
         //processEnvp = envp;
         __asm__("mov %0,[ebp+52]\n":"=a" (processEnvp));
         do_syscall0(SYSCALL_INVALID);
@@ -70,6 +72,7 @@ VISIBLE void __attribute__((constructor)) libc_init()
 void __attribute__((destructor)) libc_cleanup(void)
 {
     malloc_cleanup();
+    file_cleanup();
 }
 
 VISIBLE int print(const char *format, ...)
@@ -88,7 +91,7 @@ VISIBLE int printf(const char *format, ...)
     va_start( args, format );
     
     int size = vsprintf(printBuffer, format, args);
-    return do_syscall3(SYSCALL_WRITE, 1, (uint32_t)printBuffer, size);
+    return do_syscall3(SYSCALL_WRITE, STDOUT_FILE, (uint32_t)printBuffer, size);
 }
 
 int printfI(const char *format, ...)
@@ -108,6 +111,16 @@ int printI(const char *format, ...)
     return 0;
 }
 
+VISIBLE int printd(uint32_t DebugLevel, const char *format, ...)
+{
+    va_list args;
+    va_start( args, format );
+    
+    do_syscall3(SYSCALL_PRINTD, DebugLevel, (uint32_t)format, (uint32_t)args);
+    return 0;
+    va_end(args);
+}
+
 int printdI(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
@@ -118,10 +131,21 @@ int printdI(uint32_t DebugLevel, const char *format, ...)
     va_end(args);
 }
 
+VISIBLE unsigned int sleepMS (unsigned int __ms)
+{
+    int ms=__ms*MS_PER_TICK;
+    return SLEEP_TICKS(ms);
+}
+
 VISIBLE unsigned int sleep (unsigned int __seconds)
 {
-    SLEEP_SECONDS(__seconds)
-    return 0;
+    return SLEEP_SECONDS(__seconds);
+}
+
+VISIBLE unsigned int sleepTicks(unsigned int __ticks)
+{
+    return SLEEP_TICKS(__ticks);
+    
 }
 
 void stop()
@@ -138,7 +162,8 @@ VISIBLE int fork()
 {
     uint32_t retVal = 0;
     //return do_syscall0(SYSCALL_FORK);
-    asm("call sysEnter_Vector\n":"=a" (retVal): "a" (SYSCALL_FORK));
+    return do_syscall0(SYSCALL_FORK);
+    //asm("call sysEnter_Vector\n":"=a" (retVal): "a" (SYSCALL_FORK));
     return retVal;
 }
 
@@ -215,12 +240,10 @@ VISIBLE void exit (int status)
     do_syscall2(SYSCALL_ENDPROCESS, 0, status);
 }
 
-
-VISIBLE char* getcwd(char* buf, size_t size)
+VISIBLE char* setcwd(char* buf, size_t size)
 {
-    return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
+    return (char*)do_syscall2(SYSCALL_SETCWD,(uint32_t)buf,size);
 }
-
 
 size_t splitI(char *buffer, char *argv[], size_t argv_size)
 {
@@ -342,7 +365,17 @@ VISIBLE char** cmdlineToArgv(char* cmdline, int *argc)
     return cmdlineToArgvI(cmdline, argc);
 }
 
-VISIBLE int test()
+VISIBLE int setSTD(int std, uint32_t filed)
 {
-    return do_syscall0(0);
+    return do_syscall2(SYSCALL_SETSTD, std, filed);
+}
+
+VISIBLE void takeADump()
+{
+    do_syscall0(SYSCALL_TAKEADUMP);
+}
+
+VISIBLE int setpriority(int which, int who, int prio)
+{
+    return do_syscall1(SYSCALL_SETPRIORITY,prio);
 }

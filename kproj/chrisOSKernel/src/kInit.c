@@ -12,6 +12,8 @@
 #include "dllist.h"
 #include "time_os.h"
 #include "alloc.h"
+#include "../../chrisOS/include/utility.h"
+#include "kernelVariables.h"
 
 extern void _sysCall();
 extern void _sysEnter();
@@ -34,7 +36,7 @@ extern uint32_t getGS();
 extern uint32_t getSS();
 extern uint32_t getESP();
 extern uint64_t kCPUCyclesPerSecond;
-extern uint32_t* isrSavedStack;
+extern volatile uint32_t* isrSavedStack;
 extern bool schedulerTaskSwitched;
 extern cpuid_features_t kCPUFeatures;
 extern time_t kSystemCurrentTime;
@@ -48,7 +50,7 @@ dllist_t* kLoadedElfInfo=NULL;   //NOTE: Before using the list you must call lis
 
 char env[50][50];
 char* envs[100];
-tss_t* pagingExceptionTSS;
+tss_t* pagingExceptionTSS, *gpfExceptionTSS;
 
 
 void initKernelInternals()
@@ -73,7 +75,7 @@ __asm__("cli\n");
     //Set up our kernel task
     kKernelTask->kernel=true;
     kKernelTask->pageDir=(uint32_t*)KERNEL_CR3;
-//    kKernelProcess->pageDirPtr=oldCR3;
+    kKernelProcess->pageDirPtr=KERNEL_CR3;
     kKernelTask->tss->EIP=(uint32_t)0xBADBADBA;
     kKernelTask->tss->CS=0x20;
     kKernelTask->tss->DS=0x10;
@@ -142,7 +144,8 @@ __asm__("cli\n");
     idt_set_gate (&idtTable[0x80], 0x8, (int)&vector128, ACS_INT | ACS_DPL_3);
     //See setupPagingHandler
     //idt_set_gate (&idtTable[0xe], 0x8, (int)&vector14, ACS_INT);   //paging exception
-    //idt_set_gate (&idtTable[0xd], 0x8, (int)&vector13, ACS_INT); //Move this out of the way of the exception handlers
+    
+    idt_set_gate (&idtTable[0xd], 0x8, (int)&vector13, ACS_INT);
 
     //Configure SysEnter/SysExit
     if (!kCPUFeatures.cpuid_feature_bits.sep)
@@ -153,10 +156,10 @@ __asm__("cli\n");
     wrmsr32(SYSENTER_EIP_MSR,(uint32_t)&_sysEnter,0);       //Set sysenter EIP
     printd(DEBUG_PROCESS,"Setup SYSENTER MSRs as CS:EIP=0x%04X:0x%08x, ESP=0x%08x\n",0x88,&_sysEnter,kKernelTask->tss->ESP1);
 
-    printk("Installing new IRQ0 handler\n");
+    printk("Installing new IRQ0 handlers\n");
     //idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers
     idt_set_gate (&idtTable[0xa], 0x08, (int)&vector10, ACS_INT); //Scheduler is on IRQ 0
-    idt_set_gate (&idtTable[0xd], 0x08, (int)&vector13, ACS_INT); //Scheduler is on IRQ 0
+    //idt_set_gate (&idtTable[0xd], 0x08, (int)&vector13, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Scheduler is on IRQ 0
     idt_set_gate (&idtTable[0x7], 0x08, (int)&vector7, ACS_INT);
     
@@ -175,8 +178,8 @@ outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the 
 IRQ_clear_mask(2);
 IRQ_clear_mask(8);
 */
+      setupGPFHandler();
       setupPagingHandler();
-
     __asm__("jmp 0x88:kernJump1\nkernJump1:\n");
 
 kernJump1:    
@@ -184,16 +187,19 @@ __asm__("sti\n");
 
 }
 
-int tscGetTicksPerSecond()
+int tscGetCyclesPerSecond()
 {
-    uint64_t ticksBefore=rdtsc();
+    uint64_t cyclesBefore=rdtsc();
+    uint64_t cyclesDiff;
     wait(500);
-    return (rdtsc()-ticksBefore)*2;
+    cyclesDiff=(rdtsc()-cyclesBefore)*2;
+    printd(DEBUG_EXCEPTIONS,"tscGetCyclesPerSecond: TSC cycles per second = %u\n",cyclesDiff);
+    return cyclesDiff;
 }
 
 void hardwareInit()
 {
-    kCPUCyclesPerSecond = tscGetTicksPerSecond();
+    kCPUCyclesPerSecond = tscGetCyclesPerSecond();
 
     //Check for SEE and enable it if available, also disabling co emu and monitoring
     __asm__("mov eax, 0x1\n"
@@ -208,5 +214,8 @@ void hardwareInit()
             "or ax, 3 << 9\n"   //set CR4.OSFXSR and CR4.OSXMMEXCPT at the same time
             "mov cr4, eax\n"
             ".noSSE:\n");
+    
+    for (int cnt=0;cnt<NUMBER_OF_ISRS;cnt++)
+        isrCounts[cnt]=0;
     
 }

@@ -139,6 +139,30 @@ idt_load:
     ret
 .globl idt_load
 
+.globl kSetGDT
+.type kSetGDT, @function
+kSetGDT:
+.code32
+    mov eax,[esp+4]
+    push ss
+    push gs
+    push fs
+    push es
+    push ds
+    lgdt [eax]
+    jmp 0x88:.Kreload_CS
+.Kreload_CS:
+    pop ds
+    pop es
+    pop fs
+    pop gs
+    pop ss
+    ret
+hang:
+    hlt
+    jmp hang
+
 saved_eax:
         .word 0
         .word 0
+

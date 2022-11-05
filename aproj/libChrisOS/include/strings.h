@@ -8,8 +8,8 @@
 #ifndef STRINGS_H
 #define	STRINGS_H
 
-#include "libChrisOS.h"
 #include <stddef.h>
+#include <stdarg.h>
 
 #define ISSPACE(c) ({bool isspace = c==' '?true:false;isspace;})
 #define ISDIGIT(c) ((c) - '0' + 0U <= 9U)
@@ -36,7 +36,10 @@ size_t strlen(const char* str);
 //int strncmp(const char *s1, const char *s2, size_t n);
     char* strcat (char *dest, const char *src);
     char* strcatI (char *dest, const char *src);
+    char *strncat(char *dest, const char *src, size_t n);
+    char *strncatI(char *dest, const char *src, size_t n);
     int strcmp (const char *p1, const char *p2);
+    int strcmpI (const char *p1, const char *p2);
     char * strcpy(char *s1, const char *s2);
     char * strcpyI(char *s1, const char *s2);
     char * strcpyc(char *s1, const char *s2, unsigned count);
@@ -53,13 +56,17 @@ size_t strlen(const char* str);
     void strtrim(char *input);
     void strtrimI(char *input);
     char * strtok(char* s, /*const*/ char* delim);
+    char * strtokI(char* s, /*const*/ char* delim);
     char *strchr(const char *s, int c);
     int strcspn(char* string, char* chars);
     char* strstr(const char* string, const char* substring);
     char* strstrI(const char* string, const char* substring);
     char* strnstrI(char* string, char* substring, int length);
     int sprintf(char *buf, const char *fmt, ...);
+    int sprintfI(char *buf, const char *fmt, ...);
     int vsprintf(char *buf, const char *fmt, va_list args);
-    char *strreplace(const char *in, const char *pattern, const char *by);
+    char *strreplace(const char *in, const char *pattern, const char *by, char *outString);
+    char *strreplaceI(const char *in, const char *pattern, const char *by, char *outString);
+    size_t strnlen(const char* str, int maxlen);
 #endif	/* STRINGS_H */
 

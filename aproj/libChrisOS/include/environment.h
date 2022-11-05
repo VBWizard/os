@@ -19,8 +19,10 @@ extern "C" {
 #endif
 
     int getenv(char *varname, char *value);
+    int getenvI(char *varname, char *value);
     void  setenv(char *varname, char *value);
-
+    char* getcwdI(char* buf, size_t size);
+    char* getcwd(char* buf, size_t size);
 
 #ifdef __cplusplus
 }

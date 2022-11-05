@@ -1,14 +1,17 @@
 #!/bin/bash
 clear
+shopt -s dotglob
 echo "Initiating builds"
-mountCmd="sudo mount /dev/disk/by-id/ata-ST31000528AS_5VP8R4ME-part6 /mnt/loop/"
-clean=0
+mountCmd="sudo /home/yogi/mount_chrisos"
+unmountCmd="sudo /home/yogi/umount_chrisos"
+CLEAN=0
 if [ "$1" != "" ]
 then
 	if [ "$1" == "clean" ]
 	then
+		echo Cleaning the room
 		command="make clean "
-		clean=1
+		CLEAN=1
 	else
 		buildType=$1
 		command="make -j8 CONF=$buildType build "
@@ -22,16 +25,16 @@ pathMid=dist/${buildType^}/GNU-Linux #GNU-Linux
 
 declare -a kernProgArray=("chrisOS" "chrisOSKernel")
 declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")
-declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat" "echo" "clock" "ls")
-declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat" "echo/$pathMid/echo" "clock/$pathMid/clock" "ls/$pathMid/ls")
-basePath=/home/yogi/src/os/kproj/
+declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat" "echo" "clock" "ls" "grep" "free" "top" "wc" "ps")
+declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat" "echo/$pathMid/echo" "clock/$pathMid/clock" "ls/$pathMid/ls" "grep/$pathMid/grep" "free/$pathMid/free" "top/$pathMid/top" "wc/$pathMid/wc" "ps/$pathMid/ps")
+basePath=../../../kproj/
 tabs 5,36,50,70
 echo "Build environment: ${buildType^}"
 echo
 echo "Making kernel projects"
 for i in "${kernProgArray[@]}"
 do
-	cd $basePath$i/
+	pushd $basePath$i/ > /dev/null
 	echo "  Make $i: ($buildType)"
 	($command) > /dev/null
 	if [ $? -eq 0 ] 
@@ -41,17 +44,18 @@ do
 		echo -en "\tMake $i ... \tfailed ($?)\n"
 		echo 
 		echo 
-		sudo umount /mnt/loop
+		($unmountCmd)
 		tabs -8
 		exit -1
 	fi
+	popd > /dev/null
 done
 
 echo "Making application projects"
-basePath=/home/yogi/src/os/aproj/
+basePath=../../../aproj/
 for i in "${appProgArray[@]}"
 do
-	cd $basePath/$i/
+	pushd $basePath/$i/ > /dev/null
 	echo "  Make $i: ($buildType)"
 	($command) > /dev/null
 	if [ $? -eq 0 ] 
@@ -61,15 +65,17 @@ do
 		echo -en "\tMake $i ... \tfailed"
 		echo 
 		echo 
-		sudo umount /mnt/loop
+                ($unmountCmd)
 		tabs -8
 		exit -2
 	fi
+	popd > /dev/null
 done
 
 echo "Done making projects"
-if [ $clean == 1 ] 
+if [ "$CLEAN" == "1" ] 
 then
+	echo "Room's all clean!"
 	exit 0
 fi
 echo "Copying output to disk and ISO directory"
@@ -78,19 +84,31 @@ basePath=/home/yogi/src/os/kproj
 
 for i in "${kernOutputArray[@]}"
 do
-	sudo cp $basePath/$i /mnt/loop/
+	sudo cp $basePath/$i /mnt/chrisos
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
 	echo -en "\t$i ...done\n"
 done
 basePath=/home/yogi/src/os/aproj
+sudo mkdir /mnt/chrisos/bin
+if [ ! -d "/mnt/loop/bin" ]; then
+	sudo mkdir /mnt/loop/bin
+	echo bin directory created
+else
+	echo bin directory exists
+fi
 for i in "${appOutputArray[@]}"
 do
-	sudo cp $basePath/$i /mnt/loop/
+	sudo cp $basePath/$i /mnt/chrisos/bin
+	sudo cp $basePath/libChrisOS/$pathMid/libc.so /mnt/chrisos
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
 	echo -en "\t$i ... done\n"
 done
 echo "Copying done"
 echo "Builds complete"
 tabs -8
-sudo umount /mnt/loop
-
+echo "Copying extra stuff to disk"
+cp Debug/GNU-Linux/chrisos ../../../build_dir/isodir/boot/myos.bin
+rm ./myos.iso
+grub-mkrescue -o myos.iso ../../../build_dir/isodir > /dev/null
+($unmountCmd)
+sync

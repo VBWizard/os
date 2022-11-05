@@ -47,6 +47,7 @@ static char rcsid[] = "$Header: /user6/ouster/tcl/compat/RCS/strstr.c,v 1.2 93/0
  */
 
 #include "strings.h"
+#include "common.h"
 
 char* strnstrI(char* string, char* substring, int length)
 {

@@ -5,20 +5,21 @@
  */
 #include "strings.h"
 #include "libChrisOS.h"
+#include "config.h"
 
-///NOTE: Output pointer has to be freed!!!
-static char *strreplaceI(const char *in, const char *pattern, const char *by)
+
+
+///NOTE: outString has to be big enough to hold the modified string
+char *strreplaceI(const char *in, const char *pattern, const char *by, char *outString)
 {
     size_t outsize = strlenI(in) + 1;
     // TODO maybe avoid reallocing by counting the non-overlapping occurences of pattern
-    char *res = mallocI(outsize);
     // use this to iterate over the output
     size_t resoffset = 0;
-
     char *needle;
     while ((needle = strstrI(in, pattern))) {
         // copy everything up to the pattern
-        memcpyI(res + resoffset, in, needle - in);
+        memcpyI(outString + resoffset, in, needle - in);
         resoffset += needle - in;
 
         // skip the pattern in the input-string
@@ -26,20 +27,19 @@ static char *strreplaceI(const char *in, const char *pattern, const char *by)
 
         // adjust space for replacement
         outsize = outsize - strlenI(pattern) + strlenI(by);
-        res = reallocI(res, outsize);
 
         // copy the pattern
-        memcpyI(res + resoffset, by, strlenI(by));
+        memcpyI(outString + resoffset, by, strlenI(by));
         resoffset += strlenI(by);
     }
 
     // copy the remaining input
-    strcpyI(res + resoffset, in);
+    strcpyI(outString + resoffset, in);
 
-    return res;
+    return outString;
 }
 
-VISIBLE char *strreplace(const char *in, const char *pattern, const char *by)
+VISIBLE char *strreplace(const char *in, const char *pattern, const char *by, char *outString)
 {
-    return strreplaceI(in, pattern, by);
+    return strreplaceI(in, pattern, by, outString);
 }

@@ -7,7 +7,10 @@
 #include "signals.h"
 #include "process.h"
 #include "thesignals.h"
+#include "../../chrisOS/include/chrisos.h"
+
 volatile int kSigCheckLock;
+extern volatile uint32_t* kTicksSinceStart;
 
 //TODO: ******************** Tie signals into scheduler ********************************
 extern void sigSleepReturn();
@@ -17,7 +20,6 @@ extern void changeTaskQueue(task_t* task, eTaskState newState);
 extern uintptr_t *qRunning;
 extern uintptr_t *qRunnable;
 extern uintptr_t *qISleep;
-extern uint32_t* kTicksSinceStart;
 extern task_t* findTaskByTaskNum(uint32_t taskNum);
 extern task_t *kTaskList;
 
@@ -141,19 +143,21 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *p
             p->signals.sigind|=SIGSEGV;
             printd(DEBUG_EXCEPTIONS,"SEGV signaled for cr3=0x%08x, signald after=0x%08x processing signal\n",callerCR3,p->signals.sigind);
             printd(DEBUG_EXCEPTIONS,"Searching for children to SEGV\n");
-/*            for (int cnt=0;cnt<1000;cnt++)
+            int a=0;
+            __asm__("mov eax,cr3\n":"=a" (a));
+            for (int cnt=0;cnt<1000;cnt++)
             {
                 if (kTaskList[cnt].taskNum != 0)
                 {
                     process_t* pc = ((process_t*)kTaskList[cnt].process);
-                    if (((process_t*)pc->parent)->task->taskNum==pc->task->taskNum)
+                    if (pc->parent->task->taskNum==p->task->taskNum)
                     {
                         p->signals.sigind|=SIGSEGV;
                         printd(DEBUG_EXCEPTIONS,"SEGVing child task %s (0x%04X)\n",pc->path, pc->task->taskNum);
                     }
                 }
             }
-*/            //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
+            //NOTE: Triggering of the scheduler and the sti/hlt will be done in the 0xe exception handler
             return NULL;      //SEGV is called by kernel exception handler which is an INT handler.  We just need to return so it an IRET
             break;
         case SIGINT:
@@ -217,7 +221,6 @@ void processSignals()
     uintptr_t*sleep;
     bool awoken=false;
     //Process running
-
     uint32_t priorCR3;
 
     __asm__("cli\nmov ebx,cr3\nmov cr3,%[cr3Val]\n"
@@ -257,7 +260,7 @@ scanSleep:
             if (process->signals.sigdata[SIGSLEEP]<=*kTicksSinceStart || 
                     process->signals.sigind & SIGIO)
             {
-                while (__sync_lock_test_and_set(&kSigCheckLock, 1));
+                //while (__sync_lock_test_and_set(&kSigCheckLock, 1));
                 if (process->signals.sigdata[SIGSLEEP]<=*kTicksSinceStart)
                     printd(DEBUG_SIGNALS,"\tWaking task 0x%04X as wakeTicks (0x%08x) < kTicksSinceStart (0x%08x)\n",task->taskNum,((process_t*)(task->process))->signals.sigdata[SIGSLEEP],*kTicksSinceStart);
                 else
@@ -266,7 +269,7 @@ scanSleep:
                 process->signals.sigdata[SIGSLEEP]=0;
                 process->signals.sigind&=~SIGSLEEP;
                 process->signals.sigind&=~SIGIO;
-                __sync_lock_release(&kSigCheckLock);   
+                //__sync_lock_release(&kSigCheckLock);   
                 //CLR 01/17/2019: Don't make sure the task is chosen next!
                 //task->prioritizedTicksInRunnable=1000000;  //Make this the next chosen task
                 awoken=true;
@@ -274,15 +277,14 @@ scanSleep:
         }
         sleep++;
     }
-
-
-    __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (priorCR3));
     if (awoken) 
     {
         printd(DEBUG_SIGNALS,"Trigger the scheduler to process ... the awoken\n");
         triggerScheduler();
     }
     printd(DEBUG_SIGNALS,"Done processing signals\n");
+    __asm__("mov cr3,%[cr3Val]"::[cr3Val] "r" (priorCR3));
+    return;
 }
 
 void executeSigHandler()

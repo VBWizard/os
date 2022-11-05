@@ -26,17 +26,22 @@ extern "C" {
         SYSCALL_CLOSE                   = 0x3,
         SYSCALL_READ 			= 0x4,  
         SYSCALL_WRITE 			= 0x5,
-        SYSCALL_FORK                    = 0x6,
-        SYSCALL_PIPE                    = 0x7,
-        SYSCALL_MMAP                    = 0x8,
-        SYSCALL_SEEK                    = 0x9,
+        SYSCALL_STAT                    = 0xa,
+        SYSCALL_SEEK                    = 0xb,
+        SYSCALL_TELL                    = 0xc,
+        SYSCALL_UNLINK                  = 0xd,
+        SYSCALL_FORK                    = 0xe,
+        SYSCALL_PIPE                    = 0xf,
+        SYSCALL_DUP3                    = 0x10,
+        SYSCALL_MMAP                    = 0x11,
         SYSCALL_GETCWD                  = 0x4f,
+        SYSCALL_SETCWD                  = 0x50,
         SYSCALL_EXEC			= 0x59,
         SYSCALL_WAITFORPID		= 0x61,
         SYSCALL_SETPRIORITY             = 0x97,
         SYSCALL_REGEXITHANDLER          = 0x163,
         SYSCALL_FREE			= 0x164,
-        SYSCALL_ALLOC			= 0x165,
+        SYSCALL_ALLOCHEAP		= 0x165,
         SYSCALL_SLEEP			= 0x166,
         SYSCALL_SETSIGACTION            = 0x167,
         SYSCALL_STOP			= 0x168,
@@ -48,7 +53,9 @@ extern "C" {
         SYSCALL_HLT			= 0x302,
         SYSCALL_MASKSIG                 = 0x303,
         SYSCALL_GETDENTS                = 0x304,
-        SYSCALL_EXECNEW			= 0x305
+        SYSCALL_EXECNEW			= 0x305,
+        SYSCALL_SETSTD                  = 0x306,
+        SYSCALL_TAKEADUMP               = 0x900
     } E_SYSCALLS;
 
     typedef struct sMMapSyscall

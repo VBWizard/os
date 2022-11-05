@@ -24,6 +24,7 @@
 
 #include "drivers/tty_driver.h"
 #include "kmalloc.h"
+#include "drivers/termdrv.h"
 
 int initTTY()
 {
@@ -39,14 +40,18 @@ ttydevice_t *registerTTY(int deviceMajor, int deviceMinor)
     int stdErrPipes[2];
     device->termDeviceMajor = deviceMajor;
     device->termDeviceMinor= deviceMinor;
-    fs_pipeA(NULL, stdOutPipes,PIPENOBLOCK); //n for no blocking
+    printd(DEBUG_TERMINAL,"Creating stdout pipes for tty%u\n",deviceMinor);
+    fs_pipeI(NULL, stdOutPipes,PIPENOBLOCK); //n for no blocking
     device->stdOutReadPipe = (file_t*)stdOutPipes[0];
     device->stdOutWritePipe = (file_t*)stdOutPipes[1];
-    fs_pipeA(NULL, stdInPipes, 0); //we want this one to block!
+    printd(DEBUG_TERMINAL,"Creating stdin pipes for tty%u\n",deviceMinor);
+    fs_pipeI(NULL, stdInPipes, 0); //we want this one to block!
     device->stdInReadPipe = (file_t*)stdInPipes[0];
     device->stdInWritePipe = (file_t*)stdInPipes[1];
-    fs_pipeA(NULL, stdErrPipes, 0); //we want this one to block!
+    printd(DEBUG_TERMINAL,"Creating stderr pipes for tty%u\n",deviceMinor);
+    fs_pipeI(NULL, stdErrPipes, PIPENOBLOCK); //we want the write to not block, but the read to block
     device->stdErrReadPipe = (file_t*)stdErrPipes[0];
+    ((pipe_t*)device->stdErrReadPipe->pipe)->flags="r"; //make this blocking!
     device->stdErrWritePipe = (file_t*)stdErrPipes[1];
     
     return device;
@@ -64,3 +69,16 @@ void unregisterTTY(int deviceMajor, int deviceMinor)
             return;
         }
 }
+
+int getTTYForPipe(int pipefd)
+{
+    for (int cnt=0;cnt<ttysRegistered;cnt++)
+    {
+        if (ttyDevices[cnt].termDeviceMajor == TERMINAL_CONSOLE_MAJOR_NUMBER)
+        {
+            if (ttyDevices[cnt].stdOutWritePipe==(file_t*)pipefd)
+                return cnt;
+        }
+    }
+    return 0xFF;
+}    

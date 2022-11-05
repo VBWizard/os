@@ -7,6 +7,7 @@
 .extern debugCS, debugEIP, debugErrorCode, debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, debugCR0, debugCR1, debugCR4, debugDS, debugES, debugFS, debugGS, debugSS, debugCR2, debugSavedESP, debugFlags, debugSavedStack, isrSavedTR
 .extern kIRQ0_handler
 .extern kIRQ8_handler
+.extern triggerScheduler
 .extern _sysCall
 .extern _schedule
 .extern schedulerTaskSwitched
@@ -22,11 +23,34 @@
 .extern schedulerTriggered
 .extern kPagingExceptionHandlerNew
 .extern kPagingExceptionCount
+.extern GeneralProtectionFaultHandler
+.extern isrCounts
+
+.globl _gpfExceptionHandler
+.type _gpfExceptionHandler, @function
+_gpfExceptionHandler:
+    cli #NOTE: don't need to STI later as jumping back to the tss that caused the exception will set/clear the if
+    #02/11/2019: Count ISRs
+    incd [0xd*4+isrCounts]
+    mov ebp, esp
+    #Push the error code
+    mov eax,[esp]
+    push eax
+    call GeneralProtectionFaultHandler
+    #For fatals the paging handler will have set the victimTask's return address already for the IRET
+    #For non-fatals, the IRET will jump back into the task that triggered the exception
+    #either way we don't need to do anything before IRETing except reset the stack and enable interrupts
+    mov esp, ebp
+    call triggerScheduler
+    iret
+    jmp _gpfExceptionHandler #Next paging exception the handler will start here so jump back to the beginning of the handler
 
 .globl pagingExceptionHandler
 .type pagingExceptionHandler, @function
 pagingExceptionHandler:
     cli #NOTE: don't need to STI later as jumping back to the tss that caused the exception will set/clear the if
+    #02/11/2019: Count ISRs
+    incd [0xe*4+isrCounts]
     mov ebp, esp
     #Increment the paging exception count
     mov eax,kPagingExceptionCount
@@ -62,6 +86,8 @@ cli
     mov isrSavedEAX,eax
     mov eax,[esp]
     mov isrNumber,eax         #second vector push was ISR #
+    #02/11/2019: Count ISRs
+    incd [eax*4+isrCounts]
     mov eax,esp
     add eax,8                 #Get rid of the vector parameters in the saved esp
     mov isrSavedESP,eax
@@ -144,6 +170,8 @@ notIRQ0Handler:
     hlt
 notGPF:
     cmp eax,0xe
+    je pagingHandler
+    cmp eax,0xd
     jne notPagingHandler
 
 pagingHandler:
@@ -207,7 +235,7 @@ sysCallHandler:
     mov cr3,eax
     jmp noIRQResponseRequired
 notSysCallHandler:
-    cmp ax,21
+    cmp ax,33
     jne notKbdHandler
     mov eax,kKeyboardHandlerRoutine
     cmp eax,0
@@ -235,7 +263,7 @@ ckeckForIRQResponse:
     mov eax,isrNumber
     cmp eax,0x20                    #If this is the IRQ0 exception, respond to the PIC
     je irqResponseRequired
-    cmp eax, 21
+    cmp eax, 33
     jne noIRQResponseRequired
 irqResponseRequired:
     mov al,0x20

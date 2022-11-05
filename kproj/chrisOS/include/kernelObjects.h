@@ -4,6 +4,10 @@
  *
  * Created on May 16, 2016, 4:32 PM
  */
+
+#ifndef KERNELOBJECTADDRESSES_H
+#define	KERNELOBJECTADDRESSES_H
+
 #include <stdint.h>
 #include <time.h>
 #include "i386/gdt.h"
@@ -19,10 +23,6 @@
 #include "../../chrisOSKernel/include/tss.h"
 #include "../../chrisOSKernel/include/task.h"
 #include "../../chrisOSKernel/include/process.h"
-#include "elfloader.h"
-
-#ifndef KERNELOBJECTADDRESSES_H
-#define	KERNELOBJECTADDRESSES_H
 
 /*NOTE: Code & Data are loaded below 200k so keep everything above 400k to be safe.*/
 #define     SMAP_TABLE_OFFSET 0x0

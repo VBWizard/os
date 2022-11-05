@@ -21,12 +21,13 @@ int sharedCounter = 10;
 
 int doChild(int childNum)
 {
-        for (int sharedCounter=4;sharedCounter>=0;sharedCounter--)
+        for (int sharedCounter=10;sharedCounter>=0;sharedCounter--)
         {
-            print("Child %u counting: Count = %u\n",childNum, sharedCounter);
+            //print("Child %u counting: Count = %u\n",childNum, sharedCounter);
             if (sharedCounter > 0)
                 sleep(1);
         }
+        printf("\tChild %u returning %u\n",childNum,childNum);
         return childNum;
 }
 
@@ -50,23 +51,26 @@ int main(int argc, char** argv) {
         if (pid==0)
         {
             int cn = doChild(childNo);
-            print("Child %u quitting\n",cn);
+            //print("Child %u quitting\n",cn);
             return cn;
         }
         else
             pids[pidsP++]=pid;
-        print("Started PID %u\n",pid);
+        //print("Started PID %u\n",pid);
     }
-    
+    printf("%u children spawned\n",pidsToSpawn);
+    printf("Waiting for all children to quit\n");
     while (pidCount<pidsToSpawn)
     {
         int thePid = pids[pidCount];
-        print("Waiting for child %u (0x%04X)\n",pidCount+1, thePid);
+        //print("Waiting for child %u (0x%04X)\n",pidCount+1, thePid);
         rets[pidCount]=waitpid(thePid);
+        if (rets[pidCount]-1!=pidCount)
+            printf("Wrong return value for child #%u, value=%u (pid=0x%08x)\n",pidCount,rets[pidCount],pids[pidCount]);
         pidCount++;
+        __asm__("mov ebx,0\nmov [ebx],eax\n");
     }
-    for (int cnt=0;cnt<pidsToSpawn;cnt++)
-        print("Child %u return %u\n",cnt+1,rets[cnt]);
+    printf("All children ended\n");
     return 0;
 /*    pid=fork();
     if (pid==0)

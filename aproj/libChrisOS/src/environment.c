@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-#include "libChrisOS.h"
+#include "common.h"
 #include "strings.h"
 
-VISIBLE int getenv(char *varname, char *value)
+int getenvI(char *varname, char *value)
 {
     for (int cnt=0;cnt<100;cnt++)
         if (strncmpI(processEnvp[cnt],varname, strlenI(varname))==0)
@@ -15,6 +15,11 @@ VISIBLE int getenv(char *varname, char *value)
             return cnt+1;
         }
     return 0;
+}
+
+VISIBLE int getenv(char *varname, char *value)
+{
+    return getenvI(varname, value);
 }
 
 VISIBLE void  setenv(char *varname, char *value)
@@ -44,4 +49,15 @@ VISIBLE void  setenv(char *varname, char *value)
         }            
     //NOTE: if we get here, the value is thrown away!        
     
+}
+
+char* getcwdI(char* buf, size_t size)
+{
+    return (char*)do_syscall2(SYSCALL_GETCWD,(uint32_t)buf,size);
+    
+}
+
+VISIBLE char* getcwd(char* buf, size_t size)
+{
+    return getcwdI(buf,size);
 }

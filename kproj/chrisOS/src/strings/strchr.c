@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 #include "strings.h"
+#include "common.h"
 
 VISIBLE char *strchr(const char *s, int c)
 {

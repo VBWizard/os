@@ -48,11 +48,31 @@ void print_e820_map(SMAP_entry* buffer, int entryCount)
 uint64_t sum_e820_usable_memory(SMAP_entry* buffer, int entryCount)
 {
     qword lRetVal = 0;
-    
-    for (int cnt=0;cnt<entryCount;cnt++)
+    bool useEntry=false;
+    printk("\n");
+    for (int ptr=0;ptr<entryCount;ptr++)
     {
-        if (buffer[cnt].Type==1)    
-            lRetVal += buffer[cnt].LengthL;
+        useEntry=true;
+        if (buffer[ptr].Type==1)
+        {
+            printk("\tEvaluating entry %u, start=0x%08x, length=0x%08x, type=%u\n",ptr,buffer[ptr].BaseL, buffer[ptr].LengthL, buffer[ptr].Type);
+            for (int cmp=0;cmp<ptr;cmp++)
+            {
+                //If there is a previous entry where the current base is between the previous entry's base and base+length then don't use it
+                if (buffer[ptr].BaseL>=buffer[cmp].BaseL 
+                        && buffer[ptr].BaseL < buffer[cmp].BaseL+buffer[cmp].LengthL)
+                {
+                printk("\t\tFound overlapping entry %u, start=0x%08x, length=0x%08x, type=%u\n",cmp,buffer[cmp].BaseL, buffer[cmp].LengthL, buffer[cmp].Type);
+                    useEntry=false;
+                    break;
+                }
+            }
+            if (useEntry) 
+            {
+                lRetVal += buffer[ptr].LengthL;
+                printk("\t\tNo overlaps, using this entry ... new sum of available memory is 0x%08x\n",lRetVal);
+            }
+        }
     }
     return lRetVal;
 }

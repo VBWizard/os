@@ -31,7 +31,7 @@ extern "C" {
 #define EOF (-1)
     
 #define FS_BUFFERSIZE 1048576
-    
+#define FS_FILE_COPYBUFFER_SIZE 65535
 #define DENTRY_ROOT 0xFFFFFFFF    
 
     typedef enum
@@ -43,7 +43,8 @@ extern "C" {
     typedef enum
     {
         FILETYPE_FILE,
-        FILETYPE_PIPE
+        FILETYPE_PIPE,
+        FILETYPE_PROCFILE
     } eFileType;
     
     typedef struct file file_t;
@@ -108,7 +109,8 @@ extern "C" {
         inode_t* f_inode;
         fileops_t* fops;
         void* handle;
-        void *pipe, *buffer, **bufferPtr;
+        void *pipe, *pipeContent, **pipeContentPtr;
+        void *copyBuffer;
         uint32_t verification;
         void *owner;
     };
@@ -125,7 +127,10 @@ extern "C" {
         //size_t (*read) (file_t *, char *, size_t, uint64_t *);
         size_t (*read) (void * buffer, int size, int length, void *f);
         //size_t (*write) (file_t *, const char *, size_t, uint64_t *);
+        long (*tell) (void *f);
         size_t (*write) (const void * data, int size, int count, void *f);
+        int (*flush) (void *f);
+        int (*delete) (const char *filename);
     };
 
     struct dir_operations
@@ -141,6 +146,7 @@ extern "C" {
         inode_t* f_inode;
         dirops_t* dops;
         void* handle;
+        dllist_t listEntry;
     };
     
     struct direntry
@@ -167,14 +173,26 @@ extern "C" {
         dllist_t* dirs;
     };
     
+    struct sfstat
+    {
+        uint32_t     st_size;        /* Total size, in bytes */
+        uint32_t  st_lastmod;
+    };
+    
+    typedef struct sfstat fstat_t;
+
     
     filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const dirops_t * dops);
     void* fs_open(char* path, const char* mode);
     int fs_read(process_t* process, void* file, void * buffer, int size, int length);
     int fs_write(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);
+    long fs_tell(void* file);
     void fs_close(void* file);
+    int fs_unlink(char *filename);
+    int fs_stat(process_t *process, void *path, fstat_t *buffer);
     int getDirEntries(void *process, char* path, dirent_t *buffer, int bufferCount);
+    int parsePath(const char *inPath, char *outPath, char *outFilename, char** outPathTokens, int outPathTokensArrayCount);
 #ifdef __cplusplus
 }
 #endif

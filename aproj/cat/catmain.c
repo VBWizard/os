@@ -47,57 +47,70 @@ int main(int argc, char** argv) {
 
     return 0;
     
-*/    printf("File mmap test commencing ...\n");
-    
+    printf("File mmap test commencing ...\n");
+*/    
     direntry_t *dirbuff = malloc(16384);
     
-    char *ptr=argv[1], *ptr2=argv[1];
-    char *path, *filename;
-    int filesize = -1;
+    char *ptr=argv[1], *baseFileName=argv[1];
+    char *path, *qualifiedFileName;
     
     path=malloc(0x512);
-    filename=malloc(0x512);
+    qualifiedFileName=malloc(0x512);
     
     while (ptr=(strstr(ptr,"/")))
     {
         ptr++;
-        ptr2=ptr;
+        baseFileName=ptr;
     }
     
-    strncpy(path, argv[1], (uint32_t)ptr2-(uint32_t)argv[1]);
-    strcpy(filename, ptr2);
-    int entryCount = getdir(path, (void*)dirbuff, 16384);
-    
-    for (int cnt=0;cnt<entryCount;cnt++)
-        if (strcmp(filename,dirbuff[cnt].filename)==0)
-        {
-            filesize = dirbuff[cnt].size;
-            break;
-        }
-    
-    if (filesize == -1)
+    strncpy(path, argv[1], (uint32_t)baseFileName-(uint32_t)argv[1]);
+
+    char *temp=malloc(1024);
+    fstat_t fstat;
+
+    if (resolvePath(argv[1], temp,false)==0)
     {
-        printf("Error, can't stat file %s",filename);
+        strcpy(qualifiedFileName,temp);
+    }
+    else
+        strcpy(qualifiedFileName, path);
+
+    int statResult=stat(qualifiedFileName,&fstat);
+    
+    if (statResult)
+    {
+        printf("Error, can't stat file %s\n",qualifiedFileName);
         return -2;
     }
     
-    file = open(argv[1],"r");
+    file = open(qualifiedFileName,"r");
     if (file)
     {
         seek(file, 0, 0);
-        char *a = mmap(NULL, filesize, PROT_WRITE, MAP_PRIVATE, (int)file, 0);
+        char *a = mmap(NULL, fstat.st_size, PROT_WRITE, MAP_PRIVATE, (int)file, 0);
 
-        char test[filesize];
-        strncpy(test,a,filesize);
+        buffer=malloc(fstat.st_size);
         
-        a[1] = 0;
-        write(1, a, filesize, 1);
+        strncpy(buffer,a,fstat.st_size);
+        
+        write(1, a, fstat.st_size, 1);
         printf("\n");
         close(file);
     }
     else
         printf("Error opening file %s\n",argv[1]);
-    
+    if (temp)
+        free(temp);
+    if (dirbuff)
+        free(dirbuff);
+    if (path)
+        free(path);
+    if (qualifiedFileName)
+        free(qualifiedFileName);
+    if (temp)
+        free(temp);
+    if (dirbuff)
+        free(dirbuff);
     return 0;
 /*    file = open(argv[1],"r");
     if (file)

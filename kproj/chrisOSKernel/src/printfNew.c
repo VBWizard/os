@@ -30,7 +30,7 @@
 extern uint32_t kDebugLevel;
 extern uint32_t* kTicksSinceStart;
 
-char buffer[512];
+char printfBuffer[4096];
 
 
 static int skip_atoi(const char **s)
@@ -386,9 +386,9 @@ int printk(const char *format, ...)
 
 int printdL2(const char *format, va_list args)
 {
-    memset(buffer,0,512);
-    vsprintf(buffer, format, args);
-    int len=strlen(buffer);
+    //memset(printfBuffer,0,4096);
+    vsprintf(printfBuffer, format, args);
+    int len=strlen(printfBuffer);
     if (kDebugLevel & DEBUG_PRINT_TO_PORT)
         for (int cnt=0;cnt<len;cnt++)
             {
@@ -396,10 +396,10 @@ int printdL2(const char *format, va_list args)
         //        if (cnt%3==0)
         //            wait(10);
 
-                outb(0x3f8,buffer[cnt]);
+                outb(0x3f8,printfBuffer[cnt]);
             }
     else
-        putString(buffer);
+        putString(printfBuffer);
     return 0;
 }
 
@@ -407,7 +407,7 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
     va_start(args,format);
-    if ((DebugLevel & kDebugLevel) == DebugLevel)
+    if ((DebugLevel & kDebugLevel) > 0)
     {
         printTicks("%u:",*kTicksSinceStart);
         printdL2(format, args);

@@ -5,6 +5,7 @@
  */
 
 #include <stdarg.h>
+#include "common.h"
 #include "strings.h"
 
 static int skip_atoi(const char **s)
@@ -274,7 +275,18 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 	return str - buf;
 }
 
-int sprintf(char *buf, const char *fmt, ...)
+int sprintfI(char *buf, const char *fmt, ...)
+{
+	va_list args;
+	int i;
+
+	va_start(args, fmt);
+	i = vsprintf(buf, fmt, args);
+	va_end(args);
+	return i;
+}
+
+VISIBLE int sprintf(char *buf, const char *fmt, ...)
 {
 	va_list args;
 	int i;

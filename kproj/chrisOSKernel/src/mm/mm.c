@@ -1,4 +1,9 @@
 #include "mm.h"
+#include "i386/kPaging.h"
+#include "charDev.h"
+#include "printf.h"
+#include "paging.h"
+#include "alloc.h"
 
 extern uint64_t kE820MemoryBytes;
 extern uint32_t kDebugLevel;
@@ -28,10 +33,10 @@ void mmInitHeapTracking()
     heapMemoryInfo=(sMemInfo*)kmmHeapMemoryBaseAddress;
     printd(DEBUG_MEMORY_MANAGEMENT,"Assigning heapMemoryInfo address of 0x%08X\n",heapMemoryInfo);
     
-    kmmHeapMemoryBaseAddress += sizeof(sMemInfo)*1000;
-    kmmHeapMemoryBaseAddress += 0x1000;
+    kmmHeapMemoryBaseAddress += sizeof(sMemInfo)*10000;
+    kmmHeapMemoryBaseAddress += 0x10000;
     kmmHeapMemoryBaseAddress &= 0xFFFFF000;
-    kmmHeapMemoryTotal-= sizeof(sMemInfo)*1000; 
+    kmmHeapMemoryTotal-= sizeof(sMemInfo)*10000; 
     printd(DEBUG_MEMORY_MANAGEMENT,"heapMemoryInfo = 0x%08X\n",heapMemoryInfo);
     printd(DEBUG_MEMORY_MANAGEMENT,"Allocating 0x%08X bytes to memory block tracking\n",sizeof(sMemInfo)*1000);
     printd(DEBUG_MEMORY_MANAGEMENT,"User memory base adjusted to 0x%08X\n",kmmHeapMemoryBaseAddress);
@@ -51,6 +56,7 @@ void mmInitHeapTracking()
         heapMemoryInfo[cnt].inUse=false;
         heapMemoryInfo[cnt].pid=0;
         heapMemoryInfo[cnt].size=0;
+        strcpy(heapMemoryInfo[cnt].verify,"MEMINFO");
     }
 }
 

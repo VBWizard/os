@@ -25,8 +25,7 @@
 #include "printf.h"
 #include "drivers/tty_driver.h"
 #include "filesystem/pipe.h"
-
-extern file_t *activeSTDOUT;
+#include "io.h"
 
 char *pipeContents;
 volatile int kTermLock;
@@ -35,6 +34,7 @@ char *console;
 void initTerm()
 {
     terminfos = (terminfo_t*)kMalloc(sizeof(terminfo_t) * TERM_MAX_TERMINALS);
+    memset(terminfos,0,sizeof(terminfo_t)*TERM_MAX_TERMINALS);
     termsRegistered = 0;
     pipeContents = kMalloc(PIPE_FILE_SIZE);
     kTermLock = 0;
@@ -59,6 +59,8 @@ terminfo_t* registerTerminal(int deviceMajor, int deviceMinor, int width, int he
     terminfos[termsRegistered].screenBuffer = kMalloc(width * (height+1) * 2); //+1 is for extra row when newline takes you past bottom of screen
     memset(terminfos[termsRegistered].screenBuffer, 0, width * (height+1) * 2);
     terminfos[termsRegistered].cursorX = terminfos[termsRegistered].cursorY = 0;
+    terminfos[termsRegistered].backColor = 1;
+    terminfos[termsRegistered].foreColor = 6|8;
     terminfos[termsRegistered].refresh = false;
     terminfos[termsRegistered].description=kMalloc(1024);
     strcpy(terminfos[termsRegistered].description, description);
@@ -73,7 +75,7 @@ terminfo_t *getTermInfo(int deviceMajor, int deviceMinor)
         if (terminfos[cnt].major == deviceMajor && 
                 terminfos[cnt].minor == deviceMinor)
             return &terminfos[cnt];    
-    return NULL;
+    panic("getTerminfo: Terminal 0x%04x:0x%04x not found\n",deviceMajor, deviceMinor);
 }
 
 int unregisterTerminal(terminfo_t* term)
@@ -98,24 +100,34 @@ void cursor_update(terminfo_t* term)
 
 void processCharacter(ttydevice_t *device, terminfo_t* term, char charToPrint)
 {
-    char * screenBuffer = term->screenBuffer;
+    char *screenBuffer = term->screenBuffer;
 
     if (term->cursorY >= term->height)
     {
         //Move up 1 line by copying from the 2nd line of the screen down, to the first line
         memcpy(screenBuffer, screenBuffer + (term->width * 2), term->width * term->height * 2);
-        if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+        for (int cnt=(term->height-1)*term->width*2;cnt<(term->height-1)*term->width*2+(term->width*2);cnt+=2)
+        {
+            screenBuffer[cnt]=0x20;
+            screenBuffer[cnt+1]=((term->backColor & 15) << 4) | (term->foreColor & 15);
+        }
+        if (device->stdOutWritePipe == activeTTY->stdOutWritePipe) //if the write pipe (used by the writing program) is STDOUT
         {
             memcpy(console, console + (term->width * 2), term->width * term->height * 2);
+            for (int cnt=(term->height-1)*term->width*2;cnt<(term->height-1)*term->width*2+(term->width*2);cnt+=2)
+            {
+                console[cnt]=0x20;
+                console[cnt+1]=((term->backColor & 15) << 4) | (term->foreColor & 15);
+            }
         }
         term->cursorY--;
     }
     screenBuffer[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-    screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) + 1] = 0x07;
-    if (device->stdOutWritePipe == activeSTDOUT) //if the write pipe (used by the writing program) is STDOUT
+    screenBuffer[((term->cursorX + (term->cursorY*term->width)) * 2) + 1] = ((term->backColor & 15) << 4) | (term->foreColor & 15);
+    if (device->stdOutWritePipe == activeTTY->stdOutWritePipe) //if the write pipe (used by the writing program) is STDOUT
     {
         console[(term->cursorX + (term->cursorY*term->width)) * 2] = charToPrint;
-        console[((term->cursorX + (term->cursorY*term->width)) * 2) + 1] = 0x07;
+        console[((term->cursorX + (term->cursorY*term->width)) * 2) + 1] = ((term->backColor & 15) << 4) | (term->foreColor & 15);
     }
     if (++term->cursorX >= term->width)
     {
@@ -132,7 +144,7 @@ void clearScreen(terminfo_t* term, char* buffer)
     for (int cnt=0; cnt<(height*width)*2;cnt+=2)
     {
         buffer[cnt] = ' ';
-        buffer[cnt+1] = 0x7;
+        buffer[cnt+1] =  ((term->backColor & 15) << 4) | (term->foreColor & 15);
     }
     term->cursorX = 0;
     term->cursorY = 0;
@@ -176,8 +188,7 @@ void updateTermBuffer(ttydevice_t *device, int bytesToUpdate)
                     char contentP8 = pipeContents[cnt+8];
                     
                     if ( (contentP2==';' || contentP3==';' ||contentP4==';')
-                      && (contentP3=='H' || contentP4=='H' || contentP5=='H' || contentP6=='H' || contentP7=='H')
-                            )
+                      && (contentP3=='H' || contentP4=='H' || contentP5=='H' || contentP6=='H' || contentP7=='H') )
                     {
                         int lCursorX=-1, lCursorY=-1;
                         char num[3] = {0, 0, 0};
@@ -230,10 +241,79 @@ void updateTermBuffer(ttydevice_t *device, int bytesToUpdate)
                         }
                         term->cursorX = lCursorX;
                         term->cursorY = lCursorY;
-                        cursor_update(term);
+                        if (device->stdOutWritePipe == activeTTY->stdOutWritePipe)
+                            cursor_update(term);
                         sequenceFound = true;
                         curr=0;
                         break;
+                    }
+                    else if ( (contentP2==';' || contentP3==';' ||contentP4==';')
+                      && (contentP3=='m' || contentP4=='m' || contentP5=='m' || contentP6=='m' || contentP7=='m') )
+                    {
+                        char num[3] = {0, 0, 0};
+                        bool done=false;
+                        for (int idx=cnt+2;idx<cnt+8;cnt++)
+                        {
+                            switch (pipeContents[idx])
+                            {
+                                case ';':
+                                    idx+=1;
+                                    break;
+                                case 'm':
+                                    idx+=1;
+                                    done=true;
+                                    break;
+                                case '3':
+                                case '4':
+                                    num[0]=pipeContents[idx];
+                                    num[1]=pipeContents[idx+1];
+                                    num[2]=0;
+                                    int lNum=atoi(num);
+                                    if (pipeContents[idx]=='3')
+                                        lNum-=30;
+                                    else
+                                        lNum-=40;
+                                    switch (lNum)
+                                    {
+                                        case 0:
+                                            lNum=0;
+                                            break;
+                                        case 1:
+                                            lNum=4;
+                                            break;
+                                        case 2:
+                                            lNum=2;
+                                            break;
+                                        case 3:
+                                            lNum=6|8;
+                                            break;
+                                        case 4:
+                                            lNum=1;
+                                            break;
+                                        case 5:
+                                            lNum=5;
+                                            break;
+                                        case 6:
+                                            lNum=3;
+                                            break;
+                                        case 7:
+                                            lNum=7|8;
+                                            break;
+                                    }
+                                    if (pipeContents[idx]=='3')
+                                        term->foreColor=lNum;
+                                    else
+                                        term->backColor=lNum;
+                                    idx+=2;
+                                    break;
+                            }
+                            if (done)
+                            {
+                                cnt+=idx;
+                                curr=0;
+                                break;
+                            }
+                        }
                     }
                     switch (contentP2)
                     {
@@ -270,7 +350,7 @@ void updateTermBuffer(ttydevice_t *device, int bytesToUpdate)
                                 if (contentP2=='2')               //Clear screen
                                 {
                                     clearScreen(term, term->screenBuffer);
-                                    if (device->stdOutWritePipe == activeSTDOUT)
+                                    if (device->stdOutWritePipe == activeTTY->stdOutWritePipe)
                                         clearScreen(term, console);
                                     cnt+=3;
                                     curr = 0;
@@ -296,13 +376,14 @@ void updateTermBuffer(ttydevice_t *device, int bytesToUpdate)
             processCharacter(device, term, curr);
         }
     }
-    if (device->stdOutWritePipe == activeSTDOUT)
+    if (device->stdOutWritePipe == activeTTY->stdOutWritePipe)
         cursor_update(term);
 }
 
 void updateTerms()
 {
     int pipeReadSize;
+   printd(DEBUG_TERMINAL,"Updating terms\n");
    for (int cnt=0;cnt<ttysRegistered;cnt++)
     {
         if (ttyDevices[cnt].termDeviceMajor == TERMINAL_CONSOLE_MAJOR_NUMBER)
@@ -316,13 +397,22 @@ void updateTerms()
             //pipeReadSize = fs_read(NULL, ttyDevices[cnt].piper, pipeContents, PIPE_FILE_SIZE, 1);
             if (pipeReadSize > 0)
             {
-               printd(DEBUG_TERM,"Starting terminal update\n");
+               printd(DEBUG_TERMINAL,"Starting terminal update\n");
                updateTermBuffer(&ttyDevices[cnt], pipeReadSize);
-               printd(DEBUG_TERM,"Done terminal update\n");
+               printd(DEBUG_TERMINAL,"Done terminal update\n");
             }
             else
-               printd(DEBUG_TERM,"No terminal update necessary\n");
+               printd(DEBUG_TERMINAL,"No terminal update necessary for tty%u\n",cnt);
            __sync_lock_release(&kTermLock);
         }
     }
 }
+
+void switchTerm(int ttyNum)
+{
+    terminfo_t* term = getTermInfo(activeTTY->termDeviceMajor, activeTTY->termDeviceMinor);
+
+    memcpy(console,term->screenBuffer,term->width*term->height*2);
+    cursor_update(term);
+}   
+ 

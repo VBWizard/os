@@ -37,7 +37,7 @@ typedef struct sizeof_type
 
 void reverse(char s[]);
 int atoi(char *str);
-void itoa(int n, char s[]);
+char *itoa(int n, char s[]);
 void itox(unsigned int i, char *s);
 void itoha(unsigned int n, char *buf);
 void* mallocTemp(int size); //Only used during boot

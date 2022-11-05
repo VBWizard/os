@@ -19,6 +19,14 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+    
+#define SEEK_SET	0	/* Seek from beginning of file.  */
+#define SEEK_CUR	1	/* Seek from current position.  */
+#define SEEK_END	2	/* Seek from end of file.  */
+#define GETLINE_BUFFER_SIZE 1024
+
     
     struct direntry
     {
@@ -33,17 +41,37 @@ extern "C" {
     uint16_t                  create_time;
     } __attribute((packed));
     
-    typedef struct direntry direntry_t;
+    struct sfstat
+    {
+        uint32_t     st_size;        /* Total size, in bytes */
+        uint32_t  st_lastmod;
+    };
     
+    typedef struct direntry direntry_t;
+    typedef struct sfstat fstat_t;
+    
+    uintptr_t *filesToClose;
+    uint32_t filesToCloseCount;
+
     void* open(char* path, const char* mode);
+    void* openI(char* path, const char* mode);
     void close(void* handle);
+    void closeI(void* handle);
+    int unlink(char *filename);
     int read(void* handle, void *buffer, int size, int length);
+    int readI(void* handle, void *buffer, int size, int length);
     int write(void* handle, void *buffer, int size, int length);
-    int getdir(char* path, char *buffer, int bufferCount);
+    int getdir(char* path, direntry_t *entries, int bufferCount);
+    int getdirI(char* path, direntry_t *entries, int bufferCount);
     int seek(void* handle, long position, int whence);
+    void* freopen(char* path, const char* mode, void *stream);
+    int stat(char *path, fstat_t *stat);
+    long tell(void *stream);
+    size_t getline(char **lineptr, size_t *n, void *stream);
+    int resolvePath(const char *inPath, char *outPath, bool usePathVariable);
     
     int writeI(void* handle, void *buffer, int size, int length);
-    
+    void file_cleanup();
 #ifdef __cplusplus
 }
 #endif

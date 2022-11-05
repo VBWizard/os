@@ -18,3 +18,12 @@ void __attribute__((noinline))panic(const char *format, ...)
     goto panicLoop;
 }
 
+void __attribute__((noinline))assertPanic(char *message, char *file, int line)
+{
+    printk("\n>>>Assert: line %i, file %s (%s)",line, file, message);
+    printk("  >>>");
+    assertPanicLoop: 
+    __asm__("cli\nhlt\n");
+    goto assertPanicLoop;
+}
+

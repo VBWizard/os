@@ -13,6 +13,10 @@
 #include "charDev.h"
 #include "i386/kPaging.h"
 #include "../../../chrisOSKernel/include/paging.h"
+#ifdef KERNEL_LOADED
+#include "../../../chrisOSKernel/include/alloc.h"
+#endif
+
 extern int kTimeZone;
 extern time_t kSystemStartTime, kSystemCurrentTime;
 extern int printk_valist(const char *format, va_list args);
@@ -24,6 +28,10 @@ extern uint32_t debugAX, debugBX, debugCX, debugDX, debugSI, debugDI, debugBP, d
 extern uint32_t  *debugSavedStack;
 extern struct gdt_ptr kernelGDT;
 extern sGDT* bootGdt;
+#ifdef KERNEL_LOADED
+extern sMemInfo* heapMemoryInfo;
+#endif
+
 extern void doNonPagingJump();
 extern void doPagingJump();
 
@@ -41,7 +49,7 @@ extern void doPagingJump();
          s[j] = c;
      }
  }
- void itoa(int n, char s[])
+ char *itoa(int n, char s[])
  {
      int i, sign;
 
@@ -55,6 +63,7 @@ extern void doPagingJump();
          s[i++] = '-';
      s[i] = '\0';
      reverse(s);
+     return s;
  }
 void itox(unsigned int i, char *s)
 {
@@ -189,22 +198,43 @@ char * strtoupper(char* pointerToString)
 #define LOAD_ZERO_BASED_DS     __asm__("mov eax,0x90\nmov ds,eax":::"eax");
 #define LOAD_KERNEL_BASED_DS __asm__("mov eax,0x10\nmov ds,eax":::"eax");
 
+void __attribute__((noinline)) dumpAllHeapPointers()
+{
+#ifdef KERNEL_LOADED
+
+    sMemInfo *mInfo = heapMemoryInfo;
+    
+    printd(DEBUG_EXCEPTIONS,"\nSystem Heap Memory list:\n");
+    printd(DEBUG_EXCEPTIONS,"\tAddress   \tSize      \tInUse\tThis      \tPrev      \tNext      \n");
+     while (mInfo!=NULL)
+    {
+         if ((pagingGet4kPTEntryValue(mInfo) & 7) != 7)
+             break;
+        printd(DEBUG_EXCEPTIONS, "\t0x%08x\t0x%08X\t%c    \t0x%08x\t0x%08x\t0x%08x\n",
+                mInfo->address, 
+                mInfo->size,
+                mInfo->inUse?'Y':'N',
+                mInfo, 
+                mInfo->prev, 
+                mInfo->next==NULL?0:mInfo->next);
+        mInfo = mInfo->next;
+    };
+        
+#endif
+}
+
 //Called by exception 0xd & 0xe (possibly more)
-void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bool toLog)
+void printPagingExceptionRegs(task_t *task, uint32_t cr2, uint32_t errorCode, bool toLog, uintptr_t victimCR3)
 {
     tss_t* tss = task->tss;
     uint32_t esp = tss->ESP;
-    
-#ifdef KERNEL_LOADED
-    uint32_t *espP = (pagingGet4kPTEntryValueCR3(task->tss->CR3,tss->ESP) & 0xFFFFF000) | (esp & 0x00000FFF);
-#else
-    uint32_t *espP = (uint32_t*)tss->ESP;
-#endif    
     char content[5000];
     memset(content, 0, 5000);
     char *contentP=content;
     volatile unsigned short *lCSIPPtr=(volatile unsigned short *)tss->CS;
-LOAD_ZERO_BASED_DS    
+#ifndef KERNEL_LOADED
+    LOAD_ZERO_BASED_DS
+#endif
     sprintf(content, "EAX=%08X\tEBX=%08X\tECX=%08X\tEDX=%08X\tEFL=%08X\n", tss->EAX, tss->EBX, tss->ECX, tss->EDX,tss->EFLAGS);
     contentP=content+strlen(content);
     sprintf(contentP, "EBP=%08X\tESI=%08X\tEDI=%08X\tESP=%08X\n", tss->EBP, tss->ESI, tss->EDI, tss->ESP);
@@ -222,23 +252,38 @@ LOAD_ZERO_BASED_DS
 //          printk("\n");
     contentP=content+strlen(content);
     sprintf(contentP, "Stack (ss:ebp) @ 0x%08x:0x%08X:\n",tss->SS, esp);
-    for (int cnt=0;cnt<20;cnt++)
-    {
 #ifdef KERNEL_LOADED
-        int pte=pagingGet4kPTEntryValueCR3(task->tss->CR3,espP);
-        if (!(pte & 0x1))
+    esp-=5;
+    for (uint32_t *address=(uint32_t*)esp;address<(uint32_t*)esp+20;address++)
+    {
+        int pte=pagingGet4kPTEntryValueCR3(victimCR3,address);
+        if (pte & 1!=1)
+        {
+            sprintf(contentP, "Cannot print any more stack due to address not mapped to process. (address=0x%08x, pte=0x%08x)\n",address,pte);
+            contentP=content+strlen(content);
             break;
-#endif
-        sprintf(contentP, "\t0x%08X: 0x%08X\n",esp, *espP);
-        espP++;
+        }
+        else if ((pte & PAGE_MMAP_FLAG))
+        {
+            sprintf(contentP, "Cannot print any more stack due to address being unmapped MMAP. (address=0x%08x, pte=0x%08x)\n",address,pte);
+            contentP=content+strlen(content);
+            break;
+        }
+        pte&=0xFFFFF000;
+        pte|=((uint32_t)address&0x00000FFF);
+        sprintf(contentP, "\t0x%08X: 0x%08X\n",esp, *(uint32_t*)pte);
         esp++;
         contentP=content+strlen(content);
     }
+#endif
     if (toLog)
         printd(DEBUG_EXCEPTIONS, "%s", content);
     else
         printk("%s", content);
+
+#ifndef KERNEL_LOADED
 LOAD_KERNEL_BASED_DS
+#endif
 }
 
 //Called by exception 0xd & 0xe (possibly more)

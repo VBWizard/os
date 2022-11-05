@@ -15,6 +15,7 @@
 
 extern filesystem_t* rootFs;
 extern filesystem_t* pipeFs;
+extern filesystem_t* procFs;
 
 struct fs_dir_list_status
 {
@@ -48,6 +49,8 @@ filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const
     if (strncmp(mountPoint,"/",1024)==0)
         fs->mount->mnt_root->d_parent = (dentry_t*)DENTRY_ROOT;
     else if (strncmp(mountPoint,"/pipe/",1024)==0)
+    {}
+    else if (strncmp(mountPoint,"/proc",1024)==0)
     {}
     else
         panic("Mounting filesystem as non-root ... this is not yet supported");
@@ -107,9 +110,10 @@ void* fs_open(char* path, const char* mode)
     void* handle;
     dllist_t* list;
     file_t *file;
-    bool isPipeFile = false;
+    bool isPipeFile=false;
+    bool isProcFile=false;
     
-    printd(DEBUG_FILESYS, "fs_open: called with path=%s, mode=%s\n", path, mode);
+    printd(DEBUG_FILESYS, "\t\tfs_open: called with path=%s, mode=%s\n", path, mode);
     file = kMalloc(sizeof(file_t));
     memset(file,0,sizeof(file_t));
     
@@ -119,6 +123,11 @@ void* fs_open(char* path, const char* mode)
         //handle = (uintptr_t*)pipeFileHandle--;
         handle = file;
         isPipeFile = true;
+    }
+    else if (strncmp(path,"/proc",5)==0)
+    {
+        isProcFile = true;
+        handle=procFs->fops->open(path, mode);
     }
     else
         handle = rootFs->fops->open(path, mode);
@@ -130,7 +139,7 @@ void* fs_open(char* path, const char* mode)
             file->handle = handle;
             if (strlen(path)>7)
             {
-                file->pipe = (void*)pipedup(path, mode, file);
+                file->pipe = (void*)pipedup1(path, mode, file);
                 file->f_path = path;
                 if (!file->pipe)
                     return ERROR_FS_PIPE_DOESNT_EXIST;
@@ -151,7 +160,10 @@ void* fs_open(char* path, const char* mode)
             file->f_path = kMalloc(1024);
             file->fops = kMalloc(sizeof(file_operations_t));
             strncpy(file->f_path, path, 1024);
-            memcpy(file->fops, rootFs->fops, sizeof(file_operations_t));
+            if (isProcFile)
+                memcpy(file->fops, procFs->fops, sizeof(file_operations_t));
+            else
+                memcpy(file->fops, rootFs->fops, sizeof(file_operations_t));
         }
         //identify the fs that the path is on
 
@@ -166,10 +178,11 @@ void* fs_open(char* path, const char* mode)
             listAdd(rootFs->files,list,file);
 */
         file->verification=0xBABAABAB;
-        printd(DEBUG_FILESYS, "\tfs_open: returning handle 0x%08x\n",handle);
+        file->copyBuffer=kMalloc(FS_FILE_COPYBUFFER_SIZE);
+        printd(DEBUG_FILESYS, "\t\tfs_open: returning handle 0x%08x\n",handle);
         return file;
     }
-    printd(DEBUG_FILESYS, "\tfs_open: returning NULL\n",handle);
+    printd(DEBUG_FILESYS, "\t\tfs_open: returning NULL\n",handle);
     return NULL;
 }
 
@@ -179,9 +192,9 @@ void* fs_open(char* path, const char* mode)
 int fs_read(process_t* process, void* file, void * buffer, int size, int length)
 {
     file_t* theFile = file;
-    int retVal = 0, bytesRead;
+    int totalBytesRead=0, bytesRead=0, readSize;
     
-    printd(DEBUG_FILESYS, "fs_read: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
+    printd(DEBUG_FILESYS, "\t\tfs_read: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
 
     if (size * length == 0)
         return 0;
@@ -189,29 +202,31 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     if (theFile->verification!=0xBABAABAB)
         panic("fs_read: Referenced a file that is not a file");
     
-    if (process == NULL) //process == null means that this is being called by kernel so no need to allocate buffer or copy from kernel
-    {
-        while (__sync_lock_test_and_set(&kFileReadLock, 1));
-        bytesRead = theFile->fops->read(buffer, size, length, theFile->handle);
-        __sync_lock_release(&kFileReadLock);   
-        
-        return bytesRead;
-    }
-    
-    if (vfs_readBuffer==NULL)
-        vfs_readBuffer = allocPagesAndMap(FS_BUFFERSIZE);
-    while (__sync_lock_test_and_set(&kFileReadLock, 1));
-    retVal = theFile->fops->read(vfs_readBuffer, size, length, theFile->handle);
-    __sync_lock_release(&kFileReadLock);   
-
-    if (retVal > 0)
-    {
-        printd(DEBUG_FILESYS, "\tfs_read: Read %u bytes, copying from kernel address 0x%08x to process address 0x%08x\n", retVal, vfs_readBuffer, buffer);
-        copyFromKernel(process, buffer, vfs_readBuffer, retVal);
-    }
-    else
-        retVal = 0; //Regardless of what our disk driver returns for EOF, we return 0
-    return retVal;
+    //For kernel processes, just read the file and return in the kernel's buffer
+    if (process==NULL)
+        totalBytesRead=theFile->fops->read(buffer,size*length,1,theFile->handle);
+    else //For user processes, have to use kernel file_t copy buffer which is limited in length, so loop until all bytes are read
+        while (totalBytesRead<size*length)
+        {
+            //Figure out how many bytes we will read in this iteration
+            readSize=(size*length)-totalBytesRead>FS_FILE_COPYBUFFER_SIZE?FS_FILE_COPYBUFFER_SIZE:(size*length)-totalBytesRead; //Only read up to the size of the file_t buffer
+            //Read the bytes from the file
+            printd(DEBUG_FILESYS, "\t\tfs_read: Reading %u bytes to 0x%08x\n", readSize, theFile->copyBuffer);
+            bytesRead = theFile->fops->read(theFile->copyBuffer,readSize,1,theFile->handle);
+            //If the read returned bytes, copy them from the file_t buffer to the process' buffer
+            if (bytesRead > 0)
+            {
+                printd(DEBUG_FILESYS, "\t\tfs_read: Read %u bytes, copying (partial) from kernel address 0x%08x to process address 0x%08x\n", bytesRead, theFile->copyBuffer, buffer+totalBytesRead);
+                copyFromKernel(process, buffer+totalBytesRead, theFile->copyBuffer, bytesRead);
+                totalBytesRead+=bytesRead;
+            }
+            else //Otherwise, if the read didn't return bytes
+            {
+                break;
+            }
+        }
+        printd(DEBUG_FILESYS, "\t\tfs_read: Done reading.  Read %u bytes to user process buffer at 0x%08x\n", totalBytesRead, buffer);
+    return totalBytesRead;
 }
 
 int fs_write(process_t* process, void* file, void * buffer, int size, int length)
@@ -219,7 +234,7 @@ int fs_write(process_t* process, void* file, void * buffer, int size, int length
     file_t* theFile = file;
     int retVal = 0;
 
-    printd(DEBUG_FILESYS, "fs_write: called for file %s (handle=0x%08X), %u bytes to 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
+    printd(DEBUG_FILESYS, "\t\tfs_write: called for file %s (handle=0x%08X), %u bytes from 0x%08x\n", theFile->f_path, theFile->handle, size*length, buffer);
 
     if (theFile->verification!=0xBABAABAB)
         panic("fs_write: Referenced a file that is not a file");
@@ -238,12 +253,80 @@ int fs_seek(void* file, long offset, int whence)
 {
     file_t* theFile = file;
     
-    printd(DEBUG_FILESYS, "fs_seek: called for file %s (handle=0x%08X), offset %u, whence %u\n", theFile->f_path, theFile->handle, offset, whence);
+    printd(DEBUG_FILESYS, "\t\tfs_seek: called for file %s (handle=0x%08X), offset %u, whence %u\n", theFile->f_path, theFile->handle, offset, whence);
 
     if (theFile->verification!=0xBABAABAB)
         panic("fs_seek: Referenced a file that is not a file",file);
     
     return theFile->fops->seek(theFile->handle, offset, whence);
+}
+
+int fs_stat(process_t *process, void *path, fstat_t *buffer)
+{
+    
+    char lpath[512], lfile[512];
+    dirent_t *dir=kMalloc(16384);
+    int dircnt=0;
+    int retVal=-1;
+    fstat_t lbuffer;
+    
+    strcpy(lpath,path);
+    strtrim(lpath);
+    if (*lpath==0 || strcmp(lpath,"/")==0)
+    {
+        if (process)
+        {
+            /*lbuffer.st_size=0;
+            lbuffer.st_lastmod=0;
+            copyFromKernel(process,buffer,&lbuffer,sizeof(fstat_t));*/
+            return -1;
+        }
+        else
+        {
+            buffer->st_size=0;
+            buffer->st_lastmod=0;
+        }
+        return 0;
+    }
+    
+    parsePath(path, lpath, lfile, NULL, 0);
+    
+    dircnt=getDirEntries(NULL, lpath, dir, 16384);
+    
+    for (int cnt=0;cnt<dircnt;cnt++)
+        if (strcmp(dir[cnt].filename,lfile)==0)
+        {
+            if (process)
+            {
+                uint32_t lastMod=dir[cnt].write_date << 16 | dir[cnt].write_time;
+                copyFromKernel(process,&buffer->st_size,&dir[cnt].size,sizeof(dir[cnt].size));
+                copyFromKernel(process,&buffer->st_lastmod,&lastMod,sizeof(uint32_t));
+            }
+            else
+            {
+                buffer->st_size=dir[cnt].size;
+                buffer->st_lastmod=dir[cnt].write_date << 16 | dir[cnt].write_time;
+            }
+            retVal=0;
+            break;
+        }
+    
+    if (dir)
+        kFree(dir);
+    
+    return retVal;
+}
+
+long fs_tell(void* file)
+{
+    file_t* theFile = file;
+    
+    printd(DEBUG_FILESYS, "\t\tfs_tell: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
+
+    if (theFile->verification!=0xBABAABAB)
+        panic("fs_tell: Referenced a file that is not a file",file);
+    
+    return theFile->fops->tell(theFile->handle);
 }
 
 void close(eListType listType, void* entry)
@@ -264,14 +347,36 @@ void close(eListType listType, void* entry)
     file_t* theFile = entry;
     directory_t *dir = entry;
 
-    printd(DEBUG_FILESYS, "fs_close: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
-    if (theFile->verification!=0xBABAABAB)
-        panic("close: Referenced a file that is not a file!");
-    if (listType == LIST_DIRECTORY)
-        dir->dops->close(dir->handle);
+    if (listType==LIST_FILE)
+    {
+        printd(DEBUG_FILESYS, "\t\tfs_close: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
+        if (theFile->verification!=0xBABAABAB)
+            panic("close: Referenced a file that is not a file!");
+    }
     else
+    {
+        printd(DEBUG_FILESYS, "\t\tfs_close: called for directory %s (handle=0x%08X)\n", dir->f_path, dir->handle);
+    }
+    if (listType == LIST_DIRECTORY)
+    {
+        dir->dops->close(dir->handle);
+        printd(DEBUG_FILESYS, "\t\tfs_close: Freeing directory_t resources\n");
+        kFree(dir->dops);
+        kFree(dir->f_path);
+        kFree(dir->handle);
+        kFree(dir);
+    }
+    else
+    {
         theFile->fops->close(theFile->handle);
-    
+        printd(DEBUG_FILESYS, "\t\tfs_close: freeing file_t resources\n");
+        kFree(theFile->fops);
+        kFree(theFile->f_path);
+        kFree(theFile->copyBuffer);
+        printd(DEBUG_FILESYS, "\t\tFreeing handle (type=%u) @ 0x%08x\n",theFile->handle, theFile->filetype);
+        kFree(theFile);
+    }
+   
 //    rootFs->files = listRemove(rootFs->files,foundEntry); //NOTE: listRemove will effectively de-init the list if it becomes empty
 //    kFree(foundEntry);
 
@@ -292,10 +397,16 @@ void* fs_opendir(char* path)
     void *handle;
     dllist_t* list;
     directory_t *dir;
+    bool isProcFS;
+    
+    isProcFS=strncmp(path,"/proc",5)==0?1:0;
 
     //call the fs's open method
     handle = kMalloc(sizeof(FL_DIR));
-    handle = rootFs->dops->open(path, handle);
+    if (isProcFS)
+        handle = procFs->dops->open(path, handle);
+    else
+        handle = rootFs->dops->open(path, handle);
     if (handle)
     {
         list = kMalloc(sizeof(dllist_t));
@@ -305,7 +416,10 @@ void* fs_opendir(char* path)
         //identify the fs that the path is on
 
         strncpy(dir->f_path, path, 1024);
-        memcpy(dir->dops, rootFs->dops, sizeof(file_operations_t));
+        if (isProcFS)
+            memcpy(dir->dops, procFs->dops, sizeof(dirops_t));
+        else
+            memcpy(dir->dops, rootFs->dops, sizeof(dirops_t));
         dir->handle = handle;
 
         if (rootFs->dirs == NULL)
@@ -327,8 +441,34 @@ int fs_readdir(void* file, dirent_t *dirEntry)
     
     if (foundFile==NULL)
         panic("fs_readdir: file handle not found in fs->files");
-    int retVal = foundFile->dops->read(foundFile->handle, dirEntry);
-    return retVal;
+    return foundFile->dops->read(foundFile->handle, dirEntry);
+}
+
+int parsePath(const char *inPath, char *outPath, char *outFilename, char** outPathTokens, int outPathTokensArrayCount)
+{
+    char *lpath[512];
+    char *token, *lasttoken;
+    char tok[2] = "/";
+    int tokensCreated=0;
+    
+    strcpy((char*)lpath,inPath);
+    token=strtok(lpath,tok);
+    strcpy(outPath,"/");
+
+    while (token!=NULL)
+    {
+        lasttoken=token;
+        if (tokensCreated<outPathTokensArrayCount)
+            strcpy(outPathTokens[tokensCreated++],token);
+        token=strtok(NULL,tok);
+        if (token!=NULL)
+        {
+            strcat(outPath,lasttoken);
+            strcat(outPath,"/");
+        }
+        else
+            strcpy(outFilename,lasttoken);
+    }
 }
 
 void fs_closedir(void* dir)
@@ -339,25 +479,41 @@ void fs_closedir(void* dir)
 /*SYSCALL_GETDENTS:*/
 int getDirEntries(void *process, char* path, dirent_t *buffer, int buflen)
 {
-    void* dirp = fs_opendir(path);
     directory_t* dir;
     dirent_t *dirEntry = kMalloc(sizeof(dirent_t));
     process_t *proc = process;
-    int dirCount=0;
-    
-    dir = (directory_t*)dirp;
-    
-    if (dir->handle)
+    int dirCount=0, retVal=-1;
+    dirent_t *bufptr=buffer;
+    void* dirp = fs_opendir(path);
+
+    if (dirp)
     {
-        while (fs_readdir(dirp,dirEntry)>=0 && dirCount*sizeof(dirent_t) < buflen)
+        dir = (directory_t*)dirp;
+
+        if (dir->handle)
         {
-            copyFromKernel(proc, buffer, dirEntry, sizeof(dirent_t));
-            dirCount++;
-            int a = sizeof(dirent_t);
-            buffer++;
+            while (fs_readdir(dirp,dirEntry)>=0 && dirCount*sizeof(dirent_t) < buflen)
+            {
+                if (proc)
+                    copyFromKernel(proc, bufptr, dirEntry, sizeof(dirent_t));
+                else
+                    memcpy(bufptr, dirEntry, sizeof(dirent_t));
+                dirCount++;
+                int a = sizeof(dirent_t);
+                bufptr++;
+            }
+
+            retVal=dirCount;
         }
-        
-        return dirCount;
+        if (dirp)
+            fs_closedir(dirp);
     }
-    return 0;
+    
+    kFree(dirEntry);
+    return retVal;
+}
+
+int fs_unlink(char *filename)
+{
+     return rootFs->fops->delete(filename);
 }

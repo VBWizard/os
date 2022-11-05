@@ -87,7 +87,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/strings/strparts.o \
 	${OBJECTDIR}/src/strings/strstr.o \
 	${OBJECTDIR}/src/strings/strtol.o \
-	${OBJECTDIR}/src/strings/strtrim.o \
+	${OBJECTDIR}/src/strtrim.o \
 	${OBJECTDIR}/src/time.o
 
 
@@ -371,10 +371,10 @@ ${OBJECTDIR}/src/strings/strtol.o: src/strings/strtol.c nbproject/Makefile-${CND
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strtol.o src/strings/strtol.c
 
-${OBJECTDIR}/src/strings/strtrim.o: src/strings/strtrim.c nbproject/Makefile-${CND_CONF}.mk
-	${MKDIR} -p ${OBJECTDIR}/src/strings
+${OBJECTDIR}/src/strtrim.o: src/strtrim.c nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strings/strtrim.o src/strings/strtrim.c
+	$(COMPILE.c) -g -I/usr/local/include -I/usr/local/include/libcpuid -Iinclude -Iinclude -Iinclude/bits -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/strtrim.o src/strtrim.c
 
 ${OBJECTDIR}/src/time.o: src/time.c nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/src

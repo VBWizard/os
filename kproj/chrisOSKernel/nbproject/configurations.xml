@@ -34,8 +34,41 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="lwext4" displayName="lwext4" projectFiles="true">
+        <logicalFolder name="misc" displayName="misc" projectFiles="true">
+          <itemPath>include/lwext4/misc/queue.h</itemPath>
+          <itemPath>include/lwext4/misc/tree.h</itemPath>
+        </logicalFolder>
+        <itemPath>include/lwext4/ext4.h</itemPath>
+        <itemPath>include/lwext4/ext4_balloc.h</itemPath>
+        <itemPath>include/lwext4/ext4_bcache.h</itemPath>
+        <itemPath>include/lwext4/ext4_bitmap.h</itemPath>
+        <itemPath>include/lwext4/ext4_block_group.h</itemPath>
+        <itemPath>include/lwext4/ext4_blockdev.h</itemPath>
+        <itemPath>include/lwext4/ext4_config.h</itemPath>
+        <itemPath>include/lwext4/ext4_crc32.h</itemPath>
+        <itemPath>include/lwext4/ext4_debug.h</itemPath>
+        <itemPath>include/lwext4/ext4_dir.h</itemPath>
+        <itemPath>include/lwext4/ext4_dir_idx.h</itemPath>
+        <itemPath>include/lwext4/ext4_errno.h</itemPath>
+        <itemPath>include/lwext4/ext4_extent.h</itemPath>
+        <itemPath>include/lwext4/ext4_fs.h</itemPath>
+        <itemPath>include/lwext4/ext4_hash.h</itemPath>
+        <itemPath>include/lwext4/ext4_ialloc.h</itemPath>
+        <itemPath>include/lwext4/ext4_inode.h</itemPath>
+        <itemPath>include/lwext4/ext4_journal.h</itemPath>
+        <itemPath>include/lwext4/ext4_mbr.h</itemPath>
+        <itemPath>include/lwext4/ext4_misc.h</itemPath>
+        <itemPath>include/lwext4/ext4_mkfs.h</itemPath>
+        <itemPath>include/lwext4/ext4_oflags.h</itemPath>
+        <itemPath>include/lwext4/ext4_super.h</itemPath>
+        <itemPath>include/lwext4/ext4_trans.h</itemPath>
+        <itemPath>include/lwext4/ext4_types.h</itemPath>
+        <itemPath>include/lwext4/ext4_xattr.h</itemPath>
+      </logicalFolder>
       <itemPath>../../chrisOS/include/ahci.h</itemPath>
       <itemPath>include/alloc.h</itemPath>
+      <itemPath>include/assert.h</itemPath>
       <itemPath>../../chrisOS/include/i386/bits/bits.h</itemPath>
       <itemPath>../../chrisOS/include/chrisos.h</itemPath>
       <itemPath>../../chrisOS/include/i386/cpu.h</itemPath>
@@ -47,18 +80,20 @@
       <itemPath>include/kIRQHandlers.h</itemPath>
       <itemPath>/home/yogi/src/os/chrisOSKernel/include/kInit.h</itemPath>
       <itemPath>../../chrisOS/include/i386/kPaging.h</itemPath>
-      <itemPath>kbd.h</itemPath>
+      <itemPath>include/kbd.h</itemPath>
       <itemPath>include/kernel.h</itemPath>
       <itemPath>../../chrisOS/include/kernelObjects.h</itemPath>
       <itemPath>include/kernelVariables.h</itemPath>
       <itemPath>include/kmalloc.h</itemPath>
       <itemPath>include/kutility.h</itemPath>
+      <itemPath>include/filesystem/memdisk.h</itemPath>
       <itemPath>include/mm.h</itemPath>
       <itemPath>include/mmap.h</itemPath>
       <itemPath>include/paging.h</itemPath>
       <itemPath>../../chrisOS/include/pci/pci.h</itemPath>
       <itemPath>include/filesystem/pipe.h</itemPath>
       <itemPath>include/process.h</itemPath>
+      <itemPath>include/filesystem/procfs.h</itemPath>
       <itemPath>include/rusage.h</itemPath>
       <itemPath>include/schedule.h</itemPath>
       <itemPath>../../chrisOS/include/strings.h</itemPath>
@@ -81,6 +116,30 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="lwext4" displayName="lwext4" projectFiles="true">
+        <itemPath>src/lwext4/CMakeLists.txt</itemPath>
+        <itemPath>src/lwext4/ext4.c</itemPath>
+        <itemPath>src/lwext4/ext4_balloc.c</itemPath>
+        <itemPath>src/lwext4/ext4_bcache.c</itemPath>
+        <itemPath>src/lwext4/ext4_bitmap.c</itemPath>
+        <itemPath>src/lwext4/ext4_block_group.c</itemPath>
+        <itemPath>src/lwext4/ext4_blockdev.c</itemPath>
+        <itemPath>src/lwext4/ext4_crc32.c</itemPath>
+        <itemPath>src/lwext4/ext4_debug.c</itemPath>
+        <itemPath>src/lwext4/ext4_dir.c</itemPath>
+        <itemPath>src/lwext4/ext4_dir_idx.c</itemPath>
+        <itemPath>src/lwext4/ext4_extent.c</itemPath>
+        <itemPath>src/lwext4/ext4_fs.c</itemPath>
+        <itemPath>src/lwext4/ext4_hash.c</itemPath>
+        <itemPath>src/lwext4/ext4_ialloc.c</itemPath>
+        <itemPath>src/lwext4/ext4_inode.c</itemPath>
+        <itemPath>src/lwext4/ext4_journal.c</itemPath>
+        <itemPath>src/lwext4/ext4_mbr.c</itemPath>
+        <itemPath>src/lwext4/ext4_mkfs.c</itemPath>
+        <itemPath>src/lwext4/ext4_super.c</itemPath>
+        <itemPath>src/lwext4/ext4_trans.c</itemPath>
+        <itemPath>src/lwext4/ext4_xattr.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="strings" displayName="strings" projectFiles="true">
         <itemPath>../chrisOS/src/strings/strcat.c</itemPath>
         <itemPath>../chrisOS/src/strings/strcmp.c</itemPath>
@@ -90,9 +149,11 @@
         <itemPath>../chrisOS/src/strings/strncpy.c</itemPath>
         <itemPath>../chrisOS/src/strings/stroul.c</itemPath>
         <itemPath>../chrisOS/src/strings/strparts.c</itemPath>
+        <itemPath>strreplace.c</itemPath>
         <itemPath>../chrisOS/src/strings/strstr.c</itemPath>
+        <itemPath>src/strtok.c</itemPath>
         <itemPath>../chrisOS/src/strings/strtol.c</itemPath>
-        <itemPath>../chrisOS/src/strings/strtrim.c</itemPath>
+        <itemPath>src/strtrim.c</itemPath>
       </logicalFolder>
       <itemPath>src/_scheduler.s</itemPath>
       <itemPath>../chrisOS/src/block/ahci.c</itemPath>
@@ -115,6 +176,7 @@
       <itemPath>src/mm/kmalloc.c</itemPath>
       <itemPath>../chrisOS/src/init/kpaging.c</itemPath>
       <itemPath>../chrisOS/src/memcpy.c</itemPath>
+      <itemPath>src/filesystem/memdisk.c</itemPath>
       <itemPath>src/mm/mm.c</itemPath>
       <itemPath>src/mm/mmap.c</itemPath>
       <itemPath>../chrisOS/src/cpu/msr.c</itemPath>
@@ -130,13 +192,15 @@
       <itemPath>src/schedule_old.c</itemPath>
       <itemPath>src/signals.c</itemPath>
       <itemPath>../chrisOS/src/char/console/strftime.c</itemPath>
+      <itemPath>src/sysDump.c</itemPath>
       <itemPath>src/syscall.c</itemPath>
       <itemPath>src/sysloader.c</itemPath>
+      <itemPath>src/daemon/syslogd.c</itemPath>
       <itemPath>src/task.c</itemPath>
       <itemPath>src/drivers/terminal/termdrv.c</itemPath>
       <itemPath>../chrisOS/src/time.c</itemPath>
       <itemPath>src/drivers/terminal/tty_driver.c</itemPath>
-      <itemPath>../chrisOS/src/init/utility.c</itemPath>
+      <itemPath>src/utility.c</itemPath>
       <itemPath>src/vfs.c</itemPath>
       <itemPath>src/x86.s</itemPath>
       <itemPath>src/x86idt.c</itemPath>
@@ -152,11 +216,14 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>kernelData.ld</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>../chrisOS/src/fat</Elem>
     <Elem>../chrisOS/src/strings</Elem>
     <Elem>src/fat</Elem>
+    <Elem>src/lwext4</Elem>
+    <Elem>include/lwext4</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -173,6 +240,7 @@
           <incDir>
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
+            <pElem>include/lwext4</pElem>
           </incDir>
           <commandLine>-ffreestanding -masm=intel</commandLine>
           <preprocessorList>
@@ -241,8 +309,6 @@
       </item>
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/init/utility.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/memcpy.c" ex="false" tool="0" flavor2="0">
@@ -269,8 +335,6 @@
       </item>
       <item path="../chrisOS/src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="/home/yogi/src/os/chrisOSKernel/include/kInit.h"
@@ -285,6 +349,8 @@
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/assert.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/device.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/devices/termdrv.h" ex="false" tool="3" flavor2="0">
@@ -297,11 +363,17 @@
       </item>
       <item path="include/errors.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/filesystem/memdisk.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/filesystem/procfs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kbd.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -310,6 +382,62 @@
       <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kutility.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_balloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_bcache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_bitmap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_block_group.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_blockdev.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_config.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_crc32.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_debug.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_dir.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_dir_idx.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_errno.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_extent.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_fs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_hash.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_ialloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_inode.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_journal.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_mbr.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_mkfs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_oflags.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_super.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_trans.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_xattr.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/misc/queue.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/misc/tree.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -337,9 +465,11 @@
       </item>
       <item path="include/tty_device.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="kbd.h" ex="false" tool="3" flavor2="0">
+      <item path="kernelData.ld" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/_scheduler.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="src/daemon/syslogd.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/device.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -409,6 +539,8 @@
       </item>
       <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/filesystem/memdisk.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/filesystem/procfs.c" ex="false" tool="0" flavor2="0">
@@ -441,17 +573,27 @@
       </item>
       <item path="src/signals.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/strtok.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strtrim.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/sysDump.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/task.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/vfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/x86.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/x86idt.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="strreplace.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -467,6 +609,7 @@
           <incDir>
             <pElem>include</pElem>
             <pElem>../chrisOS/include</pElem>
+            <pElem>include/lwext4</pElem>
           </incDir>
           <commandLine>-ffreestanding -masm=intel</commandLine>
         </cTool>
@@ -540,8 +683,6 @@
       </item>
       <item path="../chrisOS/src/init/kpaging.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/init/utility.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/iodugging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../chrisOS/src/memcpy.c" ex="false" tool="0" flavor2="0">
@@ -570,8 +711,6 @@
       </item>
       <item path="../chrisOS/src/strings/strtol.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="../chrisOS/src/strings/strtrim.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="../chrisOS/src/time.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="/home/yogi/src/os/chrisOSKernel/include/kInit.h"
@@ -586,6 +725,8 @@
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/assert.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/device.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/devices/termdrv.h" ex="false" tool="3" flavor2="0">
@@ -598,11 +739,17 @@
       </item>
       <item path="include/errors.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/filesystem/memdisk.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/filesystem/pipe.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/filesystem/procfs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/fs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kIRQHandlers.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/kbd.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kernel.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -611,6 +758,62 @@
       <item path="include/kmalloc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/kutility.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_balloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_bcache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_bitmap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_block_group.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_blockdev.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_config.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_crc32.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_debug.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_dir.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_dir_idx.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_errno.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_extent.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_fs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_hash.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_ialloc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_inode.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_journal.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_mbr.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_mkfs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_oflags.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_super.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_trans.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/ext4_xattr.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/misc/queue.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/lwext4/misc/tree.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/mm.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -638,9 +841,11 @@
       </item>
       <item path="include/tty_device.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="kbd.h" ex="false" tool="3" flavor2="0">
+      <item path="kernelData.ld" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/_scheduler.s" ex="false" tool="4" flavor2="0">
+      </item>
+      <item path="src/daemon/syslogd.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/device.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -710,6 +915,8 @@
       </item>
       <item path="src/fat/version.txt" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/filesystem/memdisk.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/filesystem/pipe.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/filesystem/procfs.c" ex="false" tool="0" flavor2="0">
@@ -723,6 +930,50 @@
       <item path="src/kernelISR.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/keyboard.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/CMakeLists.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_balloc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_bcache.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_bitmap.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_block_group.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_blockdev.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_crc32.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_debug.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_dir.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_dir_idx.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_extent.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_fs.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_hash.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_ialloc.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_inode.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_journal.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_mbr.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_mkfs.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_super.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_trans.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/lwext4/ext4_xattr.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/mm/alloc.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -742,17 +993,27 @@
       </item>
       <item path="src/signals.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/strtok.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/strtrim.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/sysDump.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/syscall.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/sysloader.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/task.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/utility.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/vfs.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/x86.s" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/x86idt.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="strreplace.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

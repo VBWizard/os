@@ -4,7 +4,8 @@
  * and open the template in the editor.
  */
 
-#include "libChrisOS.h"
+#include "common.h"
+#include "strings.h"
 
 void reverseI(char s[])
  {
@@ -34,7 +35,7 @@ VISIBLE void itoa(int n, char s[])
      reverseI(s);
  }
 
- void itoaI(int n, char s[])
+ char *itoaI(int n, char s[])
  {
      int i, sign;
 
@@ -48,10 +49,11 @@ VISIBLE void itoa(int n, char s[])
          s[i++] = '-';
      s[i] = '\0';
      reverseI(s);
+     return s;
  }
 
   // A simple atoi() function - from http://www.geeksforgeeks.org/write-your-own-atoi
-VISIBLE int atoi(char *str)
+int atoiI(char *str)
 {
     int res = 0; // Initialize result
   
@@ -62,4 +64,9 @@ VISIBLE int atoi(char *str)
   
     // return result.
     return res;
+}
+
+VISIBLE int atoi(char *str)
+{
+    return atoiI(str);
 }

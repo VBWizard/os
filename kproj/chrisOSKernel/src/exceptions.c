@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 
-#include "kernel.h"
 #include "i386/bits/types.h"
 #include "process.h"
 #include <time.h>
@@ -20,6 +19,9 @@
 #include "task.h"
 #include "schedule.h" 
 #include "thesignals.h"
+#include "filesystem/pipe.h"
+#include "drivers/tty_driver.h"
+#include "kutility.h"
 
 extern volatile uint32_t* kTicksSinceStart;
 extern uint32_t exceptionErrorCode;
@@ -42,12 +44,14 @@ extern bool kPagingInitDone;
 extern volatile char* kKbdBuffCurrTop;
 extern void* kMalloc(size_t size);
 extern tss_t* pagingExceptionTSS;
+extern tss_t* gpfExceptionTSS;
 extern void pagingExceptionHandler();
+extern void _gpfExceptionHandler();
 extern task_t* kKernelTask;
 extern struct idt_entry* idtTable;
 extern uint16_t isrNumber;
 extern void waitForDeath();
-
+extern pipe_t *activeSTDOUT;
 #define KEYB_DATA_PORT 0x60
 #define KEYB_CTRL_PORT 0x61
 
@@ -60,6 +64,11 @@ void* sys_sigaction2(int signal, uintptr_t* sigAction, uint32_t sigData, void *p
 
 void defaultISRHandler()
 {
+    uintptr_t oldCR3;
+    
+    SAVE_CURRENT_CR3(oldCR3);
+    LOAD_KERNEL_CR3;
+    task_t *victimTask = getCurrentTask();
     //terminal_clear();
 
     if (isrNumber==7)
@@ -68,14 +77,35 @@ void defaultISRHandler()
         {
             //printd(DEBUG_EXCEPTIONS,"defaultISRHandler: Exception 0x7 triggered.  We are ignoring the CR0 task switched flag (TS) for now.  Will reset the flag and resume.\n",kPagingExceptionsSinceStart+1);
         }
+        LOAD_CR3(oldCR3);
         __asm__("clts\n");
         return;
     }
-   
+    
+    //We are going to "mess up" the TSS now but we're going to except anyways
+/*    victimTask->tss->EAX = isrSavedEAX;
+    victimTask->tss->EBX = isrSavedEBX;
+    victimTask->tss->ECX = isrSavedECX;
+    victimTask->tss->EDX = isrSavedEDX;
+    victimTask->tss->ESI = isrSavedESI;
+    victimTask->tss->EDI = isrSavedEDI;
+    victimTask->tss->ESP = isrSavedESP;
+    victimTask->tss->EBP = isrSavedEBP;
+    victimTask->tss->CS = isrSavedCS;
+    victimTask->tss->DS = isrSavedDS;
+    victimTask->tss->ES = isrSavedES;
+    victimTask->tss->FS = isrSavedFS;
+    victimTask->tss->GS = isrSavedGS;
+    victimTask->tss->SS = isrSavedSS;
+    printd(DEBUG_EXCEPTIONS, "Exception 0x%02x triggered at 0x%04x:0x%08x (error code 0x%08x\n", isrNumber, isrSavedCS, isrSavedEIP, isrSavedErrorCode);
+    printPagingExceptionRegs(victimTask, 0, isrSavedErrorCode, false);
+    printPagingExceptionRegs(victimTask, 0, isrSavedErrorCode, true);
+   */
 #ifndef DEBUG_NONE
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
-        printk("Exception handler called for exception # 0x%02x\n\n", isrNumber);
+	printk("Exception 0x%02x triggered at 0x%04x:0x%08x (error code 0x%08x\n", isrNumber, isrSavedCS, isrSavedEIP, isrSavedErrorCode);
+//        printk("Exception handler called for exception # 0x%02x\n\n", isrNumber);
         printDumpedRegs();
         printd(DEBUG_EXCEPTIONS,"handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
     }
@@ -105,6 +135,89 @@ void doubleFaultHandler()
     __asm__("hlt");
 }
 
+void GeneralProtectionFaultHandler(int ErrorCode)
+{
+    tss_t* ourTSS = gpfExceptionTSS;
+    uint32_t victimTaskNum = ourTSS->LINK;
+    victimTaskNum >>= 3;
+    if (victimTaskNum==0x16 || victimTaskNum==0)
+        panic("GPF exception in paging GPF handler at, error 0x%08x",ErrorCode);
+    task_t* victimTask = findTaskByTaskNum(victimTaskNum);
+    process_t* victimProcess = victimTask->process;
+
+    __asm__("clts\n");
+    sys_sigaction2(SIGSEGV,0,0xe, victimProcess);
+
+    if (activeSTDOUT)
+    {
+        char err[256];
+        sprintf(err,"\ngpfault in '%s' at 0x%08x (errorcode=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,ErrorCode);
+        fs_write(NULL, victimProcess->stdout, err,strlen(err),1);
+        fs_write(NULL, victimProcess->stderr, err,strlen(err),1);
+    }
+    else
+        printk("\ngpfault in '%s' at 0x%08x (errorcode=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,ErrorCode);
+    if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
+    {
+          printPagingExceptionRegs(victimTask, 0, ErrorCode, true, victimProcess->pageDirPtr);
+    }    
+    //Set the return address from the exception to a loop where the process can ... wait for death
+    victimTask->tss->EIP = (uint32_t)&waitForDeath;
+    victimProcess->retVal = -1;
+    return;
+    
+    
+GPFLoopOfDeath:
+    goto GPFLoopOfDeath;
+}
+
+void setupGPFHandler()
+{
+    gpfExceptionTSS = allocPages(sizeof(tss_t));
+    printd(DEBUG_PROCESS, "Allocated TSS for GPF exception task gate at 0x%08x",gpfExceptionTSS);
+    pagingMapPageCount(KERNEL_CR3, ((uint32_t)gpfExceptionTSS | KERNEL_PAGED_BASE_ADDRESS),(uint32_t)gpfExceptionTSS,0x1,0x7,true);
+    pagingMapPageCount(KERNEL_CR3, (uint32_t)gpfExceptionTSS,(uint32_t)gpfExceptionTSS,0x1,0x7,true);
+    memset(gpfExceptionTSS, 0, sizeof(tss_t));
+    
+    gpfExceptionTSS->CR3=KERNEL_CR3;
+    gpfExceptionTSS->CS=0x8;
+    gpfExceptionTSS->EIP=(uint32_t)&_gpfExceptionHandler;
+    gpfExceptionTSS->DS=kKernelTask->tss->DS;
+    
+    gpfExceptionTSS->ES=kKernelTask->tss->ES;
+    gpfExceptionTSS->FS=kKernelTask->tss->FS;
+    gpfExceptionTSS->GS=kKernelTask->tss->GS;
+    gpfExceptionTSS->DS=kKernelTask->tss->DS;
+    gpfExceptionTSS->SS=kKernelTask->tss->SS;
+    gpfExceptionTSS->SS0=kKernelTask->tss->SS0;
+
+    gpfExceptionTSS->ESP0=allocPagesAndMap(0x16000);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for GPF exception handler ESP0\n",gpfExceptionTSS->ESP0);
+    pagingMapPageCount(KERNEL_CR3, gpfExceptionTSS->ESP0 | KERNEL_PAGED_BASE_ADDRESS, gpfExceptionTSS->ESP0, 0x16, 0x7, true);
+    pagingMapPageCount(KERNEL_CR3, gpfExceptionTSS->ESP0, gpfExceptionTSS->ESP0, 0x16, 0x7, true);
+    gpfExceptionTSS->ESP0+=0x10000;
+    printd(DEBUG_PROCESS,"Offset GPF exception handler ESP0 to 0x%08x\n",gpfExceptionTSS->ESP0);
+    
+    gpfExceptionTSS->ESP=allocPagesAndMap(0x16000);
+    printd(DEBUG_PROCESS,"Allocated pages at 0x%08x for GPF exception handler ESP\n",gpfExceptionTSS->ESP);
+    pagingMapPageCount(KERNEL_CR3, gpfExceptionTSS->ESP | KERNEL_PAGED_BASE_ADDRESS, gpfExceptionTSS->ESP, 0x16, 0x7, true);
+    pagingMapPageCount(KERNEL_CR3, gpfExceptionTSS->ESP , gpfExceptionTSS->ESP, 0x16, 0x7, true);
+    gpfExceptionTSS->ESP+=0x10000;
+    printd(DEBUG_PROCESS,"Offset GPF exception handler ESP to 0x%08x\n",gpfExceptionTSS->ESP);
+
+    gpfExceptionTSS->SS1=gpfExceptionTSS->SS0;
+    gpfExceptionTSS->ESP1=gpfExceptionTSS->ESP0;
+    gpfExceptionTSS->SS2=gpfExceptionTSS->SS0;
+    gpfExceptionTSS->ESP2=gpfExceptionTSS->ESP0;
+    
+    gpfExceptionTSS->EFLAGS=0x200007;
+
+    gdtEntryOS(0x16,(int)gpfExceptionTSS,sizeof(tss_t), ACS_TSS,GDT_GRANULAR | GDT_32BIT,true);
+
+    //install the GPF exception handler task TSS (0xB0=0x16<<3)
+    idt_set_gate (&idtTable[0xd], 0xB0, 0, ACS_TASK | ACS_DPL_0); //paging exception
+}
+
 void setupPagingHandler()
 {
     pagingExceptionTSS = allocPages(sizeof(tss_t));
@@ -113,8 +226,8 @@ void setupPagingHandler()
     pagingMapPageCount(KERNEL_CR3, ((uint32_t)pagingExceptionTSS),(uint32_t)pagingExceptionTSS,0x1,0x7,true);
     memset(pagingExceptionTSS, 0, sizeof(tss_t));
     pagingExceptionTSS->CR3=KERNEL_CR3;
-    pagingExceptionTSS->CS=0x8;
-    pagingExceptionTSS->EIP=&pagingExceptionHandler;
+    pagingExceptionTSS->CS=0x88;
+    pagingExceptionTSS->EIP=(uint32_t)&pagingExceptionHandler;
     pagingExceptionTSS->DS=kKernelTask->tss->DS;
     
     pagingExceptionTSS->ES=kKernelTask->tss->ES;
@@ -147,7 +260,7 @@ void setupPagingHandler()
     
     pagingExceptionTSS->EFLAGS=0x200007;
 
-    gdtEntryOS(0x17,pagingExceptionTSS,sizeof(tss_t), ACS_TSS,GDT_GRANULAR | GDT_32BIT,true);
+    gdtEntryOS(0x17,(int)pagingExceptionTSS,sizeof(tss_t), ACS_TSS,GDT_GRANULAR | GDT_32BIT,true);
 
     //install the paging exception handler task TSS
     idt_set_gate (&idtTable[0xe], 0xB8, 0, ACS_TASK | ACS_DPL_0); //paging exception
@@ -159,7 +272,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     uint32_t lPTEValue=0;
     uint32_t lPDEAddress=0, lPTEAddress=0;
     uint32_t lOldDebugLevel=0;
-    bool isCow=false, isMMap=false, mmapSucceeded=false;
+    bool isCow=false, isMMap=false, mmapSucceeded=false, exceptionInKernelMode=false;
     tss_t* ourTSS = pagingExceptionTSS;
     uint32_t victimTaskNum = ourTSS->LINK;
     victimTaskNum >>= 3;
@@ -168,37 +281,59 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     task_t* victimTask = findTaskByTaskNum(victimTaskNum);
     process_t* victimProcess = victimTask->process;
     uint32_t pagingExceptionCR3 = victimTask->tss->CR3;
+    bool nullPointer = false;
     
     if (pagingExceptionCR3 == KERNEL_CR3)
     {
-        printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception was in kernel CR3 (0x%08x), victim CR3=0x%08x (Process 0x%04x).  Switching to victim CR3 (updating TSS.CR3 too which is a HACK)\n",pagingExceptionCR3, victimProcess->pageDirPtr, victimTaskNum);
-        pagingExceptionCR3 = victimProcess->pageDirPtr;
-        
+        exceptionInKernelMode=true;
+        printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception was in kernel CR3 (0x%08x), victim CR3=0x%08x (Process 0x%04x).\n",pagingExceptionCR3, victimProcess->pageDirPtr, victimTaskNum);
         //CLR 01/27/2019: TODO: This is a total HACK.  For some reason QEMU is storing the kernel CR3 on task switch from obvious non-kernel code, to this exception handler.
         //So I'm switching it back, in the TSS too!
         //TODO: This needs to be figured out and fixed!
         if ((victimTask->tss->CS & 0x3)==0x3)
+        {
+            
+            printd(DEBUG_EXCEPTIONS,"Switching to victim CR3 (updating TSS.CR3 too which is a HACK)\n");
             victimTask->tss->CR3 = victimProcess->pageDirPtr;
+            pagingExceptionCR3 = victimProcess->pageDirPtr;
+        }
     }
-    //TODO: COMPLETE hack because on sysexit when target stack is COW, when handler is called, CR3 is still kernel's
-
-    //Don't forget to map the victim process to VADDR!
-    pagingMapPage(victimProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)victimProcess & 0xFFFFF000, (uint16_t)0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
-   __asm__("clts\n"); //TODO: Didn't save fpu registers
-   lPTEAddress=kPagingGet4kPTEntryAddressCR3(pagingExceptionCR3,pagingExceptionCR2);
-    lPDEAddress=kPagingGet4kPDEntryAddressCR3(pagingExceptionCR3,pagingExceptionCR2);
-    lPDEValue=kPagingGet4kPDEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
-    lPTEValue=kPagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2);
+    lPTEAddress=kPagingGet4kPTEntryAddressCR3(victimProcess->pageDirPtr,pagingExceptionCR2);
+    lPDEAddress=kPagingGet4kPDEntryAddressCR3(victimProcess->pageDirPtr,pagingExceptionCR2);
+    lPDEValue=kPagingGet4kPDEntryValueCR3(victimProcess->pageDirPtr,pagingExceptionCR2);
+    lPTEValue=kPagingGet4kPTEntryValueCR3(victimProcess->pageDirPtr,pagingExceptionCR2);
+    uint32_t lKPTEValue=kPagingGet4kPTEntryValueCR3(KERNEL_CR3,pagingExceptionCR2);
+    nullPointer=lPDEValue==0;
+    
     uint32_t pagePhysAddr=lPTEValue&0xFFFFF000;
     uint32_t pageFlags=lPTEValue&0x00000FFF;
     elfInfo_t* elf=victimProcess->elf;
+    
+    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x, VPTE=0x%08X, KPTE=0x%08X)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3,lPTEValue,lKPTEValue);
+
+    if (exceptionInKernelMode)
+    {
+        //More hacking
+        if ( ( (ErrorCode & 0x2) && (lPTEValue & 0x7) )               //either request was write and PTE is write 
+                || ( (ErrorCode & 0x2==0) && lPTEValue & 0x5) )    //or request was read and 
+        {
+            printd(DEBUG_EXCEPTIONS,"\tflags=0x%03x\n",lPTEValue & 0xFFF);
+            pagingMapPage(KERNEL_CR3,(pagingExceptionCR2 & 0xFFFFF000),pagePhysAddr,(uint16_t)0x7);
+            printd(DEBUG_EXCEPTIONS,"\tpagingMapPage(0x%08x,0x%08x,0x%08x,0x%04x)\n",KERNEL_CR3, (pagingExceptionCR2 & 0xFFFFF000), pagePhysAddr, 0x7);
+            pagingMapPage(KERNEL_CR3,(pagingExceptionCR2 & 0xFFFFF000) | 0xC0000000, pagePhysAddr,(uint16_t)0x7);
+            printd(DEBUG_EXCEPTIONS,"\tpagingMapPage(0x%08x,0x%08x,0x%08x,0x%04x)\n",KERNEL_CR3, (pagingExceptionCR2 & 0xFFFFF000) | 0xC0000000, pagePhysAddr, 0x7);
+            printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Kernel mapping was missing, Mapped it.  Returning\n");
+            goto kPagingExceptionHandlerNewReturn;
+        }
+    }
+    //Don't forget to map the victim process to VADDR!
+    pagingMapPage(victimProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)victimProcess & 0xFFFFF000, (uint16_t)0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
+   __asm__("clts\n"); //TODO: Didn't save fpu registers
     //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08x (CR3=0x%08x)\n",exceptionCR2,exceptionCR3);
-    printk(0,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
-    printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: Paging exception occurred at 0x%04X:0x%08x in task 0x%04X, for 0x%08x, error code 0x%08x (CR3=0x%08x)\n",victimTask->tss->CS, victimTask->tss->EIP, victimTaskNum, pagingExceptionCR2,ErrorCode, pagingExceptionCR3);
     printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08x)\n\tChecking for uninitialized mmap page, pt entry=0x%08x\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
 
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
-    if ( (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))
+    if ( !nullPointer && (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))
     {
         isMMap = true;
         printd(DEBUG_EXCEPTIONS,"\t\tFound uninitialized mmap page\n",victimProcess->path,lPTEValue);
@@ -207,7 +342,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     else
         printd(DEBUG_EXCEPTIONS,"\t\tNot mmap page\n",victimProcess->path,lPTEValue);
 
-    if (!isMMap)
+    if (!nullPointer && !isMMap)
     {
         //Check for page tagged as COW (bit 9)
         printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bits\n");
@@ -223,11 +358,11 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
             printd(DEBUG_EXCEPTIONS,"\t\tAddress is not CoW per PTE (0x%08x=0x%08x)\n",cowPTEp, cowPTE);
         }
     }
-    if (!isMMap && !isCow)
+    if (!nullPointer && !isMMap && !isCow)
     {
         //Check for CoW pages in libraries
         printd(DEBUG_EXCEPTIONS,"\tChecking for CoW bss/data in libraries\n",victimProcess->path);
-        for (int cnt=0;cnt<victimProcess->elf->libraryElfCount;cnt++)
+        for (int cnt=0;cnt<((elfInfo_t*)victimProcess->elf)->libraryElfCount;cnt++)
         {
             elfInfo_t* lib=elf->libraryElfPtr[cnt];
             printd(DEBUG_EXCEPTIONS,"\t\tChecking for CoW in library @ 0x%08x, bss=0x%08x/0x%08x, data=0x%08x/0x%08x, tdata=0x%08x/0x%08x\n",
@@ -253,44 +388,66 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
                 break;
             }
         }
+        if (!isCow)
+            printd(DEBUG_EXCEPTIONS,"\t\tNot library CoW page\n");
     }
 
-    if (isCow || (isMMap & mmapSucceeded))
+    if (!nullPointer && (isCow || (isMMap & mmapSucceeded)))
     {
         if (isCow) //if isMMap then the page was already fixed.  This is the "success" exit point, so skip fixing up the page, clear the CR2 and exit
         {
+            victimProcess->minorFaults++;
             uintptr_t exceptionPhysicalCR2Address=pagingGet4kPTEntryValueCR3(pagingExceptionCR3,pagingExceptionCR2) & 0xFFFFF000;
             uint32_t newPhys=(uint32_t)allocPages(PAGE_SIZE);
             pagingMapPage(KERNEL_CR3,exceptionPhysicalCR2Address,exceptionPhysicalCR2Address,(uint16_t)0x7);
+            pagingMapPage(KERNEL_CR3,exceptionPhysicalCR2Address | 0xC0000000,exceptionPhysicalCR2Address,(uint16_t)0x7);
             pagingMapPage(KERNEL_CR3,newPhys,newPhys,(uint16_t)0x7);
             memcpy((void*)newPhys,(void*)(exceptionPhysicalCR2Address),PAGE_SIZE);
             pagingMapPage(pagingExceptionCR3,pagingExceptionCR2 & 0xFFFFF000,newPhys,(uint16_t)0x7);
+            pagingMapPage(victimProcess->pageDirPtr,pagingExceptionCR2 & 0xFFFFF000,newPhys,(uint16_t)0x7);
             printd(DEBUG_EXCEPTIONS,"\tReplaced CoW page 0x%08x (0x%08x) with writable page 0x%08x (contents copied).  Returning.\n",pagingExceptionCR2&0xFFFFF000,exceptionPhysicalCR2Address,newPhys);
+            if (pagingExceptionCR2>=STACK_INITIAL_PAGE_VIRT_ADDRESS && pagingExceptionCR2<=STACK_INITIAL_PAGE_VIRT_ADDRESS+PAGE_SIZE)
+            {
+                victimProcess->stackInitialPage=(uintptr_t*)newPhys;
+                printd(DEBUG_MMAP,"\tPaging exception was in process' initial stack page.  Updated stackInitialPage to 0x%08x\n",newPhys);
+            }
         }
+kPagingExceptionHandlerNewReturn:
         printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandlerNew: returning\n");
         __asm__("xor ebx,ebx\nmov cr2,ebx\n");
         return;
     }
     if ((kDebugLevel & DEBUG_EXCEPTIONS) == DEBUG_EXCEPTIONS)
     {
-          printk("\nPaging handler: Exception for virtual address 0x%02X\n",pagingExceptionCR2);
-          printk("PDE@0x%08x=0x%08x, PTE@0x%08x=0x%08x\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
-          printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, false);
-          //printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, true);
-          printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
-          printk("Finding symbol for 0x%08x ...\n",pagingExceptionCR2);
+          //printk("\nPaging handler: Exception for virtual address 0x%02X\n",pagingExceptionCR2);
+          //printk("PDE@0x%08x=0x%08x, PTE@0x%08x=0x%08x\n", lPDEAddress, lPDEValue, lPTEAddress, lPTEValue);
+          //printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, false);
+          printPagingExceptionRegs(victimTask, pagingExceptionCR2, ErrorCode, true, pagingExceptionCR3);
+          //dumpAllHeapPointers();
+          //printk("handler called %u times since system start\n",kPagingExceptionsSinceStart+1);
+          //printk("Finding symbol for 0x%08x ...\n",pagingExceptionCR2);
     }
     
     kPagingExceptionsSinceStart++;
     printd(DEBUG_EXCEPTIONS,"kPagingExceptionHandler: Signalling SEGV for cr3=0x%08x\n",pagingExceptionCR3);
-    printk("segfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
+    
+//brokeIt:
+//    goto brokeIt;
+    //Print to pipe instead of printk if available
+    if (activeSTDOUT)
+    {
+        char err[256];
+        sprintf(err, "\nsegfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
+        fs_write(NULL, victimProcess->stdout, err,strlen(err),1);
+    }
+    else
+        printk("\nsegfault in '%s' at 0x%08x (cr2=0x%08x)\n",victimProcess->path,victimTask->tss->EIP,pagingExceptionCR2);
     __asm__("push eax\n mov eax,0\nmov cr2,eax\npop eax\n  #reset CR2 after paging exception handled");
     sys_sigaction2(SIGSEGV,0,0xe, victimProcess);
 
     //Set the return address from the exception to a loop where the process can ... wait for death
     victimTask->tss->EIP = (uint32_t)&waitForDeath;
     victimProcess->retVal = -1;
-    //Return 1 which means SEGV
     return;
     
 }

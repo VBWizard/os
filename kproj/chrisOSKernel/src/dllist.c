@@ -6,6 +6,7 @@
 #include "dllist.h"
 #include "../../chrisOS/include/config.h"
 #include "fs.h"
+#include "alloc.h"
 
 //Initialize a new list
 dllist_t* listInit(dllist_t* firstItem, void* payload)
@@ -121,4 +122,19 @@ void* listTail(dllist_t* list)
     while (list->prev!=list)
         list=list->prev;
     return list;
+}
+
+//TODO: FINISH ME
+void listFree(dllist_t* theList)
+{
+    dllist_t *list=listHead(theList);
+    
+    do
+    {
+//        freeI(list->payload);
+        if (list->next!=list)
+            list = list->next;
+        else
+            list=NULL;
+    } while (list);
 }

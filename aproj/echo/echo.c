@@ -62,8 +62,17 @@ int main(int argc, char** argv, char** envp) {
     
     int textStart = processCommandLine(argc, argv);
     
+    __asm__("hlt\n");
+    
     if (textStart < 0)
         return textStart;
+
+    if (processEscapes)
+    {   outString2=malloc(1024);
+        outString3=malloc(1024);
+        outString4=malloc(1024);
+        outString5=malloc(1024);
+    }
     for (int cnt=textStart;cnt<argc;cnt++)
     {
         if (strlen(argv[cnt]) > 0)
@@ -75,11 +84,10 @@ int main(int argc, char** argv, char** envp) {
             //NOTE: Quoted text won't have double quotes around it.  It will simply be all in one parameter"
             if (processEscapes)
             {
-                //NOTE: strreplace malloc's outString2
-                outString2 = strreplace(outString, "\\n",carriageReturnString);
-                outString3 = strreplace(outString2, "\\t", tabString);
-                outString4 = strreplace(outString3, "\\033", escString);
-                outString5 = strreplace(outString4, "\\e", escString);
+                outString2 = strreplace(outString, "\\n",carriageReturnString,outString2);
+                outString3 = strreplace(outString2, "\\t", tabString,outString3);
+                outString4 = strreplace(outString3, "\\033", escString,outString4);
+                outString5 = strreplace(outString4, "\\e", escString,outString5);
                 
             }
             else
@@ -89,10 +97,10 @@ int main(int argc, char** argv, char** envp) {
         
     }
     strtrim(outString5);
-    printf("%s", outString5);
-    free(outString);
-    free(outString);
-    if (processEscapes);
+    printf("%s\n", outString5);
+    if (outString)
+        free(outString);
+    if (processEscapes)
     {
         free(outString2);
         free(outString3);
