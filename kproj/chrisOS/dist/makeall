@@ -2,7 +2,8 @@
 clear
 shopt -s dotglob
 echo "Initiating builds"
-mountCmd="sudo mount /dev/disk/by-id/ata-HGST_HTS541075A9E680_JD12021A0DR07L-part3 /mnt/loop/"
+mountCmd="sudo /home/yogi/mount_chrisos"
+unmountCmd="sudo /home/yogi/umount_chrisos"
 CLEAN=0
 if [ "$1" != "" ]
 then
@@ -43,7 +44,7 @@ do
 		echo -en "\tMake $i ... \tfailed ($?)\n"
 		echo 
 		echo 
-		sudo umount /mnt/loop
+		($unmountCmd)
 		tabs -8
 		exit -1
 	fi
@@ -64,7 +65,7 @@ do
 		echo -en "\tMake $i ... \tfailed"
 		echo 
 		echo 
-		sudo umount /mnt/loop
+                ($unmountCmd)
 		tabs -8
 		exit -2
 	fi
@@ -83,11 +84,12 @@ basePath=/home/yogi/src/os/kproj
 
 for i in "${kernOutputArray[@]}"
 do
-	sudo cp $basePath/$i /mnt/loop/
+	sudo cp $basePath/$i /mnt/chrisos
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
 	echo -en "\t$i ...done\n"
 done
 basePath=/home/yogi/src/os/aproj
+sudo mkdir /mnt/chrisos/bin
 if [ ! -d "/mnt/loop/bin" ]; then
 	sudo mkdir /mnt/loop/bin
 	echo bin directory created
@@ -96,8 +98,8 @@ else
 fi
 for i in "${appOutputArray[@]}"
 do
-	sudo cp $basePath/$i /mnt/loop/bin
-	sudo cp $basePath/libChrisOS/$pathMid/libc.so /mnt/loop/
+	sudo cp $basePath/$i /mnt/chrisos/bin
+	sudo cp $basePath/libChrisOS/$pathMid/libc.so /mnt/chrisos
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
 	echo -en "\t$i ... done\n"
 done
@@ -105,10 +107,8 @@ echo "Copying done"
 echo "Builds complete"
 tabs -8
 echo "Copying extra stuff to disk"
-sudo cp -r ../../../build_dir/diskdir/* /mnt/loop/
-sudo cp ../../../build_dir/diskdir/.krc /mnt/loop/
 cp Debug/GNU-Linux/chrisos ../../../build_dir/isodir/boot/myos.bin
 rm ./myos.iso
 grub-mkrescue -o myos.iso ../../../build_dir/isodir > /dev/null
-sudo umount /mnt/loop
+($unmountCmd)
 sync

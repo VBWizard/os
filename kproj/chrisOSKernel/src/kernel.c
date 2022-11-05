@@ -111,6 +111,7 @@ int main(int argc, char** argv)  {
     initTerm();
     initTTY();
     sysConsole1 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 0, 80, 50, "Main system console 0");
+    tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 1);
     sysConsole2 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 1, 80, 50, "Main system console 0");
     sysConsole3 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 2, 80, 50, "Main system console 0");
     sysConsole4 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 3, 80, 50, "Main system console 0");
@@ -118,7 +119,6 @@ int main(int argc, char** argv)  {
     sysConsole6 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 5, 80, 50, "Main system console 0");
     sysConsole7 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 6, 80, 50, "Main system console 0");
     sysConsole8 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 7, 80, 50, "Main system console 0");
-    tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 1);
     tty2 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 2);
     tty3 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 3);
     tty4 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 4);
@@ -149,7 +149,7 @@ int main(int argc, char** argv)  {
     fs_close(errlog);
     printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
             tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);
-    
+  
     keyboardInit();
     //CLR 04/23/2018: Commented out because this references fs.h which we are modifying to make a VFS
     //console_file.fops.write(NULL,"hello kernel world!!!\n",21,NULL);
@@ -174,6 +174,9 @@ int main(int argc, char** argv)  {
     strcpy(kKernelProcess->cwd,"/");
     
     process_t* initialShellProcess = createProcess(program, 0, args, kKernelProcess, false, false);
+    initialShellProcess->stdout=tty1->stdOutWritePipe;
+    initialShellProcess->stdin=tty1->stdInReadPipe;
+    initialShellProcess->stderr=kKernelProcess->stderr;
     schedulerEnabled=true;
     signalCheckEnabled=true;
     sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
@@ -189,7 +192,7 @@ int main(int argc, char** argv)  {
     tty3ShellProcess->stderr=kKernelProcess->stderr;
     tty3ShellProcess->childNumber=2;
     sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
-/*    process_t* tty4ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
+    process_t* tty4ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty4ShellProcess->stdout=tty4->stdOutWritePipe;
     tty4ShellProcess->stdin=tty4->stdInReadPipe;
     tty4ShellProcess->stderr=kKernelProcess->stderr;
@@ -206,16 +209,16 @@ int main(int argc, char** argv)  {
     tty6ShellProcess->stdin=tty6->stdInReadPipe;
     tty6ShellProcess->stderr=kKernelProcess->stderr;
     tty6ShellProcess->childNumber=5;
-*/    printk("All terminals started.");
+    printk("All terminals started.");
     sys_sigaction(SIGUSLEEP,0,initialShellProcess->task->taskNum, kKernelProcess);
     printk("\n\nLast task was killed, shutting down the kernel ...\n");
     schedulerEnabled=false;
     printk("Disabled scheduler ...\n");
     waitTicks(3);
-    errlog=fs_open("/var/log/syslog","a");
+/*    errlog=fs_open("/var/log/syslog","a");
     fs_write(NULL,errlog,"********** SYSTEM SHUTDOWN **********\n\n\n",40,1);
     fs_close(errlog);
-    printk("All shut down, exiting kernel!\n");
+*/    printk("All shut down, exiting kernel!\n");
     return (0xbad);
 }
 

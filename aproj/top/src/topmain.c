@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
                          sprintf(printBufferPtr,"%u\t%s\t%c\t%u\t%u\t%u\t%u\t%d\t%s\t%i\t%i%c\t\t%iK\n",
                                  ti->pid,
                                  ti->name,
-                                 ti->status,
+                                    ti->status,
                                  ti->ppid,
                                  ti->tty,
                                  ti->minorFaults,
@@ -95,8 +95,9 @@ int main(int argc, char** argv) {
         }
         printf("%s",printBuffer);
         lastSleepTicks=currTicks;
-        sleepTicks(25);
-        //sleep(intervalDelay);
+        //sleepTicks(25);
+        printd(DEBUG_PROCESS,"sleeping for %u seconds\n",intervalDelay);
+        sleep(intervalDelay);
     }
     if (sysmem)
         free(sysmem);

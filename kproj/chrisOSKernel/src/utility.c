@@ -8,13 +8,13 @@
 #include "kbd.h"
 #include "time_os.h"
 #include "i386/gdt.h"
-#include "../../../chrisOSKernel/include/tss.h"
+#include "../../chrisOSKernel/include/tss.h"
 #include "strings.h"
 #include "charDev.h"
 #include "i386/kPaging.h"
-#include "../../../chrisOSKernel/include/paging.h"
+#include "../../chrisOSKernel/include/paging.h"
 #ifdef KERNEL_LOADED
-#include "../../../chrisOSKernel/include/alloc.h"
+#include "../../chrisOSKernel/include/alloc.h"
 #include "process.h"
 #endif
 

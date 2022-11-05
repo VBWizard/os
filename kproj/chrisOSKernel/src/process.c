@@ -638,6 +638,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         //before attempting to load the new executable, so if the new executable fails to load and we try to return to the calling program,
         //we can't.  (our program was unmapped!)
         //This is our temporary fix to the problem.  Try to open the file and if it fails, return before unmapping!
+        printd(DEBUG_PROCESS,"temp1\n", process->path);
+        printd(DEBUG_PROCESS,"Opening %s because ... \n", process->path);
         void* fPtr=fs_open(process->path, "r");
         if (fPtr==0)
         {
@@ -648,6 +650,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         fs_close(fPtr);
         if (useExistingProcess)
            removeProgramSegmentMappings(process->parent, process);
+        printd(DEBUG_PROCESS,"Temp2\n");
         process->elf=sysLoadElf(process->path, process->elf, process->task->tss->CR3);
         if (!((elfInfo_t*)(process->elf))->loadCompleted)
         {

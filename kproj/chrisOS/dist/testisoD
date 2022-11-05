@@ -8,21 +8,17 @@ fi
 qemu-system-i386 							\
 	-m 1536								\
 	-smp 4    							\
-	-usb                                            		\
 	-boot order=d							\
         -drive file=./myos.iso,if=none,id=sata-cd-0,format=raw                  \
-        -drive file=/home/yogi/qemu-test-disk.img,index=4,format=raw,cache=none,if=none,id=sata-disk-0 \
-        -drive file=/home/yogi/qemu-test-disk2.img,index=5,format=raw,cache=none,if=none,id=sata-disk-1 \
-        -drive file=/dev/disk/by-id/ata-HGST_HTS541075A9E680_JD12021A0DR07L,index=6,format=raw,cache=none,if=none,id=sata-disk-2 \
+        -drive file=/home/yogi/chrisos.img,index=6,format=raw,cache=none,if=none,id=sata-disk-0 \
+	-drive file=/dev/sdc,index=4,format=raw,cache=none,if=none,id=sata-disk-1 \
 	-device ich9-ahci,id=ahci0 					\
 	-device ich9-ahci,id=ahci1 					\
         -device ide-drive,drive=sata-disk-0,bus=ahci0.0                 \
-        -device ide-drive,drive=sata-disk-1,bus=ahci0.1                 \
-	-device ide-drive,drive=sata-disk-2,bus=ahci0.2			\
         -device ide-cd,drive=sata-cd-0,bus=ahci1.0                      \
+	-device ide-drive,drive=sata-disk-1,bus=ahci0.1                 \
 	-serial file:"qemu_port.log"					\
 	-d int,cpu_reset,pcall,guest_errors                        		\
-	-usb -device usb-host,hostbus=2,hostaddr=3 			\
 	$@ 
 #	--enable-kvm
 
