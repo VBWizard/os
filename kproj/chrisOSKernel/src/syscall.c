@@ -58,6 +58,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
         printd(DEBUG_DETAILED, "_syscall: debug print\n");
     else
         printd(DEBUG_SYSCALL, "_syscall: call for 0x%04x, CR3=0x%08x\n",callNum, processCR3);
+    if (DISABLE_SCHEDULE_DURING_SYSCALLS == 1)
+        disableScheduler();
     switch (callNum)
     {
         case 0x0:       //***Invalid call #
@@ -72,7 +74,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                  printd(DEBUG_SYSCALL,"\tsyscall: endProcess\n");
                  param1=processCR3;
              printd(DEBUG_PROCESS,"\tsyscall: Ending process with CR3=0x%08x with return value %u\n",param1,param2);
-             markTaskEnded(param1, param2);
+             markTaskEnded(param1, param2, true);
              panic("syscall: exit call, continued after halt!");
              __asm__("mov eax,0xbadbadba;mov ebx,0xbadbadba;mov ecx,0xbadbadba; mov edx,0xbadbadba\ncli\nhlt\n");               //We should never get here
             break;
@@ -267,7 +269,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             if (process!=NULL)
             {
                 retVal=process->task->taskNum;
-                printd(DEBUG_PROCESS, "\t_sysCall: createProcess returning 0x%04X\n",retVal);
+                printd(DEBUG_PROCESS, "\t_sysCall: createProcess returning 0x%04x\n",retVal);
             }
             else
                 retVal=0;
@@ -293,7 +295,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             }
             else //Otherwise
             {
-                printd(DEBUG_PROCESS,"\tsyscall: signalling SIG_USLEEP for current task (cr3=0x%08x) on pid=0x%04X.  Good night!\n",processCR3,param1);
+                printd(DEBUG_PROCESS,"\tsyscall: signalling SIG_USLEEP for current task (cr3=0x%08x) on pid=0x%04x.  Good night!\n",processCR3,param1);
                 enableScheduler();
                 retVal = (uint32_t)sys_sigaction(SIGUSLEEP,0,param1, process);
             }
@@ -403,25 +405,41 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             {
                 case STDIN_FILE:
                     process->stdin=param2;
+                    if (param2 != STDIN_FILE)
+                        process->stdinRedirected = true;
                     retVal=0;
                     break;
                 case STDOUT_FILE:
                     process->stdout=param2;
+                    if (param2 != STDOUT_FILE)
+                        process->stdoutRedirected = true;
                     retVal=0;
                     break;
                 case STDERR_FILE:
                     process->stderr=param2;
+                    if (param2 != STDERR_FILE)
+                        process->stderrRedirected = true;
                     retVal=0;
                     break;
             }
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
+        case SYSCALL_SIGNAL: //send a signal param1 to process param2
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
+            printd(DEBUG_SYSCALL,"\tsyscall: signal(SIGNAL=0x%08x, PID=0x%04x)\n",param1,param2);
+            process=((task_t*)findTaskByTaskNum(param2))->process;
+            if (process)
+                sys_sigaction(param1, 0, 0, process);
+            __asm__("mov cr3,eax\n"::"a" (processCR3));
+            break;
         default:
-            panic("syscall: Invalid call number 0x%04X\n",callNum);
+            panic("syscall: Invalid call number 0x%04x\n",callNum);
     }
     //__asm__("mov esp,ebp;add esp,4;ret"); /* BLACK MAGIC! */
     if (CURRENT_CR3==KERNEL_CR3)
         panic("_syscall: CR3 set to kernel CR3 on exit\n");
+    if (DISABLE_SCHEDULE_DURING_SYSCALLS == 1)
+        enableScheduler();
     __asm__("sti\nmov esp,ebp\nadd esp,4\nret\n"::"a" (retVal)); /* BLACK MAGIC! */
 
 }

@@ -60,6 +60,7 @@
       <itemPath>src/malloc.c</itemPath>
       <itemPath>src/memcpy.c</itemPath>
       <itemPath>src/memset.c</itemPath>
+      <itemPath>src/modf.asm</itemPath>
       <itemPath>src/pipe_lib.c</itemPath>
       <itemPath>src/procinfo.c</itemPath>
       <itemPath>src/sprintf.c</itemPath>
@@ -183,6 +184,8 @@
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/modf.asm" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/pipe_lib.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -328,6 +331,8 @@
       <item path="src/memcpy.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/memset.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/modf.asm" ex="false" tool="4" flavor2="0">
       </item>
       <item path="src/pipe_lib.c" ex="false" tool="0" flavor2="0">
       </item>

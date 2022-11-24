@@ -44,12 +44,12 @@ void initTerm()
 terminfo_t* registerTerminal(int deviceMajor, int deviceMinor, int width, int height, char *description)
 {
     if (deviceMajor != TERMINAL_CONSOLE_MAJOR_NUMBER)
-        panic("termdrv: Device major number 0x%04X not implemented\n", deviceMajor);
+        panic("termdrv: Device major number 0x%04x not implemented\n", deviceMajor);
     
     for (int cnt=0;cnt<termsRegistered; cnt++)
         if (terminfos[cnt].major == deviceMajor && 
                 terminfos[cnt].minor == deviceMinor)
-            panic("termdrv: Terminal device with major 0x%04X and minor 0x%04X already registered\n", deviceMajor, deviceMinor);
+            panic("termdrv: Terminal device with major 0x%04x and minor 0x%04x already registered\n", deviceMajor, deviceMinor);
      
     //at this point it is ok to register the terminal device
     terminfos[termsRegistered].major = deviceMajor;
@@ -159,7 +159,7 @@ void updateTermBuffer(ttydevice_t *device, int bytesToUpdate)
     int lSavedX, lSavedY;
     
     if (term == NULL)
-        panic("updateTermBuffer: Couldn't find the terminal to be updated (major=0x%04X, minor=0x%04X)\n", device->termDeviceMajor, device->termDeviceMinor);
+        panic("updateTermBuffer: Couldn't find the terminal to be updated (major=0x%04x, minor=0x%04x)\n", device->termDeviceMajor, device->termDeviceMinor);
 
     for (int cnt=0;cnt<bytesToUpdate;cnt++)
     {

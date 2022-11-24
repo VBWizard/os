@@ -486,7 +486,7 @@ void dumpIDTTable()
     {
         if (idtTable->sel>0)
         {
-            printk ("0x%02X\t0x%04X\t0x%08X\t0x%02X\n",
+            printk ("0x%02X\t0x%04x\t0x%08X\t0x%02X\n",
                     cnt,
                     idtTable->sel,
                     idtTable->base_hi<<16|idtTable->base_lo,idtTable->flags);

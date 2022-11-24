@@ -44,7 +44,7 @@ extern "C" {
 
     filesystem_t *initpipefs();
     void *pipeopen(void* filePtr, const char *mode);
-    void pipeclose(file_t *file);
+    bool pipeclose(file_t *file);
     size_t piperead(void *buffer, int size, int length, void *f);
     size_t pipewrite(const void *buffer, int size, int count, void *f);
     pipe_t *pipedup1(void* path, const char *mode, file_t* file);

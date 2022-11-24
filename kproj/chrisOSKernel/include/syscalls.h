@@ -55,6 +55,7 @@ extern "C" {
         SYSCALL_GETDENTS                = 0x304,
         SYSCALL_EXECNEW			= 0x305,
         SYSCALL_SETSTD                  = 0x306,
+        SYSCALL_SIGNAL                  = 0x307,
         SYSCALL_TAKEADUMP               = 0x900
     } E_SYSCALLS;
 

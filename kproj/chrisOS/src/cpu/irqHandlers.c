@@ -67,7 +67,7 @@ static struct tm theDateTime;
         {
             cursorSavePosition();
             cursorMoveTo(55,SYS_VGA_HEIGHT-1);
-            //printf("0x%04X:0x%08X 0x%08X",exceptionCS, exceptionEIP, exceptionFlags);
+            //printf("0x%04x:0x%08X 0x%08X",exceptionCS, exceptionEIP, exceptionFlags);
             //kTermMoveTo(65,0);
             printk("%u",*kTicksSinceStart);
             printk("-%c-%04X:%08X",(exceptionFlags & 0x200)==0x200?'I':'i',exceptionCS, exceptionEIP);

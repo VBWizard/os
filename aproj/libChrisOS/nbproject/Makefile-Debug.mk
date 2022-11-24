@@ -48,6 +48,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/malloc.o \
 	${OBJECTDIR}/src/memcpy.o \
 	${OBJECTDIR}/src/memset.o \
+	${OBJECTDIR}/src/modf.o \
 	${OBJECTDIR}/src/pipe_lib.o \
 	${OBJECTDIR}/src/procinfo.o \
 	${OBJECTDIR}/src/sprintf.o \
@@ -156,6 +157,10 @@ ${OBJECTDIR}/src/memset.o: src/memset.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -Iinclude -I../../kproj/chrisOS/include -I../../kproj/chrisOSKernel/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/memset.o src/memset.c
+
+${OBJECTDIR}/src/modf.o: src/modf.asm
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(AS) $(ASFLAGS) -g -o ${OBJECTDIR}/src/modf.o src/modf.asm
 
 ${OBJECTDIR}/src/pipe_lib.o: src/pipe_lib.c
 	${MKDIR} -p ${OBJECTDIR}/src

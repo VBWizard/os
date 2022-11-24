@@ -22,7 +22,7 @@
 #include "mmap.h"
 #include "task.h"
 #include "sysloader.h"
-#include "drivers/tty_driver.h"
+#include "filesystem/pipe.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
@@ -120,21 +120,32 @@ void freeProcess(process_t *process)
     //TODO: Fix this.  Unremarking this causes paging exception SEGV in /sbin/idle
     //kFree(process->stackInitialPage);
 
+    //TODO: Not working, need to fix so that pipes aren't leaked memory when the process ends
+/*    bool bPipeClosed = false;
     if (process->stdinRedirected && process->stdin != process->parent->stdin)
     {
-        fs_close(process->stdin);
+        bPipeClosed = pipeclose(process->stdin);
+        if (bPipeClosed)
+            fs_close(process->stdin);
+        printd(DEBUG_FILESYS,"\tfreeProcess: Decremented pipe use count for stdin is %i, pipe is %s\n", ((pipe_t*)(process->stdin))->usecount, (bPipeClosed?"closed":"still open"));
         process->stdinRedirected=false;
     }
     if (process->stdoutRedirected && process->stdout != process->parent->stdout)
     {
-        fs_close(process->stdout);
+        bPipeClosed = pipeclose(process->stdout);
+        if (bPipeClosed)
+            fs_close(process->stdout);
+        printd(DEBUG_FILESYS,"\tfreeProcess: Decremented pipe use count for stdout is %i, pipe is %s\n", ((pipe_t*)(process->stdout))->usecount, (bPipeClosed?"closed":"still open"));
         process->stdoutRedirected=false;
     }
     if (process->stderrRedirected && process->stderr != process->parent->stderr)
     {
-        fs_close(process->stderr);
+        bPipeClosed = pipeclose(process->stdout);
+        if (bPipeClosed)
+            fs_close(process->stderr);
+        printd(DEBUG_FILESYS,"\tfreeProcess: Decremented pipe use count for stderr is %i, pipe is %s\n", ((pipe_t*)(process->stderr))->usecount, (bPipeClosed?"closed":"still open"));
         process->stderrRedirected=false;
-    }
+    }*/
     kFree(process->stack1Start);
     kFree(process->path);
     kFree(process->cwd);
@@ -723,7 +734,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     else
     {
         process->task=submitNewTask(process->task);
-        printd(DEBUG_PROCESS,"Submitted process 0x%04X to be run\n",process->task->taskNum);
+        printd(DEBUG_PROCESS,"Submitted process 0x%04x to be run\n",process->task->taskNum);
     }
     return process;
 }

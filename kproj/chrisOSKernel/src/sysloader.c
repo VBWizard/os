@@ -116,7 +116,7 @@ void mapLibraryIntoProcess(uint32_t CR3,elfInfo_t* searchElf)
     while (pt->pages!=0)
     {
         pagingMapPageCount(CR3, pt->startVirt, pt->startPhys, pt->pages, 0x7, true);
-        printd(DEBUG_ELF_LOADER,"mapLibraryIntoProcess: V=0x%08x mapped to P=0x%08x, 0x%04X pages (CR3=0x%08x)\n",pt->startVirt,pt->startPhys,pt->pages,CR3);
+        printd(DEBUG_ELF_LOADER,"mapLibraryIntoProcess: V=0x%08x mapped to P=0x%08x, 0x%04x pages (CR3=0x%08x)\n",pt->startVirt,pt->startPhys,pt->pages,CR3);
         pt++;
     }
 }
@@ -136,7 +136,7 @@ uint32_t processELFDynamicSection(elfInfo_t* elfInfo, uint32_t targetCR3)
             case DT_NEEDED:
                 printd(DEBUG_ELF_LOADER,"ELF at: 0x%08x, copy to: 0x%08x, neededCount=0x%08x\n",
                         elfInfo, elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount],++elfInfo->dynamicInfo.neededCount);
-                printd(DEBUG_ELF_LOADER,"Reading NEEDED name from string table index 0x%04X (0x%04X)\n",dyn[cnt].d_un.d_val, dyn[cnt].d_un.d_ptr);
+                printd(DEBUG_ELF_LOADER,"Reading NEEDED name from string table index 0x%04x (0x%04x)\n",dyn[cnt].d_un.d_val, dyn[cnt].d_un.d_ptr);
                 printd(DEBUG_ELF_LOADER,"Needed name = %s\n",strTabEntry(elfInfo->dynamicNameStringTable,elfInfo,dyn[cnt].d_un.d_val));
                 strcpy(elfInfo->dynamicInfo.neededName[elfInfo->dynamicInfo.neededCount],
                         //strTabEntryBySTName(".strtab",elfInfo,dyn[cnt].d_un.d_val));
@@ -461,13 +461,13 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
     //Make sure the file is viable
     if (elfInfo->hdr.e_type!=ET_EXEC && elfInfo->hdr.e_type!=ET_DYN)
     {
-        printd(DEBUG_ELF_LOADER,"Wrong ELF type 0x%04X, cannot load\n", elfInfo->hdr.e_type);
+        printd(DEBUG_ELF_LOADER,"Wrong ELF type 0x%04x, cannot load\n", elfInfo->hdr.e_type);
         elfInfo->loadCompleted=false;
         return false;
     }
     if (elfInfo->hdr.e_machine!=EM_386)
     {
-        printd(DEBUG_ELF_LOADER,"Wrong ELF architecture 0x%04X, cannot load\n", elfInfo->hdr.e_type);
+        printd(DEBUG_ELF_LOADER,"Wrong ELF architecture 0x%04x, cannot load\n", elfInfo->hdr.e_type);
         elfInfo->loadCompleted=false;
         return false;
     }
@@ -479,7 +479,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
     
     //Get the Section Header String Table Index (e_shstrndx)
     elfInfo->sectionNameStringTable=elfInfo->hdr.e_shstrndx;
-    printd(DEBUG_ELF_LOADER,"Section Name String Table number = 0x%04X\n",elfInfo->sectionNameStringTable);
+    printd(DEBUG_ELF_LOADER,"Section Name String Table number = 0x%04x\n",elfInfo->sectionNameStringTable);
     
     //Get the section header table
     printd(DEBUG_ELF_LOADER,"section header record count= %u\n", elfInfo->hdr.e_shnum);
@@ -528,7 +528,7 @@ bool elfLoadSections(void* file,elfInfo_t* elfInfo,uintptr_t CR3)
         }
         if (elfInfo->pgmHdrTable[pgmSectionNum].p_filesz>0)
         {
-            printd(DEBUG_ELF_LOADER,"Section %u, load fsize=0x%04X,msize=0x%04X to 0x%08x, seeking to 0x%08x ...\n",
+            printd(DEBUG_ELF_LOADER,"Section %u, load fsize=0x%04x,msize=0x%04x to 0x%08x, seeking to 0x%08x ...\n",
                     pgmSectionNum,
                     elfInfo->pgmHdrTable[pgmSectionNum].p_filesz,
                     elfInfo->pgmHdrTable[pgmSectionNum].p_memsz,
@@ -708,7 +708,7 @@ static int elf_relocate(elfInfo_t* elf) {
     return 0;
 }
 
-extern void markTaskEnded(uint32_t taskNum, uint32_t retval);
+extern void markTaskEnded(uint32_t taskNum, uint32_t retval, bool triggerScheduler);
 
 elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
 {
@@ -794,19 +794,19 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     {
         if (elfInfo->dynamicInfo.strTableName[cnt])
         {
-                printd(DEBUG_ELF_LOADER,"Found string (STRTAB) table 0x%04X named %s, read to address 0x%08x, size=0x%08x\n",
+                printd(DEBUG_ELF_LOADER,"Found string (STRTAB) table 0x%04x named %s, read to address 0x%08x, size=0x%08x\n",
                 cnt,
                 strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),
                 elfInfo->dynamicInfo.strTableAddress[cnt], elfInfo->dynamicInfo.strTableSize[cnt]);
                 if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),".dynstr",7)==0)
                 {
                     elfInfo->dynamicNameStringTable=cnt;
-                    printd(DEBUG_ELF_LOADER,"Dynamic string table entry = 0x%04X\n",cnt);
+                    printd(DEBUG_ELF_LOADER,"Dynamic string table entry = 0x%04x\n",cnt);
                 }
                 else if (strncmp(strTabEntry(elfInfo->sectionNameStringTable,elfInfo,elfInfo->dynamicInfo.strTableName[cnt]),".strtab",7)==0)
                 {
                     elfInfo->generalNameStringTable=cnt;
-                    printd(DEBUG_ELF_LOADER,"General string table entry = 0x%04X\n",cnt);
+                    printd(DEBUG_ELF_LOADER,"General string table entry = 0x%04x\n",cnt);
                 }
         }
     }
@@ -932,7 +932,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
     }
     printd(DEBUG_ELF_LOADER,"Done processing the section header table\n");
     printd(DEBUG_ELF_LOADER  | DEBUG_DETAILED,"Iterating the symbol table, %u records\n",elfInfo->symTableRecordCount);
-    printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Using string table 0x%04X\n",elfInfo->symStrTabLink);
+    printd(DEBUG_ELF_LOADER | DEBUG_DETAILED,"Using string table 0x%04x\n",elfInfo->symStrTabLink);
     for (int cnt=0;cnt<elfInfo->symTableRecordCount;cnt++)
     {
         Elf32_Sym* sym=&elfInfo->symTable[cnt];

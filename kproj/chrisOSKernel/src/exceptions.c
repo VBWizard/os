@@ -330,7 +330,7 @@ void kPagingExceptionHandlerNew(uint32_t pagingExceptionCR2, int ErrorCode)
     pagingMapPage(victimProcess->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)victimProcess & 0xFFFFF000, (uint16_t)0x7); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
    __asm__("clts\n"); //TODO: Didn't save fpu registers
     //printd(DEBUG_EXCEPTIONS,"Paging exception START: for address 0x%08x (CR3=0x%08x)\n",exceptionCR2,exceptionCR3);
-    printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%08x)\n\tChecking for uninitialized mmap page, pt entry=0x%08x\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
+    printd(DEBUG_EXCEPTIONS,"\tProcess=%s (0x%04x)\n\tChecking for uninitialized mmap page, pt entry=0x%08x\n",victimProcess->path,victimProcess->task->taskNum, lPTEValue);
 
     //Phys addr portion will equal virtual address, admin/user page will be 1, present will be 0
     if ( !nullPointer && (pageFlags&PAGE_MMAP_FLAG) && !(pageFlags&PAGE_PRESENT_FLAG))

@@ -94,25 +94,35 @@ void *pipeopen(void* filePtr, const char *mode)
             break;
         }
     }
-    
     return pipe;
 }
 
-void pipeclose(file_t *file)
+bool pipeclose(file_t *file)
 {
     pipe_t *pipe = file->pipe;
-    
-    kFree(file->pipeContent);
-    kFree(pipe);
-    for (int cnt=0;cnt<1000;cnt++)
+    bool bRetVal = false;
+
+    if (--pipe->usecount==0)
     {
-        if (openPipes[cnt].pipe == pipe)
+        printd(DEBUG_FILESYS,"\tpipeclose: Freeing pipe content area at 0x%08x\n",file->pipeContent);
+        kFree(file->pipeContent);
+        for (int cnt=0;cnt<1000;cnt++)
         {
-            openPipes[cnt].pipe = NULL;
-            openPipes[cnt].path = NULL;
-            break;
+            if (openPipes[cnt].pipe == pipe)
+            {
+                openPipes[cnt].pipe = NULL;
+                openPipes[cnt].path = NULL;
+                printd(DEBUG_FILESYS,"\tpipeclose: Marked pipe as freed in pipe set\n",file->pipeContent);
+                break;
+            }
         }
+        printd(DEBUG_FILESYS,"\tpipeclose: Freeing pipe pair 0x%08x (r) and 0x%08x (w) (pipe at 0x%08x)\n",pipe->file[0], pipe->file[1], pipe);
+        kFree(pipe);
+        bRetVal = true;
     }
+    else
+        bRetVal = false;
+    return bRetVal;
 }
 
 size_t piperead(void *buffer, int size, int length, void *f)
@@ -189,7 +199,7 @@ size_t pipewrite(const void *data, int size, int count, void *f)
             memcpy(*file->pipeContentPtr, data+written, copySize);  //Read everything from the beginning of the pipe to the pipe pointer (write pointer)
             *file->pipeContentPtr+=copySize;    
         }
-        printd(DEBUG_FILESYS, "\t\tpipewrite: wrote %u bytes to pipe %s (0x%08x)\n", copySize, file->f_path);
+        printd(DEBUG_FILESYS, "\t\tpipewrite: wrote %u bytes to pipe %s (0x%08x)\n", copySize, file->f_path, pipe->file);
         written += copySize;
         if (written < size*count)
         {
@@ -216,6 +226,7 @@ pipe_t *pipedup1(void* path, const char *mode, file_t* file)
     pipes_t *op;
     pipe_t *pipe;
     
+    //Find the first available pipe to open
     for (int cnt=0;cnt < 1000;cnt++)
     {
         if (strncmp(openPipes[cnt].path, path,256)==0)
@@ -298,6 +309,7 @@ int fs_pipeI(process_t *process, int pipefd[2], int flags)
             pipe.file[0], 
             pipe.file[1], 
             process->exename);
+    pipe.usecount=2;
     return 0;
 }
 

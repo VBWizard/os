@@ -18,12 +18,14 @@
 extern "C" {
 #endif
 
+//Determines whether the scheduler is disabled during syscalls.  Both settings work as of now
+#define DISABLE_SCHEDULE_DURING_SYSCALLS 1
 //The minimum TPS I've gotten to work is 50.  Not possible to do > 1000 because of MS_PER_TICK.  Seems like 1000 may cause AHCI issues
 #define TICKS_PER_SECOND 100
 //How many ticks expire between scheduler runs (@100hz - 5=20 ticks per run, 10=10  ticks per run)
 #define TICKS_PER_SCHEDULER_RUN TICKS_PER_SECOND / 10
 //How many ticks expire between signal checks
-#define TICKS_PER_SIGNAL_CHECK 1
+#define TICKS_PER_SIGNAL_CHECK 2 //clr 11/14/2022 - changed from 1 to 2
     //TICKS_PER_SECOND / 5 
     //old=/50
 //MS=Milliseconds or thousands of a second
@@ -70,13 +72,14 @@ extern "C" {
 #define DEBUG_FILESYS 1<<27
 #define DEBUG_COW 1<<28
 #define DEBUG_SYSCALL 1<<29
+#define DEBUG_USERPROCESS 1<<30
+#define DEBUG_SCHEDULER 1<<31
 #define DEBUG_MAX 0XFFFFFFFF            //0XFFFF TO TURN ON
-#define KDEBUGLEVEL DEBUG_EXCEPTIONS |DEBUG_PRINT_TO_PORT | DEBUG_PROCESS | DEBUG_TASK |  DEBUG_SYSCALL |  DEBUG_LIBC | DEBUG_TERMINAL | DEBUG_DETAILED | DEBUG_MMAP | DEBUG_KMALLOC | DEBUG_MALLOC
-//| DEBUG_FILESYS | DEBUG_ELF_LOADER 
-    //| DEBUG_FILESYS | DEBUG_SIGNALS | DEBUG_MEMORY_MANAGEMENT
+#define KDEBUGLEVEL DEBUG_EXCEPTIONS|DEBUG_PRINT_TO_PORT|DEBUG_PROCESS|DEBUG_TASK|DEBUG_SYSCALL|DEBUG_LIBC|DEBUG_MMAP|DEBUG_FILESYS|DEBUG_SIGNALS|DEBUG_USERPROCESS
+    //| DEBUG_KEYBOARD_DRIVER  | DEBUG_ELF_LOADER | DEBUG_KMALLOC | DEBUG_MALLOC | DEBUG_DETAILED | DEBUG_FILESYS | DEBUG_MEMORY_MANAGEMENT
     //| DEBUG_AHCI
     
-    //| DEBUG_KEYBOARD | DEBUG_ELF_LOADER
+    //| DEBUG_KEYBOARD
     // | DEBUG_SIGNALS ***GETTING SEGV WITH THIS***
 #ifdef __cplusplus
 }

@@ -154,7 +154,7 @@ __asm__("cli\n");
     wrmsr32(SYSENTER_CS_MSR,0x88,0x33);                      //Set sysenter CS(88) and SS(33), and return CS(93) & SS(3b)
     wrmsr32(SYSENTER_ESP_MSR,kKernelTask->tss->ESP1,0);     //Set sysenter ESP
     wrmsr32(SYSENTER_EIP_MSR,(uint32_t)&_sysEnter,0);       //Set sysenter EIP
-    printd(DEBUG_PROCESS,"Setup SYSENTER MSRs as CS:EIP=0x%04X:0x%08x, ESP=0x%08x\n",0x88,&_sysEnter,kKernelTask->tss->ESP1);
+    printd(DEBUG_PROCESS,"Setup SYSENTER MSRs as CS:EIP=0x%04x:0x%08x, ESP=0x%08x\n",0x88,&_sysEnter,kKernelTask->tss->ESP1);
 
     printk("Installing new IRQ0 handlers\n");
     //idt_set_gate (&idtTable[0x20], 0x08, (int)&vector32, ACS_INT); //Move this out of the way of the exception handlers

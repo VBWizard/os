@@ -96,9 +96,11 @@ VISIBLE procInfo_t *buildProcInfoT(procInfo_t *procinfo, char *statinfo)
     return buildProcInfoTI(procinfo, statinfo, 0);
 }
 
-VISIBLE void buildAllProcInfoTs(procInfo_t **topinfo, int intervalTicks, int iteration)
+VISIBLE void buildAllProcInfoTs(procInfo_t **topinfo, int intervalTicks, int iteration, double* userCPU, double* kernelCPU)
 {
     static direntry_t *dirEntries;
+    
+    *userCPU = *kernelCPU = 0;
     
     if (!dirEntries)
         dirEntries=mallocI(PROCINFO_MAX_PROCESSES*sizeof(direntry_t));
@@ -120,18 +122,25 @@ VISIBLE void buildAllProcInfoTs(procInfo_t **topinfo, int intervalTicks, int ite
             int *handle=openI(path,"r");
             if (handle)
             {
-                readI(handle,statBuffer,1024,1);
+                //CLR 11/06/2022 - Added return value ... if not > 0 then we didn't get any bytes
+                int res = readI(handle,statBuffer,256,1);
                 closeI(handle);
                 //buildTopInfo(statBuffer,topinfo);
-                char *space=strstrI(statBuffer," ");
-                char pid[8];
-                strncpyI(pid,statBuffer,space-statBuffer);
-                int ipid=atoiI(pid);
-                if (topinfo[ipid]==NULL)
-                    topinfo[ipid]=mallocI(sizeof(procInfo_t));
-                currProc=topinfo[ipid];
-                buildProcInfoTI(currProc, statBuffer, intervalTicks);
-                currProc->lastUpdateIteration=iteration;
+                if (res > 0)
+                {
+                    char *space=strstrI(statBuffer," ");
+                    char pid[8];
+                    strncpyI(pid,statBuffer,space-statBuffer);
+                    int ipid=atoiI(pid);
+                    if (topinfo[ipid]==NULL)
+                        topinfo[ipid]=mallocI(sizeof(procInfo_t));
+                    currProc=topinfo[ipid];
+                    buildProcInfoTI(currProc, statBuffer, intervalTicks);
+                    currProc->lastUpdateIteration=iteration;
+                    uint32_t* ptr = strstrI(currProc->name,"idle");
+                    if (ptr == NULL)
+                        *userCPU += currProc->cpu;
+                }
             }
         }
     }

@@ -158,7 +158,7 @@ void* mallocI(uint32_t cr3, size_t size)
     }
     
     process_t* p=findTaskByCR3(cr3)->process;
-    printd(DEBUG_KMALLOC,"mallocI: Found process 0x%04X\n",p->task->taskNum);
+    printd(DEBUG_KMALLOC,"mallocI: Found process 0x%04x\n",p->task->taskNum);
     uint32_t phys=(uint32_t)allocPages(newSize);
     printd(DEBUG_KMALLOC,"mallocI: Allocated 0x%08X bytes @ 0x%08X\n",newSize,phys);
     pagingMapPageCount(cr3, p->heapEnd, phys, newSize/PAGE_SIZE, 0x7, true); //CLR 02/25/2017 - changed map page to map page count

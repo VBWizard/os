@@ -22,17 +22,18 @@ int main(int argc, char** argv) {
     struct tm *timeinfo = malloc(sizeof(struct tm));
     char *printBuffer=malloc(100);
     int ticksSinceLastUpdate=0;
-    int refreshInterval=25;
+    int refreshInterval=TICKS_PER_SECOND / 5;
     time_t theTime;
     
     while (1==1)
     {
-        if (ticksSinceLastUpdate>TICKS_PER_SECOND)
+        //printd(DEBUG_USERPROCESS, "refreshInterval = %i, ticksSinceLastUpdate = %i, TICKS_PER_SECOND = %i\n",refreshInterval, ticksSinceLastUpdate, TICKS_PER_SECOND);
+        if (ticksSinceLastUpdate>=TICKS_PER_SECOND)
         {
             theTime=time(&theTime);
             timeinfo=localtime(&theTime);
             ticksSinceLastUpdate=0;
-            sprintf(printBuffer,"%ss%s70;0H%02i:%02i:%02i%su",
+            sprintf(printBuffer,"%ss%s70;0H%02i:%02i:%02i%su", //Move to 70x,0y
                     ansiEscSeq,
                     ansiEscSeq,
                     timeinfo->tm_hour, 
@@ -41,10 +42,6 @@ int main(int argc, char** argv) {
                     ansiEscSeq);
         }
         printf("%s",printBuffer);
-/*        saveCursorPosition();
-        moveToXY(70,0);
-        printf("%02i:%02i:%02i",timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);*/
-        //sleep(1);
         sleepTicks(refreshInterval);
         ticksSinceLastUpdate+=refreshInterval;
     }

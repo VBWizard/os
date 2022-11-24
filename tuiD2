@@ -1,0 +1,4 @@
+#!/bin/bash
+#This version of tuiD uses the config gdbcmds2 which points to source files in a different directory.  Doesn't really work, but keeping it just innnnnnnnnnnnnnnnnnn case
+gdb -x ./gdbcmds2 Debug/GNU-Linux/chrisos
+#/home/yogi/src/binutils-gdb/gdb/

@@ -16,7 +16,7 @@
 #include <time.h>
 #include "../../free/include/free.h"
 
-const char ansiEscSeq[3] =  {0x1b,0x5b,0};
+const char ansiEscSeq[3] =  {0x1b,0x5b,0}; //1b=escape, 5b=[
 int iteration;
 int intervalTicks;
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     intervalTicks=0;
     int intervalDelay=1;
     char *sysmem;
-    
+    double userCPU=0, kernelCPU=0;
     //__asm__("mov ebx,0\nmov [ebx],eax\n");
     
     if (argc>1)
@@ -49,17 +49,19 @@ int main(int argc, char** argv) {
     while (++iteration)
     {
         char c=0xff;
-        if (read(STDIN_FILE,&c,1,1))
+        read(STDIN_FILE,&c,1,1);
+        if (c=='q' || c=='Q')
             break;
         int currTicks=getticks();
         intervalTicks=currTicks-lastSleepTicks;
         sysmem=getFree(true,sysmem,40);
-        buildAllProcInfoTs(topinfo, intervalTicks, iteration);
+        buildAllProcInfoTs(topinfo, intervalTicks, iteration, &userCPU, &kernelCPU);
         printBufferPtr=printBuffer;
         time_t theTime = time(&theTime);
         timeinfo = localtime(&theTime);
-        printf("%s2JTop\t%02i:%02i:%02i\nHeapAvail:%sPID\tCommand\tStts\tPPID\tTTY\tMIF\tMAF\tCPU\tTime\t\tPRI\tVSiz\t\tPSiz\n",
-                ansiEscSeq,timeinfo->tm_hour,timeinfo->tm_min,timeinfo->tm_sec,sysmem);
+        printf("%s2JTop\t%02i:%02i:%02i\tHeapA:%s\n",ansiEscSeq,timeinfo->tm_hour,timeinfo->tm_min,timeinfo->tm_sec,sysmem);
+        printf("CPU: User: %d\tKernel:\tIdle: \n", (uint32_t)userCPU, 100-(uint32_t)userCPU);
+        printf("PID\tCommand\tStts\tPPID\tTTY\tMIF\tMAF\tCPU\tTime\t\tPRI\tVSiz\t\tPSiz\n");
         
 
         for (int cnt=0;cnt<TOP_MAX_PROCESSES;cnt++)
@@ -73,7 +75,7 @@ int main(int argc, char** argv) {
                     if (topinfo[cnt]!=NULL && topinfo[cnt]->pid!=0 && (uint32_t)topinfo[cnt]->cpu>=cpuVal && topinfo[cnt]->cpu<(cpuVal+1)) //ORDER BY cpu DESC
                     {
                         procInfo_t *ti=topinfo[cnt];
-                         sprintf(printBufferPtr,"%u\t%s\t%c\t%u\t%u\t%u\t%u\t%d\t%s\t%i\t%i%c\t\t%iK\n",
+                         sprintf(printBufferPtr,"0x%02x\t%s\t%c\t0x%02x\t%u\t%u\t%u\t%d\t%s\t%i\t%i%c\t\t%iK\n",
                                  ti->pid,
                                  ti->name,
                                     ti->status,

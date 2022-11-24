@@ -14,9 +14,6 @@
             <file>file:/home/yogi/src/os/kproj/chrisOS/src/filesystem/mbr.c</file>
         </group>
         <group name="aproj"/>
-        <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/src/cpu/irqHandlers.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOS/include/config.h</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

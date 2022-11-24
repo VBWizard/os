@@ -4,6 +4,8 @@ shopt -s dotglob
 echo "Initiating builds"
 mountCmd="sudo /home/yogi/mount_chrisos"
 unmountCmd="sudo /home/yogi/umount_chrisos"
+#mountCmd2="sudo mount /dev/sdc6 /mnt/chrisos_hd"
+#umountCmd2="sudo umount /mnt/chrisos_hd"
 CLEAN=0
 if [ "$1" != "" ]
 then
@@ -25,8 +27,8 @@ pathMid=dist/${buildType^}/GNU-Linux #GNU-Linux
 
 declare -a kernProgArray=("chrisOS" "chrisOSKernel")
 declare -a kernOutputArray=("chrisOS/$pathMid/chrisos" "chrisOSKernel/$pathMid/kernel")
-declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat" "echo" "clock" "ls" "grep" "free" "top" "wc" "ps")
-declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat" "echo/$pathMid/echo" "clock/$pathMid/clock" "ls/$pathMid/ls" "grep/$pathMid/grep" "free/$pathMid/free" "top/$pathMid/top" "wc/$pathMid/wc" "ps/$pathMid/ps")
+declare -a appProgArray=("libChrisOS" "testMainProgramEntry" "kshell" "time" "testMMap" "sleep" "cat" "echo" "clock" "ls" "grep" "free" "top" "wc" "ps" "kill")
+declare -a appOutputArray=("libChrisOS/$pathMid/libc.so" "testMainProgramEntry/$pathMid/testmainprogramentry" "kshell/$pathMid/kshell" "time/$pathMid/time" "testMMap/$pathMid/testmmap" "sleep/$pathMid/sleep" "cat/$pathMid/cat" "echo/$pathMid/echo" "clock/$pathMid/clock" "ls/$pathMid/ls" "grep/$pathMid/grep" "free/$pathMid/free" "top/$pathMid/top" "wc/$pathMid/wc" "ps/$pathMid/ps" "kill/$pathMid/kill")
 basePath=../../../kproj/
 tabs 5,36,50,70
 echo "Build environment: ${buildType^}"
@@ -80,18 +82,21 @@ then
 fi
 echo "Copying output to disk and ISO directory"
 ($mountCmd)
+#($mountCmd2)
 basePath=/home/yogi/src/os/kproj
 
 for i in "${kernOutputArray[@]}"
 do
 	sudo cp $basePath/$i /mnt/chrisos
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
+#	sudo cp $basePath/$i /mnt/chrisos_hd
 	echo -en "\t$i ...done\n"
 done
 basePath=/home/yogi/src/os/aproj
 sudo mkdir /mnt/chrisos/bin
 if [ ! -d "/mnt/loop/bin" ]; then
 	sudo mkdir /mnt/loop/bin
+#	sudo mkdir /mnt/chrisos_hd/bin
 	echo bin directory created
 else
 	echo bin directory exists
@@ -99,10 +104,12 @@ fi
 for i in "${appOutputArray[@]}"
 do
 	sudo cp $basePath/$i /mnt/chrisos/bin
-	sudo cp $basePath/libChrisOS/$pathMid/libc.so /mnt/chrisos
 	sudo cp $basePath/$i ~/src/os/build_dir/isodir/
+#	sudo cp $basePath/$i /mnt/chrisos_hd/bin
 	echo -en "\t$i ... done\n"
 done
+sudo cp $basePath/libChrisOS/$pathMid/libc.so /mnt/chrisos
+#sudo cp $basePath/libChrisOS/$pathMid/libc.so /mnt/chrisos_hd
 echo "Copying done"
 echo "Builds complete"
 tabs -8
@@ -111,4 +118,5 @@ cp Debug/GNU-Linux/chrisos ../../../build_dir/isodir/boot/myos.bin
 rm ./myos.iso
 grub-mkrescue -o myos.iso ../../../build_dir/isodir > /dev/null
 ($unmountCmd)
+#($umountCmd2)
 sync

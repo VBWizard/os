@@ -57,6 +57,7 @@ extern "C" {
     char* getcwd(char* buf, size_t size);
     char* setcwd(char* buf, size_t size);
     bool strisnum(char* str);
+    void signalTask(int signal, int taskNum);
     int fork();
     size_t split(char *buffer, char *argv[], size_t argv_size);
     void exit (int status);
