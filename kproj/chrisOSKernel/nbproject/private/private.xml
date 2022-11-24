@@ -19,8 +19,13 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/signals.c</file>
             <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kInit.c</file>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/kernel.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/schedule_old.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/schedule.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/include/process.h</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/filesystem/pipe.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
         </group>
     </open-files>
 </project-private>

@@ -6,6 +6,38 @@
 #include "common.h"
 #include "strings.h"
 
+char *resolveEnvVarsInStringI(char *input)
+{
+    char* lOutput=mallocI(4096);
+    char lVariable[100] = {0};
+    char lVariableValue[100] = {0};
+    char* myInput=input;
+    
+    strcpyI(lOutput,myInput);
+    while (1==1)
+    {
+        char *startPtr=strstrI(myInput,"$");
+        int end=0;
+        if (startPtr>0)
+        {
+            strncpyI(lVariable, startPtr++, 1);
+            while (ISALPHA(startPtr[end]) || ISDIGIT(startPtr[end]))
+                strncatI(lVariable,&startPtr[end++],1);
+            getenvI(lVariable+1,lVariableValue);
+            strreplaceI(lOutput,lVariable,lVariableValue,lOutput);
+            myInput=(int)startPtr;
+        }
+        else
+            break;
+    }
+    return lOutput;
+}
+
+VISIBLE char *resolveEnvVarsInString(char *input)
+{
+    return resolveEnvVarsInStringI(input);
+}
+
 int getenvI(char *varname, char *value)
 {
     for (int cnt=0;cnt<100;cnt++)

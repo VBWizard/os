@@ -158,13 +158,13 @@ void loadSections(void* file,elfInfo_t* elfInfo, bool isLibrary)
     //Make sure the file is viable
     if (elfInfo->hdr.e_type!=ET_EXEC && elfInfo->hdr.e_type!=ET_DYN)
     {
-        printd(DEBUG_ELF_LOADER,"Wrong ELF type 0x%04X, cannot load\n", elfInfo->hdr.e_type);
+        printd(DEBUG_ELF_LOADER,"Wrong ELF type 0x%04x, cannot load\n", elfInfo->hdr.e_type);
         elfInfo->loadCompleted=false;
         return;
     }
     if (elfInfo->hdr.e_machine!=EM_386)
     {
-        printd(DEBUG_ELF_LOADER,"Wrong ELF architecture 0x%04X, cannot load\n", elfInfo->hdr.e_type);
+        printd(DEBUG_ELF_LOADER,"Wrong ELF architecture 0x%04x, cannot load\n", elfInfo->hdr.e_type);
         elfInfo->loadCompleted=false;
         return;
     }

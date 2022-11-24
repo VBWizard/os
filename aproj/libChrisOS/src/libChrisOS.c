@@ -158,6 +158,11 @@ VISIBLE void modifySignal(int signal, void* sigHandler, int sigData)
     do_syscall3(SYSCALL_SETSIGACTION,signal,(uint32_t)sigHandler,sigData);
 }
 
+VISIBLE void signalTask(int signal, int taskNum)
+{
+    do_syscall2(SYSCALL_SIGNAL, signal, taskNum);
+}
+
 VISIBLE int fork()
 {
     uint32_t retVal = 0;

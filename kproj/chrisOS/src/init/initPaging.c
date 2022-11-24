@@ -24,7 +24,7 @@ void initializeKernelPaging()
         ptr=(uint32_t*)kKernelPageDir;
         ptrT=(uint32_t*)KERNEL_PAGE_TABLE_BASE_ADDRESS;
         printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: Page directory at 0x%08X, table at 0x%08x\n", ptr, ptrT);
-        printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: (0x%04X page directory entries)\n", tempEntries);
+        printd(DEBUG_PAGING_CONFIG,"PAGING CONFIG: (0x%04x page directory entries)\n", tempEntries);
         for (uint32_t cnt=0;cnt < tempEntries; cnt++)
         {
                 ptr[cnt] = (KERNEL_PAGE_TABLE_BASE_ADDRESS + (cnt*4096)) | 0x7;

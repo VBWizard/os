@@ -1,0 +1,21 @@
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/kproj/chrisOS/dist/Debug/GNU-Linux/chrisos 0x1000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/kproj/chrisOSKernel/dist/Debug/GNU-Linux/kernel 0x1000000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/testMainProgramEntry/dist/Debug/GNU-Linux/testmainprogramentry 0x2000000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/libChrisOS/dist/Debug/GNU-Linux/libc.so 0x9f000000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/kshell/dist/Debug/GNU-Linux/kshell 0x3100000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/time/dist/Debug/GNU-Linux/time 0x3200000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/testMMap/dist/Debug/GNU-Linux/testmmap 0x30400000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/sleep/dist/Debug/GNU-Linux/sleep 0x30200000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/cat/dist/Debug/GNU-Linux/cat 0x30300000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/echo/dist/Debug/GNU-Linux/echo 0x3210000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/clock/dist/Debug/GNU-Linux/clock 0x30500000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/ls/dist/Debug/GNU-Linux/ls 0x30600000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/grep/dist/Debug/GNU-Linux/grep 0x30700000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/free/dist/Debug/GNU-Linux/free 0x30800000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/top/dist/Debug/GNU-Linux/top 0x30900000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/wc/dist/Debug/GNU-Linux/wc 0x30a00000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/ps/dist/Debug/GNU-Linux/ps 0x30b00000
+add-symbol-file /mnt-wily/wily_i386/home/yogi/src/os/aproj/kill/dist/Debug/GNU-Linux/kill 0x30c00000
+set disassembly-flavor intel
+alias sv = set variable
+target remote localhost:1234

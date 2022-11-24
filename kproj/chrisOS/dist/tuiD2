@@ -1,0 +1,3 @@
+#!/bin/bash
+gdb -x ./gdbcmds2 Debug/GNU-Linux/chrisos
+#/home/yogi/src/binutils-gdb/gdb/

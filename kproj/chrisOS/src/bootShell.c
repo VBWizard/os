@@ -239,7 +239,7 @@ void HIGH_CODE_SECTION inPortW(char* cmdline)
    parseParamsShell(cmdline, params, MAX_PARAM_WIDTH*MAX_PARAM_COUNT);
    
    uint8_t inVal=inw(strtoul(params[0],0,16));
-   printk("0x%04X\n",inVal);
+   printk("0x%04x\n",inVal);
 }
 
 void HIGH_CODE_SECTION inPortD(char* cmdline)

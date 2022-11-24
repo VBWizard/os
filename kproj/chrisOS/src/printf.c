@@ -265,7 +265,7 @@ void printTicks(const char *format, ...)
 
 int printd(uint32_t DebugLevel, const char *format, ...)
 {
-    char formatI[1024];
+    //CLR 11/14/2022: Removed stack variable formatI which was 1024 characters but wasn't used
     
     if ((kDebugLevel & DebugLevel) == DebugLevel)    
     {

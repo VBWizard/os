@@ -20,7 +20,7 @@ char *getFree(bool humanReadable, char *in, int inLen)
     {
         int readCount=read(file,buffer,512,1);
         close(file);
-        if (readCount)
+        if (readCount > 0)
         {
             freeMemPtr=strstr(buffer,"AvailableHeap");
             if (freeMemPtr)

@@ -27,8 +27,9 @@ int main(int argc, char** argv)
     procInfo_t *parentProc=malloc(sizeof(procInfo_t)); 
     procInfo_t *currProc=malloc(sizeof(procInfo_t));
     procInfo_t **topinfo;
+    double userCPU=0, kernelCPU=0;
 
-    printf("PID\tTTY\tTIME\t\tCMD\n");
+    printf("PID\t\tTTY\t\tTIME\t\tCMD\n");
 
     if (!showAll)
     {
@@ -58,19 +59,19 @@ int main(int argc, char** argv)
             }
         }
         if (parentProc)
-            printf("%u\ttty%u\t%s\t%s\n",parentProc->pid, parentProc->tty, parentProc->time,parentProc->name);
-        printf("%u\ttty%u\t%s\t%s\n",currProc->pid, currProc->tty, currProc->time, currProc->name);
+            printf("0x%04x\ttty%04u\t%s\t%s\n",parentProc->pid, parentProc->tty, parentProc->time,parentProc->name);
+        printf("0x%04x\ttty%04u\t%s\t%s\n",currProc->pid, currProc->tty, currProc->time, currProc->name);
     }
     else
     {
         topinfo=malloc(TOP_MAX_PROCESSES*sizeof(procInfo_t*));
         memset(topinfo,0,TOP_MAX_PROCESSES*sizeof(procInfo_t*));
-        buildAllProcInfoTs(topinfo, TICKS_PER_SECOND, 1);
+        buildAllProcInfoTs(topinfo, TICKS_PER_SECOND, 1, &userCPU, &kernelCPU);
         
         for (int cnt=0;cnt<TOP_MAX_PROCESSES;cnt++)
         {
             if (topinfo[cnt]!=NULL)
-                printf("%u\ttty%u\t%s\t%s\n",topinfo[cnt]->pid, topinfo[cnt]->tty, topinfo[cnt]->time,topinfo[cnt]->name);
+                printf("0x%04x\ttty%04u\t%s\t%s\n",topinfo[cnt]->pid, topinfo[cnt]->tty, topinfo[cnt]->time,topinfo[cnt]->name);
         }
     }
                 

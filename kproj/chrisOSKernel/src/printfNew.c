@@ -407,7 +407,7 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
     va_start(args,format);
-    if ((DebugLevel & kDebugLevel) > 0)
+    if ((DebugLevel & kDebugLevel)==DebugLevel)
     {
         printTicks("%u:",*kTicksSinceStart);
         printdL2(format, args);

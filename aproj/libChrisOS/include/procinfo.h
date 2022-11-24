@@ -43,8 +43,7 @@ extern "C" {
     };
 
     procInfo_t *buildProcInfoT(procInfo_t *procinfo, char *statinfo);
-    void buildAllProcInfoTs(procInfo_t **topinfo, int intervalTicks, int iteration);
-
+    void buildAllProcInfoTs(procInfo_t **topinfo, int intervalTicks, int iteration, double* userCPU, double* kernelCPU);
 
 #ifdef __cplusplus
 }

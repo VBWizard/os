@@ -200,7 +200,8 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
         return 0;
     
     if (theFile->verification!=0xBABAABAB)
-        panic("fs_read: Referenced a file that is not a file");
+        //panic("fs_read: Referenced a file that is not a file");
+        return -1;
     
     //For kernel processes, just read the file and return in the kernel's buffer
     if (process==NULL)
@@ -346,12 +347,17 @@ void close(eListType listType, void* entry)
 */
     file_t* theFile = entry;
     directory_t *dir = entry;
+    bool bPipeClosed = false;
 
     if (listType==LIST_FILE)
     {
         printd(DEBUG_FILESYS, "\t\tfs_close: called for file %s (handle=0x%08X)\n", theFile->f_path, theFile->handle);
         if (theFile->verification!=0xBABAABAB)
-            panic("close: Referenced a file that is not a file!");
+        {
+            //panic("close: Referenced a file that is not a file!");
+            printd(DEBUG_FILESYS, "close: Referenced a file that is not a file!");
+            
+        }
     }
     else
     {

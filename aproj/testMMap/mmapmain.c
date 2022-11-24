@@ -44,6 +44,9 @@ int main(int argc, char** argv) {
     int pidsP = 0;
     int childNo = 0;
     int pidCount = 0;
+    
+    printf("This application tests all the memmap functionality in the forking process.  Please wait, spawning children processes ...");
+    
     for (int cnt=0;cnt<pidsToSpawn;cnt++)
     {
          pid=fork();
@@ -63,52 +66,14 @@ int main(int argc, char** argv) {
     while (pidCount<pidsToSpawn)
     {
         int thePid = pids[pidCount];
-        //print("Waiting for child %u (0x%04X)\n",pidCount+1, thePid);
+        //print("Waiting for child %u (0x%04x)\n",pidCount+1, thePid);
         rets[pidCount]=waitpid(thePid);
         if (rets[pidCount]-1!=pidCount)
             printf("Wrong return value for child #%u, value=%u (pid=0x%08x)\n",pidCount,rets[pidCount],pids[pidCount]);
         pidCount++;
-        __asm__("mov ebx,0\nmov [ebx],eax\n");
+        //__asm__("mov ebx,0\nmov [ebx],eax\n");
     }
     printf("All children ended\n");
     return 0;
-/*    pid=fork();
-    if (pid==0)
-    {
-        //child executes here
-        for (int sharedCounter=9;sharedCounter>=0;sharedCounter--)
-        {
-            print("Child 1 counting: Count = %u\n",sharedCounter);
-            sleep(1);
-        }
-        return 1;
-    }
-    //parent executes here
-
-    pid2=fork();
-    if (pid2==0)
-    {
-        //child executes here
-        for (int sharedCounter=12;sharedCounter>=0;sharedCounter--)
-        {
-            print("Child 2 counting: Count = %u\n",sharedCounter);
-            sleep(1);
-        }
-        return 2;
-    }
-    
-/*    for (int sharedCounter=1;sharedCounter<=10;sharedCounter++)
-    {
-        print("Parent: Count = %u\n",sharedCounter);
-        sleep(1);
-    }
-    print("waiting for child 2 (PID=0x%04X\n", pid2);
-    uint32_t pid1Return = waitpid(pid2);
-    print("PID 2 returned %u\n",pid1Return);
-    print("waiting for child 1 (PID=0x%04X)\n", pid);
-    uint32_t pid0Return = waitpid(pid);
-    print("PID 1 returned %u\n",pid0Return);
-    return (0);
-*/
 }
 

@@ -132,7 +132,7 @@ int main(int argc, char** argv)  {
     activeSTDOUT = tty1->stdOutWritePipe;
     activeSTDIN=tty1->stdInReadPipe;
     activeTTY=tty1;
-
+/*
     fstat_t fstat;
     int *errlog;
     int errstat=fs_stat(NULL,"/var/log/syslog",&fstat);
@@ -147,7 +147,7 @@ int main(int argc, char** argv)  {
         fs_write(NULL,errlog,"\n********** SYSTEM BOOTING **********\n",38,1);
     }
     fs_close(errlog);
-    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
+*/    printd (DEBUG_PROCESS, "tty 1 pipes: stdinRead = 0x%08X, stdinWrite = 0x%08X, stdoutRead = 0x%08X, stdoutWrite = 0x%08X\n", 
             tty1->stdInReadPipe, tty1->stdInWritePipe, tty1->stdOutReadPipe, tty1->stdOutWritePipe);
   
     keyboardInit();
@@ -156,7 +156,7 @@ int main(int argc, char** argv)  {
     
     kIdleTicks=0;
     kIdleProcess=createProcess("/sbin/idle", 0, NULL, kKernelProcess, true, false);
-    kIdleProcess=createProcess("/sbin/syslogd", 0, NULL, kKernelProcess, true, false);
+    //kIdleProcess=createProcess("/sbin/syslogd", 0, NULL, kKernelProcess, true, false);
     kIdleTask=kIdleProcess->task;
     //Need to let the idle task run once so that it initializes, so make sure it is the first task to run when the scheduler starts
     kIdleTask->prioritizedTicksInRunnable = 0xDFFFFFFF;
@@ -179,31 +179,31 @@ int main(int argc, char** argv)  {
     initialShellProcess->stderr=kKernelProcess->stderr;
     schedulerEnabled=true;
     signalCheckEnabled=true;
-    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+5, kKernelProcess);
     process_t* tty2ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty2ShellProcess->stdout=tty2->stdOutWritePipe;
     tty2ShellProcess->stdin=tty2->stdInReadPipe;
     tty2ShellProcess->stderr=kKernelProcess->stderr;
     tty2ShellProcess->childNumber=1;
-    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+5, kKernelProcess);
     process_t* tty3ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty3ShellProcess->stdout=tty3->stdOutWritePipe;
     tty3ShellProcess->stdin=tty3->stdInReadPipe;
     tty3ShellProcess->stderr=kKernelProcess->stderr;
     tty3ShellProcess->childNumber=2;
-    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+5, kKernelProcess);
     process_t* tty4ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty4ShellProcess->stdout=tty4->stdOutWritePipe;
     tty4ShellProcess->stdin=tty4->stdInReadPipe;
     tty4ShellProcess->stderr=kKernelProcess->stderr;
     tty4ShellProcess->childNumber=3;
-    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+5, kKernelProcess);
     process_t* tty5ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty5ShellProcess->stdout=tty5->stdOutWritePipe;
     tty5ShellProcess->stdin=tty5->stdInReadPipe;
     tty5ShellProcess->stderr=kKernelProcess->stderr;
     tty5ShellProcess->childNumber=4;
-    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+50, kKernelProcess);
+    sys_sigaction(SIGSLEEP,0,*kTicksSinceStart+5, kKernelProcess);
     process_t* tty6ShellProcess = createProcess(program,0, args, kKernelProcess, false, false);
     tty6ShellProcess->stdout=tty6->stdOutWritePipe;
     tty6ShellProcess->stdin=tty6->stdInReadPipe;

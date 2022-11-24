@@ -53,6 +53,7 @@ void taskInit()
 
 void freeTask(uint32_t taskNum)
 {
+    printd(DEBUG_TASK, "TODO: Free the! task\n");
     uint32_t* ptr=kTaskSlotAvailableInd+1+((taskNum-32)/32);     //don't touch the first 32 tasks
 
     //For now we aren't going to do anything
@@ -74,7 +75,7 @@ task_t* getAvailableTask()
         if (slot>-1)
         {
             slot=slot+(cnt*RESERVED_TASKS);
-            printd(DEBUG_TASK,"getAvailableTask: Found free slot for task (0x%04X)\n",slot);
+            printd(DEBUG_TASK,"getAvailableTask: Found free slot for task (0x%04x)\n",slot);
             task_t* task=(task_t*)kMalloc(sizeof(task_t));//&kTaskTable[slot];
             task->taskNum=slot;
             printd(DEBUG_TASK,"getAvailableTask: Marking TSS %u used\n",slot);
