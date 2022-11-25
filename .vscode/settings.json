@@ -5,6 +5,8 @@
         "cstring": "c",
         "cmath": "c",
         "*.tcc": "c",
-        "kshell.h": "c"
+        "kshell.h": "c",
+        "time.h": "c",
+        "libchrisos.h": "c"
     }
 }

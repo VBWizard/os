@@ -578,23 +578,24 @@ void runAnotherTask(bool schedulerRequested)
 #ifdef SCHEDULER_DEBUG
         printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"\tStopping task has signals ... sigind=0x%08x\n",((process_t*)(taskToStop->process))->signals.sigind);
 #endif
+        //CLR 11/25/2022: removed else statements and the panic at the bottom.  We'll ignore un-handled signals
         if ((pToStop->signals.sigind & SIGUSLEEP) == SIGUSLEEP)
             taskToStopNewQueue=TASK_USLEEP;
-        else if ((pToStop->signals.sigind & SIGSEGV) == SIGSEGV)
+         if ((pToStop->signals.sigind & SIGSEGV) == SIGSEGV)
         {
             taskToStopNewQueue=TASK_ZOMBIE;
             checkUSleepTasks(taskToStop);
         }
-        else if ((pToStop->signals.sigind & SIGSTOP) == SIGSTOP)
+        if ((pToStop->signals.sigind & SIGSTOP) == SIGSTOP)
         {
             taskToStopNewQueue=TASK_STOPPED;
 #ifdef SCHEDULER_DEBUG
             printd(DEBUG_SCHEDULER,"*SIG_STOP processed\n");
 #endif
         }
-        else if ((pToStop->signals.sigind & SIGSLEEP) == SIGSLEEP)
+        if ((pToStop->signals.sigind & SIGSLEEP) == SIGSLEEP)
             taskToStopNewQueue=TASK_ISLEEP;
-        else if ((pToStop->signals.sigind & SIGINT) == SIGINT)
+        if ((pToStop->signals.sigind & SIGINT) == SIGINT)
         {
                 //If no handler is installed, default action is to kill the process
                 if (!pToStop->signals.sighandler[SIGINT])
@@ -608,14 +609,10 @@ void runAnotherTask(bool schedulerRequested)
                     taskToStopNewQueue=TASK_RUNNABLE;
                 }
         }
-        else if ((pToStop->signals.sigind & SIGIO) == SIGIO)
+        if ((pToStop->signals.sigind & SIGIO) == SIGIO)
         {
             taskToStopNewQueue=TASK_RUNNABLE;
             printd(DEBUG_SCHEDULER,"*Task 0x%04x: SIGIO received, no default handler  Executing default action (nothing).\n",taskToStop->taskNum);
-        }
-        else
-        {
-            panic("scheduler: Unhandled signal");
         }
     }
     else
@@ -713,7 +710,9 @@ void runAnotherTask(bool schedulerRequested)
         sigProcAddress = (uint32_t)((process_t*)taskToRun->process)->signals.sighandler[SIGINT];
         sigProcCR3 = ((process_t*)taskToRun->process)->pageDirPtr;
         isrSavedEIP = (uint32_t)&_sigJumpPoint;
-        ((process_t*)taskToRun->process)->signals.sigind &= ~SIGINT;
+        //Got rid of the removing of signals.  This is because if a process doesn't have a SIGING signal handler 
+        //  then nothing will be executed when the process starts, to the signal needs to be maintained until 
+        //  the process' timeslice ends. (see signal code in runAnotherTask)
     }
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
     return;
