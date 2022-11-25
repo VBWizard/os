@@ -26,6 +26,7 @@ sysEnterReturn:
 .globl _sysEnter
 .type _sysEnter, @function
 _sysEnter:
+    cli
     mov esp,[0xF000F000]    #This is where the process's processSyscallESP (ESP1) is mapped into the process.  TODO: Fix this or process can see its own process struct
     push ebp
     pushd 0         #placeholder for RetVal (eax)
@@ -35,7 +36,6 @@ _sysEnter:
     push ecx
     push ebx
     push eax
-    sti
     call _sysCall
     mov saved_eax,eax
     pop ebx             #4

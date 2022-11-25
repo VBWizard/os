@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
         printf("%s2JTop\t%02i:%02i:%02i\tHeapA:%s\n",ansiEscSeq,timeinfo->tm_hour,timeinfo->tm_min,timeinfo->tm_sec,sysmem);
         printf("CPU: User: %d\tKernel:\tIdle: \n", (uint32_t)userCPU, 100-(uint32_t)userCPU);
         printf("PID\tCommand\tStts\tPPID\tTTY\tMIF\tMAF\tCPU\tTime\t\tPRI\tVSiz\t\tPSiz\n");
-        
+        printf("------------------------------------------------------------------------------\n");
 
         for (int cnt=0;cnt<TOP_MAX_PROCESSES;cnt++)
             if (topinfo[cnt]!=NULL && topinfo[cnt]->lastUpdateIteration!=iteration)

@@ -662,7 +662,7 @@ void runAnotherTask(bool schedulerRequested)
             activeSTDERR->owner = taskToRun->process;
             tty1->stdInReadPipe->owner = tty1->stdInWritePipe->owner = 
                 tty1->stdErrReadPipe->owner = tty1->stdErrWritePipe->owner = 
-                tty1->stdOutReadPipe->owner = tty1->stdOutWritePipe = process;
+                tty1->stdOutReadPipe->owner = tty1->stdOutWritePipe->owner = process;
         }
         printd(DEBUG_SCHEDULER,"Active STDIN/STDOUT/STDERR=0x%08x/0x%08x/0x%08x, owner 0x%08x\n",activeSTDIN, activeSTDOUT, activeSTDERR, activeSTDIN->owner);
         
@@ -697,7 +697,7 @@ void runAnotherTask(bool schedulerRequested)
 
     }
 
-    if (((process_t*)taskToRun->process)->signals.sigind & SIGINT)
+    if (((process_t*)taskToRun->process)->signals.sigind & SIGINT == SIGINT)
     {
         sigProcAddress = (uint32_t)((process_t*)taskToRun->process)->signals.sighandler[SIGINT];
         sigProcCR3 = ((process_t*)taskToRun->process)->pageDirPtr;

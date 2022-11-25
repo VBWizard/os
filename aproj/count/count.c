@@ -29,11 +29,11 @@ int main(int argc, char** argv)
     {
         unsigned int uCountTo = atoi(argv[1]);
         
-        printf("Counting to %i\n",uCountTo);
+        printf("Counting to %u\n",uCountTo);
         for (int cnt=0;cnt<uCountTo;cnt++)
             uCountedValue++;
     }
-    printf("Counted to %i\n ",uCountedValue);
+    printf("Counted to %u\n ",uCountedValue);
     return iReturnValue;
 }
 

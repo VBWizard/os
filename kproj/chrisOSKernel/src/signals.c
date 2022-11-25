@@ -286,6 +286,7 @@ scanSleep:
         }
         sleep++;
     }
+    //Can't trigger the scheduler from here because we're in kernel mode
     if (awoken) 
     {
         printd(DEBUG_SIGNALS,"Trigger the scheduler to process ... the awoken\n");
