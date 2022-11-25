@@ -77,7 +77,7 @@ extern "C" {
         bool execDontSaveRegisters;
         bool foreground, stdinRedirected, stdoutRedirected, stderrRedirected;
         uintptr_t *stackInitialPage;
-        uint32_t minorFaults, majorFaults;
+        uint32_t minorFaults, majorFaults, cSwitches;
     } process_t;
 
 

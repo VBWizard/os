@@ -95,3 +95,8 @@ gdb_history
 /aproj/ps/build/
 /aproj/syslogd/build/
 /aproj/syslogd/dist/
+aproj/kshell/dist/kshellD.asm
+
+aproj/kshell/dist/Debug/GNU-Linux/
+
+aproj/testMMap/dist/Debug/GNU-Linux/

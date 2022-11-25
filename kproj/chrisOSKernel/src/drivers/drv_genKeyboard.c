@@ -178,11 +178,11 @@ void kbd_handler_generic()
             //printk("^");
             if (translatedKeypress=='c') //CLR 12/30/2018: ^C pressed
             {
-                if (activeTTY->stdInWritePipe)
-                    pipewrite("^C\n", 2, 1, activeTTY->stdInWritePipe);
+                //if (activeTTY->stdInWritePipe)
+                //    pipewrite("^C\n", 2, 1, activeTTY->stdInWritePipe);
                 sys_sigaction2(SIGINT, NULL, 0, activeTTY->stdInReadPipe->owner);
                 printd(DEBUG_PROCESS,"Keyboard handler signalled SIGINT for process 0x%08x for CTRL+C keypress\n",activeTTY->stdInReadPipe->owner);
-                printk("CTRL+C pressed");
+                //printk("CTRL+C pressed");
                 goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
             }
             else 

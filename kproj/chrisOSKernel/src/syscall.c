@@ -288,8 +288,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 //Set the return value that we'll pass back
                 printd(DEBUG_PROCESS,"\tsyscall: waitForPid: Found task 0x%08x in queue %u\n",waitForTask->taskNum, waitForTask->taskState);
                 retVal = getExitCode(param1);
-                if (retVal==0)
-                    panic("syscall: waitForPid: Unexpected, zombie task not found\n");
+                /*if (retVal==0)
+                    panic("syscall: waitForPid: Unexpected, zombie task not found\n");*/
                 taskExited = true;
                 enableScheduler();
             }

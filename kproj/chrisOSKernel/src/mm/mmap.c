@@ -180,54 +180,50 @@ bool handleMMapPagingException(process_t* victimProcess, uintptr_t pagingExcepti
         if (mmap->mmappedPages->loaded)
             panic("handleMMapPagingException: Paging exception triggered for already loaded page");
 
-        if (mmap->flags & MAP_PRIVATE)
+        if (mmap->flags & MAP_ANONYMOUS) //memory mapping
         {
-            if (mmap->flags & MAP_ANONYMOUS) //memory mapping
+            if (mmap->flags & MAP_STACK)
             {
-                if (mmap->flags & MAP_STACK)
-                {
-                    //Verify we're really in the process' stack space. Requested address has to be a virt address within stackStart and stackSize
-                    if (pageVirtAddress < victimProcess->stackStart || pageVirtAddress > victimProcess->stackStart + victimProcess->stackSize)
-                        panic("handleMMapPagingException: mmap is marked MAP_STACK but page exception was outside the process' stack space");
-                }
-                printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: Found private, anonymous mmap.  Will allocate, map this page and add to mmap->mmappedPages\n");
-                uint32_t phys=mmapAllocatePages(victimProcess, mmap, pageVirtAddress, 1);
-                victimProcess->minorFaults++;
-                printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: Mapped v=0x%08x to p=0x%08x (CR3=0x%08x)\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr);
+                //Verify we're really in the process' stack space. Requested address has to be a virt address within stackStart and stackSize
+                if (pageVirtAddress < victimProcess->stackStart || pageVirtAddress > victimProcess->stackStart + victimProcess->stackSize)
+                    panic("handleMMapPagingException: mmap is marked MAP_STACK but page exception was outside the process' stack space");
             }
-            else if (mmap->fd) //file mapping
-            {
-                uint32_t targetFileOffset = pagingExceptionCR2 - mmap->startAddress;
-                if (targetFileOffset > mmap->startFileOffset + mmap->len)
-                {
-                    printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: ERROR!  Attempt to read past end of mmap'd file. (handle=0x%08x)  File length = %u, read offset = %u\n", mmap->fd, mmap->len, targetFileOffset);
-                    return false;
-                }
-                printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: Found private, mmap for handle 0x%08x, offset = %u, will fulfill\n", mmap->fd, targetFileOffset);
-
-                if (targetFileOffset + (4*PAGE_SIZE) < mmap->len)
-                    pagesToMap = 4;
-                else
-                    pagesToMap = 1;
-                
-                pagePhysAddr=mmapAllocatePages(victimProcess, mmap, pageVirtAddress, pagesToMap);
-                printd(DEBUG_EXCEPTIONS, "\t\tSeeking to offset %u on handle 0x%08x\n", targetFileOffset, mmap->fd);
-                if (fs_seek((void*)mmap->fd, targetFileOffset, SEEK_SET))
-                    panic("\t\tSeek error (SEEK_SET), fd=0x%08x, offset=%u.",mmap->fd, targetFileOffset);
-                //NOTE: To have process' virtual space written to set first parameter to victimProcess, address parameter set to pageVirtAddress
-                int bytesRead = fs_read(NULL, (void*)mmap->fd, (void*)pagePhysAddr, PAGE_SIZE * pagesToMap, 1);
-                if (bytesRead <= 0)
-                {
-                    printd(DEBUG_EXCEPTIONS,"\t\tfs_read unexpectedly returned %i on handle 0x%08x, cannot fulfill request.\n",bytesRead, mmap->fd);
-                    return false;
-                }
-                victimProcess->majorFaults++;
-                printd(DEBUG_EXCEPTIONS,"\t\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x), read %u bytes.\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr, bytesRead);
-                return true;
-                
-            }
+            printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: Found private, anonymous mmap.  Will allocate, map this page and add to mmap->mmappedPages\n");
+            uint32_t phys=mmapAllocatePages(victimProcess, mmap, pageVirtAddress, 1);
+            victimProcess->minorFaults++;
+            printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: Mapped v=0x%08x to p=0x%08x (CR3=0x%08x)\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr);
         }
-        //NOTE: Later we'll add loading from a file if one is defined in the mmap
+        else if (mmap->fd) //file mapping
+        {
+            uint32_t targetFileOffset = pagingExceptionCR2 - mmap->startAddress;
+            if (targetFileOffset > mmap->startFileOffset + mmap->len)
+            {
+                printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: ERROR!  Attempt to read past end of mmap'd file. (handle=0x%08x)  File length = %u, read offset = %u\n", mmap->fd, mmap->len, targetFileOffset);
+                return false;
+            }
+            printd(DEBUG_EXCEPTIONS,"\t\thandleMMapPagingException: Found private, mmap for handle 0x%08x, offset = %u, will fulfill\n", mmap->fd, targetFileOffset);
+
+            if (targetFileOffset + (4*PAGE_SIZE) < mmap->len)
+                pagesToMap = 4;
+            else
+                pagesToMap = 1;
+            
+            pagePhysAddr=mmapAllocatePages(victimProcess, mmap, pageVirtAddress, pagesToMap);
+            printd(DEBUG_EXCEPTIONS, "\t\tSeeking to offset %u on handle 0x%08x\n", targetFileOffset, mmap->fd);
+            if (fs_seek((void*)mmap->fd, targetFileOffset, SEEK_SET))
+                panic("\t\tSeek error (SEEK_SET), fd=0x%08x, offset=%u.",mmap->fd, targetFileOffset);
+            //NOTE: To have process' virtual space written to set first parameter to victimProcess, address parameter set to pageVirtAddress
+            int bytesRead = fs_read(NULL, (void*)mmap->fd, (void*)pagePhysAddr, PAGE_SIZE * pagesToMap, 1);
+            if (bytesRead <= 0)
+            {
+                printd(DEBUG_EXCEPTIONS,"\t\tfs_read unexpectedly returned %i on handle 0x%08x, cannot fulfill request.\n",bytesRead, mmap->fd);
+                return false;
+            }
+            victimProcess->majorFaults++;
+            printd(DEBUG_EXCEPTIONS,"\t\tMapped v=0x%08x to p=0x%08x (CR3=0x%08x), read %u bytes.\n",pageVirtAddress,pagePhysAddr,victimProcess->pageDirPtr, bytesRead);
+            return true;
+            
+        }
         return true;
     }
     else

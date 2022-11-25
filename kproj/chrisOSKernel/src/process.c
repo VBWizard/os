@@ -146,6 +146,14 @@ void freeProcess(process_t *process)
         printd(DEBUG_FILESYS,"\tfreeProcess: Decremented pipe use count for stderr is %i, pipe is %s\n", ((pipe_t*)(process->stderr))->usecount, (bPipeClosed?"closed":"still open"));
         process->stderrRedirected=false;
     }*/
+
+    if (getTTYForPipe(process->stdout) == 0xFF)
+        close(LIST_FILE, process->stdout);
+    if (getTTYForPipe(process->stdin) == 0xFF)
+        close(LIST_FILE, process->stdin);
+    if (getTTYForPipe(process->stderr) == 0xFF)
+        close(LIST_FILE, process->stderr);
+
     kFree(process->stack1Start);
     kFree(process->path);
     kFree(process->cwd);
@@ -153,7 +161,6 @@ void freeProcess(process_t *process)
     kFree(process);
     free_mmaps(process);
     printd(DEBUG_PROCESS,"freeProcess: Done!  Process freed!\n");
-    
 }
 
 //NOTE: Assumes contiguous memory area
@@ -686,6 +693,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         }
     }
 
+    memset((void*)&process->signals,0,sizeof(process->signals));
+
     //printk("ESP-20=0x%08x, &schedulerEnabled=0x%08x",process->task->tss->ESP+20,&schedulerEnabled);
     printd(DEBUG_PROCESS,"Setting up the stack\n");
     void* processExitAddress=&processExit;
@@ -779,6 +788,8 @@ uint32_t process_fork(process_t* currProcess)
     //The parent will maintain direct access to all of its memory.  Whenever the child tries to access the paren't memory
     //it is CoWed, so it is copied and the child gets access to the CoW page.
     CoWProcess(newProcess);
+
+    newProcess->mmaps = currProcess->mmaps;
 
     uint32_t tssFlags=ACS_TSS;
     uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;

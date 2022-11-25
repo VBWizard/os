@@ -211,6 +211,11 @@ int main(int argc, char** argv)  {
     tty6ShellProcess->childNumber=5;
     printk("All terminals started.");
     sys_sigaction(SIGUSLEEP,0,initialShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty2ShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty3ShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty4ShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty5ShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty6ShellProcess->task->taskNum, kKernelProcess);
     printk("\n\nLast task was killed, shutting down the kernel ...\n");
     schedulerEnabled=false;
     printk("Disabled scheduler ...\n");

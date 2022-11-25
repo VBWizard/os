@@ -78,6 +78,17 @@ int getTTYForPipe(int pipefd)
         {
             if (ttyDevices[cnt].stdOutWritePipe==(file_t*)pipefd)
                 return cnt;
+            if (ttyDevices[cnt].stdInWritePipe==(file_t*)pipefd)
+                return cnt;
+            if (ttyDevices[cnt].stdErrWritePipe==(file_t*)pipefd)
+                return cnt;
+            if (ttyDevices[cnt].stdOutReadPipe==(file_t*)pipefd)
+                return cnt;
+            if (ttyDevices[cnt].stdInReadPipe==(file_t*)pipefd)
+                return cnt;
+            if (ttyDevices[cnt].stdErrReadPipe==(file_t*)pipefd)
+                return cnt;
+
         }
     }
     return 0xFF;

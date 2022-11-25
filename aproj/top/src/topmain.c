@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
                     if (topinfo[cnt]!=NULL && topinfo[cnt]->pid!=0 && (uint32_t)topinfo[cnt]->cpu>=cpuVal && topinfo[cnt]->cpu<(cpuVal+1)) //ORDER BY cpu DESC
                     {
                         procInfo_t *ti=topinfo[cnt];
-                         sprintf(printBufferPtr,"0x%02x\t%s\t%c\t0x%02x\t%u\t%u\t%u\t%d\t%s\t%i\t%i%c\t\t%iK\n",
+                         sprintf(printBufferPtr,"%u\t%s\t%c\t%u\t%u\t%u\t%u\t%d\t%s\t%i\t%i%c\t\t%iK\n",
                                  ti->pid,
                                  ti->name,
                                     ti->status,

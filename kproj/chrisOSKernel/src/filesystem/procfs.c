@@ -574,7 +574,7 @@ void getStat(char *buffer, int buffersize, procfile_t *pf)
      int printPPID=0;
      if (taskNum>kKernelTask->taskNum)
          printPPID=proc->parent->task->taskNum;
-     sprintf(buffer,"%d (%s) %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %u %u %u",
+     sprintf(buffer,"%d (%s) %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %u %u %u %u",
              taskNum,                       //pid
              proc->exename,                 //comm
              procState,                     //state
@@ -597,6 +597,7 @@ void getStat(char *buffer, int buffersize, procfile_t *pf)
              0,                             //itrealvalue
              0,                             //starttime
              (uint32_t)proc->heapEnd-(uint32_t)proc->heapStart>0?(uint32_t)proc->heapEnd-(uint32_t)proc->heapStart:0, //vsize
-             calcProcessSize(proc)          //rss
+             calcProcessSize(proc),          //rss
+             proc->cSwitches
              );
 }

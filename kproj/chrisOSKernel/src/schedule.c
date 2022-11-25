@@ -12,7 +12,7 @@
 #include "../../chrisOS/include/utility.h"
 #include "printf.h"
 
-#define SCHEDULER_DEBUG 0
+#define SCHEDULER_DEBUG 1
 #define MAX_TASKS 1000
 
 extern bool schedulerTaskSwitched;
@@ -652,7 +652,7 @@ void runAnotherTask(bool schedulerRequested)
         printd(DEBUG_SCHEDULER,"*Found task 0x%04x move to CPU\n",taskToRun->taskNum);
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
-        if (!(strcmp(process->path,"/sbin/idle")==0))
+        if (!(strcmp(process->exename,"idle")==0))
         {
             activeSTDIN = process->stdin;
             activeSTDIN->owner = taskToRun->process;
@@ -660,11 +660,13 @@ void runAnotherTask(bool schedulerRequested)
             activeSTDOUT->owner = taskToRun->process;
             activeSTDERR = ((process_t *)taskToRun->process)->stderr;
             activeSTDERR->owner = taskToRun->process;
-            tty1->stdInReadPipe->owner = tty1->stdInWritePipe->owner = 
-                tty1->stdErrReadPipe->owner = tty1->stdErrWritePipe->owner = 
-                tty1->stdOutReadPipe->owner = tty1->stdOutWritePipe->owner = process;
+            activeTTY->stdInReadPipe->owner = activeTTY->stdInWritePipe->owner = 
+                activeTTY->stdErrReadPipe->owner = activeTTY->stdErrWritePipe->owner = 
+                activeTTY->stdOutReadPipe->owner = activeTTY->stdOutWritePipe->owner = taskToRun->process;
+            //Keep track of the context switch count
+            process->cSwitches++;
         }
-        printd(DEBUG_SCHEDULER,"Active STDIN/STDOUT/STDERR=0x%08x/0x%08x/0x%08x, owner 0x%08x\n",activeSTDIN, activeSTDOUT, activeSTDERR, activeSTDIN->owner);
+        printd(DEBUG_SCHEDULER,"Active STDIN/STDOUT/STDERR=0x%08x/0x%08x/0x%08x, owner %s\n",activeSTDIN, activeSTDOUT, activeSTDERR, (process_t*)(activeSTDIN->owner)->exename);
         
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG
@@ -697,21 +699,27 @@ void runAnotherTask(bool schedulerRequested)
 
     }
 
-    if (((process_t*)taskToRun->process)->signals.sigind & SIGINT == SIGINT)
+    if (strcmp(((process_t*)(taskToRun->process))->exename,"kshell")!=0)
     {
+        int a = 0;
+        a+=1;
+    }
+
+    printd(DEBUG_SCHEDULER,"Starting process' signals = %u\n",((process_t*)(taskToRun->process))->signals.sigind);
+
+    if (((process_t*)taskToRun->process)->signals.sigind & SIGINT)
+    {
+        printd(DEBUG_SCHEDULER,"Processing SIGINT for the starting process\n");
         sigProcAddress = (uint32_t)((process_t*)taskToRun->process)->signals.sighandler[SIGINT];
         sigProcCR3 = ((process_t*)taskToRun->process)->pageDirPtr;
         isrSavedEIP = (uint32_t)&_sigJumpPoint;
         ((process_t*)taskToRun->process)->signals.sigind &= ~SIGINT;
     }
     nextScheduleTicks=*kTicksSinceStart+TICKS_PER_SCHEDULER_RUN;
-    if (taskToRun->taskNum == 0x0022)
-    {
-        int a = 0;
-        a +=1;
-    }
     return;
 }
+
+
 
 void checkForKilledTasks()
 {

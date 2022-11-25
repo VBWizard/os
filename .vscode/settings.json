@@ -4,6 +4,7 @@
         "cstdio": "c",
         "cstring": "c",
         "cmath": "c",
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "kshell.h": "c"
     }
 }
