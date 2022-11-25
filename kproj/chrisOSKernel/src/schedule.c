@@ -67,7 +67,7 @@ void initSched()
     NO_NEXT = 0xFFFFFFFF;
     kTaskList=kMalloc(1000*sizeof(task_t));
     memset(kTaskList,0,1000*sizeof(task_t));
-    printd(DEBUG_PROCESS,"\tInitialized kTaskList @ 0x%08x, sizeof(task_t)=0x%02X\n",kTaskList,sizeof(task_t));
+    printd(DEBUG_SCHEDULER,"\tInitialized kTaskList @ 0x%08x, sizeof(task_t)=0x%02X\n",kTaskList,sizeof(task_t));
     kTaskList[0].prev=(task_t*)NO_PREV;
     kTaskList[MAX_TASKS-1].next=(task_t*)NO_NEXT;
     //TODO: Change # of array elements to # of processors
@@ -113,7 +113,7 @@ task_t* findTaskByCR3(uint32_t cr3)
 {
     task_t* taskList;
 
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Finding task with CR3=0x%08x\n",cr3);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"\tfindTaskByCR3: Finding task with CR3=0x%08x\n",cr3);
     taskList=kTaskList;
     do
     {
@@ -124,10 +124,10 @@ task_t* findTaskByCR3(uint32_t cr3)
 
     if (taskList->taskNum==0x0 || (uint32_t)taskList->pageDir!=cr3)
     {
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Could not find task with CR3=0x%08x\n",cr3);
+        printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"\tfindTaskByCR3: Could not find task with CR3=0x%08x\n",cr3);
         return NULL;
     }
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tfindTaskByCR3: Found task 0x%04x @ 0x%08x\n", taskList->taskNum, taskList);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"\tfindTaskByCR3: Found task 0x%04x @ 0x%08x\n", taskList->taskNum, taskList);
     return taskList;
 }
 
@@ -161,7 +161,7 @@ void markTaskEndedByTask(task_t* task, uint32_t retval, bool TriggerScheduler)
     ((process_t*)task->process)->retVal=retval;
     task->exited=true;
     //If the task being ended is running, trigger a schedule on the next tick to get rid of it
-    printd(DEBUG_PROCESS,"\tmarkTaskEnded: Marked task 0x%04x ended w/ retval=0x%08x, triggered scheduler\n",task->taskNum,retval);
+    printd(DEBUG_SCHEDULER,"\tmarkTaskEnded: Marked task 0x%04x ended w/ retval=0x%08x, triggered scheduler\n",task->taskNum,retval);
     //****DESTROY STUFF HERE****
     //When a task is ended, the scheduler will deal with it on the next tick, so lets wait for that to happen
     if (TriggerScheduler)
@@ -192,7 +192,7 @@ void storeISRSavedRegs(task_t* task)
 {
     if (((process_t*)task->process)->execDontSaveRegisters)
     {
-        printd(DEBUG_PROCESS, "* ***Process %u exec'd, not saving registers***\n", task->taskNum);
+        printd(DEBUG_SCHEDULER, "* ***Process %u exec'd, not saving registers***\n", task->taskNum);
         ((process_t*)task->process)->execDontSaveRegisters = false;
     }
     else
@@ -216,21 +216,21 @@ void storeISRSavedRegs(task_t* task)
         task->tss->CR3=isrSavedCR3;
     }
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\tSave (or not): ");
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08x,",task->tss->CR3);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08x,",task->tss->EIP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%04X,",task->tss->SS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%04X,",task->tss->DS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08x,",task->tss->EAX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBX=0x%08x,",task->tss->EBX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08x,",task->tss->ECX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08x,",task->tss->EDX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08x,",task->tss->ESI);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08x,",task->tss->EDI);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08x,",task->tss->ESP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08x,",task->tss->EBP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08x\n",task->tss->EFLAGS);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"*\tSave (or not): ");
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"CR3=0x%08x,",task->tss->CR3);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"CS=0x%04X,",task->tss->CS);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EIP=0x%08x,",task->tss->EIP);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"SS=0x%04X,",task->tss->SS);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"DS=0x%04X,",task->tss->DS);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EAX=0x%08x,",task->tss->EAX);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EBX=0x%08x,",task->tss->EBX);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"ECX=0x%08x,",task->tss->ECX);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EDX=0x%08x,",task->tss->EDX);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"ESI=0x%08x,",task->tss->ESI);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EDI=0x%08x,",task->tss->EDI);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"ESP=0x%08x,",task->tss->ESP);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EBP=0x%08x,",task->tss->EBP);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"FLAGS=0x%08x\n",task->tss->EFLAGS);
 #endif
 }
 
@@ -255,7 +255,7 @@ void loadISRSavedRegs(task_t* task)
     isrSavedCR3=task->tss->CR3;
     if (((process_t*)task->process)->justForked)
     {
-        printd(DEBUG_PROCESS,"loadISRSavedRegs: Fork return for newly spawned child\n");
+        printd(DEBUG_SCHEDULER,"loadISRSavedRegs: Fork return for newly spawned child\n");
         process_t* parent = ((process_t*)task->process)->parent;
         tss_t *parentTSS = findTaskByTaskNum(parent->task->taskNum)->tss;
         isrSavedCS = parentTSS->CS;
@@ -284,21 +284,21 @@ void loadISRSavedRegs(task_t* task)
         memcpy((uintptr_t*)((process_t*)task->process)->stack1Start, (uintptr_t*)parent->stack1Start, ((process_t*)task->process)->stack1Size);
     }
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\tLoad: ");
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CR3=0x%08x,",isrSavedCR3);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"CS=0x%04X,",isrSavedCS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EIP=0x%08x,",isrSavedEIP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"SS=0x%04X,",isrSavedSS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DS=0x%04X,",isrSavedDS);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EAX=0x%08x,",isrSavedEAX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"DBX=0x%08x,",isrSavedEBX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ECX=0x%08x,",isrSavedECX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDX=0x%08x,",isrSavedEDX);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESI=0x%08x,",isrSavedESI);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EDI=0x%08x,",isrSavedEDI);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"ESP=0x%08x,",isrSavedESP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"EBP=0x%08x,",isrSavedEBP);
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"FLAGS=0x%08x\n",isrSavedFlags);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"*\tLoad: ");
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"CR3=0x%08x,",isrSavedCR3);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"CS=0x%04X,",isrSavedCS);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EIP=0x%08x,",isrSavedEIP);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"SS=0x%04X,",isrSavedSS);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"DS=0x%04X,",isrSavedDS);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EAX=0x%08x,",isrSavedEAX);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"DBX=0x%08x,",isrSavedEBX);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"ECX=0x%08x,",isrSavedECX);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EDX=0x%08x,",isrSavedEDX);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"ESI=0x%08x,",isrSavedESI);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EDI=0x%08x,",isrSavedEDI);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"ESP=0x%08x,",isrSavedESP);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"EBP=0x%08x,",isrSavedEBP);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"FLAGS=0x%08x\n",isrSavedFlags);
 #endif
 }
 
@@ -327,7 +327,7 @@ uintptr_t* getQ(eTaskState state)
         case TASK_EXITED:
             return qExited;
         default:
-            printd(DEBUG_PROCESS,"getQ: Invalid queue 0x%02X - %s",state,TASK_STATE_NAMES[state]);
+            printd(DEBUG_SCHEDULER,"getQ: Invalid queue 0x%02X - %s",state,TASK_STATE_NAMES[state]);
             return NULL;
             break;
     }
@@ -344,7 +344,7 @@ task_t* findOpenTaskSlot()
 	}
 	if (list==(task_t*)NO_NEXT)
             panic("No free task slots to assign to new task.  Increase scheduler MAX_TASKS to fix this\n");
-        printd(DEBUG_PROCESS, "findOpenTaskSlot: Found process at slot # %u\n", slotNum);
+        printd(DEBUG_SCHEDULER, "findOpenTaskSlot: Found process at slot # %u\n", slotNum);
 	return list;
 }
 void addToQ(uintptr_t* queue, task_t* taskPtr);
@@ -353,11 +353,11 @@ task_t* submitNewTask(task_t *task)
 {
 	task_t *prev=NULL, *next=NULL;
 	task_t *slot=findOpenTaskSlot();
-	printd(DEBUG_PROCESS,"\taddTaskToTaskList: Found open slot @ 0x%08x\n",slot);
+	printd(DEBUG_SCHEDULER,"\taddTaskToTaskList: Found open slot @ 0x%08x\n",slot);
 	prev=slot->prev;
 	next=slot->next;
 	memcpy(slot,task,sizeof(task_t));
-	printd(DEBUG_PROCESS,"\tmoved new task 0x%04x there\n",task->taskNum);
+	printd(DEBUG_SCHEDULER,"\tmoved new task 0x%04x there\n",task->taskNum);
 	slot->prev=prev;
 	slot->next=next;
         slot->taskState=TASK_RUNNABLE;
@@ -402,7 +402,7 @@ task_t* findTaskToRun()
             //This is where we increment all the runnable ticks, based on the process' priority
             if ( task!=kIdleTask || (task==kIdleTask) && task->prioritizedTicksInRunnable==0)
                 task->prioritizedTicksInRunnable+=(RUNNABLE_TICKS_INTERVAL-process->priority)+1;
-            printd(DEBUG_PROCESS,"*\t(%u) Task 0x%04x (%s-%u[%s-%u]), priority=%i, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
+            printd(DEBUG_SCHEDULER,"*\t(%u) Task 0x%04x (%s-%u[%s-%u]), priority=%i, old ticks=%u, new ticks=%u (ticks RUNNING=%u)\n",
                     queEntryNum,
                     task->taskNum, process->exename,process->childNumber,
                     process->task->taskNum==0x20?"":process->parent->exename, process->parent->task->taskNum,
@@ -427,7 +427,7 @@ task_t* findTaskToRun()
 void removeFromQ(uintptr_t* queue, task_t* taskPtr, bool panicOnNotFound)
 {
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\t\tremoveFromQ: Removing task 0x%04x (0x%08x) from queue 0x%08x\n",
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"*\t\tremoveFromQ: Removing task 0x%04x (0x%08x) from queue 0x%08x\n",
             taskPtr->taskNum,
             taskPtr,
             queue);
@@ -448,7 +448,7 @@ void removeFromQ(uintptr_t* queue, task_t* taskPtr, bool panicOnNotFound)
 void addToQ(uintptr_t* queue, task_t* taskPtr)
 {
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS | DEBUG_DETAILED,"*\t\taddToQ: Adding task 0x%04x to queue %s\n",taskPtr->taskNum,TASK_STATE_NAMES[taskPtr->taskState]);
+    printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"*\t\taddToQ: Adding task 0x%04x to queue %s\n",taskPtr->taskNum,TASK_STATE_NAMES[taskPtr->taskState]);
 #endif
     while (*queue!=NO_NEXT)
     {
@@ -469,7 +469,7 @@ void changeTaskQueue(task_t* task, eTaskState newState)
     uintptr_t* oldQ=getQ(task->taskState);
 
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"*\tchangeTaskQueue: Changing task state for 0x%04x from %s to %s\n",
+    printd(DEBUG_SCHEDULER,"*\tchangeTaskQueue: Changing task state for 0x%04x from %s to %s\n",
             task->taskNum,
             TASK_STATE_NAMES[task->taskState],
             TASK_STATE_NAMES[newState]);
@@ -499,7 +499,7 @@ void taskYield()
 
 void triggerScheduler()
 {
-    printd(DEBUG_PROCESS,"triggerScheduler: triggering scheduler\n");
+    printd(DEBUG_SCHEDULER,"triggerScheduler: triggering scheduler\n");
     nextScheduleTicks=*kTicksSinceStart+1; //delay schedule by 1 tick to get the caller a chance to STI
     enableScheduler();
 }
@@ -519,14 +519,14 @@ void checkUSleepTasks(task_t* taskToStop)
     uintptr_t* q=qUSleep;
     task_t* task;
     process_t* process;
-    printd(DEBUG_PROCESS,"checkUSleepTasks: Looking through USLEEP queue for tasks to wake up\n");
+    printd(DEBUG_SCHEDULER,"checkUSleepTasks: Looking through USLEEP queue for tasks to wake up\n");
     while (*q!=NULL)
     {
         task=(task_t*)*q;
         if (task->taskNum!=0)
         {
             process=task->process;
-            printd(DEBUG_PROCESS, "\tTask 0x%04x: Waiting for task 0x%04x\n",task->taskNum, process->signals.sigdata[SIGUSLEEP]);
+            printd(DEBUG_SCHEDULER, "\tTask 0x%04x: Waiting for task 0x%04x\n",task->taskNum, process->signals.sigdata[SIGUSLEEP]);
             if (process->signals.sigdata[SIGUSLEEP]==taskToStop->taskNum || findTaskByTaskNum(process->signals.sigdata[SIGUSLEEP])->taskState==TASK_ZOMBIE)
             {
                 uint32_t taskWaitingFor = 0;
@@ -535,16 +535,16 @@ void checkUSleepTasks(task_t* taskToStop)
                 else
                     findTaskByTaskNum(process->signals.sigdata[SIGUSLEEP]);
                     
-                printd(DEBUG_PROCESS,"\tFound process 0x%04x in usleep queue waiting for process 0x%04x, moving to Runnable queue\n",task->taskNum,taskWaitingFor);
+                printd(DEBUG_SCHEDULER,"\tFound process 0x%04x in usleep queue waiting for process 0x%04x, moving to Runnable queue\n",task->taskNum,taskWaitingFor);
                 process->signals.sigdata[SIGUSLEEP]=0;
                 process->signals.sigind &=~SIGUSLEEP;
-                printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tReset SIGUSLEEP for task 0x%04x, sigind=0x%08x\n",task->taskNum,process->signals.sigind);
+                printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"\tReset SIGUSLEEP for task 0x%04x, sigind=0x%08x\n",task->taskNum,process->signals.sigind);
                 changeTaskQueue(task,TASK_RUNNABLE);
             }
         }
         q++;
     }
-    printd(DEBUG_PROCESS, "checkUSleepTasks: Done!\n");
+    printd(DEBUG_SCHEDULER, "checkUSleepTasks: Done!\n");
 }
 
 void runAnotherTask(bool schedulerRequested)
@@ -561,12 +561,12 @@ void runAnotherTask(bool schedulerRequested)
         process_t* pToStop = taskToStop->process;
     
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"*Found task 0x%04x to take off CPU @0x%04x:0x%08x (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
+    printd(DEBUG_SCHEDULER,"*Found task 0x%04x to take off CPU @0x%04x:0x%08x (exited=%u).\n",taskToStop->taskNum, taskToStop->tss->CS,taskToStop->tss->EIP,taskToStop->exited);
 #endif
     if (taskToStop->exited)
     {
 #ifdef SCHEDULER_DEBUG
-        printd(DEBUG_PROCESS,"*Task (0x%04x) ended, removing it from %s list.\n",taskToStop->taskNum,TASK_STATE_NAMES[taskToStop->taskState]);
+        printd(DEBUG_SCHEDULER,"*Task (0x%04x) ended, removing it from %s list.\n",taskToStop->taskNum,TASK_STATE_NAMES[taskToStop->taskState]);
 #endif
         taskToStopNewQueue=TASK_ZOMBIE;
         gdtEntryOS(taskToStop->taskNum,0,0,0,0,false);
@@ -576,7 +576,7 @@ void runAnotherTask(bool schedulerRequested)
     else if (pToStop->signals.sigind)
     {
 #ifdef SCHEDULER_DEBUG
-        printd(DEBUG_PROCESS | DEBUG_DETAILED,"\tStopping task has signals ... sigind=0x%08x\n",((process_t*)(taskToStop->process))->signals.sigind);
+        printd(DEBUG_SCHEDULER | DEBUG_DETAILED,"\tStopping task has signals ... sigind=0x%08x\n",((process_t*)(taskToStop->process))->signals.sigind);
 #endif
         if ((pToStop->signals.sigind & SIGUSLEEP) == SIGUSLEEP)
             taskToStopNewQueue=TASK_USLEEP;
@@ -589,7 +589,7 @@ void runAnotherTask(bool schedulerRequested)
         {
             taskToStopNewQueue=TASK_STOPPED;
 #ifdef SCHEDULER_DEBUG
-            printd(DEBUG_PROCESS,"*SIG_STOP processed\n");
+            printd(DEBUG_SCHEDULER,"*SIG_STOP processed\n");
 #endif
         }
         else if ((pToStop->signals.sigind & SIGSLEEP) == SIGSLEEP)
@@ -599,7 +599,7 @@ void runAnotherTask(bool schedulerRequested)
                 //If no handler is installed, default action is to kill the process
                 if (!pToStop->signals.sighandler[SIGINT])
                 {
-                    printd(DEBUG_PROCESS,"*Task 0x%04x: SIGINT received, no default handler  Executing default action (kill process).\n",taskToStop->taskNum);
+                    printd(DEBUG_SCHEDULER,"*Task 0x%04x: SIGINT received, no default handler  Executing default action (kill process).\n",taskToStop->taskNum);
                     taskToStopNewQueue=TASK_EXITED;
                     checkUSleepTasks(taskToStop);
                 }   
@@ -611,7 +611,7 @@ void runAnotherTask(bool schedulerRequested)
         else if ((pToStop->signals.sigind & SIGIO) == SIGIO)
         {
             taskToStopNewQueue=TASK_RUNNABLE;
-            printd(DEBUG_PROCESS,"*Task 0x%04x: SIGIO received, no default handler  Executing default action (nothing).\n",taskToStop->taskNum);
+            printd(DEBUG_SCHEDULER,"*Task 0x%04x: SIGIO received, no default handler  Executing default action (nothing).\n",taskToStop->taskNum);
         }
         else
         {
@@ -621,13 +621,13 @@ void runAnotherTask(bool schedulerRequested)
     else
     {
         taskToStopNewQueue=TASK_RUNNABLE;
-        printd(DEBUG_PROCESS, "No signals (sigind=%08X)\n",pToStop->signals.sigind);
+        printd(DEBUG_SCHEDULER, "No signals (sigind=%08X)\n",pToStop->signals.sigind);
     }
 
     //Get task to start
     storeISRSavedRegs(taskToStop);              //we're taking it off the cpu so save the registers
     changeTaskQueue(taskToStop,taskToStopNewQueue);
-    printd(DEBUG_PROCESS,"*Finding task to run\n");
+    printd(DEBUG_SCHEDULER,"*Finding task to run\n");
     task_t* taskToRun=findTaskToRun();
 
     if (taskToRun == 0)
@@ -635,21 +635,21 @@ void runAnotherTask(bool schedulerRequested)
     
     if (taskToRun!=NULL && taskToRun->taskNum==taskToStop->taskNum)
     {
-        printd(DEBUG_PROCESS,"*No new task to run, continuing with the current task\n");
+        printd(DEBUG_SCHEDULER,"*No new task to run, continuing with the current task\n");
         if (((process_t*)taskToStop)->execDontSaveRegisters)
         {
-            printd(DEBUG_PROCESS,"Task to keep running was just exec'd, loading registers from tss\n");
+            printd(DEBUG_SCHEDULER,"Task to keep running was just exec'd, loading registers from tss\n");
             loadISRSavedRegs(taskToStop);
             ((process_t*)taskToStop)->execDontSaveRegisters = false;
         }
         changeTaskQueue(taskToStop,TASK_RUNNING);   //switch it back to the running queue
-        printd(DEBUG_PROCESS,"CS: 0x%08x, EIP: 0x%08x, DS: 0x%08x\n",isrSavedCS, isrSavedEIP, isrSavedDS);
+        printd(DEBUG_SCHEDULER,"CS: 0x%08x, EIP: 0x%08x, DS: 0x%08x\n",isrSavedCS, isrSavedEIP, isrSavedDS);
     }
 
     if (taskToRun!=NULL && taskToRun->taskNum!=taskToStop->taskNum)
     {
         process_t *process = taskToRun->process;
-        printd(DEBUG_PROCESS,"*Found task 0x%04x move to CPU\n",taskToRun->taskNum);
+        printd(DEBUG_SCHEDULER,"*Found task 0x%04x move to CPU\n",taskToRun->taskNum);
         changeTaskQueue(taskToRun,TASK_RUNNING);
         loadISRSavedRegs(taskToRun);
         if (!(strcmp(process->path,"/sbin/idle")==0))
@@ -664,14 +664,14 @@ void runAnotherTask(bool schedulerRequested)
                 tty1->stdErrReadPipe->owner = tty1->stdErrWritePipe->owner = 
                 tty1->stdOutReadPipe->owner = tty1->stdOutWritePipe = process;
         }
-        printd(DEBUG_PROCESS,"Active STDIN/STDOUT/STDERR=0x%08x/0x%08x/0x%08x, owner 0x%08x\n",activeSTDIN, activeSTDOUT, activeSTDERR, activeSTDIN->owner);
+        printd(DEBUG_SCHEDULER,"Active STDIN/STDOUT/STDERR=0x%08x/0x%08x/0x%08x, owner 0x%08x\n",activeSTDIN, activeSTDOUT, activeSTDERR, activeSTDIN->owner);
         
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG
-        printd(DEBUG_PROCESS,"*Restarting CPU with new process (0x%04x) @ 0x%04x:0x%08x\n",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
+        printd(DEBUG_SCHEDULER,"*Restarting CPU with new process (0x%04x) @ 0x%04x:0x%08x\n",taskToRun->taskNum,taskToRun->tss->CS,taskToRun->tss->EIP);
 #endif
 
-        printd(DEBUG_PROCESS,"*Total running ticks: 0x%04x: %u, 0x%04x: %u\n",
+        printd(DEBUG_SCHEDULER,"*Total running ticks: 0x%04x: %u, 0x%04x: %u\n",
                 taskToStop->taskNum,
                 ((process_t*)taskToStop->process)->totalRunTicks,
                 taskToRun->taskNum,
@@ -683,7 +683,7 @@ void runAnotherTask(bool schedulerRequested)
         nextTaskTSS <<= 3;
         if (!taskToRun->kernel)
             nextTaskTSS |= 3;
-        printd(DEBUG_PROCESS,"*SET nextTaskTSS to 0x%04x\n",nextTaskTSS);
+        printd(DEBUG_SCHEDULER,"*SET nextTaskTSS to 0x%04x\n",nextTaskTSS);
         //Mark the task being taken off the CPU as "not busy."  This is necessary because the LTR instruction sets the busy flag
         //Since we are using a task gate for exception 0xe, we have to use LTR to keep the currently running task in the TR for back linking
         bootGdt[taskToStop->taskNum].access &= ~(2);
@@ -718,7 +718,7 @@ void checkForKilledTasks()
     process_t* process;
     task_t* taskList;
 
-    printd(DEBUG_PROCESS,"checkForKilledTasks: Start\n");
+    printd(DEBUG_SCHEDULER,"checkForKilledTasks: Start\n");
 
     taskList=kTaskList;
     do
@@ -726,19 +726,19 @@ void checkForKilledTasks()
         process = taskList->process;
         if (process->signals.sigind & SIGKILL == SIGKILL && !taskList->exited)
         {
-            printd(DEBUG_PROCESS,"\tcheckForKilledTasks: Found task 0x%04x with the SIGKILL signal.  Killing\n", taskList->taskNum);
+            printd(DEBUG_SCHEDULER,"\tcheckForKilledTasks: Found task 0x%04x with the SIGKILL signal.  Killing\n", taskList->taskNum);
             changeTaskQueue(taskList,TASK_ZOMBIE);
             markTaskEndedByTask(taskList, 0xffffffff, false);
         }
         taskList++;
     }  while (taskList->next!=(task_t*)NO_NEXT && taskList->taskNum!=0);
-    printd(DEBUG_PROCESS,"checkForKilledTasks: End\n");
+    printd(DEBUG_SCHEDULER,"checkForKilledTasks: End\n");
 }
 
 void scheduler()
 {
     uint64_t ticksBefore=rdtsc();
-    printd(DEBUG_PROCESS,"\n****************************** SCHEDULER *******************************\n");
+    printd(DEBUG_SCHEDULER,"\n****************************** SCHEDULER *******************************\n");
     signalCheckEnabled = false;
     //NOTE: When this method is entered, it is time to reschedule.  The check for whether it is time is in kIRQ0_handler()
     checkForKilledTasks();
@@ -748,12 +748,12 @@ void scheduler()
     uint64_t ticksAfter=rdtsc();
     
 #ifdef SCHEDULER_DEBUG
-    printd(DEBUG_PROCESS,"*Scheduler: calls=%u, task switchs=%u, ticks since start=0x%08x\n",kSchedulerCallCount, kTaskSwitchCount,*kTicksSinceStart);
+    printd(DEBUG_SCHEDULER,"*Scheduler: calls=%u, task switchs=%u, ticks since start=0x%08x\n",kSchedulerCallCount, kTaskSwitchCount,*kTicksSinceStart);
     uint32_t diff = ticksAfter-ticksBefore;
 __asm__("clts\n");  //TODO: Hackish but have to clear the task switched flag BEFORE using the FPU
     uint32_t timeInScheduler = (diff/kCPUCyclesPerSecond)*100;
-    printd(DEBUG_PROCESS,"%u ticks expired (%u CPU cycles)\n",timeInScheduler, diff);
-    printd(DEBUG_PROCESS,"**************************************************************************\n");
+    printd(DEBUG_SCHEDULER,"%u ticks expired (%u CPU cycles)\n",timeInScheduler, diff);
+    printd(DEBUG_SCHEDULER,"**************************************************************************\n");
 #endif
 }
 
@@ -763,7 +763,7 @@ int32_t getExitCode(uint32_t taskNum)
     task_t* task;
     process_t* process;
     
-    printd(DEBUG_PROCESS,"getExitCode: Looking through ZOMBIE queue for exit code for task 0x%04x\n", taskNum);
+    printd(DEBUG_SCHEDULER,"getExitCode: Looking through ZOMBIE queue for exit code for task 0x%04x\n", taskNum);
 
     while (*q!=NO_NEXT)
     {
@@ -771,7 +771,7 @@ int32_t getExitCode(uint32_t taskNum)
         task_t *taskList=kTaskList;
         if (task->taskNum!=0)
         {
-            printd(DEBUG_PROCESS,"getExitCode: Found task 0x%04x\n", task->taskNum);
+            printd(DEBUG_SCHEDULER,"getExitCode: Found task 0x%04x\n", task->taskNum);
             if (task->taskNum == taskNum)
             {
                 disableScheduler();
@@ -779,12 +779,12 @@ int32_t getExitCode(uint32_t taskNum)
                 removeFromQ(qZombie,task,true);
                 freeProcess(task->process);
                 freeTask(taskNum);
-                printd(DEBUG_PROCESS,"\tgetExitCode: Looking for task in kTaskList\n");
+                printd(DEBUG_SCHEDULER,"\tgetExitCode: Looking for task in kTaskList\n");
                 do
                 {
                     if (taskList->taskNum==taskNum)
                     {
-                        printd(DEBUG_PROCESS,"\tgetExitCode: Removing task from kTaskList\n");
+                        printd(DEBUG_SCHEDULER,"\tgetExitCode: Removing task from kTaskList\n");
                         memset(taskList,0,sizeof(task_t));
                         break;
                     }
@@ -797,6 +797,6 @@ int32_t getExitCode(uint32_t taskNum)
         }
         q++;
     }
-    printd(DEBUG_PROCESS,"getExitCode: Didn't find the task we were looking for\n", task->taskNum);
+    printd(DEBUG_SCHEDULER,"getExitCode: Didn't find the task we were looking for\n", task->taskNum);
     return 0;
 }

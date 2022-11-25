@@ -431,7 +431,7 @@ process_t *initializeProcess(bool isKernelProcess)
     process->processSyscallESP=process->task->tss->ESP1;
     process->priority=PROCESS_DEFAULT_PRIORITY;
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08x, p=0x%08x\n",PROCESS_STRUCT_VADDR,process);
-    pagingMapPage(process->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000, (uint16_t)0x5); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
+    pagingMapPage(process->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000, (uint16_t)0x5); 
     pagingMapPage(process->task->tss->CR3, process->task, process->task, (uint16_t)0x5);
 
     uint32_t tssFlags=ACS_TSS;
@@ -727,6 +727,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         task_t *t = getCurrentTask();
         t->process=process;
         process->execDontSaveRegisters = true;
+        t->tss->EFLAGS |= 0x200;
         enableScheduler();
         triggerScheduler();
         __asm__("sti\nhlt\n");

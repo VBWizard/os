@@ -26,6 +26,7 @@
 #include "../../chrisOS/include/strings.h"
 #include "../../chrisOS/include/chrisos.h"
 #include "io.h"
+#include "process.h"
 
 extern uint32_t kDebugLevel;
 extern uint32_t* kTicksSinceStart;
@@ -397,6 +398,7 @@ int printdL2(const char *format, va_list args)
         //            wait(10);
 
                 outb(0x3f8,printfBuffer[cnt]);
+				__asm__("nop\n");
             }
     else
         putString(printfBuffer);
@@ -407,6 +409,8 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 {
     va_list args;
     va_start(args,format);
+	process_t *process = PROCESS_STRUCT_VADDR;
+
     if ((DebugLevel & kDebugLevel)==DebugLevel)
     {
         printTicks("%u:",*kTicksSinceStart);
@@ -418,6 +422,8 @@ int printd(uint32_t DebugLevel, const char *format, ...)
 //This version is called from the PRINTD syscall, so not from the kernel but from libc
 int printdExternal(uint32_t DebugLevel, const char *format, va_list args) 
 {
+	process_t *process = PROCESS_STRUCT_VADDR;
+
     if ((DebugLevel & kDebugLevel) == DebugLevel)
     {
         printTicks("%u:",*kTicksSinceStart);

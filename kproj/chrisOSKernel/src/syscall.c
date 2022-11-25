@@ -142,8 +142,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_READ:       //read(handle,buffer,size,length)
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: read(0x%08x,0x%08x,0x%08x,0x%08x)\n",param1,param2,param3);
+            process=getCurrentProcess();
             genericFileHandle = (uintptr_t*)param1;
             if (genericFileHandle == (uintptr_t*)STDIN_FILE)
                 genericFileHandle = process->stdin;

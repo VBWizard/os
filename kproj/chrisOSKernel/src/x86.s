@@ -38,7 +38,6 @@ _sysEnter:
     sti
     call _sysCall
     mov saved_eax,eax
-    sti
     pop ebx             #4
     pop ebx             #8
     pop ebx             #12
@@ -50,6 +49,7 @@ _sysEnter:
     mov edx,[ebp]
     mov ecx,ebp
     mov eax, saved_eax
+    sti
     sysexit
 .globl _sysEnter
 retVal: .word 0x0, 0x0

@@ -32,8 +32,9 @@ static struct tm theDateTime;
     {
         if(*kTicksSinceStart>=nextScheduleTicks && schedulerEnabled)
         {
-            printd(DEBUG_PROCESS,"kIRQ0_Handler: triggering scheduler\n");
+            printd(DEBUG_SCHEDULER,"kIRQ0_handler: triggering scheduler\n");
             schedulerTriggered=true;
+            return;
         }
         if (*kTicksSinceStart>kNextSignalCheckTicks && signalCheckEnabled)
         {

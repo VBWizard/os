@@ -300,6 +300,32 @@ execScheduler:
     #we need our own stack!
     mov eax, 0
     mov schedulerTriggered, eax
+    mov eax,[ebp]
+    mov isrSavedEIP,eax
+    mov eax,[ebp+4]
+    mov isrSavedCS,eax
+    mov eax,[ebp+8]
+    mov isrSavedFlags,eax
+
+    #Check to see if we're returning to the same priv level. 
+    #If we are then we can't (and don't need to) save the ESP and SS as they aren't on the stack
+    #We know we're returning to the scheduler which is ring 0, so if the saved CS is ring 3, we'll save the ESP & SS
+    #Grab the old CS value
+    mov eax,[ebp+4]
+
+    #is it ring 3?
+    and eax,3
+    cmp eax,3
+    
+    #nope, so jump over the ESP/SS saving code
+    jne notReturnDiffPrivLvl
+
+    #yep, so save the ESP/SS
+    mov eax,[ebp+12]
+    mov isrSavedESP,eax
+    mov eax,[ebp+16]
+    mov isrSavedSS,eax
+notReturnDiffPrivLvl:
     mov eax, schedStack
     add eax, 0x100
     mov esp, eax
