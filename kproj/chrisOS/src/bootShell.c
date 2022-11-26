@@ -499,8 +499,8 @@ void HIGH_CODE_SECTION bootShell()
         execInternalCommand(lcmd1);
         char lcmd2[40]="part 0";
         execInternalCommand(lcmd2);
-//        char lcmd3[40]="exec /kernel";
-//        execInternalCommand(lcmd3);
+        char lcmd3[40]="exec /kernel";
+        execInternalCommand(lcmd3);
         /*******************************************************/
     }    
     

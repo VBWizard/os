@@ -72,6 +72,7 @@
       <itemPath>../../chrisOS/include/i386/bits/bits.h</itemPath>
       <itemPath>../../chrisOS/include/chrisos.h</itemPath>
       <itemPath>../../chrisOS/include/i386/cpu.h</itemPath>
+      <itemPath>debugger.h</itemPath>
       <itemPath>include/device.h</itemPath>
       <itemPath>include/dllist.h</itemPath>
       <itemPath>include/drv_genKeyboard.h</itemPath>
@@ -163,6 +164,7 @@
       <itemPath>../chrisOS/src/init/ata_disk.c</itemPath>
       <itemPath>../chrisOS/src/char/console/basic_display.c</itemPath>
       <itemPath>../chrisOS/src/cpu/bits.c</itemPath>
+      <itemPath>debugger.c</itemPath>
       <itemPath>src/device.c</itemPath>
       <itemPath>src/dllist.c</itemPath>
       <itemPath>src/drivers/drv_genKeyboard.c</itemPath>
@@ -347,6 +349,10 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="debugger.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="debugger.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -725,6 +731,10 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="debugger.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="debugger.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/alloc.h" ex="false" tool="3" flavor2="0">
       </item>

@@ -41,7 +41,7 @@ extern ttydevice_t *tty1, *tty2, *tty3, *tty4, *tty5, *tty6, *tty7, *tty8;
 extern pipe_t *activeSTDIN;
 extern pipe_t *activeSTDOUT;
 extern ttydevice_t *activeTTY;
-
+extern bool* kKbdHandlerActivateDebugger;
 uint32_t kbdTop=KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE;
 
 void kbd_handler_generic()
@@ -204,12 +204,6 @@ void kbd_handler_generic()
         }
         else
             panic("kbd_handler_generic: STDIN pipe is null! (2)\n");
-        //Debug
-        if (kKeyStatus[INDEX_ALT] && translatedKeypress==0x6A)
-        {
-            //__asm("int 0x3");
-            //kKbdHandlerActivateDebugger=true;
-        }
         if (kKeyStatus[INDEX_ALT] && kKeyStatus[INDEX_CTRL] && translatedKeypress==0xE0)
         {
             translatedKeypress=0;
@@ -217,6 +211,14 @@ void kbd_handler_generic()
         }
         if (kKeyStatus[INDEX_ALT])
         {
+        //Debug
+            if (translatedKeypress=='q')
+            {
+                printk("Debugger started\n");
+                kKbdHandlerActivateDebugger=true;
+                activateDebugger();
+                __asm("int 0x3");
+            }
             if (translatedKeypress=='c')
             {
                 printk("%u",*kTicksSinceStart);

@@ -25,6 +25,9 @@
 .extern kPagingExceptionCount
 .extern GeneralProtectionFaultHandler
 .extern isrCounts
+.extern activateDebugger, kStopDebugging
+.extern kKbdHandlerActivateDebugger
+.extern debugStep
 
 .globl _gpfExceptionHandler
 .type _gpfExceptionHandler, @function
@@ -344,9 +347,18 @@ vector0:
   jmp alltraps
 .globl vector1
 vector1:
-  pushd 0
-  pushd 1
-  jmp alltraps
+  mov exceptionAX, eax
+  mov     al,kKbdHandlerActivateDebugger
+  cmp     al,1
+  jne done
+  orw [esp+8],0x100
+  mov al,0
+  mov kKbdHandlerActivateDebugger,al
+  mov eax,exceptionAX
+done:
+  sti
+  iretd
+
 .globl vector2
 vector2:
   pushd 0
@@ -354,9 +366,12 @@ vector2:
   jmp alltraps
 .globl vector3
 vector3:
-  pushd 0
-  pushd 3
-  jmp alltraps
+  #NOTE: This just sets the trap flag, next IRQ 1 gets called (IRQ 31 for us
+  pushad
+  orw [esp+8],0x100
+  call debugStep
+  popad
+  iretd
 .globl vector4
 vector4:
   pushd 0
