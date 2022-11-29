@@ -139,6 +139,5 @@ kernelDataLoadAddress = .;
     _days_abbrev = 0x8948;
     _months = 0x8980;
     _months_abbrev = 0x89c0;
-    kKbdHandlerActivateDebugger = 0x8a00;
     *(kernelData);
 }

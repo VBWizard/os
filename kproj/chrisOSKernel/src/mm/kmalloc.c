@@ -98,6 +98,7 @@ void kFree(void* address)
 {
     process_t *p=getCurrentProcess();
     freeI(p->pageDirPtr, address, NULL);
+    address = NULL;
 }
 
 void* kMalloc(size_t size)
@@ -108,27 +109,6 @@ void* kMalloc(size_t size)
     return (void*)allocateMemoryToProcess(size,isKernel);
 }
 
-
-heapPtrPage *getHeapPtr(uintptr_t address)
-{
-/*    heapPtrPage* ptrPg=kHeapPagePtr;
-    
-    while (1==1)
-    {
-        for (int cnt=0;cnt<(int)(POINTERS_PER_HEAP_PTR_PAGE);cnt++)
-        {
-            if (ptrPg->ptrs[cnt]->address <= address &&
-                    ptrPg->ptrs[cnt]->address+ptrPg->ptrs[cnt]->size >= address)
-                return ptrPg[cnt];
-            if (ptrPg->next==NO_NEXT_HEAP_PTR)
-                break;
-        }
-        if (ptrPg->next==NO_NEXT_HEAP_PTR)
-            return NULL;
-        ptrPg=(heapPtrPage*)ptrPg->next;
-    }*/
-    return NULL;
-}
 
 void* kCalloc(size_t num, size_t size)
 {
@@ -144,7 +124,7 @@ void kRealloc(void *ptr, size_t size)
     
 }
 
-//Called by syscall only
+//Called by syscall only - allocates heap for running user processes
 void* mallocI(uint32_t cr3, size_t size)
 {
     uint32_t newSize, retVal;

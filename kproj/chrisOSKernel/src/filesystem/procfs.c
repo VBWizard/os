@@ -157,6 +157,16 @@ void initPathTokens()
             memset(pathTokens[cnt],0,128);
 }
 
+void destroyPathTokens()
+{
+    if (pathTokens)
+        for (int cnt=0;cnt<20;cnt++)
+            if (pathTokens[cnt])
+                kFree(pathTokens[cnt]);
+    kFree(pathTokens);
+    pathTokens = NULL;
+}
+
 void *procOpenFile(void *file, const char *mode)
 {
     char path[128];
@@ -286,6 +296,7 @@ void procCloseFile(void *file)
     }
     else
         panic("procCloseFile: passed file is not a proc file\n");
+    destroyPathTokens();
     return;
 }
 
@@ -417,7 +428,7 @@ void *procDirOpen(const char* path, void* dir)
 int procDirClose(void *dir)
 {
     pdir_t *pdir=dir;
-    if (pdir->handle==pdir)
+    if (pdir->handle==pdir || pdir != NULL)
     {
         kFree(pdir);
     }

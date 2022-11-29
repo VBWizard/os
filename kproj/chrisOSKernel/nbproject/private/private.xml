@@ -19,7 +19,9 @@
         <group name="os"/>
         <group name="aproj"/>
         <group>
-            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/process.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOS/src/block/ahci.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/panic.c</file>
+            <file>file:/home/yogi/src/os/kproj/chrisOSKernel/src/dllist.c</file>
         </group>
     </open-files>
 </project-private>

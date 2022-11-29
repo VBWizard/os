@@ -23,6 +23,7 @@
 #include "task.h"
 #include "sysloader.h"
 #include "filesystem/pipe.h"
+#include "vfs.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
@@ -56,6 +57,7 @@ process_t *getCurrentProcess()
 
 void freeProcess(process_t *process)
 {
+    return;
     elfInfo_t *elf=process->elf;
     elfPageInfo_t *epi=elf->elfLoadedPages;
 
@@ -160,6 +162,7 @@ void freeProcess(process_t *process)
     kFree(process->argv);
     kFree(process);
     free_mmaps(process);
+    vfs_close_files_for_process(process);
     printd(DEBUG_PROCESS,"freeProcess: Done!  Process freed!\n");
 }
 
@@ -486,6 +489,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     else
         process = initializeProcess(isKernelProcess);
     
+    //Need a pointer to the process so that we can reference it through PROCESS_STRUCT_VADDR
+    process->this = process;
     //We will always load startHandlers whether we're createing a process or just loading into it
     process->startHandlerPtr=0; //CLR 12/23/2018: Initialize the start handler pointer to the first entry
 
@@ -658,7 +663,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         //This is our temporary fix to the problem.  Try to open the file and if it fails, return before unmapping!
         printd(DEBUG_PROCESS,"temp1\n", process->path);
         printd(DEBUG_PROCESS,"Opening %s because ... \n", process->path);
-        void* fPtr=fs_open(process->path, "r");
+        void* fPtr=fs_open(process->path, "r",NULL);
         if (fPtr==0)
         {
             if (useExistingProcess)

@@ -102,7 +102,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: open(%s,%s)\n",path, attrib);
-            retVal=(uint32_t)fs_open((char*)path, (char*)attrib);
+            retVal=(uint32_t)fs_open((char*)path, (char*)attrib,process);
             //NOTE: freopen only works with STDIN/STDOUT/STDERR
             if (retVal)
                 switch (param3)

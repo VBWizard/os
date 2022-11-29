@@ -746,7 +746,7 @@ elfInfo_t* sysLoadElf(char* fileName, elfInfo_t* pElfInfo, uintptr_t CR3)
 
     printd(DEBUG_ELF_LOADER,"Opening image file %s\n",elfInfo->fileName);
     //void* fPtr=fopen(elfInfo->fileName, "r");
-    void* fPtr=fs_open(elfInfo->fileName, "r");
+    void* fPtr=fs_open(elfInfo->fileName, "r",NULL);
     printd(DEBUG_ELF_LOADER,"fopen returned %u\n",fPtr);
     if (fPtr==0)
     {

@@ -32,6 +32,8 @@
 #include "filesystem/procfs.h"
 #include "fat/fat_filelib.h"
 
+#define KERNEL 1
+
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
 extern bool schedulerEnabled;

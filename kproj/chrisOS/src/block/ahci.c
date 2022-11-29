@@ -32,6 +32,7 @@ int ahciHostCount = 2;
 extern HBA_PORT* kAHCICurrentDisk;
 extern partEntry_t kAHCICurrentPart;
 extern HBA_MEM* ahciABAR;
+extern void panic(const char *format, ...);
 
 
 // Check device type

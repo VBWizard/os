@@ -26,7 +26,7 @@ void syslogd()
         
         if (bufptr)
         {
-            int* f=fs_open("/var/log/syslog","a");
+            int* f=fs_open("/var/log/syslog","a",NULL);
             if (f)
             {
                 printd(DEBUG_PROCESS,"Printing %u bytes to syslog\n",bufptr);

@@ -7,6 +7,7 @@
 #include "../../chrisOS/include/config.h"
 #include "fs.h"
 #include "alloc.h"
+#include "../../chrisOSKernel/include/panic.h"
 
 //Initialize a new list
 dllist_t* listInit(dllist_t* firstItem, void* payload)
@@ -61,10 +62,12 @@ dllist_t* listRemove(dllist_t* listHead, dllist_t* item)
     printList(listHead, "Before", item);
     dllist_t *listPrev = item->prev;
     dllist_t *listNext = item->next;
-    
+
     if (listPrev == item && listNext == item)
     {
-        listHead = NULL;
+        listHead = listNext;
+        if (listNext = item)
+            listHead = NULL;
         goto listRemoveReturn;
     }
     
@@ -76,14 +79,14 @@ dllist_t* listRemove(dllist_t* listHead, dllist_t* item)
             listPrev->next = listNext;
             goto listRemoveReturn;
         }
-        else                                //If there is not a next item
+        else                                //If there is not a next item (i.e. next = item)
         {
             listPrev->next = listPrev;          //Make the previous item the last
             goto listRemoveReturn;
         }
     }
     
-    if (listNext != item)                   //If we've gotten here there is no previous item, so just fixup the next item to make it the first
+    if (listNext != item)                   //If we've gotten here I am the first item and there are more items, so just fixup the next item to make it the first
     {
         listNext->prev = listNext;
         listHead = listNext;
@@ -91,6 +94,9 @@ dllist_t* listRemove(dllist_t* listHead, dllist_t* item)
     
     listRemoveReturn:
     printList(listHead, "After", item);
+    //CLR 11/27/2022 - Clean up code - free item after removing it
+    if (item!=NULL)
+        kFree(item);
     return listHead;
 }
 
