@@ -340,6 +340,8 @@ void close(eListType listType, void* entry)
     else
     {
         theFile->fops->close(theFile->handle);
+        if (!vfs_remove_from_open_list(rootFs, LIST_FILE, entry))
+            vfs_remove_from_open_list(procFs, LIST_FILE, entry);
         printd(DEBUG_FILESYS, "\t\tfs_close: freeing file_t resources\n");
         kFree(theFile->fops);
         kFree(theFile->f_path);

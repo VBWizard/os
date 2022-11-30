@@ -307,7 +307,7 @@ int fs_pipeI(process_t *process, int pipefd[2], int flags)
             pipe.file[0]->f_path, 
             pipe.file[0], 
             pipe.file[1], 
-            process->exename);
+            process==NULL?"{no process id}":process->exename);
     pipe.usecount=2;
     return 0;
 }

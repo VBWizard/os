@@ -93,6 +93,8 @@ overloadTaskRegister2:
     push eax
     mov eax, sigProcCR3
     mov cr3, eax
+    xor eax,eax             #reset the sigProcAddress variable since we are using it
+    mov sigProcAddress,eax
 overSignalReturn:
     mov ebx,isrSavedEBX
     mov eax, isrSavedEAX

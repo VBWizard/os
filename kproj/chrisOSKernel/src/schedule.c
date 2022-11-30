@@ -583,8 +583,14 @@ void runAnotherTask(bool schedulerRequested)
             taskToStopNewQueue=TASK_USLEEP;
          if ((pToStop->signals.sigind & SIGSEGV) == SIGSEGV)
         {
-            taskToStopNewQueue=TASK_ZOMBIE;
-            checkUSleepTasks(taskToStop);
+            if (!pToStop->signals.sighandler[SIGSEGV])
+            {
+                printd(DEBUG_SCHEDULER,"*Task 0x%04x: SIGSEGV received, no default handler  Executing default action (kill process).\n",taskToStop->taskNum);
+                taskToStopNewQueue=TASK_ZOMBIE;
+                checkUSleepTasks(taskToStop);
+            }
+            else
+                taskToStopNewQueue=TASK_RUNNABLE;
         }
         if ((pToStop->signals.sigind & SIGSTOP) == SIGSTOP)
         {
@@ -601,7 +607,7 @@ void runAnotherTask(bool schedulerRequested)
                 if (!pToStop->signals.sighandler[SIGINT])
                 {
                     printd(DEBUG_SCHEDULER,"*Task 0x%04x: SIGINT received, no default handler  Executing default action (kill process).\n",taskToStop->taskNum);
-                    taskToStopNewQueue=TASK_EXITED;
+                    taskToStopNewQueue=TASK_ZOMBIE; //CLR 11/30/2022 - changed from TASK_EXITED so that parent process can get exit code
                     checkUSleepTasks(taskToStop);
                 }   
                 else
@@ -663,7 +669,7 @@ void runAnotherTask(bool schedulerRequested)
             //Keep track of the context switch count
             process->cSwitches++;
         }
-        printd(DEBUG_SCHEDULER,"Active STDIN/STDOUT/STDERR=0x%08x/0x%08x/0x%08x, owner %s\n",activeSTDIN, activeSTDOUT, activeSTDERR, (process_t*)(activeSTDIN->owner)->exename);
+        printd(DEBUG_SCHEDULER,"Active STDIN/STDOUT/STDERR=0x%08x/0x%08x/0x%08x, owner %s\n",activeSTDIN, activeSTDOUT, activeSTDERR, (process_t*)(activeSTDIN->owner)->exename==NULL?"":(process_t*)(activeSTDIN->owner)->exename);
         
         //Move the new task onto the CPU
 #ifdef SCHEDULER_DEBUG
@@ -696,7 +702,7 @@ void runAnotherTask(bool schedulerRequested)
 
     }
 
-    if (strcmp(((process_t*)(taskToRun->process))->exename,"kshell")!=0)
+    if (taskToRun->taskNum==0x0022 && taskToStop->taskNum==0x0028)
     {
         int a = 0;
         a+=1;
@@ -704,10 +710,21 @@ void runAnotherTask(bool schedulerRequested)
 
     printd(DEBUG_SCHEDULER,"Starting process' signals = %u\n",((process_t*)(taskToRun->process))->signals.sigind);
 
-    if (((process_t*)taskToRun->process)->signals.sigind & SIGINT)
+    sigProcAddress = 0x0;
+    //If we got here there is a signal handler for the SIGINT/SIGSEGV
+    if (((process_t*)taskToRun->process)->signals.sigind & SIGINT || ((process_t*)taskToRun->process)->signals.sigind & SIGSEGV)
     {
-        printd(DEBUG_SCHEDULER,"Processing SIGINT for the starting process\n");
-        sigProcAddress = (uint32_t)((process_t*)taskToRun->process)->signals.sighandler[SIGINT];
+        if (((process_t*)taskToRun->process)->signals.sigind & SIGINT)
+        {
+            sigProcAddress = (uint32_t)((process_t*)taskToRun->process)->signals.sighandler[SIGINT];
+
+            printd(DEBUG_SCHEDULER,"Calling SIGINT handler for the starting process @ 0x%08x\n",sigProcAddress);
+        }
+        else
+        {
+            sigProcAddress = (uint32_t)((process_t*)taskToRun->process)->signals.sighandler[SIGSEGV];
+            printd(DEBUG_SCHEDULER,"Calling SIGSEGV handler for the starting process @ 0x%08x\n",sigProcAddress);
+        }
         sigProcCR3 = ((process_t*)taskToRun->process)->pageDirPtr;
         isrSavedEIP = (uint32_t)&_sigJumpPoint;
         //Got rid of the removing of signals.  This is because if a process doesn't have a SIGING signal handler 
@@ -771,6 +788,7 @@ int32_t getExitCode(uint32_t taskNum)
     process_t* process;
     
     printd(DEBUG_SCHEDULER,"getExitCode: Looking through ZOMBIE queue for exit code for task 0x%04x\n", taskNum);
+
 
     while (*q!=NO_NEXT)
     {

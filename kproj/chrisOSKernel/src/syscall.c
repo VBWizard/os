@@ -161,7 +161,9 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             if (genericFileHandle == (uintptr_t*)STDERR_FILE)
                 genericFileHandle = process->stderr;
             retVal=fs_write(process, genericFileHandle, (void*)param2, param3, 1);
+#ifdef DEBUG_FS_PIPES
             printd(DEBUG_FILESYS, "\t_sysCall: write() wrote %u bytes to %s from %s\n",retVal, ((file_t*)genericFileHandle)->f_path, process->exename);
+#endif
             __asm__("mov cr3,eax\n"::"a" (processCR3));
             break;
         case SYSCALL_SEEK: //seek(position,whence)
@@ -276,7 +278,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax"::"a" (processCR3));
             break;
         case SYSCALL_WAITFORPID:      //***waitForPID - param1=pid to check
-            LOAD_KERNEL_CR3;
+            __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             //Find out if the PID to be waited on has already exited
             process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: waitForPid(0x%08x)\n",param1);
