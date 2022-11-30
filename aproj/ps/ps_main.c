@@ -60,8 +60,8 @@ int main(int argc, char** argv)
             }
         }
         if (parentProc)
-            printf("%u\ttty%04u\t%s\t%s\n",parentProc->pid, parentProc->tty, parentProc->time,parentProc->name);
-        printf("%u\ttty%04u\t%s\t%s\n",currProc->pid, currProc->tty, currProc->time, currProc->name);
+            printf("%u\ttty%02u\t%s\t%s\n",parentProc->pid, parentProc->tty, parentProc->time,parentProc->name);
+        printf("%u\ttty%02u\t%s\t%s\n",currProc->pid, currProc->tty, currProc->time, currProc->name);
     }
     else
     {
