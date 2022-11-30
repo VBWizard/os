@@ -55,23 +55,34 @@ void freeI(void* fpointer)
 {
     heaprec_t* mp;;  //-1 means back up to the heaprec_t struct
     
-    if ((uint32_t)fpointer < heapBase || (uint32_t)fpointer > heapCurr)
-        return;
-    
     if (fpointer==NULL)
+    {
+        printdI(DEBUG_MALLOC, "libc_free: pointer is null, cannot be freed\n");
         return;             //CLR 04/20/2017: If pointer to be freed is NULL, don't do anything
+    }
+
+    if ((uint32_t)fpointer < heapBase || (uint32_t)fpointer > heapCurr)
+    {
+        printdI(DEBUG_MALLOC, "libc_free: Error ... pointer (0x%08x) is not between base(0x%08x) and current (0x%08x) heap pointers\n", fpointer, heapBase, heapCurr);
+        return;
+    }
+    
+    printdI(DEBUG_MALLOC, "libc_free: freeing memory at 0x%08x (called by instruction before 0x%08x)\n", fpointer, __builtin_return_address(0));
     HEAP_CURR(fpointer,mp);
     
     //printDebug(DEBUG_MALLOC,"libc_free: Freeing heap @ fp=0x%08X (mp=0x%08X)\n",fpointer,mp);
     if (mp->marker!=MALLOC_MARKER_VALUE)
     {
-        printI("malloc: marker not found error!!!\n");
+        printdI(DEBUG_MALLOC, "libc_free: verification marker not found, cannot free memory\n");
         return; //Return silently ... for now
     }
     mp->inUse=false;
 #ifdef MALLOC_CLEAR_ON_FREE
     uint32_t bytesToClear=0, bytesCleared=0;
     memset(fpointer,mp->len,MALLOC_DEFAULT_CLEAR_VALUE1);
+    printdI(DEBUG_MALLOC, "libc_free: pointer cleared and freed)\n");
+#else
+    printdI(DEBUG_MALLOC, "libc_free: pointer freed)\n");
 #endif
 }
 
@@ -126,7 +137,7 @@ void*  mallocI(size_t size)
 
     if (size<MALLOC_MIN_SIZE_TO_ALLOCATE)
         requestSize=MALLOC_MIN_SIZE_TO_ALLOCATE;
-    printdI(DEBUG_MALLOC,"libc_malloc: Request for 0x%08x bytes\n",requestSize);
+    printdI(DEBUG_MALLOC,"libc_malloc: Request for 0x%08x bytes from instruction before 0x%08x\n",requestSize,__builtin_return_address(0));
     if (heapBase>0)
     {
         heapPtr=mallocFindAvailableMemory(requestSize);
@@ -134,7 +145,7 @@ void*  mallocI(size_t size)
         {
             heapPtr->inUse=true;
             heapPtr->uses++;
-            printdI(DEBUG_MALLOC,"libc_malloc: Reusing heaprec=0x%08x, address=0x%08x (uses=%u)",heapPtr,HEAP_PTR_MEM_ADDR(heapPtr),heapPtr->uses);
+            printdI(DEBUG_MALLOC,"libc_malloc: Reusing heaprec=0x%08x, address=0x%08x (uses=%u)\n",heapPtr,HEAP_PTR_MEM_ADDR(heapPtr),heapPtr->uses);
             return ((void*)heapPtr)+sizeof(heaprec_t);
         }
     }
@@ -173,7 +184,7 @@ void*  mallocI(size_t size)
     printdI(DEBUG_MALLOC,"libc_malloc: heapCurr=0x%08x\n",heapCurr);
     retVal=((void*)(heapPtr)+sizeof(heaprec_t));
     heapCurr+=requestSize+(sizeof(heaprec_t));
-    printdI(DEBUG_MALLOC,"malloc: returning 0x%08X\n",retVal);
+    printdI(DEBUG_MALLOC,"libc_malloc: returning 0x%08X\n",retVal);
     lastHRCreated=heapPtr;
     return retVal;
 }

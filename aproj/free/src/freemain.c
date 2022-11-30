@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 {
     bool humanReadable=false;
     char temp[20]={0};
-    char *printVal=malloc(1024);
+    char *freeMem=malloc(1024);
     
     
     if (argc>1)
@@ -30,9 +30,10 @@ int main(int argc, char** argv)
             humanReadable=true;
     }
     
-    printVal=getFree(humanReadable,printVal,1024);
+    freeMem=getFree(humanReadable,freeMem,1024);
     
-    printf("%s",printVal);
+    printf("%s",freeMem);
+    free(freeMem);
     return 0;
 }
 

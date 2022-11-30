@@ -23,6 +23,7 @@
 #include "task.h"
 #include "sysloader.h"
 #include "filesystem/pipe.h"
+#include "vfs.h"
 
 extern time_t kSystemCurrentTime;
 extern task_t* submitNewTask(task_t *task);
@@ -56,6 +57,7 @@ process_t *getCurrentProcess()
 
 void freeProcess(process_t *process)
 {
+    return;
     elfInfo_t *elf=process->elf;
     elfPageInfo_t *epi=elf->elfLoadedPages;
 
@@ -146,14 +148,22 @@ void freeProcess(process_t *process)
         printd(DEBUG_FILESYS,"\tfreeProcess: Decremented pipe use count for stderr is %i, pipe is %s\n", ((pipe_t*)(process->stderr))->usecount, (bPipeClosed?"closed":"still open"));
         process->stderrRedirected=false;
     }*/
+
+    if (getTTYForPipe(process->stdout) == 0xFF)
+        close(LIST_FILE, process->stdout);
+    if (getTTYForPipe(process->stdin) == 0xFF)
+        close(LIST_FILE, process->stdin);
+    if (getTTYForPipe(process->stderr) == 0xFF)
+        close(LIST_FILE, process->stderr);
+
     kFree(process->stack1Start);
     kFree(process->path);
     kFree(process->cwd);
     kFree(process->argv);
     kFree(process);
     free_mmaps(process);
+    vfs_close_files_for_process(process);
     printd(DEBUG_PROCESS,"freeProcess: Done!  Process freed!\n");
-    
 }
 
 //NOTE: Assumes contiguous memory area
@@ -431,7 +441,7 @@ process_t *initializeProcess(bool isKernelProcess)
     process->processSyscallESP=process->task->tss->ESP1;
     process->priority=PROCESS_DEFAULT_PRIORITY;
     printd(DEBUG_PROCESS,"Mapping the process struct into the process, v=0x%08x, p=0x%08x\n",PROCESS_STRUCT_VADDR,process);
-    pagingMapPage(process->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000, (uint16_t)0x5); //FIX ME!!!  Had to change to 0x7 for sys_sigaction2 USLEEP
+    pagingMapPage(process->task->tss->CR3, PROCESS_STRUCT_VADDR, (uint32_t)process & 0xFFFFF000, (uint16_t)0x5); 
     pagingMapPage(process->task->tss->CR3, process->task, process->task, (uint16_t)0x5);
 
     uint32_t tssFlags=ACS_TSS;
@@ -479,6 +489,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
     else
         process = initializeProcess(isKernelProcess);
     
+    //Need a pointer to the process so that we can reference it through PROCESS_STRUCT_VADDR
+    process->this = process;
     //We will always load startHandlers whether we're createing a process or just loading into it
     process->startHandlerPtr=0; //CLR 12/23/2018: Initialize the start handler pointer to the first entry
 
@@ -651,7 +663,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         //This is our temporary fix to the problem.  Try to open the file and if it fails, return before unmapping!
         printd(DEBUG_PROCESS,"temp1\n", process->path);
         printd(DEBUG_PROCESS,"Opening %s because ... \n", process->path);
-        void* fPtr=fs_open(process->path, "r");
+        void* fPtr=fs_open(process->path, "r",NULL);
         if (fPtr==0)
         {
             if (useExistingProcess)
@@ -685,6 +697,8 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
             }
         }
     }
+
+    memset((void*)&process->signals,0,sizeof(process->signals));
 
     //printk("ESP-20=0x%08x, &schedulerEnabled=0x%08x",process->task->tss->ESP+20,&schedulerEnabled);
     printd(DEBUG_PROCESS,"Setting up the stack\n");
@@ -727,6 +741,7 @@ process_t* createProcess(char* path, int argc, char** argv, process_t* parentPro
         task_t *t = getCurrentTask();
         t->process=process;
         process->execDontSaveRegisters = true;
+        t->tss->EFLAGS |= 0x200;
         enableScheduler();
         triggerScheduler();
         __asm__("sti\nhlt\n");
@@ -778,6 +793,8 @@ uint32_t process_fork(process_t* currProcess)
     //The parent will maintain direct access to all of its memory.  Whenever the child tries to access the paren't memory
     //it is CoWed, so it is copied and the child gets access to the CoW page.
     CoWProcess(newProcess);
+
+    newProcess->mmaps = currProcess->mmaps;
 
     uint32_t tssFlags=ACS_TSS;
     uint32_t gdtFlags=GDT_PRESENT | GDT_CODE;

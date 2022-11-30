@@ -121,7 +121,7 @@ newTaskLoaded:
     #reset the task switched indicator
     mov eax, nextTaskTSS
     cmp eax,0
-    je overloadTaskRegister
+    #je overloadTaskRegister
     mov eax,0
     mov nextTaskTSS, eax
     mov schedulerTaskSwitched,eax

@@ -10,7 +10,7 @@ char *getFree(bool humanReadable, char *in, int inLen)
 {
     char *freeMemPtr=NULL;
     char *printPtr=NULL, *printEndPtr=NULL;
-    char *printVal=NULL;
+    char printVal[128];
     unsigned int freeMemory=0;
     char temp[20]={0};
     int* file=open("/proc/meminfo","r");
@@ -34,14 +34,12 @@ char *getFree(bool humanReadable, char *in, int inLen)
             }
             if (printEndPtr)
             {
-                printVal=malloc((int)printEndPtr-(int)printPtr+2);
                 strncpy(printVal,printPtr,(int)printEndPtr-(int)printPtr);
                 
                 freeMemory=atoi(printVal);
                 if (humanReadable)
                     freeMemory/=1048576;
                 sprintf(in,"%u%s\n",freeMemory,humanReadable?"M":"");
-                free(printVal);
             }
                 
         }

@@ -189,6 +189,8 @@ void freeI(uintptr_t cr3, void* physAddress, uintptr_t* virtAddress)
     sMemInfo* mInfo = findBlockByMemoryAddress(physAddress);
     int pageCounter=0;
     
+    printd(DEBUG_KMALLOC, "kFree: request to free phys=0x%08x, virt=0x%08x, cr3=0x%08x\n",physAddress, virtAddress, cr3);
+
     if (mInfo!=NULL)
         if (mInfo->inUse)
         {

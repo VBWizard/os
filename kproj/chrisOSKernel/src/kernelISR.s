@@ -25,6 +25,9 @@
 .extern kPagingExceptionCount
 .extern GeneralProtectionFaultHandler
 .extern isrCounts
+.extern activateDebugger, kStopDebugging
+.extern kKbdHandlerActivateDebugger
+.extern debugStep
 
 .globl _gpfExceptionHandler
 .type _gpfExceptionHandler, @function
@@ -300,6 +303,32 @@ execScheduler:
     #we need our own stack!
     mov eax, 0
     mov schedulerTriggered, eax
+    mov eax,[ebp]
+    mov isrSavedEIP,eax
+    mov eax,[ebp+4]
+    mov isrSavedCS,eax
+    mov eax,[ebp+8]
+    mov isrSavedFlags,eax
+
+    #Check to see if we're returning to the same priv level. 
+    #If we are then we can't (and don't need to) save the ESP and SS as they aren't on the stack
+    #We know we're returning to the scheduler which is ring 0, so if the saved CS is ring 3, we'll save the ESP & SS
+    #Grab the old CS value
+    mov eax,[ebp+4]
+
+    #is it ring 3?
+    and eax,3
+    cmp eax,3
+    
+    #nope, so jump over the ESP/SS saving code
+    jne notReturnDiffPrivLvl
+
+    #yep, so save the ESP/SS
+    mov eax,[ebp+12]
+    mov isrSavedESP,eax
+    mov eax,[ebp+16]
+    mov isrSavedSS,eax
+notReturnDiffPrivLvl:
     mov eax, schedStack
     add eax, 0x100
     mov esp, eax
@@ -318,9 +347,18 @@ vector0:
   jmp alltraps
 .globl vector1
 vector1:
-  pushd 0
-  pushd 1
-  jmp alltraps
+  mov exceptionAX, eax
+  mov     al,kKbdHandlerActivateDebugger
+  cmp     al,1
+  jne done
+  orw [esp+8],0x100
+  mov al,0
+  mov kKbdHandlerActivateDebugger,al
+  mov eax,exceptionAX
+done:
+  sti
+  iretd
+
 .globl vector2
 vector2:
   pushd 0
@@ -328,9 +366,12 @@ vector2:
   jmp alltraps
 .globl vector3
 vector3:
-  pushd 0
-  pushd 3
-  jmp alltraps
+  #NOTE: This just sets the trap flag, next IRQ 1 gets called (IRQ 31 for us
+  pushad
+  orw [esp+8],0x100
+  call debugStep
+  popad
+  iretd
 .globl vector4
 vector4:
   pushd 0

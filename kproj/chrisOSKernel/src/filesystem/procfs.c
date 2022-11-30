@@ -157,6 +157,16 @@ void initPathTokens()
             memset(pathTokens[cnt],0,128);
 }
 
+void destroyPathTokens()
+{
+    if (pathTokens)
+        for (int cnt=0;cnt<20;cnt++)
+            if (pathTokens[cnt])
+                kFree(pathTokens[cnt]);
+    kFree(pathTokens);
+    pathTokens = NULL;
+}
+
 void *procOpenFile(void *file, const char *mode)
 {
     char path[128];
@@ -286,6 +296,7 @@ void procCloseFile(void *file)
     }
     else
         panic("procCloseFile: passed file is not a proc file\n");
+    destroyPathTokens();
     return;
 }
 
@@ -417,7 +428,7 @@ void *procDirOpen(const char* path, void* dir)
 int procDirClose(void *dir)
 {
     pdir_t *pdir=dir;
-    if (pdir->handle==pdir)
+    if (pdir->handle==pdir || pdir != NULL)
     {
         kFree(pdir);
     }
@@ -574,7 +585,7 @@ void getStat(char *buffer, int buffersize, procfile_t *pf)
      int printPPID=0;
      if (taskNum>kKernelTask->taskNum)
          printPPID=proc->parent->task->taskNum;
-     sprintf(buffer,"%d (%s) %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %u %u %u",
+     sprintf(buffer,"%d (%s) %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %u %u %u %u",
              taskNum,                       //pid
              proc->exename,                 //comm
              procState,                     //state
@@ -597,6 +608,7 @@ void getStat(char *buffer, int buffersize, procfile_t *pf)
              0,                             //itrealvalue
              0,                             //starttime
              (uint32_t)proc->heapEnd-(uint32_t)proc->heapStart>0?(uint32_t)proc->heapEnd-(uint32_t)proc->heapStart:0, //vsize
-             calcProcessSize(proc)          //rss
+             calcProcessSize(proc),          //rss
+             proc->cSwitches
              );
 }

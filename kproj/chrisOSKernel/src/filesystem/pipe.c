@@ -31,7 +31,6 @@ filesystem_t *initpipefs()
     fops->close=&pipeclose;
     fops->seek=NULL;
     fs = kRegisterFileSystem("/pipe/", fops, NULL);
-    fs->files = kMalloc(sizeof(dllist_t));
     memset(openPipes,0,sizeof(pipes_t)*1000);
     kPipeWriteLock = 0;
     kPipeReadLock = 0;
@@ -284,9 +283,9 @@ int fs_pipeI(process_t *process, int pipefd[2], int flags)
     strcpy(mode, "r");
     if (flags & PIPENOBLOCK)
         strcat(mode, "n");
-    filer = fs_open("/pipe/",mode);
+    filer = fs_open("/pipe/",mode,process);
     strcpy(mode, "w");
-    filew = fs_open(filer->f_path,mode);
+    filew = fs_open(filer->f_path,mode,process);
     
     pipes[0] = (int)filer;
     pipes[1] = (int)filew;

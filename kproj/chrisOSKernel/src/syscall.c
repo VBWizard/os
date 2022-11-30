@@ -102,7 +102,7 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
             process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: open(%s,%s)\n",path, attrib);
-            retVal=(uint32_t)fs_open((char*)path, (char*)attrib);
+            retVal=(uint32_t)fs_open((char*)path, (char*)attrib,process);
             //NOTE: freopen only works with STDIN/STDOUT/STDERR
             if (retVal)
                 switch (param3)
@@ -142,8 +142,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
             break;
         case SYSCALL_READ:       //read(handle,buffer,size,length)
             __asm__("mov cr3,eax\n"::"a" (KERNEL_CR3));
-            process=getCurrentProcess();
             printd(DEBUG_SYSCALL,"\tsyscall: read(0x%08x,0x%08x,0x%08x,0x%08x)\n",param1,param2,param3);
+            process=getCurrentProcess();
             genericFileHandle = (uintptr_t*)param1;
             if (genericFileHandle == (uintptr_t*)STDIN_FILE)
                 genericFileHandle = process->stdin;
@@ -288,8 +288,8 @@ void _sysCall(uint32_t callNum, uint32_t param1, uint32_t param2, uint32_t param
                 //Set the return value that we'll pass back
                 printd(DEBUG_PROCESS,"\tsyscall: waitForPid: Found task 0x%08x in queue %u\n",waitForTask->taskNum, waitForTask->taskState);
                 retVal = getExitCode(param1);
-                if (retVal==0)
-                    panic("syscall: waitForPid: Unexpected, zombie task not found\n");
+                /*if (retVal==0)
+                    panic("syscall: waitForPid: Unexpected, zombie task not found\n");*/
                 taskExited = true;
                 enableScheduler();
             }

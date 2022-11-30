@@ -267,7 +267,7 @@ scanSleep:
             process_t *process = task->process;
             
             if (process->signals.sigdata[SIGSLEEP]<=*kTicksSinceStart || 
-                    process->signals.sigind & SIGIO)
+                    process->signals.sigind & SIGIO || process->signals.sigind & SIGINT)
             {
                 //while (__sync_lock_test_and_set(&kSigCheckLock, 1));
                 if (process->signals.sigdata[SIGSLEEP]<=*kTicksSinceStart)
@@ -286,6 +286,7 @@ scanSleep:
         }
         sleep++;
     }
+    //Can't trigger the scheduler from here because we're in kernel mode
     if (awoken) 
     {
         printd(DEBUG_SIGNALS,"Trigger the scheduler to process ... the awoken\n");

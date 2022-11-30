@@ -147,6 +147,7 @@ extern "C" {
         dirops_t* dops;
         void* handle;
         dllist_t listEntry;
+        void *owner;
     };
     
     struct direntry
@@ -169,8 +170,8 @@ extern "C" {
         file_operations_t* fops;
         dirops_t* dops;
         dllist_t inode_list;
-        dllist_t* files;
-        dllist_t* dirs;
+        file_t *files;
+        directory_t *dirs;
     };
     
     struct sfstat
@@ -183,7 +184,7 @@ extern "C" {
 
     
     filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const dirops_t * dops);
-    void* fs_open(char* path, const char* mode);
+    void* fs_open(char* path, const char* mode, process_t *process);
     int fs_read(process_t* process, void* file, void * buffer, int size, int length);
     int fs_write(process_t* process, void* file, void * buffer, int size, int length);
     int fs_seek(void* file, long offset, int whence);

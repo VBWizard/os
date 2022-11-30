@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 
-#include "fs.h"
 #include "kmalloc.h"
 #include "strings.h"
 #include "printf.h"
@@ -12,6 +11,7 @@
 #include "alloc.h"
 #include "errors.h"
 #include "filesystem/pipe.h"
+#include "vfs.h"
 
 extern filesystem_t* rootFs;
 extern filesystem_t* pipeFs;
@@ -31,6 +31,7 @@ char* vfs_readBuffer;
 volatile int kFileWriteLock;
 volatile int kFileReadLock;
 
+/*VFS register filesystem*/
 filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const dirops_t * dops)
 {
     filesystem_t *fs;
@@ -59,6 +60,8 @@ filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const
     fs->dops = kMalloc(sizeof(dirops_t));
     memcpy(fs->fops, fops, sizeof(fileops_t));
     memcpy(fs->dops, dops, sizeof(dirops_t));
+    fs->files = kMalloc(sizeof(file_t*)*VFS_MAX_OPEN_FILES);
+    fs->dirs = kMalloc(sizeof(directory_t*)*VFS_MAX_OPEN_DIRS);
     vfs_writeBuffer = NULL;
     vfs_readBuffer = NULL;
     kFileWriteLock = 0;
@@ -66,57 +69,20 @@ filesystem_t* kRegisterFileSystem(char *mountPoint, const fileops_t *fops, const
     return fs;
 }
 
-dllist_t* getListEntry(filesystem_t *fs, eListType listType, void* entryToFind)
-{
-    dllist_t* list;
-    
-    if (listType== LIST_DIRECTORY)
-        list = listHead(fs->dirs);
-    else
-        list = listHead(fs->files);
-    
-    while (1)
-    {
-        if (listType == LIST_FILE)
-        {
-            if (((file_t*)list->payload)->handle==entryToFind)
-                return list;
-        }
-        else if (((directory_t*)list->payload)==entryToFind)
-                return list;
-        if (list->next==list)
-            break;
-        list=listNext(list);
-            
-    }
-    return NULL;
-}
-
-void* getFileFromList(filesystem_t *fs, eListType listType, void* file)
-{
-    dllist_t* list;
-    
-    if (listType == LIST_DIRECTORY)
-        list = listHead(fs->dirs);
-    else
-        list = listHead(fs->files);
-    
-    return getListEntry(fs, listType, file)->payload;
-}
-
-
-void* fs_open(char* path, const char* mode)
+/*VFS open*/
+void* fs_open(char* path, const char* mode, process_t* process)
 {
     void* handle;
     dllist_t* list;
     file_t *file;
     bool isPipeFile=false;
     bool isProcFile=false;
-    
+
     printd(DEBUG_FILESYS, "\t\tfs_open: called with path=%s, mode=%s\n", path, mode);
     file = kMalloc(sizeof(file_t));
     memset(file,0,sizeof(file_t));
     
+    file->owner = process;
     //call the fs's open method
     if (strncmp(path,"/pipe/",6)==0)
     {
@@ -180,6 +146,10 @@ void* fs_open(char* path, const char* mode)
         file->verification=0xBABAABAB;
         file->copyBuffer=kMalloc(FS_FILE_COPYBUFFER_SIZE);
         printd(DEBUG_FILESYS, "\t\tfs_open: returning handle 0x%08x\n",handle);
+        if (isProcFile)
+            vfs_add_to_open_list(procFs, LIST_FILE, file);
+        else
+            vfs_add_to_open_list(rootFs, LIST_FILE, file);
         return file;
     }
     printd(DEBUG_FILESYS, "\t\tfs_open: returning NULL\n",handle);
@@ -230,6 +200,7 @@ int fs_read(process_t* process, void* file, void * buffer, int size, int length)
     return totalBytesRead;
 }
 
+/*VFS write*/
 int fs_write(process_t* process, void* file, void * buffer, int size, int length)
 {
     file_t* theFile = file;
@@ -250,6 +221,7 @@ int fs_write(process_t* process, void* file, void * buffer, int size, int length
     return retVal;
 }
 
+/*VFS seek*/
 int fs_seek(void* file, long offset, int whence)
 {
     file_t* theFile = file;
@@ -262,6 +234,7 @@ int fs_seek(void* file, long offset, int whence)
     return theFile->fops->seek(theFile->handle, offset, whence);
 }
 
+/*VFS fstat*/
 int fs_stat(process_t *process, void *path, fstat_t *buffer)
 {
     
@@ -273,6 +246,8 @@ int fs_stat(process_t *process, void *path, fstat_t *buffer)
     
     strcpy(lpath,path);
     strtrim(lpath);
+
+    //Invalid path passed
     if (*lpath==0 || strcmp(lpath,"/")==0)
     {
         if (process)
@@ -332,19 +307,7 @@ long fs_tell(void* file)
 
 void close(eListType listType, void* entry)
 {
-/*    dllist_t* foundEntry;
 
-    if (listType == LIST_DIRECTORY)
-        foundEntry = listHead(rootFs->dirs);
-    else
-        foundEntry = listHead(rootFs->files);
-
-    while (((file_t*)foundEntry->payload)->handle!=entry && foundEntry->next!=foundEntry)
-        foundEntry=foundEntry->next;
-    
-    if (((file_t*)foundEntry->payload)->handle!=entry && foundEntry==foundEntry)
-        panic("fs_close: handle not found in fs->files/fs->dirs");
-*/
     file_t* theFile = entry;
     directory_t *dir = entry;
     bool bPipeClosed = false;
@@ -356,7 +319,6 @@ void close(eListType listType, void* entry)
         {
             //panic("close: Referenced a file that is not a file!");
             printd(DEBUG_FILESYS, "close: Referenced a file that is not a file!");
-            
         }
     }
     else
@@ -366,6 +328,9 @@ void close(eListType listType, void* entry)
     if (listType == LIST_DIRECTORY)
     {
         dir->dops->close(dir->handle);
+        //Try to remove the file from the rootFS files.  If that doesn't work remove it from the procFs files
+        if (!vfs_remove_from_open_list(rootFs, LIST_DIRECTORY, entry))
+            vfs_remove_from_open_list(procFs, LIST_DIRECTORY, entry);
         printd(DEBUG_FILESYS, "\t\tfs_close: Freeing directory_t resources\n");
         kFree(dir->dops);
         kFree(dir->f_path);
@@ -401,10 +366,10 @@ void fs_close(void* file)
 void* fs_opendir(char* path)
 {
     void *handle;
-    dllist_t* list;
     directory_t *dir;
     bool isProcFS;
-    
+    process_t* owner=(process_t*)PROCESS_STRUCT_VADDR;
+
     isProcFS=strncmp(path,"/proc",5)==0?1:0;
 
     //call the fs's open method
@@ -415,26 +380,25 @@ void* fs_opendir(char* path)
         handle = rootFs->dops->open(path, handle);
     if (handle)
     {
-        list = kMalloc(sizeof(dllist_t));
         dir = kMalloc(sizeof(file_t));
+        dir->owner=owner->this;
         dir->f_path = kMalloc(1024);
         dir->dops = kMalloc(sizeof(dirops_t));
         //identify the fs that the path is on
 
         strncpy(dir->f_path, path, 1024);
         if (isProcFS)
-            memcpy(dir->dops, procFs->dops, sizeof(dirops_t));
-        else
-            memcpy(dir->dops, rootFs->dops, sizeof(dirops_t));
-        dir->handle = handle;
-
-        if (rootFs->dirs == NULL)
         {
-            rootFs->dirs = kMalloc(sizeof(dllist_t));
-            listInit(rootFs->dirs,dir);
+            memcpy(dir->dops, procFs->dops, sizeof(dirops_t));
+            vfs_add_to_open_list(procFs, LIST_DIRECTORY, dir);
         }
         else
-            listAdd(rootFs->dirs,list,dir);
+        {
+            memcpy(dir->dops, rootFs->dops, sizeof(dirops_t));
+            vfs_add_to_open_list(rootFs, LIST_DIRECTORY, dir);
+        }
+        dir->handle = handle;
+
         return dir;
     }
     return NULL;
@@ -442,12 +406,14 @@ void* fs_opendir(char* path)
 
 int fs_readdir(void* file, dirent_t *dirEntry)
 {
+    directory_t* dir = file;
 
-    directory_t* foundFile = getFileFromList(rootFs, LIST_DIRECTORY, file);
+/*    directory_t* foundFile = getFileFromList(rootFs, LIST_DIRECTORY, file);
     
     if (foundFile==NULL)
         panic("fs_readdir: file handle not found in fs->files");
-    return foundFile->dops->read(foundFile->handle, dirEntry);
+    return foundFile->dops->read(foundFile->handle, dirEntry);*/
+    return dir->dops->read(dir->handle, dirEntry);
 }
 
 int parsePath(const char *inPath, char *outPath, char *outFilename, char** outPathTokens, int outPathTokensArrayCount)
@@ -522,4 +488,9 @@ int getDirEntries(void *process, char* path, dirent_t *buffer, int buflen)
 int fs_unlink(char *filename)
 {
      return rootFs->fops->delete(filename);
+}
+
+void cleanupProcessFiles(process_t *process)
+{
+
 }

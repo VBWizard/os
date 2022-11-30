@@ -53,6 +53,7 @@ extern "C" {
     int execb(char* path);
     int waitpid(uint32_t pid);
     time_t time (time_t *result);
+    int setTZ(int newTZ);
     struct tm* gettime(struct tm *time, bool localTime);
     char* getcwd(char* buf, size_t size);
     char* setcwd(char* buf, size_t size);

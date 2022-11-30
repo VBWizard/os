@@ -21,6 +21,8 @@ extern void vector7();
 extern void vector10();
 extern void vector13();
 extern void vector14();
+extern void vector3();
+extern void vector1();
 extern void vector32();
 extern void vector40();
 extern void vector128();
@@ -146,6 +148,9 @@ __asm__("cli\n");
     //idt_set_gate (&idtTable[0xe], 0x8, (int)&vector14, ACS_INT);   //paging exception
     
     idt_set_gate (&idtTable[0xd], 0x8, (int)&vector13, ACS_INT);
+
+    idt_set_gate (&idtTable[0x1], 0x8, (int)&vector1, ACS_INT);
+    idt_set_gate (&idtTable[0x3], 0x8, (int)&vector3, ACS_INT);
 
     //Configure SysEnter/SysExit
     if (!kCPUFeatures.cpuid_feature_bits.sep)

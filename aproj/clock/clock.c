@@ -24,10 +24,22 @@ int main(int argc, char** argv) {
     int ticksSinceLastUpdate=0;
     int refreshInterval=TICKS_PER_SECOND / 5;
     time_t theTime;
-    
+    char tz[50];
+    char tzPos[50];
+    int itz = 0;
+
     while (1==1)
     {
-        //printd(DEBUG_USERPROCESS, "refreshInterval = %i, ticksSinceLastUpdate = %i, TICKS_PER_SECOND = %i\n",refreshInterval, ticksSinceLastUpdate, TICKS_PER_SECOND);
+        memset(tz,0,10);
+        memset(tzPos,0,10);
+        getenv("tz",tz);
+        bool bNegative = strstr(tz,"-");
+        if (bNegative)
+            strreplace(tz, "-","",tzPos);
+        itz = atoi(tzPos);
+        if (bNegative)
+            itz *= -1;
+        setTZ(itz);
         if (ticksSinceLastUpdate>=TICKS_PER_SECOND)
         {
             theTime=time(&theTime);

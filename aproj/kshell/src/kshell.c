@@ -449,7 +449,7 @@ getAKey:
                     lCurrKeyCount = 0;
                     if (echoInput)
                     {
-                        printf("\n");
+                        printf("^C\n");
                         prompt();
                     }
                 }

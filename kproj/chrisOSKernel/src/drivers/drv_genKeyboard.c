@@ -41,7 +41,7 @@ extern ttydevice_t *tty1, *tty2, *tty3, *tty4, *tty5, *tty6, *tty7, *tty8;
 extern pipe_t *activeSTDIN;
 extern pipe_t *activeSTDOUT;
 extern ttydevice_t *activeTTY;
-
+extern bool* kKbdHandlerActivateDebugger;
 uint32_t kbdTop=KEYBOARD_BUFFER_ADDRESS+KEYBOARD_BUFFER_SIZE;
 
 void kbd_handler_generic()
@@ -178,11 +178,11 @@ void kbd_handler_generic()
             //printk("^");
             if (translatedKeypress=='c') //CLR 12/30/2018: ^C pressed
             {
-                if (activeTTY->stdInWritePipe)
-                    pipewrite("^C\n", 2, 1, activeTTY->stdInWritePipe);
+                //if (activeTTY->stdInWritePipe)
+                //    pipewrite("^C\n", 2, 1, activeTTY->stdInWritePipe);
                 sys_sigaction2(SIGINT, NULL, 0, activeTTY->stdInReadPipe->owner);
                 printd(DEBUG_PROCESS,"Keyboard handler signalled SIGINT for process 0x%08x for CTRL+C keypress\n",activeTTY->stdInReadPipe->owner);
-                printk("CTRL+C pressed");
+                //printk("CTRL+C pressed");
                 goto timeToReturn;      //Don't want to process the "c" that triggered the SIGINT
             }
             else 
@@ -204,12 +204,6 @@ void kbd_handler_generic()
         }
         else
             panic("kbd_handler_generic: STDIN pipe is null! (2)\n");
-        //Debug
-        if (kKeyStatus[INDEX_ALT] && translatedKeypress==0x6A)
-        {
-            //__asm("int 0x3");
-            //kKbdHandlerActivateDebugger=true;
-        }
         if (kKeyStatus[INDEX_ALT] && kKeyStatus[INDEX_CTRL] && translatedKeypress==0xE0)
         {
             translatedKeypress=0;
@@ -217,6 +211,14 @@ void kbd_handler_generic()
         }
         if (kKeyStatus[INDEX_ALT])
         {
+        //Debug
+            if (translatedKeypress=='q')
+            {
+                printk("Debugger started\n");
+                kKbdHandlerActivateDebugger=true;
+                activateDebugger();
+                __asm("int 0x3");
+            }
             if (translatedKeypress=='c')
             {
                 printk("%u",*kTicksSinceStart);

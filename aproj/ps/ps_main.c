@@ -10,7 +10,8 @@
  *
  * Created on February 21, 2019, 11:36 AM
  */
-
+//CHANGELOG
+//CLR   11/25/2022  Changed pid & ppid display to base-10
 #include "libChrisOS.h"
 #include "../../top/include/top.h"
 
@@ -59,8 +60,8 @@ int main(int argc, char** argv)
             }
         }
         if (parentProc)
-            printf("0x%04x\ttty%04u\t%s\t%s\n",parentProc->pid, parentProc->tty, parentProc->time,parentProc->name);
-        printf("0x%04x\ttty%04u\t%s\t%s\n",currProc->pid, currProc->tty, currProc->time, currProc->name);
+            printf("%u\ttty%04u\t%s\t%s\n",parentProc->pid, parentProc->tty, parentProc->time,parentProc->name);
+        printf("%u\ttty%04u\t%s\t%s\n",currProc->pid, currProc->tty, currProc->time, currProc->name);
     }
     else
     {
@@ -71,7 +72,7 @@ int main(int argc, char** argv)
         for (int cnt=0;cnt<TOP_MAX_PROCESSES;cnt++)
         {
             if (topinfo[cnt]!=NULL)
-                printf("0x%04x\ttty%04u\t%s\t%s\n",topinfo[cnt]->pid, topinfo[cnt]->tty, topinfo[cnt]->time,topinfo[cnt]->name);
+                printf("%u\ttty%04u\t%s\t%s\n",topinfo[cnt]->pid, topinfo[cnt]->tty, topinfo[cnt]->time,topinfo[cnt]->name);
         }
     }
                 

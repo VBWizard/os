@@ -47,7 +47,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/f336e79e/kpaging.o \
 	${OBJECTDIR}/_ext/9e02dec1/iodugging.o \
 	${OBJECTDIR}/_ext/9e02dec1/memcpy.o \
-	${OBJECTDIR}/_ext/9e02dec1/panic.o \
 	${OBJECTDIR}/_ext/9e02dec1/printf.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcat.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strcmp.o \
@@ -60,6 +59,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/3e0a6d34/strstr.o \
 	${OBJECTDIR}/_ext/3e0a6d34/strtol.o \
 	${OBJECTDIR}/_ext/9e02dec1/time.o \
+	${OBJECTDIR}/debugger.o \
+	${OBJECTDIR}/panic.o \
 	${OBJECTDIR}/src/_scheduler.o \
 	${OBJECTDIR}/src/daemon/syslogd.o \
 	${OBJECTDIR}/src/device.o \
@@ -123,6 +124,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/task.o \
 	${OBJECTDIR}/src/utility.o \
 	${OBJECTDIR}/src/vfs.o \
+	${OBJECTDIR}/src/vsf_file_dir_list.o \
 	${OBJECTDIR}/src/x86.o \
 	${OBJECTDIR}/src/x86idt.o \
 	${OBJECTDIR}/strreplace.o
@@ -211,11 +213,6 @@ ${OBJECTDIR}/_ext/9e02dec1/memcpy.o: ../chrisOS/src/memcpy.c
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/memcpy.o ../chrisOS/src/memcpy.c
 
-${OBJECTDIR}/_ext/9e02dec1/panic.o: ../chrisOS/src/panic.c
-	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/panic.o ../chrisOS/src/panic.c
-
 ${OBJECTDIR}/_ext/9e02dec1/printf.o: ../chrisOS/src/printf.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
@@ -275,6 +272,16 @@ ${OBJECTDIR}/_ext/9e02dec1/time.o: ../chrisOS/src/time.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/9e02dec1
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/9e02dec1/time.o ../chrisOS/src/time.c
+
+${OBJECTDIR}/debugger.o: debugger.c
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/debugger.o debugger.c
+
+${OBJECTDIR}/panic.o: panic.c
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/panic.o panic.c
 
 ${OBJECTDIR}/src/_scheduler.o: src/_scheduler.s
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -587,6 +594,11 @@ ${OBJECTDIR}/src/vfs.o: src/vfs.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/vfs.o src/vfs.c
+
+${OBJECTDIR}/src/vsf_file_dir_list.o: src/vsf_file_dir_list.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -Iinclude -I../chrisOS/include -Iinclude/lwext4 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/vsf_file_dir_list.o src/vsf_file_dir_list.c
 
 ${OBJECTDIR}/src/x86.o: src/x86.s
 	${MKDIR} -p ${OBJECTDIR}/src

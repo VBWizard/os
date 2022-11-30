@@ -208,3 +208,12 @@ VISIBLE time_t time (time_t *result)
     memcpyI(result, &ticks, 4);
     return ticks;
 }
+
+VISIBLE int setTZ(int newTZ)
+{
+  if (newTZ >= -12 && newTZ <= 12)
+    libcTZ = newTZ;
+  else
+    newTZ = 0;
+  return newTZ;
+}

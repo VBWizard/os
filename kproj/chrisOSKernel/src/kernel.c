@@ -32,6 +32,8 @@
 #include "filesystem/procfs.h"
 #include "fat/fat_filelib.h"
 
+#define KERNEL 1
+
 extern char* kernelDataLoadAddress;
 extern struct gdt_ptr kernelGDT;
 extern bool schedulerEnabled;
@@ -110,15 +112,15 @@ int main(int argc, char** argv)  {
     globalMMapInit();
     initTerm();
     initTTY();
-    sysConsole1 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 0, 80, 50, "Main system console 0");
+    sysConsole1 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 1, 80, 50, "Main system console 1");
+    sysConsole2 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 2, 80, 50, "Main system console 2");
+    sysConsole3 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 3, 80, 50, "Main system console 3");
+    sysConsole4 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 4, 80, 50, "Main system console 4");
+    sysConsole5 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 5, 80, 50, "Main system console 5");
+    sysConsole6 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 6, 80, 50, "Main system console 6");
+    sysConsole7 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 7, 80, 50, "Main system console 7");
+    sysConsole8 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 8, 80, 50, "Main system console 8");
     tty1 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 1);
-    sysConsole2 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 1, 80, 50, "Main system console 0");
-    sysConsole3 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 2, 80, 50, "Main system console 0");
-    sysConsole4 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 3, 80, 50, "Main system console 0");
-    sysConsole5 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 4, 80, 50, "Main system console 0");
-    sysConsole6 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 5, 80, 50, "Main system console 0");
-    sysConsole7 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 6, 80, 50, "Main system console 0");
-    sysConsole8 = registerTerminal(TERMINAL_CONSOLE_MAJOR_NUMBER, 7, 80, 50, "Main system console 0");
     tty2 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 2);
     tty3 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 3);
     tty4 = registerTTY(TERMINAL_CONSOLE_MAJOR_NUMBER, 4);
@@ -211,6 +213,11 @@ int main(int argc, char** argv)  {
     tty6ShellProcess->childNumber=5;
     printk("All terminals started.");
     sys_sigaction(SIGUSLEEP,0,initialShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty2ShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty3ShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty4ShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty5ShellProcess->task->taskNum, kKernelProcess);
+    sys_sigaction(SIGUSLEEP,0,tty6ShellProcess->task->taskNum, kKernelProcess);
     printk("\n\nLast task was killed, shutting down the kernel ...\n");
     schedulerEnabled=false;
     printk("Disabled scheduler ...\n");

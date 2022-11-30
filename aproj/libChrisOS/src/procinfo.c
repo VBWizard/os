@@ -133,7 +133,10 @@ VISIBLE void buildAllProcInfoTs(procInfo_t **topinfo, int intervalTicks, int ite
                     strncpyI(pid,statBuffer,space-statBuffer);
                     int ipid=atoiI(pid);
                     if (topinfo[ipid]==NULL)
+                    {
+                        //printdI(DEBUG_MALLOC,"buildAllProcInfoTs: Mallocing memory for pid %u (pointer currently 0x%08x)\n",ipid, topinfo[ipid]);
                         topinfo[ipid]=mallocI(sizeof(procInfo_t));
+                    }
                     currProc=topinfo[ipid];
                     buildProcInfoTI(currProc, statBuffer, intervalTicks);
                     currProc->lastUpdateIteration=iteration;
