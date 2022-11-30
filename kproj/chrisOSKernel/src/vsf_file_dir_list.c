@@ -10,7 +10,6 @@ extern filesystem_t *rootFs, *pipeFs, *procFs;
 
 file_t *vfs_files;
 
-//TODO: Debug this!
 void *getListPtrAndMax(filesystem_t *fs, eListType type, int *maxItems)
 {
     void *retVal;
@@ -33,6 +32,7 @@ void *getListPtrAndMax(filesystem_t *fs, eListType type, int *maxItems)
     return retVal;
 }
 
+//VFS method to add the passed item to either the directory_t or file_t list
 void vfs_add_to_open_list(filesystem_t *fs, eListType type, void *item)
 {
     uint32_t *listPtr;
@@ -58,6 +58,7 @@ void vfs_add_to_open_list(filesystem_t *fs, eListType type, void *item)
 
 }
 
+//VFS method to remove the passed item from either the directory_t or file_t list
 bool vfs_remove_from_open_list(filesystem_t* fs, eListType type, void *item)
 {
     uint32_t *listPtr;
@@ -79,6 +80,7 @@ bool vfs_remove_from_open_list(filesystem_t* fs, eListType type, void *item)
     return true;
 }
 
+//VFS method to close open files/directories for a process
 int vfs_close_files_for_process(process_t *process)
 {
 
@@ -92,12 +94,13 @@ int vfs_close_files_for_process(process_t *process)
     //Populate our listPtr and maxItems variables
     listPtr = getListPtrAndMax(rootFs, LIST_DIRECTORY, &maxItems);
 
+    //Iterate the list looking for open directories that belong to the process in question
     while (*listPtr && currItem < maxItems)
     {
         directory_t *dir = *listPtr;
         if (dir->owner == process)
         {
-            //vfs_remove_from_open_list(rootFs, LIST_DIRECTORY, dir);
+            //Found a directory belonging to the process in question ... close it
             fs_close(dir);
             closedItems++;
         }
@@ -109,17 +112,19 @@ int vfs_close_files_for_process(process_t *process)
     //Populate our listPtr and maxItems variables
     listPtr = getListPtrAndMax(rootFs, LIST_FILE, &maxItems);
 
+    //Iterate the list looking for open files that belong to the process in question
     while (*listPtr && currItem < maxItems)
     {
         file_t *file = *listPtr;
         if (file->owner == process)
         {
-            //vfs_remove_from_open_list(rootFs, LIST_DIRECTORY, file);
+            //Found a file belonging to the process in question ... close it
             fs_close(file);
             closedItems++;
         }
         currItem++;
         listPtr++;
     }
+    //Return the # of files+directories closed
     return closedItems;
 }
